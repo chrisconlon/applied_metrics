@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{What is Time Series?}{3}{0}{1}
+\beamer@sectionintoc {2}{Theory of Time Series}{10}{0}{2}
+\beamer@sectionintoc {3}{Trends}{33}{0}{3}
+\beamer@sectionintoc {4}{Applications of Time Series}{52}{0}{4}

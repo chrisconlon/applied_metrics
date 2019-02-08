@@ -1,0 +1,155 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{focus}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 1: Time Series}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{frame}[fragile]{Course Objectives}
+\begin{itemize}
+\item Review Syllabus
+\item I will try and give an overview of a number of different methods, tools, and techniques
+\item I will try to teach the course in a very \alert{applied} manner.
+\begin{itemize}
+\item Will vary lecture to lecture on how much theory vs. application
+\end{itemize} 
+\item This is a small class- so what matters is what is useful to \alert{you} not to me.
+\end{itemize} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Course Organization}
+\begin{itemize}
+\item I will try and have a break in our (very long) lecture
+\item This is a small class-- please ask plenty of questions
+\item If you are lost - don't panic - so is everyone else!
+\item I will post slides and code examples to Github on the day of class
+\end{itemize} 
+\end{frame}
+
+\begin{frame}[fragile]{Grading}
+This is a Ph.D. course so you should be done worrying about grades by now
+\begin{itemize}
+\item (6) Problem Sets
+\item (1) Exam / Final Project
+\item Class Participation
+\end{itemize} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Textbooks}
+You should learn from as many sources as possible\\
+I will follow two main textbooks.
+\begin{itemize}
+\item Greene (2017). \textit{Econometric Analysis}. ISBN: 0134461363
+\item Tibshirani, Hastie, Friedman (2016), \textit{The Elements of Statistical Learning}. ISBN: 0387848576. Available online at \url{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}.
+\item The standard Econometrics Ph.D. course is a bit more theoretical: \url{https://www.ssc.wisc.edu/~bhansen/econometrics/}
+\end{itemize} 
+\end{frame}
+
+
+\begin{frame}[fragile]{Software/R stuff}
+\texttt{R} is basically two different languages
+\begin{itemize}
+\item Base \texttt{R} is derived from \texttt{S/S-Plus}
+\item ``Modern'' \texttt{R} lives in \texttt{tidyverse} with a very different structure
+\item I will jump back and forth as necessary, but I will try to present things from \texttt{tidyverse} when possible
+\item Most of my day-to-day is in \texttt{Python} so I am far from an expert in R.
+\end{itemize}
+\begin{minted}{R}
+#always
+library(tidyverse)
+\end{minted}
+\end{frame}
+
+
+\section*{Thanks!}
+
+\end{document}
