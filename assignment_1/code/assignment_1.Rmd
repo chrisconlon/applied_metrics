@@ -195,10 +195,8 @@ setwd(data_dir) # <- This is set in CODE SETUP section
                 #     set this variable to the folder where the data is
 
 ## Load Air Revenue Data ##
-# us_air_rev = read.csv('us_air_rev.csv')
 
 ## Load Air Load Factor Data ##
-# us_load_factor = read.csv('us_load_factor.csv')
 ```
 
 There are two ways to view data that you have loaded into memory in R.
