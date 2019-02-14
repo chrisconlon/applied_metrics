@@ -1,7 +1,7 @@
 ---
 title: "Problem Set 1"
 author: "Prof. Conlon"
-date: "Due: XXX"
+date: "Due: 2/15/19"
 output:
   pdf_document: default
   html_document: default
@@ -273,7 +273,7 @@ Fixing notation, we have:
 
 ## Problem 3 (Coding Exercise)
 
-In class, you have learned about the Wold decomposition, a fundamental result in time series analysis. This exercise will attempt to walk through Wold's theorem in practice. We have provided simulated time series data, where $Y_{t}$ is the t$^{th}$ observation from our data.
+In class, you have learned about the Wold decomposition, a fundamental result in time series analysis. This exercise will attempt to walk through Wold's theorem in practice. We have provided simulated time series data, in an .rda file called "ts_simulation.rda", where $Y_{t}$ is the t$^{th}$ observation from our data. To open this file, use the load command. The name of the dataframe is "sim". 
 
 **We now want you to do the following**:
 
