@@ -1,0 +1,14 @@
+\frametitle{High Dimensional FE Examples: Backus, Conlon Sinkinson (2019)}
+\footnotesize
+\begin{align*}
+\kappa_{fg,t} &= \beta_1 \log \text{Market Cap}_{f,t} + \beta_2\frac{1}{\text{Retail Share}_{f,t}} + \beta_3\text{Indexing}_{f,t} +\\
+&\beta_4 \text{Indexing}_{f,t}^2 + \beta_5 \text{Indexing}_{f,t}^3 \beta_5 BlackRock_{f,t} + \beta_6 Vanguard_{f,t} + \beta_7 StateStreet_{f,t}
+ + c_{f,g} + c_t + u_{f,g,t}
+\end{align*}
+
+\tiny
+\begin{minted}{R}
+require(lfe)
+fe4<-felm(data=data,kappa~I(1/(1-retail_share)) + I(log(market_cap))+ poly(normalized_l2,3) +
+BlackRock  + Vanguard + StateStreet| pair + quarter | 0 | pair)
+\end{minted}
