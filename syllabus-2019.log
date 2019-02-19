@@ -1,6 +1,7 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.27)  6 FEB 2019 10:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.27)  19 FEB 2019 10:45
 entering extended mode
  \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
 **syllabus-2019.tex
 (./syllabus-2019.tex
@@ -603,6 +604,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 112--114
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 114--115
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 117--118
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 124--126
 
  []
@@ -642,7 +653,7 @@ ive/2018/texmf-dist/fonts/type1/public/cm-super/sftt1095.pfb></usr/local/texliv
 e/2018/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texlive/2018/
 texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2018/texmf-d
 ist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on syllabus-2019.pdf (3 pages, 94348 bytes).
+Output written on syllabus-2019.pdf (3 pages, 94365 bytes).
 PDF statistics:
  68 PDF objects out of 1000 (max. 8388607)
  57 compressed objects within 1 object stream
