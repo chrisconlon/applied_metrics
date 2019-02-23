@@ -1,0 +1,125 @@
+---
+title: "Problem Set 2"
+author: "Prof. Conlon"
+date: "Due: 3/1/19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newcommand{\E}[1]{\ensuremath{\mathbb{E}\big[#1\big]}}
+\newcommand{\Emeasure}[2]{\ensuremath{\mathbb{E}_{#1}\big[#2\big]}}
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* estimatr (Tidyverse version of lm function)
+
+```{r,comment='\t\t',echo=FALSE}
+
+## This is a code chunk: it is outlined in grey and has R code inside of it
+## Note: you can change what is shown in the final .pdf document using arguments 
+##       inside the curly braces at the top {r, comment='\t\t'}. For example, you 
+##       can turn off print statements showing in the .pdf by adding 'echo=False' 
+##       i.e. changing the header to {r, comment='\t\t',echo=FALSE}
+
+## ~~~~~~~~~~~~~~ CODE SETUP ~~~~~~~~~~~~~~ ##
+
+# ~ This bit of code will be hidden after Problem Set 1 ~
+#
+# This section sets up the correct directory structure so that
+#  the working directory for your code is always in the data folder
+
+# Retrieve the code working directory
+#script_dir = dirname(sys.frame(1)$ofile)
+initial_options <- commandArgs(trailingOnly = FALSE)
+render_command <- initial_options[grep('render',initial_options)]
+script_name <- gsub("'", "", 
+                    regmatches(render_command, 
+                               gregexpr("'([^']*)'",
+                               render_command))[[1]][1])
+
+# Determine OS (backslash versus forward slash directory system)
+sep_vals = c(length(grep('\\\\',script_name))>0,length(grep('/',script_name))>0)
+file_sep = c("\\\\","/")[sep_vals]
+
+# Get data directory
+split_str = strsplit(script_name,file_sep)[[1]]
+len_split = length(split_str) - 2
+data_dir = paste(c(split_str[1:len_split],'data',''),collapse=file_sep)
+
+# Check that the data directory contains the files for this weeks assignment
+data_files = list.files(data_dir)
+if(any(sort(data_files)!=sort(c('prob_4_simulation.rda')))){
+  cat("ERROR: DATA DIRECTORY NOT CORRECT\n")
+  cat(paste("data_dir variable set to: ",data_dir,collapse=""))
+}
+
+```
+
+
+## Problem 1 (Analytical Exercise)
+
+Consider the estimation of the individual effects model:
+
+\begin{align*}
+	y_{it} = x_{it}'\beta + \alpha_{i} + \epsilon_{it} \mbox{,     } \E{\epsilon \vert x_{it},\alpha_{i}} = 0
+\end{align*}
+where $i=\{1,...,n\}$ and $t=\{1,...,T\}$.
+\newline
+This exercises ask you to relate the (random effects) GLS estimator $\hat{\beta}_{GLS}=(X_{*}'X_{*})^{-1}X_{*}'y_{*}$ to the "within" (fixed-effects) estimator $\hat{\beta}_{FE}=(\dot{X}'\dot{X})\dot{X}'\dot{y}$ and the "between" estimator $\hat{\beta}_{BW}=(\bar{X}'\bar{X})^{-1}\bar{X}'\bar{y}$ where $w=\{x,y\}$:
+\begin{align*}
+	\bar{w}_{i} &:= \frac{1}{T} \sum_{i=1}^{T} w_{i} \\
+	\dot{w}_{i} &:= w_{it} - \bar{w}_{i} \\
+	w_{it,*} &:= w_{it} - (1-\lambda)\bar{w}_{i} \\
+	\lambda^{2} &= \frac{Var(\epsilon)}{T\,Var(\alpha_{i}) + Var(\epsilon_{it})}
+\end{align*}
+
+\begin{enumerate}
+	\item Express the GLS estimator in terms of $\bar{X}$, $\dot{X}$, $\bar{y}$, $\dot{y}$, $\lambda$, and $T$.
+	\item Show that there is a matrix R depending on $\bar{X}$, $\dot{X}$, $\lambda$ and $T$ such that the GLS estimator is a weighted average of the "within" and "between" estimators: 
+	\begin{align*}
+		\hat{\beta}_{GLS} = R \hat{\beta}_{FE} + (I-R)\hat{B}_{W}
+	\end{align*}
+	\item What happens to the relative weights on the "within" and "between" estimators as we increase the sample size, i.e. $T \to \infty$?
+	\item Suppose that the random effects assumption $\E{\alpha_{i} \vert x_{i1,...,x_{iT}}} = 0$ does not hold. Characterize the bias of the estimators $\hat{\beta}_{FE}$, $\hat{\beta}_{W}$. (Note: An estimator $\hat{\beta}$ is unbiased if $\E{\hat{\beta}}=\beta$)
+	\item Use your result from $(d)$ to give a formula for the bias of our random effects estimator $\hat{\beta}_{GLS}$. What happens to the bias as $T \to \infty$.
+\end{enumerate}
+
+## Problem 2 (Coding Exercise)
+
+We observe $N$ observations of the random variable $X_{i}$ where each $X_{i}$ is drawn from the Weibull distribution:
+
+\begin{align*}
+	X_{i} \sim W(\gamma)
+\end{align*}
+
+The probability density function for the Weibull is the following:
+
+\begin{align*}
+	f(x;\gamma) = \gamma x^{\gamma - 1} \exp(-(x^{\gamma})) \;\; ; x \geq 0 , \gamma > 0
+\end{align*}
+
+\begin{enumerate}
+	\item Assume our $N$ observations are independent and identically distributed, what is the log-likelihood function?
+	\item Calculate the gradient (or first derivative) of your log-likelihood function.
+	\item Using the first order condition, what is the MLE estimator for $\gamma$?
+	\item Verify that the second order condition guarantees a unique global solution. 
+	\item In R, I want you to write a function called mle\_weibull that takes two arguments $(X,\gamma)$, where $X$ is a vector of data and $\gamma$ is a scalar. The function returns the value of the log-likelihood function you derived in the last part.
+	\item Optimiziation routines can either be given a first derivative (or gradient) or the optimization routines calculate numerical derivatives. We will be using the R function $optim$, which accepts the first derivative as an argument $gr$. 
+	\begin{itemize}
+		\item[a.] We first want you to run $optim$ without supplying a first derivative (leaving gr out of the function). Note, to run optim you will need to supply your data $X$ as an additional parameter at the end of the function. We have provided you with simulated data in the file 'prob\_4\_simulation.rda' located in the data folder. 
+		\item[b.]  We now want you to create a new function called gradient, which takes the same two arguments as your likelihood function. Now calculate the MLE using optim with the gradient.
+		\item[c.] Compare both the number of iterations until convergence and your estimated $\gamma$ values from both runs. 	
+	\end{itemize}
+\end{enumerate}
+
+
+
