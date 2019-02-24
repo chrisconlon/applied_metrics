@@ -105,23 +105,38 @@ We've discussed the \alert{least squares estimator}:
 \end{frame}
 
 
+\begin{frame}{Review: What is a Likelihood?}
+Suppose we write down the joint distribution of our data $(y_i,x_i)$ for $i=1,\ldots,n$.
+\begin{align*}
+Pr(y_1,\ldots,y_n, x_1,\ldots,x_n | \theta)
+\end{align*}
+If  $(y_i,x_i)$ are I.I.D then we can write this as:
+\begin{align*}
+ Pr(y_1,\ldots,y_n, x_1,\ldots,x_n | \theta) = \prod_{i=1}^N Pr(y_i, x_i | \theta) \propto \prod_{i=1}^N Pr(y_i | x_i , \theta)=L( \mathbf{y}| \mathbf{x} ,\theta )
+\end{align*}
+We call this $L( \mathbf{y}| \mathbf{x} ,\theta )$ the \alert{likelihood} of the observed data.
+\end{frame}
+
+
+
+
 \begin{frame}{MLE: Example}
 If we know the distribution of $\varepsilon_i$ we can construct a \alert{maximum likelihood estimator}
 \begin{align*}
-(\widehat{\beta}_{MLE},\widehat{\sigma}^2_{MLE} &= \arg \min_{\beta,\sigma^2} \L(\beta,\sigma^2)
+(\widehat{\beta}_{MLE},\widehat{\sigma}^2_{MLE}) &= \arg \min_{\beta,\sigma^2} L(\beta,\sigma^2)
 \end{align*}
 Where 
 \begin{align*} 
 L(\beta,\sigma^2) &= \prod_{i=1}^N p(y_i | x_i,\beta,\sigma^2) \\
                   &= \prod_{i=1}^N \frac{1}{\sqrt{2 \pi \sigma^2}} \exp \left[-\frac{1}{2\sigma^2}(Y_i - X_i' \beta)^2 \right]\\
-l(\beta,\sigma^2) &= \sum_{i=1}^N -\frac{1}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2}(Y_i - X_i' \beta)^2
+l(\beta,\sigma^2) &= \sum_{i=1}^N -\frac{1}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i=1}^N(Y_i - X_i' \beta)^2
 \end{align*}
 \end{frame}
 
 \begin{frame}{MLE: FOC's}
 Take the FOC's
 \begin{align*}
-l(\beta,\sigma^2) &= \sum_{i=1}^N -\frac{1}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2}(Y_i - X_i' \beta)^2
+l(\beta,\sigma^2) &= -\frac{N}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i=1}^N(Y_i - X_i' \beta)^2
 \end{align*}
 Where 
 \begin{align*} 
@@ -137,11 +152,11 @@ Note: the unbiased estimator uses $\frac{1}{N-K-1}$.
 \item Start with the \alert{joint density of the data} $Z_1,\ldots,Z_N$ with density $f_Z(z,\theta)$
 \item Construct the likelhood function of the sample $z_1,\ldots,z_n$
 \begin{align*}
-L(\theta) = \prod_{i=1}^N f_Z(z_i,\theta)
+L(\mathbf{z} | \theta) = \prod_{i=1}^N f_Z(z_i,\theta)
 \end{align*}
 \item Construct the \alert{log likelihood} (this has the same $\arg \max$)
 \begin{align*}
-l(\theta) = \sum_{i=1}^N \ln f_Z(z_i,\theta)
+l(\mathbf{z} | \theta) = \sum_{i=1}^N \ln f_Z(z_i,\theta)
 \end{align*}
 \item Take the FOC's to find $\widehat{\theta}_{MLE}$
 \begin{align*}
@@ -187,7 +202,7 @@ We have defined what is known as a (constant) \alert{Hazard Model}
 \begin{itemize}
 \item Survivor Function: $S(y) = 1 - F_Y(y) = \exp(-y \theta)$
 \item Hazard Function: $\lim_{dy \rightarrow 0^{+}} \frac{Pr(y < Y < y +dy}{Pr(y < Y)} =\frac{f_Y(y)}{S(y)} = \theta$
-\item Exponential has \alert{constant hazard property}
+\item Exponential has \alert{constant hazard property} (We will show this later).
 \end{itemize}
 \end{frame}
 
@@ -338,7 +353,7 @@ l ( \theta ) = - N \cdot \ln ( 2 \pi ) - \sum _ { i = 1 } ^ { N } \left( z _ { i
 
 \begin{frame}{MLE: Example \# 2}
 \begin{itemize}
-\item $Z_i = (Y_i, X_i)$  $X_i$ has finite mean and variance (but arbitrary distribution)
+\item $Z_i = (Y_i, X_i)$---   $X_i$ has finite mean and variance (but arbitrary distribution)
 \item $(Y_i | X_i  x) \sim N(x' \beta_0, \sigma_0^2)$
 \begin{align*}
 \widehat{\beta}_{MLE} &= (X'X)^{-1} X'Y\\
@@ -351,7 +366,7 @@ l ( \theta ) = - N \cdot \ln ( 2 \pi ) - \sum _ { i = 1 } ^ { N } \left( z _ { i
 
 \begin{frame}{MLE: Example \# 3}
 \begin{itemize}
-\item $Z_i = (Y_i, X_i)$  $X_i$ has finite mean and variance (but arbitrary distribution)
+\item $Z_i = (Y_i, X_i)$---   $X_i$ has finite mean and variance (but arbitrary distribution)
 \item $Pr(Y_i=1 | X_i  x) =  \frac{e^{x' \theta_0}}{1+ e^{x'\theta_0}}$
 \item Solution is the \alert{logit} model.
 \item No simple MLE solution, establishing properties is not obvious...
@@ -402,11 +417,13 @@ Therefore
 \begin{frame}{Information Matrix Equality}
 We can relate the \alert{Fisher Information} to the Hessian of the log-likelihood
 \begin{align*}
-\mathcal { I } \left( \theta _ { 0 } \right) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta } \left( z ; \theta _ { 0 } \right) \right] = \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \cdot \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( z ; \theta _ { 0 } \right) \right]
+\mathcal { I } \left( \theta _ { 0 } \right) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta } \left( z ; \theta _ { 0 } \right) \right] 
+= \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \times \frac { \partial \ln f } { \partial \theta  } \left( z ; \theta _ { 0 } \right)' \right]
 \end{align*}
 \begin{itemize}
     \item This is sometimes known as the \alert{outer product of scores}.
     \item This matrix is \alert{negative definite}
+    \item Recall that $ \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \right]\approx 0$ at the maximum
 \end{itemize}
 \end{frame}
 
@@ -457,8 +474,9 @@ l( \beta ) = \sum _ { i = 1 } ^ { N } \ln f _ { Y | X } \left( y _ { i } | x _ {
 \end{align*}
 And Score, Hessian, and Information Matrix:
 \begin{align*}
-\mathcal { S } ( y , x , \beta ) &= x ^ { \prime } \left( 1 - y \exp \left( x ^ { \prime } \beta \right) \right)\\
-\mathcal { H } ( y , x , \beta ) &= - y x x ^ { \prime } \exp \left( x ^ { \prime } \beta \right)\\
+\mathcal { S }_i ( y_i, x_i , \beta ) &= x_i ^ { \prime } \left( 1 - y_i \exp \left( x_i ^ { \prime } \beta \right) \right)\\
+\mathcal { H }_i ( y_i , x_i , \beta ) &= - y_i x_i x_i ^ { \prime } \exp \left( x_i ^ { \prime } \beta \right)\\
+% WHERE DOES THIS COME FROM
 \mathcal { I } \left( \beta _ { 0 } \right) &= \mathbb { E } \left[ Y X X ^ { \prime } \exp \left( X ^ { \prime } \beta _ { 0 } \right) \right] = \mathbb { E } \left[ X X ^ { \prime } \right]
 \end{align*}
 \end{frame}
@@ -466,7 +484,40 @@ And Score, Hessian, and Information Matrix:
 
 \section*{Computing Maximum Likelihood Estimators}
 
-\begin{frame}{Newton's Method}
+\begin{frame}{Newton's Method for Root Finding}
+Consider the Taylor series for $f(x)$ approximated around $f(x_0)$:
+\begin{align*}
+f(x) \approx f(x_0) + f'(x_0) \cdot (x-x_0) + f''(x_0) \cdot (x-x_0)^2 + o_p(3)
+\end{align*}
+Suppose we wanted to find a \alert{root} of the equation where $f(x^{*})=0$ and solve for $x$:
+\begin{align*}
+0 &= f(x_0) + f'(x_0) \cdot (x-x_0) \\
+x_1 &= x_0-\frac{f(x_0)}{f'(x_0)} 
+\end{align*}
+This gives us an \alert{iterative} scheme to find $x^{*}$:
+\begin{enumerate}
+\item Start with some $x_k$. Calculate $f(x_k),f'(x_k)$
+\item Update using $x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)} $
+\item Stop when $|x_{k+1}-x_{k}| < \epsilon_{tol}$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Newton-Raphson for Minimization}
+We can re-write \alert{optimization} as \alert{root finding};
+\begin{itemize}
+\item We want to know $\hat{\theta} = \arg \max_{\theta} \ell(\theta)$.
+\item Construct the FOCs $\frac{\partial \ell}{\partial \theta}=0 \rightarrow$  and find the zeros.
+\item How? using Newton's method! Set $f(\theta) = \frac{\partial \ell}{\partial \theta}$
+\end{itemize}
+\begin{align*}
+\theta_{k+1} &= \theta_k -  \left[ \frac{\partial^2 \ell}{\partial \theta^2}(\theta_k) \right]^{-1} \cdot \frac{\partial \ell}{\partial \theta}(\theta_k)
+\end{align*}
+The SOC is that $ \frac{\partial^2 \ell}{\partial \theta^2} >0$. Ideally at all $\theta_k$.\\
+This is all for a \alert{single variable} but the \alert{multivariate} version is basically the same.
+\end{frame}
+
+
+\begin{frame}{Newton's Method: Multivariate}
 Start with the objective $Q(\theta) = - l(\theta)$:
 \begin{itemize}
 \item Approximate $Q(\theta)$ around some initial guess $\theta_0$ with a quadratic function
@@ -475,7 +526,7 @@ Start with the objective $Q(\theta) = - l(\theta)$:
 \begin{align*}
 \theta_{k+1} = \theta_k - \left[ \frac{\partial^2 Q}{\partial \theta \partial \theta'} \right]^{-1}\frac{\partial Q}{\partial \theta}(\theta_k)
 \end{align*}
-\item An important property is whether the \alert{Hessian Matrix} is positive semi-definite at all $\theta$.
+\item The equivalent SOC is that the {Hessian Matrix} is \alert{positive semi-definite}  (ideally at all $\theta$).
 \item In that case the problem is \alert{globally convex} and has a \alert{unique maximum} that is easy to find.
 \end{itemize}
 \end{frame}
@@ -487,12 +538,12 @@ f ( y | x , \beta _ { 0 } ) = { e } ^ { x ^ { \prime } \beta _ { 0 } } \exp \lef
 \end{align*}
 This gives the log-likelihood
 \begin{align*}
-l ( \beta ) = \sum _ { i = 1 } ^ { N } \ln f \left( y _ { i } | x _ { i } , \beta \right) = \sum _ { i = 1 } ^ { N } x _ { i } ^ { \prime } \beta - y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right)
+\ell ( \beta ) = \sum _ { i = 1 } ^ { N } \ln f \left( y _ { i } | x _ { i } , \beta \right) = \sum _ { i = 1 } ^ { N } x _ { i } ^ { \prime } \beta - y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right)
 \end{align*}
 With derivatives (No analytic solution!)
 \begin{align*}
-\frac { \partial L } { \partial \beta } ( \beta ) &= \sum _ { i = 1 } ^ { N } x _ { i } \cdot \left( 1 - y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right) \right)\\
-\frac { \partial ^ { 2 } L } { \partial \beta \partial \beta ^ { \prime } } ( \beta ) &= - \sum _ { i = 1 } ^ { N } x _ { i } x _ { i } ^ { \prime } \cdot y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right)
+\frac { \partial \ell } { \partial \beta } ( \beta ) &= \sum _ { i = 1 } ^ { N } x _ { i } \cdot \left( 1 - y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right) \right)\\
+\frac { \partial ^ { 2 } \ell } { \partial \beta \partial \beta ^ { \prime } } ( \beta ) &= - \sum _ { i = 1 } ^ { N } x _ { i } x _ { i } ^ { \prime } \cdot y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right)
 \end{align*}
 This is PD if $\sum x_i x_i'$
 \end{frame}
@@ -1132,7 +1183,7 @@ l(x_1,\ldots,x_n | \theta) = \sum_{i=1}^N  \log \left( \sum_{k=1}^K I[z_i = k]  
 \end{eqnarray*}
 \item We iterate between updating $\hat{\alpha}_k(\theta^{(q)})$ (E-step) and $\hat{\theta}^{(q+1)}$ (M-step)
 \item For the mixture of normals we can compute the M-step very easily:
-\begin{eqnarray*}https://en.wikipedia.org/wiki/Jensen%27s_inequality#General_inequality_in_a_probabilistic_setting
+\begin{eqnarray*}
 \mu_k^{(q+1)} &=& \frac{1}{N} \sum_{i=1}^N \hat{\alpha}_k(\theta^{(q)}) x_{i}\\
 \sigma_k^{(q+1)} &=& \frac{1}{N} \sum_{i=1}^N \hat{\alpha}_k(\theta^{(q)}) (x_{i} - \overline{x})^2 \\
 \end{eqnarray*}

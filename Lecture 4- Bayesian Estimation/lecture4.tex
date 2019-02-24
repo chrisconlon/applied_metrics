@@ -69,7 +69,7 @@
 
 
 % \usepackage{slashbox}
-\title{Lecture 2: Basics of Panel Data}
+\title{Lecture 4: Bayesian Analysis}
 \author{Chris Conlon }
 \institute{NYU Stern }
 
@@ -92,63 +92,29 @@
 \begin{document}
 \maketitle
 
-
-
-\section{Advanced Linear Models}
-
-\begin{frame}{Hierarchical Linear Models}
-An Example
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Suppose that we toss a coin several times with $x_i \in \{H,T\}=\{1,0\}$ 
+\item $\mathbf{X} = \{H,T,H,H,\ldots\}$.
+\item Suppose that the probability of heads $Pr(x_i = H) = p$.
+\item What is the likelihood of an observed sequence of $\mathbf{X}$? where $x_i$ are I.I.D.
 \begin{align*}
-Y_{it} &= X_{it}'\beta_i + \varepsilon_{it}\\
-\varepsilon_{it} | X_{it} &\sim N(0,\sigma^2)
+Pr(x_i | p) &= p^{x_i} (1-p)^{1-x_i} \\
+Pr(\mathbf{X} | p) &=  p^{\sum_i x_i} (1-p)^{\sum_i (1- x_i)} 
 \end{align*}
-
-Two Possibilities:
-\begin{align*}
-\left( \begin{array} { c } { \beta _ { 1 } } \\ { \vdots } \\ { \beta _ { N } } \end{array} \right) \sim \mathcal { N } \left( \left( \begin{array} { c } { 0 } \\ { \vdots } \\ { 0 } \end{array} \right) , \tau ^ { 2 } \cdot 
-\left( \begin{array} { c c c } { \mathcal { I } _ { \mathcal { K } } } & { \ldots } & { 0 } \\ { \vdots } & { \ddots } & { \vdots } \\ { 0 } & { \cdots } & { I _ { \mathcal { K } } } \end{array} 
-\right) 
-\right)
-\end{align*}
-
-
-\begin{align*}
-\left( \begin{array} { c } { \beta _ { 1 } } \\ { \vdots } \\ { \beta _ { N } } \end{array} \right) \sim \mathcal { N } \left( \left( \begin{array} { c } { 0 } \\ { \vdots } \\ { 0 } \end{array} \right) , \tau ^ { 2 } \cdot 
-\left( \begin{array} { c c c } { \mathcal { I } _ { \mathcal { K } } } & { \ldots } & { \rho \cdot \mathcal { I } _ { \mathcal { K } } } \\ { \vdots } & { \ddots } & { \vdots } \\ { \rho \cdot \mathcal { I } _ { \mathcal { K } } } & { \ldots } & { \mathcal { I } _ { \kappa } } \end{array} 
-\right) \right)
-\end{align*}
-
-
-
+\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Packages for Today}
-Let's load some packages so that I can make some better looking plots:\\
-\begin{minted}{R}
-#always
-library(tidyverse)
-# for SE's
-library(estimatr)
-library(broom)
-# for Panel
-library(lfe)
-library(plm)
-\end{minted}
+\begin{frame}{Introduction: MLE for coin toss}
+\begin{itemize}
+\item Can construct the \alert{log likelihood}
+\begin{align*}
+\ell(\mathbf{X} | p) &= (\sum_i  x_i ) \ln p + (N-\sum_i x_i) \ln (1-p)\\
+\frac{\partial \ell(p) }{\partial p} &= (\sum_i  x_i ) \frac{1}{p} - (N-\sum_i x_i) \frac{1}{1-p} =0\\
+\frac{1-p}{p}  &= \frac{(\frac{1}{N}\cdot N-\frac{1}{N}\cdot\sum_i x_i) }{\frac{1}{N}\cdot \sum_i x_i} \rightarrow \hat{p} = \frac{1}{N}\cdot \sum_i x_i
+\end{align*}
+\end{itemize}
 \end{frame}
-
-
-
-
-\begin{frame}{Employment}
-\begin{center}
-%\includegraphics[width=5in]{./resources/nonfarm_level.png}
-\end{center}
-\end{frame}
-
-
-
-
-
 
 
 \section*{Thanks!}
