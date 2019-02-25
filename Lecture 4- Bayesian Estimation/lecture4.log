@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.8.15)  24 FEB 2019 15:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.8.15)  24 FEB 2019 23:23
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -1901,58 +1901,163 @@ LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/n' will be
 [1
 
 {/usr/local/texlive/2018/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Try loading font information for U+msa on input line 106.
+LaTeX Font Info:    Try loading font information for U+msa on input line 113.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 106.
+LaTeX Font Info:    Try loading font information for U+msb on input line 113.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 106.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 113.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Try loading font information for U+stmry on input line 106.
+LaTeX Font Info:    Try loading font information for U+stmry on input line 113.
 
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/stmaryrd/Ustmry.fd)
 LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
-(Font)              scaled to size 10.95pt on input line 106.
+(Font)              scaled to size 10.95pt on input line 113.
 LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
-(Font)              scaled to size 8.0pt on input line 106.
+(Font)              scaled to size 8.0pt on input line 113.
 LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
-(Font)              scaled to size 6.0pt on input line 106.
-LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <10.95> not avail
-able
-(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
-e 106.
+(Font)              scaled to size 6.0pt on input line 113.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/n' will be
+(Font)              scaled to size 10.0pt on input line 113.
 LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
-(Font)              scaled to size 10.95pt on input line 106.
-LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <8> not available
-
-(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
-e 106.
-LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
-(Font)              scaled to size 8.0pt on input line 106.
-LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <6> not available
-
-(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
-e 106.
-LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
-(Font)              scaled to size 6.0pt on input line 106.
+(Font)              scaled to size 10.0pt on input line 113.
  [2
 
 ] [3
 
 ]
-Overfull \vbox (4.99998pt too high) detected at line 120
- []
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <10.95> not avail
+able
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 146.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 10.95pt on input line 146.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <8> not available
+
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 146.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 8.0pt on input line 146.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <6> not available
+
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 146.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 6.0pt on input line 146.
 
 [4
+
+] [5
+
+] [6
+
+]
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <10> not availabl
+e
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 10.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <7> not available
+
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 7.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <5> not available
+
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 5.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/n' will be
+(Font)              scaled to size 7.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/n' will be
+(Font)              scaled to size 5.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
+(Font)              scaled to size 10.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
+(Font)              scaled to size 7.0pt on input line 179.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
+(Font)              scaled to size 5.0pt on input line 179.
+ [7
+
+] [8
+
+] [9
+
+] [10
+
+] [11
+
+] [12
+
+] [13
+
+] [14
+
+] [15
+
+] [16
+
+] [17
+
+]
+\openout4 = `lecture4.vrb'.
+
+ (./lecture4.vrb) [18
+
+]
+\openout4 = `lecture4.vrb'.
+
+ (./lecture4.vrb
+<./resources/baseball.png, id=129, 643.40375pt x 513.92pt>
+File: ./resources/baseball.png Graphic file (type png)
+<use ./resources/baseball.png>
+Package pdftex.def Info: ./resources/baseball.png  used on input line 3.
+(pdftex.def)             Requested size: 252.94499pt x 202.0434pt.
+)
+Overfull \vbox (7.659pt too high) detected at line 338
+ []
+
+[19
+
+ <./resources/baseball.png>]
+\openout4 = `lecture4.vrb'.
+
+ (./lecture4.vrb) [20
+
+]
+\openout4 = `lecture4.vrb'.
+
+ (./lecture4.vrb) [21
+
+]
+\openout4 = `lecture4.vrb'.
+
+
+(./lecture4.vrb
+<./resources/baseball2.png, id=148, 719.68875pt x 533.995pt>
+File: ./resources/baseball2.png Graphic file (type png)
+<use ./resources/baseball2.png>
+Package pdftex.def Info: ./resources/baseball2.png  used on input line 3.
+(pdftex.def)             Requested size: 252.94499pt x 187.68326pt.
+) [22
+
+ <./resources/baseball2.png>]
+Overfull \vbox (4.99998pt too high) detected at line 372
+ []
+
+[23
 
 ]
 \tf@nav=\write10
@@ -1964,44 +2069,44 @@ Overfull \vbox (4.99998pt too high) detected at line 120
 \tf@snm=\write12
 \openout12 = `lecture4.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 122.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 122.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 373.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 373.
  (./lecture4.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 122.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 122.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 373.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 373.
 Package rerunfilecheck Info: File `lecture4.out' has not changed.
 (rerunfilecheck)             Checksum: 4406653F378ED5FBDAF1412C87F06525;42.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 36027 strings out of 492642
- 699194 string characters out of 6129384
- 782798 words of memory out of 5000000
- 39244 multiletter control sequences out of 15000+600000
- 789596 words of font info for 89 fonts, out of 8000000 for 9000
+ 36338 strings out of 492642
+ 704873 string characters out of 6129384
+ 787798 words of memory out of 5000000
+ 39476 multiletter control sequences out of 15000+600000
+ 932988 words of font info for 139 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,16n,96p,791b,806s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolA.enc}{/
-usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolF.enc}{/usr/
-local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolE.enc}{/usr/loca
+ 71i,18n,96p,791b,842s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolS.enc}{/
+usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolA.enc}{/usr/
+local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolF.enc}{/usr/loca
 l/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolC.enc}{/usr/local/te
-xlive/2018/texmf-dist/fonts/enc/dvips/fira/fir_7gpamp.enc}{/usr/local/texlive/2
-018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolD.enc}{/usr/local/texlive/2018/
-texmf-dist/fonts/enc/dvips/fira/fir_765q6w.enc}</usr/local/texlive/2018/texmf-d
-ist/fonts/type1/public/fira/FiraSans-Bold.pfb></usr/local/texlive/2018/texmf-di
-st/fonts/type1/public/fira/FiraSans-Italic.pfb></usr/local/texlive/2018/texmf-d
-ist/fonts/type1/public/fira/FiraSans-Regular.pfb></usr/local/texlive/2018/texmf
--dist/fonts/type1/public/mnsymbol/MnSymbol10.pfb></usr/local/texlive/2018/texmf
--dist/fonts/type1/public/mnsymbol/MnSymbol8.pfb></usr/local/texlive/2018/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2018/texmf-d
-ist/fonts/type1/public/amsfonts/cm/cmss10.pfb>
-Output written on lecture4.pdf (4 pages, 221551 bytes).
+xlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolE.enc}{/usr/local/texliv
+e/2018/texmf-dist/fonts/enc/dvips/fira/fir_7gpamp.enc}{/usr/local/texlive/2018/
+texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolD.enc}{/usr/local/texlive/2018/texm
+f-dist/fonts/enc/dvips/fira/fir_765q6w.enc}</usr/local/texlive/2018/texmf-dist/
+fonts/type1/public/fira/FiraSans-Bold.pfb></usr/local/texlive/2018/texmf-dist/f
+onts/type1/public/fira/FiraSans-Italic.pfb></usr/local/texlive/2018/texmf-dist/
+fonts/type1/public/fira/FiraSans-Regular.pfb></usr/local/texlive/2018/texmf-dis
+t/fonts/type1/public/mnsymbol/MnSymbol10.pfb></usr/local/texlive/2018/texmf-dis
+t/fonts/type1/public/mnsymbol/MnSymbol8.pfb></usr/local/texlive/2018/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2018/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2018/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2018/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2018/texmf-dist/fonts
+/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on lecture4.pdf (23 pages, 765350 bytes).
 PDF statistics:
- 96 PDF objects out of 1000 (max. 8388607)
- 76 compressed objects within 1 object stream
- 10 named destinations out of 1000 (max. 500000)
- 51 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 224 PDF objects out of 1000 (max. 8388607)
+ 177 compressed objects within 2 object streams
+ 48 named destinations out of 1000 (max. 500000)
+ 61 words of extra memory for PDF output out of 10000 (max. 10000000)
 
