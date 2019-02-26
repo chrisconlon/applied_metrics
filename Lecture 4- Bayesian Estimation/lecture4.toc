@@ -1,0 +1,2 @@
+\beamer@sectionintoc {1}{Conjugate Priors}{18}{0}{1}
+\beamer@sectionintoc {2}{Empirical Bayes}{20}{0}{2}

@@ -318,6 +318,37 @@ Under these conditions (and some more):
 \end{enumerate}
 \end{frame}
 
+\section{Conjugate Priors}
+\begin{frame}{What is a Conjugate Prior?}
+For a given \alert{likelihood} $f_{X|\theta}(x| \theta)$ we can chose a \alert{prior} $f_{\theta}(\theta)$ so that the \alert{posterior} is proportional to a known parametric distribution.
+\begin{itemize}
+\item This makes life easy because now the posterior has a known parametric distribution (normal, beta, gamma, etc.)
+\item Other than convenience, this alone doesn't tell us that our choice of $f_{\theta}(\theta)$ is the \alert{best} prior by any metric.
+\item Using a non-conjugate prior is entirely defensible, just less convenient.
+\end{itemize}
+\end{frame}
+
+
+\section{Empirical Bayes}
+\begin{frame}{What is Emprical Bayes?}
+\begin{itemize}
+\item Priors can be an important modeling choice
+\item But what makes a good prior?
+\begin{itemize}
+\item Sufficiently diffuse
+\item As non-informative as possible
+\item Don't tip the scales
+\item Don't rule out the truth
+\end{itemize}
+\item Idea: can we use the data itself to construct a prior?
+\begin{itemize}
+\item If everything is a function of data, are we back in frequentist paradigm?
+\item Can we get benefits of Bayes estimation without unpalatable assumptions?
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
 
 \begin{frame}[fragile]{A (famous) Baseball Example}
 Suppose we want to estimate batting averages $(AVG)$ for some baseball players
