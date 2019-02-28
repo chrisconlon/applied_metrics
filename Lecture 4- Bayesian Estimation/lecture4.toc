@@ -1,2 +1,4 @@
 \beamer@sectionintoc {1}{Conjugate Priors}{18}{0}{1}
-\beamer@sectionintoc {2}{Empirical Bayes}{20}{0}{2}
+\beamer@sectionintoc {2}{Empirical Bayes}{25}{0}{2}
+\beamer@sectionintoc {3}{Example: Diversion Ratios}{32}{0}{3}
+\beamer@sectionintoc {4}{Bayesian Estimation}{43}{0}{4}

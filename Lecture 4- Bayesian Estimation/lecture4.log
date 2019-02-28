@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.27)  25 FEB 2019 15:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.27)  27 FEB 2019 18:12
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -1842,49 +1842,131 @@ LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
 
 ] [21
 
+] [22
+
+] [23
+
+] [24
+
+] [25
+
+] [26
+
 ]
 \openout4 = `lecture4.vrb'.
 
- (./lecture4.vrb) [22
+ (./lecture4.vrb) [27
 
 ]
 \openout4 = `lecture4.vrb'.
 
  (./lecture4.vrb
-<./resources/baseball.png, id=148, 643.40375pt x 513.92pt>
+<./resources/baseball.png, id=177, 643.40375pt x 513.92pt>
 File: ./resources/baseball.png Graphic file (type png)
 <use ./resources/baseball.png>
 Package pdftex.def Info: ./resources/baseball.png  used on input line 3.
 (pdftex.def)             Requested size: 252.94499pt x 202.0434pt.
 )
-Overfull \vbox (3.659pt too high) detected at line 369
+Overfull \vbox (3.659pt too high) detected at line 439
  []
 
-[23
+[28
 
  <./resources/baseball.png>]
 \openout4 = `lecture4.vrb'.
 
- (./lecture4.vrb) [24
+ (./lecture4.vrb) [29
 
 ]
 \openout4 = `lecture4.vrb'.
 
- (./lecture4.vrb) [25
+ (./lecture4.vrb) [30
 
 ]
 \openout4 = `lecture4.vrb'.
 
 
 (./lecture4.vrb
-<./resources/baseball2.png, id=168, 719.68875pt x 533.995pt>
+<./resources/baseball2.png, id=195, 719.68875pt x 533.995pt>
 File: ./resources/baseball2.png Graphic file (type png)
 <use ./resources/baseball2.png>
 Package pdftex.def Info: ./resources/baseball2.png  used on input line 3.
 (pdftex.def)             Requested size: 252.94499pt x 187.68326pt.
-) [26
+) [31
 
- <./resources/baseball2.png>]
+ <./resources/baseball2.png>] [32
+
+] [33
+
+]
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <14.4> not availa
+ble
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 494.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 14.4pt on input line 494.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
+(Font)              scaled to size 14.4pt on input line 494.
+ [34
+
+] [35
+
+] [36
+
+]
+[37
+
+] [38
+
+] [39
+
+]
+Overfull \vbox (13.2018pt too high) detected at line 603
+ []
+
+[40
+
+]
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/n' will be
+(Font)              scaled to size 9.0pt on input line 623.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/bx/n' in size <9> not available
+
+(Font)              Font shape `T1/FiraSans-OsF/b/n' tried instead on input lin
+e 623.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/b/n' will be
+(Font)              scaled to size 9.0pt on input line 623.
+LaTeX Font Info:    Font shape `T1/FiraSans-OsF/m/it' will be
+(Font)              scaled to size 9.0pt on input line 623.
+ [41
+
+]
+\openout4 = `lecture4.vrb'.
+
+ (./lecture4.vrb
+LaTeX Font Info:    Try loading font information for T1+FiraMono-TOsF on input 
+line 3.
+
+(/usr/local/texlive/2018/texmf-dist/tex/latex/fira/T1FiraMono-TOsF.fd
+File: T1FiraMono-TOsF.fd 2018/05/23 (autoinst) Font definitions for T1/FiraMono
+-TOsF.
+)
+LaTeX Font Info:    Font shape `T1/FiraMono-TOsF/m/n' will be
+(Font)              scaled to size 9.0pt on input line 3.
+
+Overfull \hbox (3.23456pt too wide) in paragraph at lines 22--22
+[]  \T1/FiraMono-TOsF/m/n/9 int<lower=1> J;               // number of products
+, including outside good[] 
+ []
+
+) [42
+
+] [43
+
+] [44
+
+] [45
+
+]
 \tf@nav=\write8
 \openout8 = `lecture4.nav'.
 
@@ -1894,45 +1976,50 @@ Package pdftex.def Info: ./resources/baseball2.png  used on input line 3.
 \tf@snm=\write10
 \openout10 = `lecture4.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 404.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 404.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 692.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 692.
  (./lecture4.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 404.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 404.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 692.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 692.
  ) 
 Here is how much of TeX's memory you used:
- 37437 strings out of 492616
- 726121 string characters out of 6128981
- 805328 words of memory out of 5000000
- 40582 multiletter control sequences out of 15000+600000
- 933513 words of font info for 142 fonts, out of 8000000 for 9000
+ 37626 strings out of 492616
+ 728860 string characters out of 6128981
+ 830422 words of memory out of 5000000
+ 40698 multiletter control sequences out of 15000+600000
+ 1016340 words of font info for 180 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 71i,18n,96p,791b,899s stack positions out of 5000i,500n,10000p,200000b,80000s
-pdfTeX warning (dest): name{Outline0.3} has been referenced but does not exis
+ 71i,18n,96p,791b,905s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{Outline0.5} has been referenced but does not exis
 t, replaced by a fixed one
 
-{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolS.enc}{/us
-r/local/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolA.enc}{/usr/lo
-cal/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolF.enc}{/usr/local/
-texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolC.enc}{/usr/local/texl
-ive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolE.enc}{/usr/local/texlive/
-2018/texmf-dist/fonts/enc/dvips/fira/fir_7gpamp.enc}{/usr/local/texlive/2018/te
-xmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolD.enc}{/usr/local/texlive/2018/texmf-
-dist/fonts/enc/dvips/fira/fir_765q6w.enc}</usr/local/texlive/2018/texmf-dist/fo
-nts/type1/public/fira/FiraSans-Bold.pfb></usr/local/texlive/2018/texmf-dist/fon
-ts/type1/public/fira/FiraSans-Italic.pfb></usr/local/texlive/2018/texmf-dist/fo
-nts/type1/public/fira/FiraSans-Regular.pfb></usr/local/texlive/2018/texmf-dist/
-fonts/type1/public/mnsymbol/MnSymbol10.pfb></usr/local/texlive/2018/texmf-dist/
-fonts/type1/public/mnsymbol/MnSymbol8.pfb></usr/local/texlive/2018/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2018/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2018/texmf-dist/font
-s/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2018/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texlive/2018/texmf-dist/fonts/t
-ype1/public/amsfonts/symbols/msbm10.pfb>
-Output written on lecture4.pdf (26 pages, 769631 bytes).
+{/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/fira/fir_xbqiro.enc}{/usr/l
+ocal/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolD.enc}{/usr/local
+/texlive/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolC.enc}{/usr/local/tex
+live/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolS.enc}{/usr/local/texlive
+/2018/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolA.enc}{/usr/local/texlive/201
+8/texmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolF.enc}{/usr/local/texlive/2018/te
+xmf-dist/fonts/enc/dvips/mnsymbol/MnSymbolE.enc}{/usr/local/texlive/2018/texmf-
+dist/fonts/enc/dvips/fira/fir_7gpamp.enc}{/usr/local/texlive/2018/texmf-dist/fo
+nts/enc/dvips/fira/fir_765q6w.enc}</usr/local/texlive/2018/texmf-dist/fonts/typ
+e1/public/fira/FiraMono-Regular.pfb></usr/local/texlive/2018/texmf-dist/fonts/t
+ype1/public/fira/FiraSans-Bold.pfb></usr/local/texlive/2018/texmf-dist/fonts/ty
+pe1/public/fira/FiraSans-Italic.pfb></usr/local/texlive/2018/texmf-dist/fonts/t
+ype1/public/fira/FiraSans-Regular.pfb></usr/local/texlive/2018/texmf-dist/fonts
+/type1/public/mnsymbol/MnSymbol10.pfb></usr/local/texlive/2018/texmf-dist/fonts
+/type1/public/mnsymbol/MnSymbol6.pfb></usr/local/texlive/2018/texmf-dist/fonts/
+type1/public/mnsymbol/MnSymbol7.pfb></usr/local/texlive/2018/texmf-dist/fonts/t
+ype1/public/mnsymbol/MnSymbol8.pfb></usr/local/texlive/2018/texmf-dist/fonts/ty
+pe1/public/mnsymbol/MnSymbol9.pfb></usr/local/texlive/2018/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmss8.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/pub
+lic/amsfonts/symbols/msbm10.pfb>
+Output written on lecture4.pdf (45 pages, 875160 bytes).
 PDF statistics:
- 250 PDF objects out of 1000 (max. 8388607)
- 200 compressed objects within 2 object streams
- 56 named destinations out of 1000 (max. 500000)
- 77 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 386 PDF objects out of 1000 (max. 8388607)
+ 311 compressed objects within 4 object streams
+ 96 named destinations out of 1000 (max. 500000)
+ 93 words of extra memory for PDF output out of 10000 (max. 10000000)
 

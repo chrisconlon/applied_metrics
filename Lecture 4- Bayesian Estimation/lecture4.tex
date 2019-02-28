@@ -329,6 +329,76 @@ For a given \alert{likelihood} $f_{X|\theta}(x| \theta)$ we can chose a \alert{p
 \end{frame}
 
 
+
+\begin{frame}{Beta-Binomial}
+Prior has \alert{hyper parameters} $(\alpha,\beta)$:
+\begin{align*}
+Pr(p | \alpha, \beta)=\frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha) \Gamma(\beta)} p^{\alpha-1}(1-p)^{\beta-1} ,\quad E[p] = \frac{\alpha}{\alpha+\beta}
+\end{align*}
+Likelihood
+\begin{align*}
+Pr(y=k| n, p) = \left( \begin{array}{l}{n} \\ {k}\end{array}\right) p^{k}(1-p)^{n-k}
+\end{align*}
+Posterior
+\begin{align*}
+f(p | n,k, \alpha,\beta) &\propto  p^{k+\alpha}(1-p)^{n-k+ \beta} \\
+&\sim Beta(\alpha + k, \beta + n-k)
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{Dirichlet-Multinomial}
+Prior defined on \alert{unit simplex} when $ \sum_{i=1}^{k} p_{i}=n$
+\begin{align*}
+Pr \left(p_{1}, \ldots, p_{K} ; \alpha_{1}, \ldots, \alpha_{K}\right)=\frac{1}{B(\alpha)} \prod_{i=1}^{K} p_{i}^{\alpha_{i}-1}\end{align*}
+Likelihood
+\begin{align*}
+L(x_1,\ldots,x_k | n, p_1,\ldots,p_k) = \frac{n !}{x_{1} ! \cdots x_{k} !} p_{1}^{x_{1}} \times \cdots \times p_{k}^{x_{k}}
+\end{align*}
+Posterior
+\begin{align*}
+f( p_1,\ldots,p_k | x_1,\ldots,x_k , \alpha_1,\ldots,\alpha_k) &\propto p_{1}^{x_{1} +\alpha_1} \times \cdots \times p_{k}^{x_{k} +\alpha_k} \\
+&\sim Dirichlet(\alpha_k + x_k)
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{Beta-Binomial and Dirichlet-Multinomial}
+\begin{itemize}
+\item Dirichlet is the Multinomial generalization of a beta
+\item In the Beta-Binomial we can write things as if $m=\alpha + \beta$ is the number of \alert{pseudo observations}  and $E[p] = \frac{\alpha}{\alpha+\beta}$.
+\item In the Dirichlet-Multinomial we can write things as if $m = \sum_{k} \alpha_k$ and $E[p_1,\ldots,p_k] =  \left( \frac{\alpha_1}{\sum_{k=1}^K \alpha_k} \ldots \frac{\alpha_K}{\sum_{k=1}^K \alpha_k} \right)$
+\item In both cases it is as if we see $m$ observations from before the data and $n$ observations from the data.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Gamma-Poisson}
+Prior (Gamma) has $\alpha$ occurrences in $\beta$ intervals
+\begin{align*}
+Pr(\theta | \alpha, \beta)=\frac{\theta^{\alpha-1} e^{-\theta / \beta}}{\beta^{\alpha} \Gamma(\alpha)} \text { for } \theta>0, \alpha>0, \beta>0
+\end{align*}
+Likelihood (Poisson) we observe $k$ events in each of the $n$ periods:
+\begin{align*}
+Pr(x_i=k | \theta )= \frac{\theta^{k} e^{-\theta}}{k !}
+\end{align*}
+Posterior is \alert{Gamma}
+\begin{align*}
+\theta \sim Gamma(\alpha + \sum_{i=1}^n x_i, \beta + n)
+\end{align*}
+
+\end{frame}
+
+
+\begin{frame}{Multivariate Normal Distribution}
+\begin{itemize}
+\item Multivariate Normal Likelihood
+\item Various Prior Options: Inverse Wishart for Variance.
+\item This is useful later on but a mess of matrix algebra for now.
+\item I will skip it.
+\end{itemize}
+\end{frame}
+
 \section{Empirical Bayes}
 \begin{frame}{What is Emprical Bayes?}
 \begin{itemize}
@@ -399,6 +469,224 @@ Idea is to take an average between the observed average $y_i$ and the overall me
 \includegraphics[width=3.5in]{./resources/baseball2.png}
 \end{center}
 \end{frame}
+\section{Example: Diversion Ratios}
+\begin{frame}{The Diversion Ratio: Conlon and Mortimer (2018)}
+ Raise price of good $j$. People leave. What fraction of leavers switch to $k$?
+\begin{eqnarray*}
+D_{jk} = \frac{\frac{\partial q_k}{\partial p_j}}{\left|\frac{\partial q_j}{\partial p_j} \right|}
+\end{eqnarray*}
+It's one of the best ways economists have to characterize competition among sellers.
+\begin{itemize}
+\item High Diversion: Close Substitutes $\rightarrow$ Mergers more likely to increase prices.
+\item Very low diversion $\rightarrow$ products may not be in the same market.\\ (ie: Katz \& Shapiro)
+\item Demand Derivatives NOT elasticities.
+\item No equilibrium responses.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimating $\overline{D}_{jk}$}
+Remove a product $j$ measure $\Delta q_j$ and $\Delta q_k$.
+ \begin{eqnarray*}
+ \overline{D_{jk}} =  \frac{\widehat{\Delta q_k}}{|\widehat{\Delta q_j}|} = \frac{ E[q_k | Z=1] - E[q_k | Z=0]}{ \left| E[q_j | Z=1] - E[q_j | Z=0] \right|}  
+ =\frac{ E[q_k | Z=1] - E[q_k | Z=0]}{ E[q_j | Z=0] }
+ \end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Using a Beta-Binomial Prior}
+How to restrict $D_{jk} \in [0,1]$?
+\begin{eqnarray*}
+\Delta q_k | \Delta q_j,D_{jk} &\sim& Bin(n=\Delta q_j, p=D_{jk})\\ \pause
+ D_{jk} | \beta_1, \beta_2 &\sim& Beta(\beta_1,\beta_2)\\
+E[D_{jk} | \beta_1, \beta_2, \Delta q_j, \Delta q_k] &=& \frac{\beta_1 + \Delta q_k}{\beta_1 + \beta_2 + \Delta q_j}\\ \mu_{jk} &=& \frac{\beta_1}{\underbrace{\beta_1+\beta_2}_{m_{jk}}},  \quad \lambda = \frac{m_{jk}}{m_{jk} + \Delta q_j} \\
+\widehat{D_{jk}} &=& \lambda \cdot \mu_{jk} + (1-\lambda) \frac{\widehat{\Delta q_k}}{\widehat{\Delta q_j}}
+\end{eqnarray*}
+$\mu_{jk}$ is prior mean; $m_{jk}$ is no. pseudo-obs; $\lambda$ weights our prior mean. \\% vs. experimental obs.
+When we have a lot of experimental obs, prior receives little weight.
+\end{frame}
+
+\begin{frame}
+\frametitle{Using a Dirichlet Prior}
+How do restrict $D_{j\cdot} \in \Delta$?
+\begin{itemize}
+\item Same idea as before, but use \alert{Dirichlet Prior}.
+\item Acts like pseudo-observations from the \alert{multinomial} distribution.
+\item If we had same number of treated observations for each substitute we would have conjugacy/closed form (We don't).
+\item Likelihood is $\Delta q_{k} \sim Binomial(\Delta q_j, D_{jk})$ not \alert{multinomial}.
+\item We use $m=3.05$ pseudo-observations for the Dirichlet prior.
+\item Estimator is still technically \alert{non-parametric}. Why?
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Shrinkage Estimator, Intuition}
+\begin{itemize}
+\item We ``shrink'' towards the prior mean when we have experimental estimates that are imprecise.
+\item Idea is very simple: when we have lots of data, use the experimental measure.
+\item When data are scarce: put more weight on the prior/model-based measure.
+\begin{itemize}
+\item In practice: FTC/DOJ tend to assume diversion proportional to marketshare
+\item Use plain logit (could also use more complicated model)
+\item Logit sets the mean of the prior as: $\mu_{jk} = \frac{s_k}{1-s_{j}}$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Results: Mars }
+\tiny
+\begin{tabular}{ll |   r r r r  r r r  r}
+Firm & Product & \# Weeks & $\Delta q_k$ & $\Delta q_j$ & $\frac{\Delta q_k}{\Delta q_j}$ & Beta(J) & Beta(300) & Dirichlet(4.15)\\ 
+\hline  &&\multicolumn{7}{c}{Snickers Removal}\\ \hline
+Mars & M\&M Peanut & 176 & 375.52 & -954.30 & 39.35 & 37.04 & 30.80 & 18.40 \\
+Mars & Twix Caramel & 134 & 289.60 & -702.39 & 41.23 & 37.86 & 29.49 & 15.88 \\
+Pepsi & Rold Gold (Con) & 174 & 161.37 & -900.11 & 17.93 & 16.84 & 13.95 & 7.54 \\
+Nestle & Butterfinger & 61 & 72.95 & -362.82 & 20.11 & 17.07 & 11.19 & 4.45 \\
+Mars & M\&M Milk Chocolate & 97 & 71.76 & -457.36 & 15.69 & 13.83 & 9.85 & 4.14 \\
+Kraft & Planters (Con) & 136 & 78.01 & -759.87 & 10.27 & 9.57 & 7.80 & 3.81 \\
+Kellogg & Zoo Animal Cracker & 177 & 65.72 & -970.22 & 6.77 & 6.48 & 5.68 & 2.92 \\
+Pepsi & Sun Chip & 159 & 45.30 & -866.09 & 5.23 & 4.98 & 4.33 & 2.07 \\
+Hershey & Choc Hershey (Con) & 41 & 29.78 & -179.57 & 16.58 & 12.17 & 6.30 & 2.01 \\
+& Outside Good & 180 & 460.89 & -970.22 & 47.50 &  &  & 23.12 \\
+
+\hline  &&\multicolumn{7}{c}{M\&M Peanut Removal}\\ \hline
+Mars & Snickers & 218 & 296.58 & -1239.29 & 23.93 & 22.90 & 19.91 & 16.47 \\
+Mars & Twix Caramel & 176 & 110.93 & -1014.32 & 10.94 & 10.39 & 8.88 & 6.76 \\
+Mars & M\&M Milk Chocolate & 99 & 73.47 & -529.58 & 13.87 & 12.46 & 9.18 & 6.26 \\
+Nestle & Raisinets & 181 & 71.82 & -1001.14 & 7.17 & 6.82 & 5.82 & 4.37 \\
+Kraft & Planters (Con) & 190 & 61.42 & -1046.10 & 5.87 & 5.62 & 4.90 & 3.60 \\
+Hershey & Twizzlers & 62 & 32.98 & -332.99 & 9.90 & 8.32 & 5.32 & 3.35 \\
+Kellogg & Rice Krispies Treats & 46 & 22.37 & -220.17 & 10.16 & 7.90 & 4.43 & 2.51 \\
+Pepsi & Frito  & 160 & 37.25 & -902.42 & 4.13 & 3.95 & 3.47 & 2.37 \\
+& Outside Good& 218 & 606.18 & -1238.49 & 48.95 &  &  & 36.35 \\
+\end{tabular}
+\end{frame}
+
+
+\begin{frame}{Results: Kellogg's}
+\tiny
+\begin{tabular}{ll |   r r r r  r r r  r}
+Firm & Product & \# Weeks & $\Delta q_k$ & $\Delta q_j$ & $\frac{\Delta q_k}{\Delta q_j}$ & Beta(J) & Beta(300) & Dirichlet(4.15)\\ 
+\hline  &&\multicolumn{7}{c}{Animal Crackers Removal}\\ \hline
+Pepsi & Rold Gold (Con) & 132 & 114.39 & -440.80 & 25.95 & 22.90 & 16.21 & 9.89 \\
+Mars & Snickers & 145 & 92.44 & -483.63 & 19.11 & 17.26 & 13.04 & 7.58 \\
+Mars & M\&M Peanut & 142 & 77.72 & -469.44 & 16.55 & 14.98 & 11.43 & 6.47 \\
+Kellogg & CC Famous Amos & 144 & 66.18 & -478.20 & 13.84 & 12.40 & 9.15 & 5.39 \\
+Pepsi & Baked Chips (Con) & 134 & 62.55 & -447.60 & 13.97 & 12.46 & 9.13 & 5.27 \\
+Mars & Twix Caramel & 110 & 50.17 & -338.97 & 14.80 & 12.75 & 8.74 & 4.58 \\
+Sherwood & Ruger Wafer (Con) & 119 & 48.20 & -368.65 & 13.07 & 11.28 & 7.63 & 4.28 \\
+Hershey & Choc Herhsey (Con) & 30 & 33.60 & -132.57 & 25.34 & 17.14 & 7.86 & 3.81 \\
+Kellogg & Rice Krispies Treats & 13 & 23.52 & -37.80 & 62.22 & 23.24 & 7.16 & 2.99 \\
+Kar's Nuts & Kar Sweet\&Salty Mix & 95 & 30.06 & -334.50 & 8.99 & 7.72 & 5.27 & 2.73 \\
+Misc & Popcorn (Con) & 56 & 25.72 & -226.89 & 11.34 & 8.92 & 5.08 & 2.61 \\
+Kraft & Planters (Con) & 114 & 28.05 & -380.25 & 7.38 & 6.53 & 4.78 & 2.43 \\
+Mars & M\&M Plain & 73 & 22.67 & -295.07 & 7.68 & 6.47 & 4.26 & 2.15 \\
+& Outside Good& 145 & 240.52 & -482.91 & 49.81 &  &  & 21.98 \\
+
+\hline  &&\multicolumn{7}{c}{Famous Amos Removal}\\ \hline
+Pepsi & Sun Chip & 139 & 143.60 & -355.68 & 40.37 & 34.39 & 22.66 & 15.75 \\
+Kraft & Planters (Con) & 121 & 82.11 & -332.61 & 24.69 & 20.89 & 13.68 & 8.75 \\
+Hershey & Choc Hershey (Con) & 38 & 48.60 & -66.84 & 72.72 & 36.93 & 13.36 & 7.18 \\
+Pepsi & Frito & 119 & 49.88 & -313.21 & 15.93 & 13.44 & 8.85 & 5.32 \\
+Misc & Rasbry Knotts & 133 & 46.62 & -345.38 & 13.50 & 11.45 & 7.49 & 4.81 \\
+Pepsi & Grandmas Choc Chip & 95 & 39.99 & -259.21 & 15.43 & 12.51 & 7.62 & 4.49 \\
+Pepsi & Dorito Buffalo Ranch & 72 & 38.11 & -224.24 & 17.00 & 13.28 & 7.53 & 4.43 \\
+Pepsi & Chs PB Frito Cracker & 34 & 26.87 & -83.65 & 32.13 & 18.16 & 7.14 & 3.74 \\
+Kellogg & Choc Sandwich FA & 57 & 27.97 & -122.04 & 22.91 & 15.06 & 6.84 & 3.69 \\
+Pepsi & Rold Gold (Con) & 147 & 32.62 & -392.22 & 8.32 & 7.40 & 5.54 & 3.19 \\
+Kraft & Oreo Thin Crisps & 29 & 20.73 & -43.29 & 47.89 & 19.20 & 6.12 & 3.05 \\
+Mars & Combos (Con) & 98 & 23.56 & -274.54 & 8.58 & 7.03 & 4.34 & 2.61 \\
+& Outside Good& 156 & 192.90 & -399.12 & 48.33 &  &  & 20.95 \\
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Comparison of Assumptions: Snickers Experiment}
+\begin{table}
+\footnotesize
+\begin{tabular}{|l|ccccc|}
+%& Total  & Impose & Impose & Impose & Impose\\ 
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{Total} & \multicolumn{1}{c}{Assn 1} & \multicolumn{1}{c}{Assn 2}   & \multicolumn{1}{c}{Assn 3} & \multicolumn{1}{c}{Assn 4} \\ 
+\multicolumn{1}{c}{} 	&\multicolumn{1}{c}{} 	&\multicolumn{1}{c}{} 	&\multicolumn{1}{c}{} 	&\multicolumn{1}{c}{($m = K$)} 	&\multicolumn{1}{c}{(m = 4.15)} \\ \hline
+Products with $D_{jk} < $ 0 & 51&24&26&0&0\\
+Products with $0 \leq D_{jk} \leq 10$& 51&13&15&43&48\\
+Products with $10 \leq D_{jk} \leq 20$ & 51&5&5&5&2\\
+Products with $D_{jk} > $ 20 & 51&9&5&3&1\\ \hline
+Sum of all positive $D_{jk}$s & 51&402.84&301.95&265.41&98.72\\
+Sum of all negative $D_{jk}$s & 51&-238.90&-239.07&0.00&0.00\\
+\hline
+\end{tabular}\\
+\footnotesize
+Note: Table includes only products for which there were at least 50 sales of the focal product in control weeks, on average.
+\end{table}
+\end{frame}
+
+
+\begin{frame}[fragile]{Stan Code}
+\footnotesize
+\begin{verbatim}
+% Main Specification: Dirichlet Prior
+data {
+  int<lower=1> J;               // number of products, including outside good
+  int<lower=1> N[J];            // number of trials
+  int<lower=0> y[J];            // number of successes for each product j
+  vector[J] priors;    // mean of the distribution of alpha
+}
+
+parameters {
+  simplex[J] theta;
+}
+
+model {
+  theta ~ dirichlet(priors);
+  for (j in 1:J) {
+    y[j] ~ binomial(N[j], theta[j]);
+  }
+}
+\end{verbatim}
+\end{frame}
+
+
+\section{Bayesian Estimation}
+
+\begin{frame}{How do we estimate these models?}
+A few options
+\begin{itemize}
+\item With conjugate priors we can closed forms
+\item Can do it by hand if we have \alert{sufficient statistics}
+\begin{itemize}
+\item Clear in beta-binomial or poisson-gamma relationship.
+\item Mostly not the case.
+\end{itemize}
+\item Mostly we do what is known as \alert{Markov Chain Monte Carlo}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Gibbs Sampling}
+The first building block is known as \alert{Gibbs Sampling}
+\begin{itemize}
+\item Suppose that $p(x,y)$ is a p.d.f or p.m.f that is hard to sample directly from.
+\item But suppose that $p(x | y)$ or $p(y | x)$ are easy to sample from.
+\item Gibbs sampler says:
+\begin{enumerate}
+\item Initialize $(x_0,y_0)$.
+\item Randomly draw $y_1 \sim g(y | x_0)$.
+\item Randomly draw $x_1 \sim f(x | y_1)$.
+\item Randomly draw $y_2 \sim g(y | x_1)$.
+\item Rinse and Repeat. 
+\end{enumerate}
+\item This sequence $(x_0,y_0),(x_1,y_1), (x_2,y_2), \ldots$ is a \alert{Markov Chain}.
+\item Why? Because $(x_k,y_k) | (x_{k-1},y_{k-1})$ doesn't depend on $x_{k-h}$ or $y_{k-h}$ for $h \geq 2$.
+\begin{itemize}
+\item This does not mean that $(x_3,y_3)$ and $(x_1,y_1)$ are I.I.D!
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
 
 \section*{Thanks!}
 \end{document}

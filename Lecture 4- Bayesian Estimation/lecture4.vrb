@@ -1,4 +1,22 @@
-\frametitle{A Baseball Example}
-\begin{center}
-\includegraphics[width=3.5in]{./resources/baseball2.png}
-\end{center}
+\frametitle{Stan Code}
+\footnotesize
+\begin{verbatim}
+% Main Specification: Dirichlet Prior
+data {
+  int<lower=1> J;               // number of products, including outside good
+  int<lower=1> N[J];            // number of trials
+  int<lower=0> y[J];            // number of successes for each product j
+  vector[J] priors;    // mean of the distribution of alpha
+}
+
+parameters {
+  simplex[J] theta;
+}
+
+model {
+  theta ~ dirichlet(priors);
+  for (j in 1:J) {
+    y[j] ~ binomial(N[j], theta[j]);
+  }
+}
+\end{verbatim}
