@@ -1,14 +1,22 @@
-\frametitle{Monte Carlo Example}
-\begin{itemize}
-\item Let's integrate $g(x) = \phi(x)$ (normal pdf) over $f(x) = Unif(0,1)$ from $[0,1]$.
-\item We know the answer is $\Phi(1) - \Phi(0)$.
-\end{itemize}
-\begin{minted}{R}
-Integral <- function(n){
-    X <- runif(n)
-    Y <- exp(-X^2/2)/sqrt(2*pi)
-    Int <- sum(Y)/n
-    Error <- Int-(pnorm(1)-pnorm(0))
-    list(Int,Error)}
-\end{minted}
+\frametitle{Stan Code}
+\footnotesize
+\begin{verbatim}
+% Main Specification: Dirichlet Prior
+data {
+  int<lower=1> J;               // number of products, including outside good
+  int<lower=1> N[J];            // number of trials
+  int<lower=0> y[J];            // number of successes for each product j
+  vector[J] priors;    // mean of the distribution of alpha
+}
 
+parameters {
+  simplex[J] theta;
+}
+
+model {
+  theta ~ dirichlet(priors);
+  for (j in 1:J) {
+    y[j] ~ binomial(N[j], theta[j]);
+  }
+}
+\end{verbatim}

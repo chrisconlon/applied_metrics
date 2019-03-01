@@ -164,8 +164,28 @@ Can also construct the properties of $\hat{p}$.
 Which gives us a CI of:  $\left(\overline{x} \pm 1.96 \cdot \sqrt{\frac{1}{N} \overline{x} (1-\overline{x})} \right)$
 \end{frame}
 
+\begin{frame}{Interpretation of Bayesian methods}
+Basic idea is as follows:
+\begin{itemize}
+\item You observe some data $X$ which has probability $P(x|\theta)$ under
+parameters $\theta\in\Theta.$ 
+\item There is an (assumed) \alert{prior distribution} $P(\theta).$
+\item The object of interest is the \alert{posterior distribution } $P(\theta|X)$
+and/or functionals of $P(\cdot|X)$ such as the mean.
+\item The posterior distribution is sufficient for any counterfactual you'd
+want to run:
+\begin{itemize}
+\item Draw random samples from $P(\cdot|X),$ and simulate your counterfactual.
+\item This gives you a distribution of counterfactual outcomes.
+\item Report 5th and 95th percentiles.
+\item ``Inference on counterfactuals is for free.''
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Bayesian Statistics: Brief Introduction}
-A different idea:
+The same application:
 \begin{itemize}
 \item Start with a (diffuse) initial guess for the distribution of $p$: $f_P(p)$.
 \item Incorporate information from likelihood: $f(x_i | p)$
@@ -181,7 +201,7 @@ A different idea:
 
 
 \begin{frame}{Bayesian Statistics: Brief Introduction}
-One possible guess is the uniform distribution $f(x) = 0$ on $0 \leq x \leq 1$.
+One possible guess is the uniform distribution $f(z) = 1$ on $0 \leq z \leq 1$.
 \begin{itemize}
 \item \alert{Marginal/Prior Distribution}: $f_P(p) = 1$ for $0 \leq p \leq 1$.
 \item \alert{Conditional Distribution}/Likelihood: $f_{X|P} (x | p) = p^x (1-p)^{1-p}$
@@ -218,7 +238,7 @@ f _ { P } ( p | \alpha,\beta) &= \frac { \Gamma ( \alpha + \beta ) } { \Gamma ( 
 \mathbb{E}[p | \alpha,\beta] &=\frac{\alpha}{\alpha + \beta}\\
 \mathbb{V}[p | \alpha,\beta] &=\frac{\alpha \beta}{(\alpha + \beta)^2(\alpha+\beta+1)}
 \end{align*}
-\item This has the advantage that it places nicely with the Binomial.
+\item This has the advantage that it plays nicely with the Binomial.
 \item Consider $\alpha=16, \beta=8$. This gives $\mathbb{E}[p ] = \frac{2}{3}$ and $\mathbb{SE}[p] = 0.094$. 
 \end{itemize}
 \end{frame}
@@ -260,36 +280,7 @@ f_{\mu|X}(\mu | x) &\propto \exp \left(-\frac{1}{2}(x-\mu)^{2}\right) \cdot \exp
 &\propto \exp \left(-\frac{1}{2(100 / 101)}(\mu-(100 / 101) x)^{2}\right)
 \end{align*}
 It happens that $(u | x) \sim N(100x/101 , 100/101)$. \\
-In general the posterior will not be well defined.
-\end{frame}
-
-\begin{frame}{Kalman Update: A More Complicated Normal}
-Assume $X \sim N(\mu,\sigma^2)$ with $\sigma^2$ known. $\mu \sim N(\mu_0,\tau^2)$. What is $f_{\mu | X}(\mu | X=x)$?
-\begin{align*}
-f_{\mu|X}(\mu | x) &\propto \exp \left(-\frac{1}{2 \sigma^{2}}(x-\mu)^{2}\right) \cdot \exp \left(-\frac{1}{2 \cdot \tau^{2}}\left(\mu-\mu_{0}\right)^{2}\right)\\
-&\propto \exp -\frac{1}{2}\left(\frac{x^{2}}{\sigma^{2}}-\frac{2 x \mu}{\sigma^{2}}+\frac{\mu^{2}}{\sigma^{2}}+\frac{\mu^{2}}{\tau^{2}}-\frac{2 \mu \mu_{0}}{\tau^{2}}+\frac{\mu_{0}^{2}}{\tau^{2}}\right)\\
-&\propto \exp -\frac{1}{2}\left(\mu^{2} \frac{\sigma^{2}+\tau^{2}}{\tau^{2} \sigma^{2}}-\mu \frac{2 x \tau^{2}+2 \mu_{0} \sigma^{2}}{\tau^{2} \cdot \sigma^{2}}\right)\\
-&\propto \exp -\frac{1}{2\left(1 /\left(1 / \tau^{2}+1 / \sigma^{2}\right)\right)}\left(\left(\mu-\left(x / \sigma^{2}+\mu_{0} / \tau^{2}\right) /\left(1 / \sigma^{2}+1 / \tau^{2}\right)\right)\right.
-\end{align*}
-The resulting distribution is Normal with mean and variance
-\begin{align*}
-\mathbb{E}[\mu | X=x]=\frac{\frac{x}{\sigma^{2}}+\frac{\mu_{0}}{\tau^{2}}}{\frac{1}{\sigma^{2}}+\frac{1}{\tau^{2}}}, \quad \frac{1}{\mathbb{V}(\mu | X)}=\frac{1}{\sigma^{2}}+\frac{1}{\tau^{2}}
-\end{align*}
-\end{frame}
-
-
-\begin{frame}{Kalman Update: A More Complicated Normal}
-Despite being a giant mess this makes sense:
-\begin{align*}
-\mathbb{E}[\mu | X=x]=\frac{\frac{x}{\sigma^{2}}+\frac{\mu_{0}}{\tau^{2}}}{\frac{1}{\sigma^{2}}+\frac{1}{\tau^{2}}}, \quad \frac{1}{\mathbb{V}(\mu | X)}=\frac{1}{\sigma^{2}}+\frac{1}{\tau^{2}}
-\end{align*}
-\begin{itemize}
-\item Posterior mean is a weighted average of \alert{prior mean} and \alert{sample mean}.
-\item Weights depend on \alert{precision} of two samples.
-\item Posterior \alert{Precision} is sum of precision of each sample $\frac{1}{\mathbb{V}(\cdot)}$
-\item Probably we want to choose a relatively \alert{uninformative} prior with large $\tau^2$.
-\item $\tau^2 \rightarrow \infty$ implies an \alert{improper prior distribution} because it no longer integrates to one. But because of $\propto$ still mostly ok.
-\end{itemize}
+In general we can't expect a closed form posterior.
 \end{frame}
 
 \begin{frame}{Generalization to Multiple Observations}
@@ -300,6 +291,26 @@ p(\theta | X_{1}, \ldots, X_{N}) \propto \mathcal{L}(\theta | X_{1}, \ldots, X_{
 \begin{itemize}
 \item Still depends on: \alert{prior}, \alert{likelihood} to construct \alert{posterior}.
 \item Can update one observation at a time or all at once.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bayesian Vs. Frequentist methods}
+\begin{itemize}
+\item Once you've got estimates, you've got posterior probability intervals
+without additional work.
+\item But Bayesian objects of interest are different from confidence intervals:
+\begin{itemize}
+\item NOT a sampling experiment.
+\end{itemize}
+\item There is also a frequentist interpretation: 
+\begin{itemize}
+\item In large samples, in identified models: means, modes, medians of Bayesian
+posteriors converge to MLE estimates.
+\end{itemize}
+\item An asymptotic result, the Bernstein-Von Mises Theorem, states that
+if you have enough data, under some (weak) technical conditions the
+posterior of a finite-dimensional parameter is asymptotically normal
+and independent of the prior.  (See Van der Vaart for a general statement)
 \end{itemize}
 \end{frame}
 
@@ -317,6 +328,19 @@ Under these conditions (and some more):
 \item  log-likelihood needs to be smooth (two derivates at the true value and more)
 \end{enumerate}
 \end{frame}
+\begin{frame}{Uses of Bernstein-Von Mises Theorems}
+\begin{itemize}
+\item Bayesian posterior mean is asymptotically
+equivalent to the maximum likelihood estimator.
+%\item Can relax many of the assumptions (see Van der Vaart).
+\item In practice, computations of extremum estimators might not converge,
+might get stuck in local optima, etc.
+\item It can be a lot easier to compute a mean than to find a mode of a
+function.
+\item The B-vM theorem says that ``the Ns justify the means.''
+\end{itemize}
+\end{frame}
+
 
 \section{Conjugate Priors}
 \begin{frame}{What is a Conjugate Prior?}
@@ -327,7 +351,6 @@ For a given \alert{likelihood} $f_{X|\theta}(x| \theta)$ we can chose a \alert{p
 \item Using a non-conjugate prior is entirely defensible, just less convenient.
 \end{itemize}
 \end{frame}
-
 
 
 \begin{frame}{Beta-Binomial}
@@ -386,18 +409,240 @@ Posterior is \alert{Gamma}
 \begin{align*}
 \theta \sim Gamma(\alpha + \sum_{i=1}^n x_i, \beta + n)
 \end{align*}
-
 \end{frame}
 
-
-\begin{frame}{Multivariate Normal Distribution}
+\begin{frame}{Exponential families}
 \begin{itemize}
-\item Multivariate Normal Likelihood
-\item Various Prior Options: Inverse Wishart for Variance.
-\item This is useful later on but a mess of matrix algebra for now.
-\item I will skip it.
+\item Bayesian methods make heavy use of exponential-family distributions.
+\begin{itemize}
+\item Class of distributions that includes normal, beta, gamma, exponential
+distribution, ...
+\end{itemize}
+\item Definition: If we have a sample $(y_{1},\ldots,y_{n})$ from an exponential
+family, the likelihood is proportional to: 
+\[
+p(y|\theta)\propto g(\theta)^{n}\exp\{\sum_{j=1}^{k}c_{j}\varphi_{j}(\theta)\overline{h}_{j}(y)\},\ \ \overline{h}_{j}(y)=\sum_{i=1}^{n}h_{j}(y_{i}).
+\]
 \end{itemize}
 \end{frame}
+%
+\begin{frame}{Exponential-family distributions have conjugate priors}
+\begin{itemize}
+\item Fact: Exponential family distributions with $j$ parameters $\theta$
+have $j$ \alert{minimal sufficient statistics} $\{h_{1},\ldots,h_{j}\}.$
+\begin{itemize}
+\item A minimal sufficient statistic is a sufficient statistic that can
+be represented as a function of any other sufficient statistic.
+\end{itemize}
+\item Result is as follows:
+
+{\footnotesize{}
+\begin{align*}
+\text{Prior (with hyperparameters }\tau\text{):\ } & p(\theta|\tau)\propto g(\theta)^{\tau_{0}}\exp\{\sum_{j=1}^{k}c_{j}\varphi_{j}(\theta)\tau_{j}\},\\
+\text{Posterior: } & p(\theta|y)\propto g(\theta)^{\tau_{0}+n}\exp\{\sum_{j=1}^{k}c_{j}\varphi_{j}(\theta)\left(h_{j}+\tau_{j}\right)\},
+\end{align*}
+} where $h_{j}$ is the minimal sufficient statistic.
+\end{itemize}
+\end{frame}
+%
+
+
+
+\begin{frame}{Normal: Known Variance}
+Assume $x \sim N(\beta,\sigma^2)$ with $\sigma^2$ known. Prior: $\beta \sim N(\mu_0,\tau^2)$. What is $f_{\beta | X}(\beta | X=x)$?
+\begin{align*}
+f_{\beta|X}(\beta | x) &\propto \exp \left(-\frac{1}{2 \sigma^{2}}(x-\beta)^{2}\right) \cdot \exp \left(-\frac{1}{2 \cdot \tau^{2}}\left(\beta-\mu_{0}\right)^{2}\right)\\
+&\propto \exp -\frac{1}{2}\left(\frac{x^{2}}{\sigma^{2}}-\frac{2 x \beta}{\sigma^{2}}+\frac{\beta^{2}}{\sigma^{2}}+\frac{\beta^{2}}{\tau^{2}}-\frac{2 \beta \mu_{0}}{\tau^{2}}+\frac{\mu_{0}^{2}}{\tau^{2}}\right)\\
+&\propto \exp -\frac{1}{2}\left(\beta^{2} \frac{\sigma^{2}+\tau^{2}}{\tau^{2} \sigma^{2}}-\beta \frac{2 x \tau^{2}+2 \mu_{0} \sigma^{2}}{\tau^{2} \cdot \sigma^{2}}\right)\\
+&\propto \exp -\frac{1}{2\left(1 /\left(1 / \tau^{2}+1 / \sigma^{2}\right)\right)}\left(\left(\beta-\left(x / \sigma^{2}+\mu_{0} / \tau^{2}\right) /\left(1 / \sigma^{2}+1 / \tau^{2}\right)\right)\right.
+\end{align*}
+The resulting distribution is Normal with mean and variance (precision):
+\begin{align*}
+\mathbb{E}[\beta | X=x]=\frac{\frac{x}{\sigma^{2}}+\frac{\mu_{0}}{\tau^{2}}}{\frac{1}{\sigma^{2}}+\frac{1}{\tau^{2}}}, \quad \frac{1}{\mathbb{V}(\beta | X)}=\frac{1}{\sigma^{2}}+\frac{1}{\tau^{2}}
+\end{align*}
+\end{frame}
+
+
+
+\begin{frame}{Example: normal, known variance}
+\begin{itemize}
+\item observe a draw $x\sim N(\beta,\sigma^{2}).$ 
+\begin{itemize}
+\item $\beta$ has conjugate prior $\beta\sim N(\mu,\tau^2).$
+\item Suppose $\sigma^{2}$ is known.
+\end{itemize}
+\item With some algebra, we showed:
+\begin{itemize}
+\item Posterior: $f_{\beta|x}(\beta|x)\sim N\left(\frac{\overline{\beta}/\tau^{2}+x/\sigma^{2}}{1/\tau^{2}+1/\sigma^{2}},\frac{1}{1/\tau^{2}+1/\sigma^{2}}\right).$
+\begin{itemize}
+\item Mean is weighted average of prior mean and data mean.
+\item Weights are proportional to \textbf{precisions}. 
+\end{itemize}
+\end{itemize}
+\item With multiple draws $x_{i}\sim N(\beta,\sigma^{2})$:
+\begin{itemize}
+\item Minimal sufficient statistics are $h_{1}(x)=\overline{x},$ $h_{2}(x)=\sum x^{2}.$
+\item $\beta|x_{1},\ldots,x_{n}\sim N\left(\frac{\mu/\tau^{2}+\overline{x}\left(n/\sigma^{2}\right)}{1/\tau^2+n/\sigma^{2}},\frac{1}{1/\tau^2+n/\sigma^{2}}\right).$
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+
+\begin{frame}{Example: normal, known variance}
+Despite being a giant mess this makes sense:
+\begin{align*}
+\mathbb{E}[\beta | h(\mathbf{x}) =(\overline{x},\sum x_i^2)]
+=\frac{\frac{\overline{x}}{\sigma^{2}}+\frac{\mu_{0}}{\tau^{2}}}{\frac{n}{\sigma^{2}}+\frac{1}{\tau^{2}}}, \quad \frac{1}{\mathbb{V}(\mu | X)}
+=\frac{n}{\sigma^{2}}+\frac{1}{\tau^{2}}
+\end{align*}
+\begin{itemize}
+\item Posterior mean is a weighted average of \alert{prior mean} and \alert{sample mean}.
+\item Weights depend on \alert{precision} of two samples.
+\item Posterior \alert{Precision} is sum of precision of each sample $\frac{1}{\mathbb{V}(\cdot)}$
+\item Probably we want to choose a relatively \alert{uninformative} prior with large $\tau^2$.
+\item $\tau^2 \rightarrow \infty$ implies an \alert{improper prior distribution} because it no longer integrates to one. But because of $\propto$ still mostly ok.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Bayesian linear regression}
+\begin{itemize}
+\item We're now ready to estimate the standard linear regression model:
+\[
+y_{i}=x_{i}\beta+\epsilon_{i},\ \epsilon_{i}\sim iid\ N(0,\sigma^{2})
+\]
+\item In matrix form:
+\[
+y\sim N(X\beta,\sigma^{2}I_{n}).
+\]
+\item Specify prior as 
+\begin{align*}
+P(\beta,\sigma^{2}) & =P(\sigma^{2})P(\beta|\sigma^{2})\\
+P(\sigma^{2}) & \propto(\sigma^{2})^{-(v_{0}/2+I)}\exp\left(-\frac{v_{0}s_{0}^{2}}{2\sigma^{2}}\right)\\
+\beta|\sigma^{2} & \sim N(\overline{\beta},\sigma^{2}A^{-1}).
+\end{align*}
+That is, $\sigma^{2}\sim IG(v_{0}/2,v_{0}s_{0}^{2}/2),$ or 
+\[
+\sigma^{2}\sim\frac{v_{o}s_{o}^{2}}{\chi_{v_{0}}^{2}}.
+\]
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Linear regression: posterior}
+\begin{itemize}
+\item Can show that posterior distribution will be of same form: 
+\begin{align*}
+\beta|\sigma^{2},y,X & \sim N(\tilde{\beta},\sigma^{2}(X'X+A)^{-1}),\\
+\sigma^{2}|y,X & \sim\frac{v_{1}s_{1}^{2}}{\chi_{v_{1}^{2}}},
+\end{align*}
+ with 
+\begin{align*}
+v_{1} & =v_{0}+n\\
+s_{1}^{2} & =\frac{v_{0}s_{0}^{2}+ns^{2}}{v_{0}+n}\\
+\tilde{\beta} & =(X'X+A)^{-1}(X'X\hat{\beta}+A\overline{\beta})\\
+ns^{2} & =(y-x\tilde{\beta})'(y-x\tilde{\beta})+(\tilde{\beta}-\overline{\beta})'A(\tilde{\beta}-\overline{\beta}).
+\end{align*}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Linear regression: comments}
+\begin{itemize}
+\item No simulation required.
+\item The Bayes estimator of $\beta$ is a weighted average of the least
+squares estimator and the prior mean.
+\item The bayes estimator of $\sigma^{2}$ is ``centered'' over $s_{1}^{2}$
+which is a weighted average of the prior hyperparameter and a sample
+quantity.
+\item As $n\rightarrow\infty$ the distribution of the Bayes estimator about
+the posterior mean converges to the distribution of the MLE estimator
+about the true value.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Multivariate regression}
+\begin{itemize}
+\item We can extend these results to the following multivariate regression
+model:
+\begin{align*}
+y_{i}^{1} & =X_{i}^{1}\beta_{1}+\epsilon_{i1}\\
+\vdots\\
+y_{i}^{k} & =X_{i}^{k}\beta_{k}+\epsilon_{ik}\\
+\epsilon_{i} & \sim N(0,\Sigma).
+\end{align*}
+\item In vector form: 
+\[
+y_{i}=\beta X_{i}+\epsilon_{i},\ \epsilon_{i}\sim N(0,\Sigma).
+\]
+\item N independent observations $i=1,\ldots,N,$ $k$-dimensional LHS variable
+in each observation.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Priors}
+\begin{itemize}
+\item We need to place a prior on $\beta,\Sigma.$
+
+\begin{itemize}
+\item Write as $p(\beta,\Sigma)=p(\Sigma)p(\beta|\Sigma).$
+\item Start with independent priors $p(\beta,\Sigma)=p(\beta)p(\Sigma).$
+\item Traditional to place a prior on $\Sigma^{-1}$ instead of $\Sigma.$
+\end{itemize}
+\item Convenient conjugate prior: Wishart distribution on $\Sigma^{-1},$
+or Inverse Wishart on $\Sigma.$
+
+\begin{itemize}
+\item Inverse Wishart is a matrix-valued distribution with two parameters,
+$\Psi$ and $v$.
+\item $\Psi$ is a positive-definite $K\times K$ matrix. $v\in\mathbb{R}$
+satisfies $v\geq K-1.$
+\item Density evaluated at $X:$ 
+\[
+\frac{|\Psi|^{v/2}}{2^{vp/2}\Gamma_{p}(v/2)}|X|^{-\frac{v+p+1}{2}}e^{-\frac{1}{2}tr(\Psi X^{-1})},
+\]
+ where $\Gamma_{J}$ is the multivariate gamma function.
+\end{itemize}
+\item Omitting the constant that makes the density integrate to 1, 
+\[
+p(\beta|\overline{\beta},A)\propto|A|^{1/2}\exp(-\frac{1}{2}(\beta-\overline{\beta})'A(\beta-\overline{\beta})).
+\]
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Posterior: $\beta|y,X$}
+\begin{itemize}
+\item Notation: $G=\Sigma^{-1}.$
+\item Take Cholesky decomposition: $G=CC'.$
+\item Premultiply linear system by $C':$ 
+\begin{align*}
+C'u_{i} & =C'X_{i}\beta+C'\epsilon_{i}\\
+u_{i}^{*} & =X_{i}^{*}\beta+\epsilon_{i}^{*}.
+\end{align*}
+\item We now have iid errors: $\epsilon_{i}^{*}\sim N(0,I).$
+\item As before, in the Bayesian linear model: 
+\begin{align*}
+\beta|u,G & \sim N(\tilde{\beta},\Sigma_{\beta}),\\
+\Sigma_{\beta} & =(X^{*'}X^{*}+A)^{-1}\\
+\tilde{\beta} & =\Sigma_{\beta}(X^{*'}u^{*}+A\overline{\beta}).
+\end{align*}
+\item Note: As $X^{*'}$ becomes large relative to $A,$ this estimator
+approaches the GLS estimator.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Posterior: $\Sigma|y,X$}
+\begin{itemize}
+\item The posterior distribution of $\Sigma|y,X$ is given by:
+\[
+G|\beta,w\sim W(v+N,\Psi+\sum_{i=1}^{N}\epsilon_{i}\epsilon_{i}'),
+\]
+ or 
+\[
+\Sigma|\beta,w\sim IW(v+N,\Psi+\sum_{i=1}^{N}\epsilon_{i}\epsilon_{i}').
+\]
+\end{itemize}
+\end{frame}
+%
+
 
 \section{Empirical Bayes}
 \begin{frame}{What is Emprical Bayes?}
@@ -416,7 +661,6 @@ Posterior is \alert{Gamma}
 \item Can we get benefits of Bayes estimation without unpalatable assumptions?
 \end{itemize}
 \end{itemize}
-
 \end{frame}
 
 
@@ -622,32 +866,6 @@ Note: Table includes only products for which there were at least 50 sales of the
 \end{table}
 \end{frame}
 
-
-\begin{frame}[fragile]{Stan Code}
-\footnotesize
-\begin{verbatim}
-% Main Specification: Dirichlet Prior
-data {
-  int<lower=1> J;               // number of products, including outside good
-  int<lower=1> N[J];            // number of trials
-  int<lower=0> y[J];            // number of successes for each product j
-  vector[J] priors;    // mean of the distribution of alpha
-}
-
-parameters {
-  simplex[J] theta;
-}
-
-model {
-  theta ~ dirichlet(priors);
-  for (j in 1:J) {
-    y[j] ~ binomial(N[j], theta[j]);
-  }
-}
-\end{verbatim}
-\end{frame}
-
-
 \section{Bayesian Estimation}
 
 \begin{frame}{How do we estimate these models?}
@@ -692,13 +910,22 @@ Integral <- function(n){
     Error <- Int-(pnorm(1)-pnorm(0))
     list(Int,Error)}
 \end{minted}
+\end{frame}
 
+\begin{frame}{MCMC}
+\begin{itemize}
+\item Linear regression is nice because it has closed forms (even in Bayesian
+framework).
+\item In most nonlinear models, it's hard to write down the posterior in
+closed form.
+\item It's often easier to sample from a distribution than to characterize
+it.
+\end{itemize}
 \end{frame}
 
 
-
 \begin{frame}{Gibbs Sampling}
-The first building block is known as \alert{Gibbs Sampling}
+The first building block is known as the \alert{Gibbs Sampler}
 \begin{itemize}
 \item Suppose that $p(x,y)$ is a p.d.f or p.m.f that is hard to sample directly from.
 \item But suppose that $p(x | y)$ or $p(y | x)$ are easy to sample from.
@@ -718,14 +945,546 @@ The first building block is known as \alert{Gibbs Sampling}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Gibbs Sampler: Example}
+\begin{frame}{Comments}
+\begin{itemize}
+\item Can prove that the Gibbs sampler converges to the posterior distribution
+of $\theta|X,$ regardless of starting value $\theta^{0}$, under
+some regularity conditions.
+\begin{itemize}
+\item In practice, you throw out a chunk of observations at the beginning
+of a run as ``burn-in.''
+\end{itemize}
+\item For any statistic you want to compute, it would suffice to draw from
+the posterior distribution of $\left(u,\beta,\Sigma\right)$ and simulate
+the statistic at these points.
+
+\begin{itemize}
+\item In practice: you pick every $m$th point along your chain.
+\end{itemize}
+\item No explicit optimization!
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Metropolis Hastings}
+
+\begin{frame}{Bayesian Multinomial Probit}
+\begin{itemize}
+\item Consider the following model: 
+\begin{align*}
+u_{ij} & =X_{ij}\beta+\epsilon_{ij}^{*},\ j=1,\ldots,J-1\\
+u_{i0} & =\epsilon_{i0}.
+\end{align*}
+ In matrix form: 
+\[
+u_{i}=X_{i}\beta+\epsilon_{i},\ \epsilon_{i}\sim N(0,\Sigma).
+\]
+ We observe 
+\[
+y_{ij}=1(u_{ij}\geq u_{ik}\forall k),
+\]
+ as well as $X.$
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Key insight}
+\begin{itemize}
+\item We want to be able to sample from 
+\[
+p(\beta,\Sigma|y_{1},\ldots,y_{N},X).
+\]
+\item If we knew $u$ we could estimate $\beta,\Sigma$ via linear regression.
+\item We don't know $u,$ but if we can sample from its marginal distribution
+and treat it as data, we can alternate ``regression'' steps and
+new draws of $u.$
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{McCulloch and Rossi (JoE 1994)}
+\begin{itemize}
+\item Estimation procedure as follows.
+\begin{itemize}
+\item Start with a guess of $\beta,\Sigma.$
+\item Iterate the following steps:
+
+\begin{enumerate}
+\item Draw $u|\beta,\Sigma$, subject to constraints imposed by $y_{i}:$
+\end{enumerate}
+\begin{itemize}
+\item If $y_{ij}=1$ then we must have $u_{ij}\geq u_{ik}$ for all $k\neq j.$
+\end{itemize}
+\begin{enumerate}
+\item With $u$ in hand, derive $\beta,\Sigma$ from posterior distribution
+given their priors, $X$, and $u.$ (regression step)
+\end{enumerate}
+\item Repeating steps (a) and (b) creates a markov chain which converges
+to the joint distribution of $\beta,\Sigma,u$.
+\item Estimator is an example of a Gibbs sampler.
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Estimation outline}
+\begin{itemize}
+\item Impose Normal and IW priors for $\beta,\Sigma$ respectively.
+\item Iterate the following steps:
+
+\begin{itemize}
+\item Step 1: $N*J$ conditional distributions $u_{ij}|u_{i,-j},\beta,\Sigma,X,y$
+\item Step 2: $\beta|u,\Sigma,X,y$
+\item Step 3: $\Sigma|u,\beta,X,y$
+\end{itemize}
+\item Steps (2) and (3) are exactly as in the multivariate regression model.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Step 1 details}
+\begin{itemize}
+\item for each $i,j$, $u_{ij}|u_{i,-j},\beta,G,y_{i}$ is distributed according
+to a truncated univariate normal distribution.
+\begin{enumerate}
+\item If $u=\left[\begin{array}{c}
+u_{_{ij}}\\
+u_{i,-j}
+\end{array}\right]$ is normally distributed with mean $\mu=\left[\begin{array}{c}
+\mu_{_{ij}}\\
+\mu_{i,-j}
+\end{array}\right]$ and variance $\Sigma=\left[\begin{array}{cc}
+\Sigma_{jj} & \Sigma_{j,-j}\\
+\Sigma_{-j,j} & \Sigma_{-j,-j}
+\end{array}\right]$, then 
+\[
+u_{ij}|u_{i,-j}\sim N(\mu_{ij}+\Sigma_{-j,j}\Sigma_{-j,-j}^{-1} \left( u_{i,-j}-\mu_{i,-j}\right), \ \Sigma_{jj}-\Sigma_{-j,j}\Sigma_{-j,-j}^{-1}\Sigma_{j,-j}).
+\]
+Here, $\mu=X_{i}\beta.$
+\item Truncation points: 
+
+\begin{enumerate}
+\item If $y_{ij}=1$, then we know $u_{ij}\geq\max_{k\neq j}u_{ik}.$
+\item Otherwise, $u_{ij}\leq\max_{k\neq j}u_{ik}.$
+\end{enumerate}
+\item To draw from a distribution $F$ truncated at $[l,u]$, draw a uniform
+random number $x$ and compute 
+\[
+u_{ij}=F^{-1}(xF(l)+(1-x)F(u)).
+\]
+\end{enumerate}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{data augmentation}
+\begin{itemize}
+\item Treating $u$ as an additional unknown parameter is an example of
+\textbf{data augmentation}.
+\item Well-chosen auxiliary parameters can make Bayesian estimation tractable.
+\item Try augmenting the data with $\epsilon\equiv u-X\beta$ instead of
+$u$! 
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{When does Gibbs sampling fail?}
+\small
+\begin{example}[High-probability island ]
+Let 
+\[
+S=\{0,1\}^{100}.
+\]
+Suppose that the zero vector has probability $P(0)=1/2$, and all
+other vectors are equally likely, i.e. occur with probability $P(s)=\frac{1}{2}\cdot\frac{1}{2^{100}-1}.$ 
+
+Consider a Gibbs sampler with an initial value of $s=0$. Suppose
+that we are updating the $j$th component. There are two possible
+outcomes, $e_{j}$ and $0.$ We have:
+\begin{align*}
+p(e_{j}|0) & =\frac{1}{2^{100}-1}/\left(\frac{1}{2^{100}-1}+1\right)\approx\frac{1}{2^{100}}\\
+p(0|0) & =1/\left(\frac{1}{2^{100}-1}+1\right)\approx1.
+\end{align*}
+ 
+\end{example}
+Once $0$ is reached, it will take approximately $2^{100}$ draws
+on average to draw a value other than $0.$ Therefore it will take
+{*}many{*} draws to estimate $P(0).$ 
+\end{frame}
+%
+\begin{frame}{When does Gibbs sampling fail?}
+\footnotesize
+Another failure mode occurs when there are multiple high-probability
+islands.
+\begin{example}[Two islands ]
+Let 
+\[
+S=\{0,1\}^{2}.
+\]
+ and suppose 
+ {\footnotesize
+\begin{align*}
+P(0,0) & =\frac{1}{2}\\
+P(1,1) & =\frac{1}{2}\\
+P(0,1) & =0\\
+P(1,0) & =0.
+\end{align*}
+}
+ In this case a sampler that starts at $(0,0)$ or $(1,1)$ will never
+reach the other high-probability state.
+\end{example}
+\begin{itemize}
+\item This example is an extreme case.
+\item But Gibbs samplers may mix poorly when the underlying
+density has multiple separated peaks.
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Metropolis Hastings: Example}
+
+\begin{frame}{Hierarchical models}
+\begin{itemize}
+\item Bayesian approach to random effects and random coefficients.
+\begin{itemize}
+\item Actually much more general than this.
+\item Hierarchical models have some parameters that are distributed according
+to distributions which in turn have priors.
+\end{itemize}
+\item Example (random coefficients, McCulloch and Rossi): In the multinomial
+probit model, we could impose structure on the covariance matrix as
+follows: 
+\begin{align*}
+u_{i} & =X_{i}\beta_{i}+\epsilon_{i}\\
+\epsilon_{i} & \sim N(0,I)\\
+\beta_{i} & \sim N(\overline{\beta},\Sigma_{\beta_{i}})\\
+\overline{\beta} & \sim N\left(\overline{\overline{\beta}},\Sigma_{\overline{\beta}}\right)\\
+\Sigma_{\overline{\beta}} & \sim IW(\alpha,\nu).
+\end{align*}
+ In this case, $\beta_{i}$ are normally-distributed random coefficients.
+The parameters of $F(\beta_{i})$ in turn have prior distributions.
+\end{itemize}
 \end{frame}
+%
+\begin{frame}{Random coefficients: estimation}
+\begin{itemize}
+\item Augment data w/ random coefficients $\beta_{i}$ as well as $u_{i}.$
+\item Use Gibbs sampler:
+\begin{itemize}
+\item Update $u|\beta_{i},X$ exactly as before, except that variance of
+$\epsilon$ is fixed at $N(0,I).$ 
+\item Update $(\beta_{i}|u,\overline{\beta},\Sigma_{\beta_{i}},X_{i})$,
+one observation $i$ at a time.
+\item Update $\overline{\beta},\Sigma_{\beta_{i}}|\left\{ \beta_{i}\right\} _{i=1,\ldots,N}$
+as in Bayesian linear regression. 
+\end{itemize}
+\item See McCulloch and Rossi for estimation procedure.
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Metropolis-Hastings}
+\begin{itemize}
+\item Gibbs samplers require you to know conditional densities.
+\item Often, all you know is a function that is proportional to the (conditional)
+density.
+\begin{itemize}
+\item Example: you want to draw from $f(x|x\in R)$ for some region $R$,
+and you know $f(x)$, but it is difficult to characterize the region
+$R.$
+\item In this case it's easy to compute $f(x)\cdot1(x\in R)$ but difficult
+to compute $\frac{f(x)1(x\in R)}{\int_{R}f(x)dx}.$ 
+\end{itemize}
+\item Metropolis-Hastings simulators are algorithms to sample from a density
+when you know a function proportional to it.
+\item You can even use MH for conditional distributions within a Gibbs sampler
+(known as MH-within-Gibbs).
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{MH algorithm}
+\begin{itemize}
+\item Suppose you know a function $\pi(x|data)$ which is proportional to $f(x|data).$
+\item The Metropolis-Hastings simulator creates a sequence that converges
+to the stationary distribution $\pi(\cdot).$
+\item Algorithm is as follows:
+\begin{enumerate}
+\item Fix a proposal density $q(x'|x).$ 
+\item Start at $x=x^{(0)}.$ 
+\item For iteration $i=1,\ldots,T$ do:
+\begin{itemize}
+\item Propose $x'\sim q(x'|x^{(i-1)})$
+\item Define the acceptance probability 
+\[
+\alpha(x'|x)=\min\left\{ 1,\frac{q(x'|x^{(i-1)})\pi(x'|data)}{q(x^{(i-1)}|x')\pi(x^{(i-1)}|data)}\right\} .
+\]
+\item Update $x$ according to: 
+\[
+x^{(i)}=\begin{cases}
+x' & \text{ with probability }\alpha(x'|x)\\
+x^{(i-1)} & \text{ with probability }1-\alpha(x'|x)
+\end{cases}.
+\]
+\end{itemize}
+\end{enumerate}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Choosing a proposal density}
+\begin{itemize}
+\item Symmetric proposal density 
+\[
+q(x'|x)=q(x|x')
+\]
+ is a popular choice. 
+\begin{itemize}
+\item This option is known as \textbf{random walk Metropolis-Hastings}.
+\item Normal distribution is a popular choice within this class: 
+\[
+q(x'|x)=\phi(x'-x;\ 0,\sigma_{q}^{2}).
+\]
+\item For any symmetric $q(\cdot|\cdot)$:
+\[
+\alpha(x'|x)=\min\left\{ 1,\frac{\pi(x'|data)}{\pi(x|data)}\right\} .
+\]
+\item Aim for acceptance rate$\approx1/3$ by choice of scale of proposal
+distribution? 
+\begin{itemize}
+\item Too low and too many draws are needed.
+\item Too high and the chain mixes slowly.
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Other proposal densities}
+\begin{enumerate}
+\item Independent proposal density: 
+\[
+\alpha(x'|x)=\min\left\{ 1,\frac{q(x')\pi(x'|data)}{q(x)\pi(x|data)}\right\} .
+\]
+
+\begin{itemize}
+\item Can be convenient if some choice of $q(\cdot)$ is easy to sample
+from \textbf{and }results in an easy-to-evaluate expression for $q(x)\pi(x).$ 
+\end{itemize}
+\item Other proposal densities that simplify the expression $\frac{q(x'|x^{(i-1)})\pi(x'|data)}{q(x^{(i-1)}|x')\pi(x^{(i-1)}|data)}$.
+\end{enumerate}
+\end{frame}
+%
+\begin{frame}{Other methods when your ``density'' doesn't integrate to 1}
+\begin{itemize}
+\item MH is not the only method for sampling when all you know is a function
+proportional to the density.
+\item Slice sampling (Neal 2003) can be practical on some problems.
+\item Also: Hamiltonian Monte Carlo (aka ``Hybrid Monte Carlo'')
+\begin{itemize}
+\item Requires gradient, but can be much faster to converge than MH.
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+% \begin{frame}{Slice sampling}
+% \end{frame}
+% %
+\begin{frame}{Hamiltonian Monte Carlo}
+Hamiltonian Monte Carlo combines ideas from physics with the Metropolis-Hastings algorithm to sample from the posterior with much less autocorrelation than random-walk MH algorithms.
+
+My slides follow Neal (2012), ``MCMC using Hamiltonian Dynamics''
+\end{frame}
+
+\begin{frame}{Hamiltonian}
+Think of a marble rolling around on a surface.  The marble has:
+\begin{itemize}
+	\item a $d$-dimensional position vector, $q$
+	\item a $d$-dimensional momentum vector, $p$
+\end{itemize}
+Define the {\it Hamiltonian} as follows:
+$$  H(q,p) = U(q) + K(p)  $$
+where
+\begin{itemize}
+	\item $U(q)$ is the potential energy (depends on position).
+	\item $K(p)$ is the kinetic energy (depends on how fast the marble is moving).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hamiltonian dynamics}
+The partial derivatives of the Hamiltonian determine how $p$ and $q$ evolve.
+\begin{align*}
+\frac{\partial q_i}{\partial t} &= \frac{\partial H}{\partial p_i} \\
+\frac{\partial p_i}{\partial t} &= -\frac{\partial H}{\partial q_i} 
+\end{align*}
+These equations imply that the Hamiltonian is invariant.
+\end{frame}
+
+\begin{frame}{Details}
+
+$$H(q,p) = U(q) + K(p)$$
+
+\begin{enumerate}
+	\item Typically, $K(p) = p'M^{-1}p/2$, where $M$ is a symmetric, positive-definite ``mass matrix''.  (This is the formula for kinetic energy.)
+	\item Observe that $K(p)=p'M^{-1}p/2$ is also the log-pdf of a Normal with mean 0 and covariance $M$.
+	\item In physics, $U(\cdot)$ would represent the height of the surface at different locations.
+	\item We're going to choose $U(\cdot)$ to have a probabiliistic interpretation.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Interpretation as probability}
+\begin{itemize}
+	\item Fact (from statistical mechanics): Given a ``temperature'' $T$, Hamiltonian dynamics imply a joint distribution of states, given by 
+$$ Pr(q,p) = \frac{1}{Z}\exp\left( \frac{-H(q,p)}{T} \right) $$
+\begin{itemize}
+	\item  $Z$ is the constant needed to make $Pr(\cdot)$ integrate to 1. \end{itemize}
+	\item In our case, taking $T=1$, we have $$Pr(q,p) = \frac{1}{Z}\exp\left( -U(q) \right)\exp\left( -K(p) \right).$$
+	\item Goal: pick $U(\cdot)$ so that the marginal of $Pr(\cdot)$ is the posterior over $q$.
+	\item Achieve this by picking $$U(q) = -\log \left( \pi(q) L(q|D) \right)$$ where: \begin{itemize}
+		\item $\pi(q)$: prior density
+		\item $L(q|D)$: likelihood given data $D$.
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hamiltonian Monte Carlo algorithm}
+Assume \begin{enumerate}
+\item prior $\pi(q)$ on parameters $q$
+\item Gaussian prior w/ diagonal covariance matrix on $p$, {\bf independent of} $\pi(\cdot)$
+\item diagonal mass matrix.
+\end{enumerate}
+Iterate as follows:
+\begin{enumerate}
+	\item[0] At beginning of iteration $t$, algorithm has state $(q_t,p_t)$.
+	\item[1] Draw a new $p$, iid, from independent Gaussian distribution.  Consider state $(q_t,p)$.
+	\item[2] Simulate a trajectory using Hamiltonian dynamics.  Arrive at $(q',p')$.
+	\item[3] Use the (standard) Metropolis-Hastings acceptance rule for a symmetric proposal density: 
+	$$ \alpha = \min[1, \exp(-H(q',p') + H(q_t,p_t))].$$
+	With probability $\alpha$, the new state is $(q',p')$; otherwise it's $(q_t,p_t)$ again.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Simulating Hamiltonian dynamics}
+\begin{itemize}
+	\item Hamiltonian is conserved under (continuous) Hamiltonian dynamics.
+	\item To implement on a computer, need to discretize.  Some subtlety to simulation/discretization. 
+	\item Naive methods could cause simulation errors to blow up.
+	\item Use ``leapfrog'' algorithm or refinements thereof.  This algorithm keeps Hamiltonian (exactly) constant.  See details in Neal (2012).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Hamiltonian Monte Carlo: comments}
+\begin{enumerate}
+	\item Equations of motion involve gradient of log-likelihood.  Need to provide this.
+	\item Why is the proposal density symmetric?  Can prove that ``forward'' trajectory is as likely as ``backward''.
+	\item If we skipped step (1), would always have $H(q_t,p_t) = H(q',p')$.  Only change in likelihood of $(p,q)$ comes from new momentum draw in step (1).
+	\item Step 1 is necessary. If total energy is fixed, particle will never reach states with likelihood below a given finite value.)
+	\item Well-tested implementation in \texttt{STAN} (domain-specific language; callable from \texttt{R/Python/Julia}; provides automatic differentiation).  Fantastic if you can phrase your problem in its language.
+	\item If you can shoehorn your problem into \texttt{STAN}, do it!
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}[fragile]{Stan Code}
+\footnotesize
+\begin{verbatim}
+% Main Specification: Dirichlet Prior
+data {
+  int<lower=1> J;               // number of products, including outside good
+  int<lower=1> N[J];            // number of trials
+  int<lower=0> y[J];            // number of successes for each product j
+  vector[J] priors;    // mean of the distribution of alpha
+}
+
+parameters {
+  simplex[J] theta;
+}
+
+model {
+  theta ~ dirichlet(priors);
+  for (j in 1:J) {
+    y[j] ~ binomial(N[j], theta[j]);
+  }
+}
+\end{verbatim}
+\end{frame}
+
+
+
+
+\begin{frame}{An MCMC approach to classical estimation (Chernozhukov and Hong, JoE
+2003)}
+\begin{itemize}
+\item It turns out that MCMC can be useful outside of Bayesian framework.
+\item CH consider case of extremum estimation
+\begin{itemize}
+\item Review: want to maximize a criterion function $L_{n}(\theta)$, where
+$n$ is sample size. 
+\item Leading example: GMM 
+\[
+L_{n}(\theta)=-\frac{1}{2}\left(n^{-1/2}\sum_{i=1}^{n}m_{i}(\theta)\right)^{'}W_{n}(\theta)\left(n^{-1/2}\sum_{i=1}^{n}m_{i}(\theta)\right)
+\]
+ for moment function $m_{i}(\theta)$, weight matrix $W_{n}(\theta).$ 
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Laplace-type estimators}
+\begin{itemize}
+\item Consider an objective function $L_{n}(\theta)$.
+\item Pick a prior $\pi(\theta)$ strictly positive and continuous over
+$\Theta.$ 
+\item The following transformation is known as a\textbf{ quasi-posterior:}
+\[
+p_{n}(\theta)\equiv\frac{\pi(\theta)\exp(L_{n}(\theta))}{\int_{\Theta}\pi(\theta)\exp(L_{n}(\theta))d\theta}.
+\]
+\item Quasi-posterior mean is an example of a \textbf{Laplace-type estimator}:
+\[
+\int_{\Theta}\theta p_{n}(\theta)d\theta
+\]
+
+\begin{itemize}
+\item Formally: LTEs solve
+\[
+\hat{\theta}=\arg\inf_{\zeta}\int\rho_{n}(\theta-\zeta)p_{n}(\theta)d\theta
+\]
+\item Different choices of $\rho_{n}$ give posterior means, medians, $\tau th$
+quantiles.
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Computing LTEs}
+
+\[
+p_{n}(\theta)\equiv\frac{\pi(\theta)\exp(L_{n}(\theta))}{\int_{\Theta}\pi(\theta)\exp(L_{n}(\theta))d\theta}.
+\]
+
+\begin{itemize}
+\item Even if $L_{n}(\theta)$ is not a likelihood, $p_{n}(\cdot)$ is a
+proper density over $\Theta.$ 
+\item Goal: compute mean.
+\item Can do so via MCMC: 
+\[
+\hat{\theta}=\frac{1}{B}\sum_{i=1}^{B}\theta^{(i)}
+\]
+\item In practice:
+\begin{itemize}
+\item Constant term $\int_{\Theta}\pi(\theta)\exp(L_{n}(\theta))d\theta$
+may be difficult to compute.
+\item Use Metropolis-Hastings with $f(\theta)=\pi(\theta)\exp(L_{n}(\theta)).$ 
+\end{itemize}
+\end{itemize}
+\end{frame}
+%
+\begin{frame}{Notes on LTEs}
+
+\[
+p_{n}(\theta)\equiv\frac{\pi(\theta)\exp(L_{n}(\theta))}{\int_{\Theta}\pi(\theta)\exp(L_{n}(\theta))d\theta}.
+\]
+
+\begin{enumerate}
+\item If $L_{n}(\cdot)$ is log-likelihood, then $p_{n}(\theta)$ is the
+(Bayesian) posterior.
+\item Paper gives two procedures for inference.
+\begin{enumerate}
+\item Can estimate variance along your sequence, use delta method.
+\item Under stronger conditions, to estimate a 95\% CI, can use quantiles
+of sequence $\theta^{(i)}.$
+\begin{enumerate}
+\item Valid in GMM iff you use best estimate of optimal weight matrix. 
+\item See paper for details.
+\end{enumerate}
+\end{enumerate}
+\end{enumerate}
+\end{frame}
+
 
 \section*{Thanks!}
 \end{document}
