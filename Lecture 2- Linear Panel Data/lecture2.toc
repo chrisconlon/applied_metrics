@@ -1,2 +1,0 @@
-\beamer@sectionintoc {1}{Recap: Asymptotics for OLS and the Linear Model}{4}{0}{1}
-\beamer@sectionintoc {2}{What is Panel Data?}{32}{0}{2}
