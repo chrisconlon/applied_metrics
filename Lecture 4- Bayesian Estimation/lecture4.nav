@@ -98,8 +98,17 @@
 \headcommand {\beamer@framepages {44}{44}}
 \headcommand {\slideentry {4}{0}{3}{45/45}{}{0}}
 \headcommand {\beamer@framepages {45}{45}}
-\headcommand {\beamer@partpages {1}{45}}
-\headcommand {\beamer@subsectionpages {46}{45}}
-\headcommand {\beamer@sectionpages {46}{45}}
-\headcommand {\beamer@documentpages {45}}
-\headcommand {\gdef \inserttotalframenumber {39}}
+\headcommand {\slideentry {4}{0}{4}{46/46}{}{0}}
+\headcommand {\beamer@framepages {46}{46}}
+\headcommand {\slideentry {4}{0}{5}{47/47}{}{0}}
+\headcommand {\beamer@framepages {47}{47}}
+\headcommand {\beamer@sectionpages {43}{47}}
+\headcommand {\beamer@subsectionpages {43}{47}}
+\headcommand {\sectionentry {5}{Thanks!}{48}{Thanks!}{0}}
+\headcommand {\slideentry {5}{0}{1}{48/48}{}{0}}
+\headcommand {\beamer@framepages {48}{48}}
+\headcommand {\beamer@partpages {1}{48}}
+\headcommand {\beamer@subsectionpages {48}{48}}
+\headcommand {\beamer@sectionpages {48}{48}}
+\headcommand {\beamer@documentpages {48}}
+\headcommand {\gdef \inserttotalframenumber {41}}

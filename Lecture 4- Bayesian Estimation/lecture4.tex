@@ -660,8 +660,41 @@ A few options
 \item Mostly not the case.
 \end{itemize}
 \item Mostly we do what is known as \alert{Markov Chain Monte Carlo}
+\item The goal is to draw from $f(\theta | \mathbf{X})$ or to compute moments of the distribution $E_f[g(\theta)]$.
 \end{itemize}
 \end{frame}
+
+\begin{frame}{Monte Carlo Methods}
+\begin{itemize}
+\item Suppose we want to calculate a function 
+$$E_f[g(x)] = \int g(x) f(x) d\,x$$
+\item How do we do it?
+\begin{enumerate}
+\item Draw from $\hat{x}_s \sim f(x)$
+\item Caclulate $g(\hat{x}_s)$
+\item Repeat for $s=1\ldots,S$
+\item Calculate $E[\hat{g}]=\frac{1}{S} \sum_{s=1}^S g(\hat{x}_s)$
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Monte Carlo Example}
+\begin{itemize}
+\item Let's integrate $g(x) = \phi(x)$ (normal pdf) over $f(x) = Unif(0,1)$ from $[0,1]$.
+\item We know the answer is $\Phi(1) - \Phi(0)$.
+\end{itemize}
+\begin{minted}{R}
+Integral <- function(n){
+    X <- runif(n)
+    Y <- exp(-X^2/2)/sqrt(2*pi)
+    Int <- sum(Y)/n
+    Error <- Int-(pnorm(1)-pnorm(0))
+    list(Int,Error)}
+\end{minted}
+
+\end{frame}
+
 
 
 \begin{frame}{Gibbs Sampling}
@@ -682,11 +715,17 @@ The first building block is known as \alert{Gibbs Sampling}
 \begin{itemize}
 \item This does not mean that $(x_3,y_3)$ and $(x_1,y_1)$ are I.I.D!
 \end{itemize}
-
 \end{itemize}
-
 \end{frame}
 
+\begin{frame}{Gibbs Sampler: Example}
+\end{frame}
+
+\begin{frame}{Metropolis Hastings}
+\end{frame}
+
+\begin{frame}{Metropolis Hastings: Example}
+\end{frame}
 
 \section*{Thanks!}
 \end{document}
