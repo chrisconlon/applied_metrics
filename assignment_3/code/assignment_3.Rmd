@@ -1,0 +1,206 @@
+---
+title: "Problem Set 3"
+author: "Prof. Conlon"
+date: 'Due: 3/15/19'
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newcommand{\E}[1]{\ensuremath{\mathbb{E}\big[#1\big]}}
+\newcommand{\Emeasure}[2]{\ensuremath{\mathbb{E}_{#1}\big[#2\big]}}
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* lme4 (Linear Mixed Effects Models using Maximum Likelihood)
+* bayesm (Bayesian Models using MCMC)
+* ggplot2 (Plotting library)
+* estimatr (Tidyverse version of lm function)
+
+```{r,comment='\t\t',echo=FALSE}
+
+## This is a code chunk: it is outlined in grey and has R code inside of it
+## Note: you can change what is shown in the final .pdf document using arguments 
+##       inside the curly braces at the top {r, comment='\t\t'}. For example, you 
+##       can turn off print statements showing in the .pdf by adding 'echo=False' 
+##       i.e. changing the header to {r, comment='\t\t',echo=FALSE}
+
+## ~~~~~~~~~~~~~~ CODE SETUP ~~~~~~~~~~~~~~ ##
+
+# ~ This bit of code will be hidden after Problem Set 1 ~
+#
+# This section sets up the correct directory structure so that
+#  the working directory for your code is always in the data folder
+
+# Retrieve the code working directory
+#script_dir = dirname(sys.frame(1)$ofile)
+initial_options <- commandArgs(trailingOnly = FALSE)
+render_command <- initial_options[grep('render',initial_options)]
+script_name <- gsub("'", "", 
+                    regmatches(render_command, 
+                               gregexpr("'([^']*)'",
+                               render_command))[[1]][1])
+
+# Determine OS (backslash versus forward slash directory system)
+sep_vals = c(length(grep('\\\\',script_name))>0,length(grep('/',script_name))>0)
+file_sep = c("\\\\","/")[sep_vals]
+
+# Get data directory
+split_str = strsplit(script_name,file_sep)[[1]]
+len_split = length(split_str) - 2
+data_dir = paste(c(split_str[1:len_split],'data',''),collapse=file_sep)
+
+# Check that the data directory contains the files for this weeks assignment
+data_files = list.files(data_dir)
+if(any(sort(data_files)!=sort(c('height.csv')))){
+  cat("ERROR: DATA DIRECTORY NOT CORRECT\n")
+  cat(paste("data_dir variable set to: ",data_dir,collapse=""))
+}
+
+```
+
+## Problem 1 (Coding Exercise)
+
+For this exercise, you will be working with a dataset provided by an R package. Many R packages have standardized datasets that allow you to test code. The specific dataset you will be working with is the "sleepstudy" dataset available from the "lme4" package. When you load the "lme4" package, the dataframe "sleepstudy" will be available for you to use. 
+
+The dataset contains results from a sleep study experiment. 18 subjects were deprived of sleep over 9 days, and given reaction time tests on each day. The columns are as follows:
+
+\begin{itemize}
+  \item[] \textbf{Reaction} : reaction time (in seconds) 
+  \item[] \textbf{Days} : number of days with sleep deprivate (0 is no sleep deprivation)
+  \item[] \textbf{Subject} : unique subject identifier
+\end{itemize}
+Before doing any regression analysis, it's always a good idea to get a feel for the data. 
+
+\begin{enumerate}
+  \item[a.] \textbf{Plot the mean reaction time as the number of sleep deprivation days increase. What do you see?}
+\end{enumerate}
+
+At first, we think that the following model is the correct model to explain the impact of sleep deprivation on reaction times:
+
+\begin{align*}
+  r_{it} = \mu + \beta s_{it} + \epsilon_{it} 
+\end{align*}
+where,
+\begin{itemize}
+  \item[--] $r_{it}$ is reaction time of subject $i$ on day $t$
+  \item[--] $s_{it}$ is the number of days without sleep deprivation for subject $i$ on day $t$
+\end{itemize}
+
+R has two ways for us to do these simple regressions: (1) using the plot functions or (2) using the regression functions.
+
+\begin{enumerate}
+\item[b.] \textbf{Using ggplot and the "stat\_smooth" option, plot a scatter plot with an ols line from the above model.}
+\item[c.] \textbf{Using the 'lm\_robust' function, run the above regression. Remake the same plot.}
+\item[d.] \textbf{One issue with the above procedure is it assumes a constant slope $\beta$ for all subjects. Run a seperate ols regression for each individual, and make a histogram of the estimates. What do you see?}
+\end{enumerate}
+
+
+To address the issues with differing responsiveness to sleep deprivation, we instead decide to estimate the following random-slope model:
+
+\begin{align*}
+  r_{it} &= \mu + \beta s_{it} + \beta_{i} s_{it} + \epsilon_{it} \\
+  \beta_{i} &\sim N(0,\sigma^{2}_{\beta}) \\
+  \epsilon_{i,t} &\sim N(0,\sigma^{2}_{\epsilon}) \\
+  \beta_{i} &\perp \epsilon_{i,t} 
+\end{align*}
+
+\begin{enumerate}
+\item[e.] \textbf{You have seen this model before, what type of model is it?}
+\item[f.] \textbf{What is the covariance matrix of the random-slope model? Compare it to the covariance matrix of the previous model? What has changed?}
+\item[g.] \textbf{One useful statistic people calculate when trying to determine if the random-slope model is correct is the intraclass correlation coefficient, $ICC$, defined as:}
+\begin{align*}
+  ICC = \frac{Var(\beta_{i})}{Var(\beta_{i}) + Var(\epsilon_{ij})}
+\end{align*}
+\textbf{Why is this a good measure to think about whether the above model is the correct model? Estimate the ICC for this data, interpret your results. \newline
+(Note: What are unbiased estimates for each of the components? Try using the law of total variance on the sum of squared errors.)}
+\end{enumerate}
+
+To estimate the above model, there are two different approaches that one can take: (1) using Maximum likelihood or (2) using Bayesian methods. Lucky for us, there are R packages for both of them. 
+
+## Maximum Likelihood Approach
+
+\begin{enumerate}
+\item[h.] \textbf{Run a seperate ols regression for each individual, plot the resulting ols estimates across subjects (pick 5 subjects). What do you see?}
+\item[i.] \textbf{In part (d), we had you run an individual-by-individual ols regression. Why is this not the best estimation strategy?}
+\item[j.] \textbf{Using the lme4 package, run the regression in the model specified above. Plot the resulting unit-level regression lines for 5 subjects, how do they compare to the individual-by-individual ols regressions?}
+\end{enumerate}
+
+The **lme4** package is maximizing a likelihood function, an alternative approach would be to use a bayesian method. The next part of this exercise asks you to understand these differences and run a bayesian method. In order for this model to be bayesian, we now write down the following model:
+
+## Bayesian Approach
+
+To help you better understand the main package you will be using, I have provided an example code in the code folder: bayesm\_example.R.
+\newline
+\newline
+Consider the following model:
+
+\begin{align*}
+  r_{it} &= \mu_{i} + \bar{\beta}_{i}s_{it} + \epsilon_{ij} \\
+  \bar{\mu}_{i} &= \mu + \mu_{i} \\
+  \bar{\beta}_{i} &= \beta + \beta_{i} \\
+  \begin{bmatrix} \mu_{i} 
+               \\ \beta_{i} 
+  \end{bmatrix} &\sim N(0,\sigma^{2}_{\beta}) \\
+  \sigma^{2}_{\beta} &\sim IW(v_{0},V_{0}) 
+\end{align*}
+
+where,
+\begin{itemize}
+  \item[] IW is an inverse-wishart distribution (a common prior distribution used)
+\end{itemize}
+\vspace{0.3cm}
+
+\begin{enumerate}
+\item[k.] \textbf{What is} $\beta$ \textbf{in the model above? In words, no calculations are needed.}
+\item[l.] \textbf{What differs in this model from the previous model we estimated?}
+\item[m.] \textbf{Using the rhierLinearModel function from bayesm (do not change the default settings except the number of MCMC draws), run an MCMC algorithm to estimate the model above, with 2000 draws. Do the following:}
+\begin{itemize}
+  \item[m1.] \textbf{Plot the last 500 MCMC draws (these are the betadraw variables) for the slope term for 5 of the subjects, does it seem to converge?}
+  \item[m2.] \textbf{Using the last draw from the MCMC draws, plot the new unit-level regression line for 5 subjects, i.e. make a scatterplot of the data and plot a regression line using both the new slope and intercept terms $(\mu_{i},\beta_{i})$ \newline
+(Note: If your model output is stored in the variable, mcmc, then you can get the last draw using the following mcmc\$betadraws[,,-1])}.
+\end{itemize}
+\end{enumerate}
+
+
+## Problem 2 (Coding Exercise)
+
+The goal of this exercise is to predict the average height of a randomly selected person from the population. We have provided a dataset 'height.csv' dataframe with heights for men and women in the population. For now, assume that height, $X_{i}$ for each individual $i$, is distributed as $X_{i} \sim N(\mu,\sigma^{2})$. 
+
+\begin{enumerate}
+  \item[a.] \textbf{Recast this problem as a regression problem and estimate $\mu$.}
+  \item[b.] \textbf{Going back to the data, plot histograms for the overall population, and then for men and women seperately. What do you notice?}
+
+\end{enumerate}
+
+Given the answer to part (b), one way to think about this problem is that we have some proportion of men and women in the population $(\omega_{m},\omega_{w})$ and the height of individual $i$ depends on which subpopulation the person comes from. This new model is:
+
+\begin{align*}
+  X_{i} &= \omega_{w}X_{w} + (1-\omega_{w})X_{m} \\
+  X_{w} &\sim N(\mu_{w},\sigma^{2}_{w}) \\
+  X_{m} &\sim N(\mu_{m},\sigma^{2}_{m}) \\
+  \omega_{w} &\in [0,1] 
+\end{align*}
+
+This is a hard estimation problem to code up (see Expectation Maximization), but luckily for us we can use `bayesm' again. 
+
+\begin{enumerate}
+\item[c.] \textbf{Once again, recast this problem in a regression framework. \newline
+(Hint: What is the mean and variance of $X_{i}$?)}
+\item[d.] \textbf{Using your answer to the last part, justify running a linear hierarchical mixture model regression. Use \textbf{rhierLinearMixture} to run this model. \newline
+(Note: \textbf{ncomp} option specifies the number of mixture components)}
+\item[e.] \textbf{Using the last MCMC draw, plot a histogram of the beta estimates for men and women observations seperately. What do you notice about these new distributions? \newline
+}
+\end{enumerate}
+
+
+
