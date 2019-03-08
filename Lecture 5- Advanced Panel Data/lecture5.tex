@@ -1,0 +1,392 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{focus}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 5:  Advanced Panel Data}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Causal FE}
+
+\begin{frame}
+\frametitle{Recall the FE Assumptions}
+\begin{eqnarray*}
+y_{it} =  x_{it}'\beta + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+\begin{itemize}
+\item $\eta_i$ is a \alert{fixed effect}.
+\item To estimate everything consistently, we need $E[ \varepsilon_{it} | x_{it}, \eta_i]=0$
+\item Mostly this is not true. Instead usually treat $\eta_i$ as a \alert{control variable} or \alert{nuisance parameter}.
+\begin{itemize}
+\item A nuisance parameter is one that we estimate but don't care about interpreting.
+\item If we only care about $\beta$ then $\eta_i$ is a nuisance parameter.
+\end{itemize}
+\item With a control or nuisance parameter we only require that $E[ \varepsilon_{it} | \eta_{i}]=E[ \varepsilon_{it} | x_{it}, \eta_i]$ \alert{conditional mean independence}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Recall the FE Assumptions}
+\begin{eqnarray*}
+y_{it} =  x_{it}'\beta + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+\begin{itemize}
+\item $\eta_i$ is a \alert{fixed effect}.
+\item To estimate everything consistently, we need $E[ \varepsilon_{it} | x_{it}, \eta_i]=0$
+\item Mostly this is not true. Instead usually treat $\eta_i$ as a \alert{control variable} or \alert{nuisance parameter}.
+\begin{itemize}
+\item A nuisance parameter is one that we estimate but don't care about interpreting.
+\item If we only care about $\beta$ then $\eta_i$ is a nuisance parameter.
+\end{itemize}
+\item With a control or nuisance parameter we only require that $E[ \varepsilon_{it} | \eta_{i}]=E[ \varepsilon_{it} | x_{it}, \eta_i]$ \alert{conditional mean independence}.
+\item Once we condition on $\eta_i$ it is as if $\varepsilon_{it}$ and $x_{it}$ are uncorrelated.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Causal FE}
+\begin{itemize}
+\item We can get away with conditional mean independence if we don't care about $\eta_i$.
+\item But suppose that we care about $\widehat{\eta}_i$?
+\begin{itemize}
+\item Teacher FE
+\item Physician/Hospital FE
+\item Location/County FE
+\item Suppose we take someone from the $10th$ percentile and move them to the $90th$ percentile
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Causal FE}
+\begin{itemize}
+\item Now we have to really believe $E[ \varepsilon_{it} | x_{it}, \eta_i]=0$
+\item We should worry about the conventional \alert{omitted variable bias} problem.
+\item Suppose there exists a variable $w_{it}$ so that:
+\begin{eqnarray*}
+y_{it} =  x_{it}'\beta +  w_{it}'\gamma + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+\item Recall the conditions for OVB
+\begin{itemize}
+\item $w_{it}$ is correlated with $x_{it}$
+\item $w_{it}$ is a determinant of $y_{it}$
+\end{itemize}
+\item New one:  $w_{it}$ is correlated with $\eta_i$
+\begin{itemize}
+\item This is easy to satisfy!
+\item $w_{it}$ needs to be uncorrelated with anything about the individual $i$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Example: Test Scores}
+\begin{itemize}
+\item Students $s$, Teachers $t$
+\item Want to measure effect of \alert{Teachers} on \alert{Test Scores}
+\begin{eqnarray*}
+TestScore_{st} = \beta x_s +\gamma w_t+  \eta_{t} + \varepsilon_{st}
+\end{eqnarray*}
+\item We observe some features of students but not all of them (parent's education, household income, language spoken at home).
+\item We also observe some school specific variables $w_t$ but not all of them (district spending per pupil, \% free lunch, etc.).
+\item But we don't observe other things (jackhammering outside the classroom, which students have disruptive home lives,etc.).
+\begin{itemize}
+\item If the mean of those things varies across teachers $\rightarrow$ we are screwed!
+\item Can't get an accurate estimate of $\eta_i$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example: Test Scores}
+We need a better design:
+\begin{itemize}
+\item We probably need random assignment of students to teachers.
+\item Ideally we would be able to control for student and school unobservables.
+\item Might want to see many students match with many teachers.
+\end{itemize}
+\end{frame}
+
+\section*{Dynamic Panel Data}
+
+\begin{frame}{Dynamic Panel}
+\begin{itemize}
+\item Suppose that we also want to include a lagged $y_{i,t-1}$
+\begin{eqnarray*}
+y_{it} = \rho y_{i,t-1} + x_{it}'\beta + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+\item We can treat $\eta_i$ as a \alert{random effect} or a \alert{fixed effect}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dynamic Panel: Nickell (1981) Bias}
+Consider the within transform
+\begin{eqnarray*}
+(y_{it}-\overline{y}_i) = \rho (y_{i,t-1}-\overline{y}_i) + (x_{it}-\overline{x}_i)'\beta +( \varepsilon_{it}- \overline{\varepsilon}_{i})
+\end{eqnarray*}
+\begin{itemize}
+\item This eliminates the fixed effect.
+\item But $Cov(y_{i,t-1}-\overline{y}_i, \varepsilon_{it}- \overline{\varepsilon}_{i}) \neq0$. Why?
+\begin{itemize}
+\item Both contain past and future values
+\item There is a direct relationship between $y$ and $\varepsilon$
+\item Bias does not disappear as $N \rightarrow \infty$ (it does as $T\rightarrow \infty$).
+\item For small $T$, dynamic panel model is \alert{inconsistent}.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dynamic Panel: Bias Alternative}
+\begin{eqnarray*}
+y_{it} = \rho y_{i,t-1} + x_{it}'\beta + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+\begin{itemize}
+\item We require the following assumption (\alert{strict exogeneity}):
+\begin{eqnarray*}
+E\left(\varepsilon_{i t} | x_{i 1}, \ldots, x_{i T}, \eta_{i}\right)=0, \quad t=1, \ldots, T
+\end{eqnarray*}
+\item But what about $y_{it-1}$? 
+\begin{itemize}
+\item It is correlated with $\varepsilon_{i,t-1}$ and $\eta_i$ (by construction).
+\item With serial correlation it is correlated with $\varepsilon_{it}$
+\item This is the usual \alert{endogeneity} concern.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Dynamic Panel: Differenced Model (Anderson-Hsiao)}
+How do we deal with endogeneity? With \alert{instruments}!
+\begin{eqnarray*}
+y_{it} = \rho y_{i,t-1} + x_{it}'\beta + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+Consider the first differences ($s$ is a dummy time index):
+\begin{eqnarray*}
+E\left[x_{i s}\left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]=0
+\end{eqnarray*}
+Idea:
+\begin{itemize}
+\item Under \alert{strict exogeneity} of $x_{it}$ we can use both \alert{lags} and \alert{leads} as instruments for $y_{i,t-1}$
+\item \alert{Excluded Instruments} $x_{i,s}$ do not have a direct effect on $\Delta y_{i,t-1}$.
+\item These moments work even in presence of \alert{serially correlated errors}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Minimal Example: Anderson-Hsiao}
+Imagine we have only $T=3$ periods:
+\begin{align*}
+y_{3}-y_{2}=\alpha\left(y_{2}-y_{1}\right)+\beta_{0}\left(x_{3}-x_{2}\right)+\beta_{1}\left(x_{2}-x_{1}\right)+\left(\varepsilon_{3}-\varepsilon_{2}\right)
+\end{align*}
+\begin{itemize}
+\item $E\left(x_{i s} \Delta \varepsilon_{i 3}\right)=0$ has three instruments $(x_{i1},x_{i2},x_{i3})$.
+\item The model is \alert{just identified} with 3 parameters $(\alpha,\beta_0,\beta_1)$.
+\item The challenge with this approach is often that it suffers from \alert{weak instruments}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994)}
+Study annual cigarette consumption with state-level data:
+\begin{align*}
+c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
+\end{align*}
+A model of (forward looking) \alert{rational addiction}:
+\begin{itemize}
+\item $c_{it} = $ Annual per capita cigarette consumption in packs by state.
+\item $p_{it} =$ Average cigarette price per pack.
+\item $\theta = $ Measure of the extent of addiction (for $\theta > 0$).
+\item $\beta= $ Discount factor.
+\item Derived from forward looking model of \alert{habit formation} FOC's.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Becker, Grossman, Murphy (1994)}
+\begin{align*}
+c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
+\end{align*}
+\begin{itemize}
+\item Marginal utility of wealth can show up in $\gamma$ or $\eta_i$.
+\item The errors $v_{it}$ are unobserved life-cycle utility shifters, can be autocorrelated. 
+\item Absent addiction $\theta=0$ and serial correlation in prices, we would expect to find dependence over time in $c_{it}$.
+\item Conditional on $c_{i,t}| (c_{i,t-1},c_{i,t+1})$ does not depend on $p_{i,t+1}$ or $p_{i,t+1}$.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Becker, Grossman, Murphy (1994)}
+\begin{align*}
+c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
+\end{align*}
+\begin{itemize}
+\item Identify $(\theta,\beta,\gamma)$ from the assumption that prices are strictly exogenous
+\item Use lagged and future $p_{i,t+s}$ and $p_{i,t-s}$ as IV. 
+\item Use the change in cigarette taxes.
+\item Consumers need to fully anticipate \alert{future price changes} for this to work.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994):Table}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994):Table}
+\end{frame}
+
+
+\begin{frame}{Dynamic Panel: Arellano Bond}
+The main idea is that the \alert{instruments come from within the model}!
+\begin{eqnarray*}
+y_{it} = \rho y_{i,t-1} + x_{it}'\beta + \eta_i + \varepsilon_{it}
+\end{eqnarray*}
+Consider the first differences ($s$ is a dummy time index):
+\begin{eqnarray*}
+E\left[x_{i s}\left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]=0
+\end{eqnarray*}
+Idea:
+\begin{itemize}
+\item Now relax \alert{strict exogeneity}.
+\item Can still use $x_{is}$ as contemporaneous exogenous instrument.
+\item What is an excluded instrument for $\Delta y_{i,t-1}$?
+\begin{itemize}
+\item Needs to be \alert{relevant}
+\item Still needs to be \alert{exogenous}: not a direct determinant
+\end{itemize}
+%\item Estimate with GMM \texttt{pgmm} or \texttt{dynpanel}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dynamic Panel: Arellano Bond}
+\begin{eqnarray*}
+E\left[x_{i s}\left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]=0
+\end{eqnarray*}
+Idea: Use higher lags of $y_{it}$:
+\begin{itemize}
+\item $[t=2]$ or $[t=1]$: no instruments,
+\item $[t=3]$:  valid instrument for $\Delta y_{i2} = (y_{i2}-y_{i1})$ is $y_{i1}$.
+\item $[t=4]$:  valid instruments for $\Delta y_{i3} = (y_{i3}-y_{i2})$ is $(y_{i2}, y_{i1})$
+\item$[t=5]$:  valid instruments for $\Delta y_{i5} = (y_{i5}-y_{i4})$ is $(y_{i1},\ldots, y_{i4})$.
+\item$[t=T]$:  valid instruments for $\Delta y_{iT} = (y_{iT}-y_{i,T-1})$ is $(y_{i1},\ldots, y_{i,T-1})$.
+\end{itemize}
+Thus there are $T/(T-1)/2$ instruments
+\end{frame}
+
+\begin{frame}{Dynamic Panel: Arellano Bond}
+\begin{eqnarray*}
+E\left[\mathbf{y}_{i s}\left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]=0\\
+E\left[\Delta x_{it} \left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]=0
+\end{eqnarray*}
+\begin{itemize}
+\item $\mathbf{y}_{is}= [y_{i1},\ldots,y_{i,t-2}]$ for $t>2$.
+\item \alert{Levels} instrument \alert{Differences}
+\item Thus there are $T/(T-1)/2$ instruments
+\item We can estimate with linear IV GMM:  \texttt{pgmm} or \texttt{dynpanel}.
+\item The common complain is that \alert{instruments are still weak}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{More Moments: Blundell and Bond}
+\begin{align*}
+E\left[\mathbf{y}_{i s}\left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]&=0\\
+E\left[\Delta y_{i,t-1} \left(y_{i t}-\rho y_{i(t-1)}- x_{i t}^{\prime} \beta\-\eta_i \right)\right]&=0\\
+E\left[\Delta x_{it} \left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^{\prime} \beta\right)\right]&=0
+\end{align*}
+\begin{itemize}
+\item \alert{Differences} also instrument \alert{Levels}!
+\item Important when $\rho \rightarrow 1$ or when $\sigma_u/\sigma_{\epsilon}$ becomes large.
+\item These can also pin down $y_{i0}$, etc.
+\item This is known as \texttt{GMM-SYS}.
+\end{itemize}
+\end{frame}
+
+
+
+
+\end{document}
