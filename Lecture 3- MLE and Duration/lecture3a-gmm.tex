@@ -1,0 +1,511 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{focus}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 3a: Other Nonlinear Estimation (GMM and EM)}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\begin{frame}
+\frametitle{Estimating Finite Mixtures}
+\begin{itemize}
+\item In practice estimating finite mixture models can be tricky.
+\item A simple example is the mixture of normals (incomplete data likelihood)
+\begin{eqnarray*}
+f(x_1,\ldots,x_n | \theta) = \prod_{i=1}^N \sum_{k=1}^K \pi_k f(x_i | \mu_k, \sigma_k)
+\end{eqnarray*}
+\item We need to find both mixture weights $\pi_k = Pr(z_k)$ and the components $(\mu_k,\sigma_k)$ the weights define a valid probabiltiy measure $\sum_k \pi_k = 1$.
+\item Easy problem is \alert{label switching}. Usually it helps to order the components by say decreasing $\pi_1 > \pi_2 > \ldots$ or  $\mu_1 > \mu_2 > \ldots$ 
+\item The real problem is that which component you belong to is unobserved. We can add an extra indicator variable $z_{ik} \in \{0,1\}$.
+\item We don't care about $z_{ik}$ per-se so they are \alert{nuisance parameters}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimating Finite Mixtures}
+\begin{itemize}
+\item We can write the complete data log-likelihood (as if we observed $z_{ik}$):
+\begin{eqnarray*}
+l(x_1,\ldots,x_n | \theta) = \sum_{i=1}^N  \log \left( \sum_{k=1}^K I[z_i = k]  \pi_k f(x_i \mu_k, \sigma_k) \right)
+\end{eqnarray*}
+\item We can instead maximized the expected log-likelihood where we take the expectation $E_{z|\theta}$
+\begin{eqnarray*}
+\alpha_{ik}(\theta) = Pr(z_{ik} =1 | x_i,\theta) = \frac{f_k(x_i,z_k,\mu_k,\sigma_k) \pi_k }{\sum_{m=1}^K f_m(x_i,z_m,\mu_m,\sigma_m) \pi_m}
+\end{eqnarray*}
+\item Now we have a probability $\hat{\alpha}_{ik}$ that gives us the probability that $i$ came from component $k$. We also compute $\hat{\pi}_k = \frac{1}{N} \sum_{i=1}^N \alpha_{ik}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{EM Algorithm}
+\begin{itemize}
+\item Treat the $\hat{\alpha}_k(\theta^{(q)})$ as data and maximize to find $\mu_k,\sigma_k$ for each $k$
+\begin{eqnarray*}
+\hat{\theta}^{(q+1)} = \arg \max_{\theta}  \sum_{i=1}^N  \log \left( \sum_{k=1}^K \hat{\alpha}_k(\theta^{(q)}) f(x_i | z_{ik}, \theta ) \right)
+\end{eqnarray*}
+\item We iterate between updating $\hat{\alpha}_k(\theta^{(q)})$ (E-step) and $\hat{\theta}^{(q+1)}$ (M-step)
+\item For the mixture of normals we can compute the M-step very easily:
+\begin{eqnarray*}
+\mu_k^{(q+1)} &=& \frac{1}{N} \sum_{i=1}^N \hat{\alpha}_k(\theta^{(q)}) x_{i}\\
+\sigma_k^{(q+1)} &=& \frac{1}{N} \sum_{i=1}^N \hat{\alpha}_k(\theta^{(q)}) (x_{i} - \overline{x})^2 \\
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{EM Algorithm}
+\begin{itemize}
+\item EM algorithm has the advantage that it avoids complicated integrals in computing the expected log-likelihood over the missing data.
+\item For a large set of families it is proven to converge to the MLE
+\item That convergence is \alert{monotonic} and \alert{linear}. (Newton's method is quadratic)
+\item This means it can be slow, but sometimes $\nabla_{\theta} f (\cdot)$ is really complicated.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Brief Review of GMM}
+Generalized Method of Moments is a powerful tool to estimate econometric models under weaker assumptions than MLE:
+\begin{itemize}
+\item We no longer need to know $f(y,x | \theta)$.
+\item Instead we just need that $E[g(y_i,x_i; \theta)]=0$ (\alert{Moment Condition})
+\item Like MLE this is another \alert{M-Estimator} or \alert{Extremum Estimator}
+\item We choose $\hat{\theta}_{GMM}$ to minimize some objective function that is an expectation over our entire dataset.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{GMM Setup}
+\begin{itemize}
+\item some data $w_i$ where $i=1,\ldots,N$
+\item Our data $w_i$ might contain all kinds of things such as dependent variables $y_i$, regressors $x_i$ and excluded instruments $z_i$.
+\item Our economic model provides the following restriction on our data:
+\begin{eqnarray*}
+E[g(w_i, \theta_0) ] =0
+\end{eqnarray*}
+\item At the true parameter value $\theta_0\in \mathbb{R}^k$ our moment conditions $g(w_i,\theta)$ are on average equal to zero. 
+\begin{itemize}
+\item  What does ``on average'' mean? 
+\item In theory, we are making an asymptotic statement about what happens as $N \rightarrow \infty$.  This is what we mean when we write $E[\cdot]$. 
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{GMM Setup}
+In practice, it is helpful to consider the sample analogue: 
+\begin{itemize}
+\item We write as $g_N(\theta) \in \mathbb{R}^q$, where $g_N(\theta)$ is a $q$-dimensional vector of moment conditions:
+\begin{eqnarray*}
+E[g(w_i, \theta )] \approx \frac{1}{N} \sum_{i=1}^N g(w_i, \theta)  \equiv g_N(\theta)
+\end{eqnarray*}
+\item We define the Jacobian: $D(\theta) \equiv E[\frac{\partial g(w_i,\theta)}{\partial \theta}]$, which is a $q \times k$ matrix.
+\item Evaluated at the optimum, $\frac{1}{\sqrt{N}} \sum_{i=1}^N g(w_i,\theta_0) \overset{d}{\to} N(0,S)$ where $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is a $q \times q$ matrix.
+\item In other words, the moment conditions which are $0$ in expectation at $\theta_0$ are normally distributed with some covariance $S$.
+\item  Later, we will refer to a weighting matrix $W_N$ which is a $q \times q$ positive semi-definite matrix. It tells us how much to penalize the violations of one moment condition relative to another (in quadratic distance).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{GMM: Examples}
+Here is the GMM estimator:
+\begin{eqnarray*}
+\hat{\theta} = \arg \min_{\theta}  Q_N(\theta) \quad Q_N(\theta)=g_N(\theta)' W_N  g_N(\theta)
+\end{eqnarray*}
+It is easy to see some very simple examples:
+\begin{description} 
+\item[OLS] Here $y_i = x_i \beta + \epsilon_i$. Exogeneity implies that $E[x_i' \epsilon_i]=0$. We can write this in terms of just observables and parameters as $E[x_i' (y_i - x_i \beta)]=0$ so that $g(y_i,x_i, \beta) = x_i' (y_i - x_i \beta)$.
+\item[IV]  Again $y_i = x_i \beta + \epsilon_i$. Now, endogeneity implies that $E[x_i' \epsilon_i]\neq0$. However there are some instruments $z_i$ which may be partly contained in $x_i$ and partly excluded from $y_i$, so that $E[z_i' \epsilon_i]=0$. $E[z_i' (y_i - x_i \beta)]=0$ so that $g(y_i,x_i,z_i, \beta) = z_i' (y_i - x_i \beta)$.
+\item[Maximum Likelihood] $g(w_i,\theta) =  \frac{\partial \log f(w_i,\theta)}{\partial \theta}$ where $f(w_i,\theta)$ is the density function so that $\log f(w_i,\theta)$ is the contribution of observation $i$ to the log-likelihood. Here we set the expected (average) derivative of the log-likelihood (score) function to zero.
+\end{description}
+\end{frame}
+
+\begin{frame}{A Famous Example: Euler Equation}
+Assume we have a CRRA utility function $u(c) = \frac{c^{1-\gamma} -1}{1-\gamma}$ and an agent who maximizes the expected discounted value of their stream of consumption. This leads to an \alert{Euler Equation}:
+\begin{eqnarray*}
+E \left[\beta \left( \frac{c_{t+1}}{c_t} \right)^{-\gamma} R_{t+1} -1 | \Omega_t \right] =0
+\end{eqnarray*}
+where $\Omega_t$ is the \alert{Information Set} (sigma algebra) of everything known to the agent up until time $t$ (include full histories). We can write a moment restriction of the form for any measurable $z_t \in \Omega_t$.
+\begin{eqnarray*}
+E \left[z_t \left(\beta  \left( \frac{c_{t+1}}{c_t} \right)^{-\gamma} R_{t+1} -1\right) \right] =0
+\end{eqnarray*}
+In the original work by Hansen (1982) on GMM, this $g(c_t,c_{t+1},R_{t+1},\beta,\gamma)$ was used to estimate $(\beta,\gamma)$.
+\end{frame}
+
+\begin{frame}{GMM: Technical Conditions}
+\footnotesize
+Here is the GMM estimator:
+\begin{eqnarray*}
+\hat{\theta} = \arg \min_{\theta}  Q_N(\theta) \quad Q_N(\theta)=g_N(\theta)' W_N  g_N(\theta)
+\end{eqnarray*}
+
+\textit{These are a set of sufficient conditions to establish consistency and asymptotic normality of the GMM estimator. These conditions are stronger than necessary, but they establish the requisite LLN and CLT.}
+
+\begin{enumerate}
+\item $\theta \in \Theta$ is compact.
+\item $W_N \overset{p}{\to} W$.
+\item $g_N(\theta) \overset{p}{\to} E[g(z_i,\theta)]$ (uniformly)
+\item $E[g(z_i,\theta)]$ is continous.
+\item We need that $E[g(z_i,\theta_0)]=0$ and $W_N E[g(z_i,\theta)] \neq 0$ for $\theta \neq \theta_0$ (global identification condition).
+\item $g_N(\theta)$ is twice continuously differentiable about $\theta_0$.
+\item $\theta_0$ is not on the boundary of $\Theta$.
+\item $D(\theta_0) W D(\theta_0)'$ is invertible (non-singular).
+\item $g(z_i,\theta)$ has at least two moments finite and finite derivatives at all $\theta \in \Theta$.
+\end{enumerate}
+The first five conditions give us consistency $\hat{\theta} \overset{p}{\to} \theta_0$ as $N \rightarrow \infty$. All nine conditions give us asymptotic normality.
+\begin{eqnarray*}
+\sqrt{N}(\hat{\theta}-\theta)  &\overset{d}{\to}& N(0,V_{\theta})\\
+V_{\theta} &=& \underbrace{(D W D')^{-1}}_{\mbox{bread}} \underbrace{(D W S W' D')}_{\mbox{filling}}\underbrace{(D W D')^{-1}}_{\mbox{bread}} 
+\end{eqnarray*}
+It is common to refer parts of the variance as the \textit{bread} and the \textit{filling} or \textit{meat}, together this is referred to as the \textit{sandwich} estimator of the variance.
+\end{frame}
+
+\begin{frame}{Special Case: Linear Model}
+The global identification condition is difficult to understand, for the linear model we can replace it with a (local) condition on Jacobian of the moment conditions. 
+\begin{itemize}
+\item Recall the Jacobian: $D \equiv \frac{\partial g(w_i,\theta)}{\partial \theta}$, which is a $q \times k$ matrix.
+\item For OLS this reduces to $(X'X)$
+\item We call the problem:
+\begin{description}
+\item[Under-identified] if $rank(D) < k$
+\item[Just-identified] if $rank(D) = k$
+\item[Over-identified] if $rank(D) > k$. 
+\end{description}
+\item In the under-identified case, there may be many such $\hat{\theta}$ where $g(w_i,\hat{\theta}) =0$. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Overidentification}
+We are primarily interested in the \alert{over-identified case} 
+\begin{eqnarray*}
+\hat{\theta} = \arg \min_{\theta}  Q_N(\theta) \quad Q_N(\theta)=g_N(\theta)' W_N  g_N(\theta)
+\end{eqnarray*}
+\begin{itemize} 
+\item There is no $\hat{\theta}$ which satisfies the moment conditions $g_N(\hat{\theta})\neq0$.
+\item Instead, we search for $\hat{\theta}$ which minimizes the violations of the moment conditions. 
+\item We write this as a quadratic form for some positive definite matrix $W_N$ which is $q \times q$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Linear IV}
+For the linear IV problem this becomes:
+\begin{eqnarray*}
+g_N(\theta)' W_N  g_N(\theta) &=& \frac{1}{N^2} \cdot (\mathbf{Z}' (\mathbf{Y} - \mathbf{X} \beta))' W_N (\mathbf{Z}' (\mathbf{Y} - \mathbf{X} \beta)) \\
+&=& \frac{1}{N^2}\cdot [Y'Z W_N Z' Y - 2 \beta X' Z W_N Z' Y + \beta' X' Z W_N Z' X \beta]
+\end{eqnarray*}
+We can ignore the $\frac{1}{N^2}$ and take the first-order condition:
+\begin{eqnarray*}
+2 X'Z W_N Z' Y &=& 2 X'Z W_N Z' X \beta\\
+\hat{\beta}_{GMM} &=& (X'Z W_N Z' X)^{-1} X' Z W_N Z'Y
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{OLS}
+Suppose that we do not have any excluded instruments so that $Z=X$ (and thus $q=k$). Also suppose that $W_N = \mathbf{I}_q$ (the identity matrix). Then we can see that:
+\begin{eqnarray*}
+\hat{\beta}_{GMM} &=& (X'X \mathbf{I}_q X' X)^{-1} X' X \mathbf{I}_q X'Y\\
+ &=& (X'X X' X)^{-1} X' X X'Y\\
+ &=& (X'X)^{-1} (X' X)^{-1} (X' X) X'Y =  (X'X)^{-1} X'Y = \hat{\beta}_{OLS}
+\end{eqnarray*}
+\begin{itemize}
+\item In other words, OLS is a special case of the GMM estimator. 
+\item Also, the identification condition $D=\frac{\partial g(w_i,\theta)}{\partial \theta} =\frac{1}{N} \sum_{i=1}^N z_i' x_i = \frac{1}{N} \sum_{i=1}^N x_i' x_i$ becomes that $rank(X'X) = k$ the well-known OLS rank condition
+\end{itemize}
+\end{frame}
+
+\begin{frame}{2SLS Estimator}
+Suppose that we do have excluded instruments so that:
+\begin{itemize}
+\item  $dim(Z) = q > dim(X) = k$ 
+\item $W_N = (Z'Z)^{-1}$
+\end{itemize}
+It immediately follows that:
+\begin{eqnarray*}
+\hat{\beta}_{GMM} &=& (X'Z (Z'Z)^{-1} Z' X)^{-1} X' Z (Z'Z)^{-1} Z'Y = \hat{\beta}_{2SLS}
+\end{eqnarray*}
+If $dim(Z) = q = dim(X) = k$ then $(X'Z)$ is square (and invertible). This expression further simplifies:
+\begin{align*}
+(X'Z (Z'Z)^{-1} Z' X)^{-1} =& (Z'X)^{-1} (Z'Z) (X'Z)^{-1}\\
+\rightarrow \hat{\beta}_{GMM} =& (Z'X)^{-1} (Z'Z) (X'Z)^{-1}  X' Z (Z'Z)^{-1} Z'Y = (Z'X)^{-1} Z'Y = \hat{\beta}_{IV}
+\end{align*}
+\end{frame}
+
+\begin{frame}{Choice of Weighting Matrix}
+How do we choose the weighting matrix $W_N$. Already seen two options: 
+\begin{enumerate}
+\item  The identity matrix $\mathbf{I}_q$ equally penalizes violations of all $q$ moments;
+\item TSLS weighting matrix $(Z'Z)^{-1}$ which can be thought about as the inverse of the covariance of the instruments. 
+\end{enumerate}  
+We are interested in \alert{efficient GMM} which is the GMM estimator with the lowest variance. 
+\end{frame}
+
+\begin{frame}{Efficient GMM}
+In order to find the $W_N$ which minimizes the variance of $\hat{\theta}_{GMM}$ we recall the asymptotic variance (\alert{sandwich form}) of the GMM estimator:
+\begin{eqnarray*}
+V_{\theta} =\underbrace{(D W D')^{-1}}_{\text{bread}} \underbrace{(D W S W' D')}_{\text{filling}} \underbrace{(D W D')^{-1}}_{bread}
+\end{eqnarray*}
+It turns out that the best choice of $W_N = S^{-1}$ (which sets $filling = bread$). This is easy to see, because $W_N$ is positive semi-definite.
+\begin{eqnarray*}
+(D S^{-1} D')^{-1} (D S^{-1} S S^{-1'} D') (D S^{-1} D')^{-1} = (D S^{-1} D')^{-1} (D S^{-1} D') (D S^{-1} D')^{-1} = (D S^{-1} D')^{-1}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Efficient GMM}
+What are we looking for, in ideal world:
+\begin{itemize}
+\item  $S$ to be small (we want the sampling variation/noise of our moments to be as small as possible)
+\item $D$ (the Jacobian of the moments) to be large. This means that small violations in moment conditions lead to large changes in the objective function.
+\item  The problem is well identified when the objective function is steep around $\theta_0$. 
+\item When the problem becomes flat, it becomes hard to distinguish one $\theta$ in favor of another.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Efficient GMM}
+The problem is that $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is not something that we readily observe from our data. In fact, the asymptotic covariance evaluated at $\theta_0$ is \alert{infeasible}. The best we can hope for is to use some sample analogue $W_N=\hat{S}^{-1}$ in its place. One way to compute that is the covariance of the moments estimated at some $\hat{\theta}$ for an initial guess of $W$:
+\begin{eqnarray*}
+\hat{W} = \hat{S}^{-1} = \left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))  \, (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))'\right)^{-1}
+\end{eqnarray*}
+Because $E[g(w_i,\theta_0)]=0$ at $\theta_0$ there is a tendency to use $\left(\frac{1}{N} \sum_{i=1}^N g(w_i,\hat{\theta}) \, g(w_i,\hat{\theta} )'\right)^{-1}$ (without de-meaning the moments). In theory this would work fine, but in practice \textbf{it is nearly always a bad idea}.\\
+\end{frame}
+
+\begin{frame}{GMM Recipe}
+\noindent The overall procedure works as follows:
+\begin{enumerate}
+\item Pick some initial weighting matrix $W_0$: often $\mathbf{I}_q$ or $(Z'Z)^{-1}$.
+\item Solve $\hat{\theta} = \arg \min_{\theta} g_N(\theta)' W_0  g_N(\theta)$.
+\item Update $\hat{W} = \left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))  \, (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))'\right)^{-1}$
+\item Solve $\hat{\theta}_{GMM} = \arg \min_{\theta}\, g_N(\theta)' \, \hat{W} \, g_N(\theta)$.
+\item Compute $D(\hat{\theta}_{GMM})$ and $S(\hat{\theta}_{GMM})$ and compute standard errors.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{GMM: Example}\footnotesize
+For the linear IV estimator when $i$ is independent then $g(w_i,\theta) = z_i \epsilon_i$ and $E[z_i \epsilon_i]=0$
+\begin{eqnarray*}
+\hat{S}=\frac{1}{N} \sum_{i=1}^N z_i z_i' \epsilon_i^2
+\end{eqnarray*}
+\begin{itemize}
+\item With homoskedastic variance $E[\epsilon_i^2 | z_i] = \sigma^2$ and the covariance of the moments becomes $\frac{\sigma^2}{N} \sum_{i=1}^N z_i z_i'$. 
+\item Because scaling weighting matrix by a constant has no effect on the maximum this is equivalent to the 2SLS weight matrix: $\sum_{i=1}^N z_i z_i'$ or $Z'Z$. 
+\item Thus 2SLS is only the efficient estimator when \alert{homoskedasticity} is a reasonable assumption.
+\item If all regressors are exogenous then $X=Z$ and we are left with the GMM formula coincides with the covariance for heteroskedasticity robust standard errors.
+\item Similarly, when appropriate we can consider extensions such as \alert{clustered standard errors} which are robust to weaker forms of independence.
+\item As a practical matter, we should always use the \textit{sandwich} form when calculating the GMM standard errors, rather than the simpler \textit{bread} version which is only correct at $\theta_0$ under asymptotic optimality conditions.
+\end{itemize}
+\end{frame}
+
+\section*{\normalsize  Common Questions}
+\begin{frame}{Semiparametric Efficiency}
+In a famous paper, Chamberlain (1987) showed that GMM obtained the \alert{semi-parametric efficiency bound} asymptotically. 
+\begin{itemize}
+\item  as our sample gets large and without making additional parametric assumptions the efficient GMM provides the most efficient estimator.
+\item We get close to MLE benefits without distributional assumptions!
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{1st estimates look ok.. 2nd stage estimates look like garbage}
+\footnotesize
+This means there is a  \alert{problem with your weighting matrix}!
+\begin{itemize}
+\item Make sure you are subtracting off the average $g_N(\theta)$ when computing the covariance. 
+\item Another problem appears is when you take the inverse. There is a statistic known as the \alert{condition number} which measures the ratio of the minimum and maximum eigenvalue of a matrix. 
+\begin{itemize}
+\item When these eigenvalues are close together then small errors in $A+\epsilon$ lead to small errors in $(A+\epsilon)^{-1}$. 
+\item Software sometimes reports either the condition number, or its inverse. 
+\item In an ideal world this would be $\approx 1$. 
+\item If the condition number is $10^{\pm 13}$ it approaches the numerical precision of your computer. 
+\item Even tiny (sampling) errors can lead to nearly infinite weighting matrices. 
+\end{itemize}
+\item Usually this happens if the gradient of $Q_n(\theta)$ is not close to zero in a particular dimension or the average Jacobian $D(\theta)=\frac{1}{N} \sum_{i=1}^N \frac{\partial g(w_i,\theta)}{\partial \theta}$ is not close to zero in some dimension. You are not at the optimum of $Q_n(\theta)$!
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Point Estimates Good, SE's not so much...}
+\begin{itemize}
+\item Assuming it is not one of the problems described above, you have probably dropped a $\frac{1}{N}$ or $\frac{1}{\sqrt{N}}$ somewhere. 
+\item You can ignore the $N$'s when obtaining point estimates because scaling $Q_n(\theta)$ or $W_n$ does not affect the location of $\hat{\theta}$, but you need to be more careful in computing $V_{\theta}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why not 3 or 4 step GMM?}
+Can I get even smaller standard errors?
+\begin{itemize}
+\item Asymptotically the answer is no. Even with a sub-optimal choice of weighting matrix, your first stage  $\hat{\theta} \overset{p}{\to}\theta_0$ as $N \rightarrow \infty$.
+\item This means that in the limit, you always recover the efficient choice of $\hat{W}$. 
+\item In finite sample, anything can happen, but numerous studies have found little to no improvement from considering a $K$-step GMM estimator.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What about Infinite Step GMM?}
+There isn't such a thing. But there is the Continuously Updating Estimator (CUE) of Hansen Heaton and Yaron (1996). In this case we let:
+\begin{align*}
+W(\theta) &=\left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\theta) - g_N(\theta)) (g(w_i,\theta)-g_N(\theta))' \right) \\
+Q_n(\theta)^{CUE} &= g_N(\theta)' \left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\theta) - g_N(\theta)) (g(w_i,\theta)-g_N(\theta))' \right) g_N(\theta)
+\end{align*}
+\begin{itemize}
+\item Because the weighting matrix now changes with $\theta$, even for linear models this becomes very difficult to estimate. 
+\item The original GMM problem was a quadratic optimization problem. 
+\item The CUE problem is \alert{no longer a convex optimization problem}
+\item This means that even numerical Quasi-Newton approaches are \alert{no longer guaranteed to work}
+\end{itemize}
+In practice, CUE is not very popular for this reason.
+\end{frame}
+
+\begin{frame}{More on CUE}
+
+CUE has some additional advantages. We see this by examining the GMM FOC. 
+\begin{eqnarray*}
+\hat{D}(\theta) W_n \hat{g}_N(\hat{\theta}) =0
+\end{eqnarray*}
+If we take an \alert{Edgeworth expansion} we can see how the  \alert{asymptotic bias} term looks:
+\begin{eqnarray*}
+\frac{1}{N^2}\sum_{i=1}^N E[g(w_i,\theta) W_n g(w_i,\theta)]
+\end{eqnarray*}
+\begin{itemize}
+\item As long as the variance is finite we can see that this bias disappears as $N \rightarrow \infty$. 
+\item  it also tends to grow linearly with $q$ the number of moment restrictions. This is often referred to as the \alert{too many moments} or \alert{many instruments} problem.
+\item When we estimate $\hat{g}(\hat{\theta})$ and $\hat{D}(\hat{\theta})$ we construct them so that they are mechanically correlated with one another.
+\item  It turns out the CUE estimator fixes this in exactly the right way. 
+\item How is beyond the scope of this note (and course). If you are really interested you should look at Newey and Smith (2004).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Gravity Equation}
+\begin{itemize}
+\item An important set of models in international trade talk about \alert{Gravity Equations}
+\item They are called gravity because trade declines with distance (or distance$^2$).
+\end{itemize}
+\begin{align*}
+T_{ij}  = \alpha_0 Y_i^{\alpha_1} Y_j^{\alpha_2} D_{ij}^{\alpha_3} \eta_{ij}
+\end{align*}
+Take Logs
+\begin{align*}
+\ln T_{ij}  =  \ln \alpha_0  +\alpha_1 \ln Y_i + \alpha_2 \ln Y_j + \alpha_3 \ln D_{ij} + \ln \eta_{ij}
+\end{align*}
+\begin{itemize}
+\item $T_{ij}$  (Exports from $i$ to $j$)
+\item $(Y_i,Y_j)$ GDP of each country
+\item $D_{ij}$ distance between two countries
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example: Gravity Equation}
+If the moment condition holds then everything is good:
+\begin{align*}
+E[ln (\eta_{ij}) | Y_i, Y_j D_{ij} ]=0
+\end{align*}
+Some problems
+\begin{itemize}
+\item Lots of Zeros in $T_{ij}$ (so we can't take logs).
+\item If $( Y_i, Y_j D_{ij},\eta_{ij})$ has heteroskedasticity then moment condition is violated.
+\item Why?  Expectation is \alert{linear operator} but $\log(\cdot)$ not so much.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Gravity: Part 2}
+Rearrange things so that:
+\begin{align*}
+T_{i j}&=\exp \left(\beta_{0}+\alpha_{1} \log \left(Y_{i}\right)+\alpha_{2} \log \left(Y_{j}\right)+\alpha_{3} \log \left(D_{i j}\right)\right) \eta_{i j} \\
+T_{i j}&=\exp \left(x_{i} \beta\right) \eta_{i j}
+\end{align*}
+This gives us our moment condition:
+\begin{align*}
+E[ T_{i j} - \exp \left(x_{i} \beta\right) | x_i]=0
+\end{align*}
+This works as long as we are okay with \alert{proportional variance}
+
+\end{frame}
+
+
+
+\section*{Thanks!}
+
+
+
+
+\end{document}
