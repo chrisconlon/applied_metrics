@@ -194,6 +194,88 @@ We need a better design:
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Healthcare Exceptionalism: Static Reallocation}
+Is \alert{quality} (or productivity) correlated with \alert{marketshare}?
+\begin{align*}
+\ln \left(N_{h}\right)=\beta_{0}^{s}+\beta_{1}^{s} q_{h}+\gamma_{M}^{S}+\varepsilon_{h}^{s}
+\end{align*}
+\begin{itemize}
+\item $N_h$ measures market size for hospital $h$
+\item $\gamma_M^s$ are market FE
+\item $q_h$ is measure of hospital quality
+\item Goal: Is $\beta_1^s>0$ or not. $\beta_1^s<0$ is usually only Soviet countries or 1970's steel.
+\item $\beta_1^s>0$ means allocation towards productive firms (or just returns to scale?)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Healthcare Exceptionalism: Dynamic Reallocation}
+\begin{align*}
+\Delta_{h}&=\beta_{0}^{d}+\beta_{1}^{d} q_{h}+\gamma_{M}^{d}+\varepsilon_{h}^{d}\\
+\Delta_{h}&=\frac{N_{h, 2010}-N_{h, 2008}}{\frac{1}{2}\left(N_{h, 2010}+N_{h, 2008}\right)}
+\end{align*}
+\begin{itemize}
+\item $\beta_1^d>0$ means growth towards productive firms (not just returns to scale)
+\item Same idea but now we capture \alert{dynamics}.
+\item Patients may still be attracted to \alert{unobservables correlated with quality}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Healthcare Exceptionalism}
+\begin{center}
+\includegraphics[width=4in]{./resources/hc1.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Healthcare Exceptionalism}
+\begin{center}
+\includegraphics[width=4in]{./resources/hc2.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Healthcare Exceptionalism}
+\begin{center}
+\includegraphics[width=4in]{./resources/hc3.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Healthcare Exceptionalism}
+\begin{center}
+\includegraphics[width=4in]{./resources/hc4.png}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Healthcare Exceptionalism: Production Function}
+Hospital Production Function:
+\begin{align*}
+y_{p}^{s}=a_{h}+\sum_{k} \lambda_{k} r_{p k}+\mu x_{p}+\xi_{p}
+\end{align*}
+\begin{itemize}
+\item $a_h$ is \alert{hospital productivity} (a FE) and variable of interest
+\item $y_p$ is a patient outcome (survival-days, etc.)
+\item $x_p$ are (log) hospital inputs
+\item $r_{pk}$ are patient risk factors.
+\item This has interpretation as a \alert{production function}. Why?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Healthcare Exceptionalism}
+\begin{center}
+\includegraphics[width=4in]{./resources/hc7.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Healthcare Exceptionalism: EB Adjustment}
+\begin{center}
+\includegraphics[width=4in]{./resources/hc_a2.png}
+\end{center}
+\end{frame}
+
+
+
+
 \section*{Dynamic Panel Data}
 
 \begin{frame}{Dynamic Panel}
@@ -314,10 +396,46 @@ c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Becker, Grossman, Murphy (1994):Table}
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 1}
+\begin{center}
+\includegraphics[width=3in]{./resources/gbm_t1.png}
+\end{center}
 \end{frame}
 
-\begin{frame}{Becker, Grossman, Murphy (1994):Table}
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 2}
+\begin{center}
+\includegraphics[width=2.8in]{./resources/gbm_t2.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 3}
+\begin{center}
+\includegraphics[width=2.8in]{./resources/gbm_t3.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 4}
+\begin{center}
+\includegraphics[width=2.5in]{./resources/gbm_t4.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 5}
+\begin{center}
+\includegraphics[width=2.3in]{./resources/gbm_t5.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 6}
+\begin{center}
+\includegraphics[width=2.3in]{./resources/gbm_t6.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Becker, Grossman, Murphy (1994): Table 7}
+\begin{center}
+\includegraphics[width=4in]{./resources/gbm_t7.png}
+\end{center}
 \end{frame}
 
 
