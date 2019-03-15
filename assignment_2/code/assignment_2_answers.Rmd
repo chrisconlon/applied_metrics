@@ -1,0 +1,350 @@
+---
+title: "Problem Set 2"
+author: "Prof. Conlon"
+date: "Due: 3/1/19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newcommand{\E}[1]{\ensuremath{\mathbb{E}\big[#1\big]}}
+\newcommand{\Emeasure}[2]{\ensuremath{\mathbb{E}_{#1}\big[#2\big]}}
+\newcommand{\mbf}{\mathbf}% math bold
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* estimatr (Tidyverse version of lm function)
+
+```{r,comment='\t\t',echo=FALSE}
+
+## This is a code chunk: it is outlined in grey and has R code inside of it
+## Note: you can change what is shown in the final .pdf document using arguments 
+##       inside the curly braces at the top {r, comment='\t\t'}. For example, you 
+##       can turn off print statements showing in the .pdf by adding 'echo=False' 
+##       i.e. changing the header to {r, comment='\t\t',echo=FALSE}
+
+## ~~~~~~~~~~~~~~ CODE SETUP ~~~~~~~~~~~~~~ ##
+
+# ~ This bit of code will be hidden after Problem Set 1 ~
+#
+# This section sets up the correct directory structure so that
+#  the working directory for your code is always in the data folder
+
+# Retrieve the code working directory
+#script_dir = dirname(sys.frame(1)$ofile)
+initial_options <- commandArgs(trailingOnly = FALSE)
+render_command <- initial_options[grep('render',initial_options)]
+script_name <- gsub("'", "", 
+                    regmatches(render_command, 
+                               gregexpr("'([^']*)'",
+                               render_command))[[1]][1])
+
+# Determine OS (backslash versus forward slash directory system)
+sep_vals = c(length(grep('\\\\',script_name))>0,length(grep('/',script_name))>0)
+file_sep = c("\\\\","/")[sep_vals]
+
+# Get data directory
+split_str = strsplit(script_name,file_sep)[[1]]
+len_split = length(split_str) - 2
+data_dir = paste(c(split_str[1:len_split],'data',''),collapse=file_sep)
+
+# Check that the data directory contains the files for this weeks assignment
+data_files = list.files(data_dir)
+if(!('prob_4_simulation.rda' %in% sort(data_files))){
+  cat("ERROR: DATA DIRECTORY NOT CORRECT\n")
+  cat(paste("data_dir variable set to: ",data_dir,collapse=""))
+}
+setwd(data_dir)
+
+```
+
+
+## Problem 1 (Analytical Exercise)
+
+Consider the estimation of the individual effects model:
+
+\begin{align*}
+	y_{it} = x_{it}'\beta + \alpha_{i} + \epsilon_{it} \mbox{,     } \E{\epsilon \vert x_{it},\alpha_{i}} = 0
+\end{align*}
+where $i=\{1,...,n\}$ and $t=\{1,...,T\}$.
+\newline
+This exercises ask you to relate the (random effects) GLS estimator $\hat{\beta}_{GLS}=(X_{*}'X_{*})^{-1}X_{*}'y_{*}$ to the "within" (fixed-effects) estimator $\hat{\beta}_{FE}=(\dot{X}'\dot{X})\dot{X}'\dot{y}$ and the "between" estimator $\hat{\beta}_{BW}=(\bar{X}'\bar{X})^{-1}\bar{X}'\bar{y}$ where $w=\{x,y\}$:
+\begin{align*}
+	\bar{w}_{i} &:= \frac{1}{T} \sum_{i=1}^{T} w_{i} \\
+	\dot{w}_{i} &:= w_{it} - \bar{w}_{i} \\
+	w_{it,*} &:= w_{it} - (1-\lambda)\bar{w}_{i} \\
+	\lambda^{2} &= \frac{Var(\epsilon)}{T\,Var(\alpha_{i}) + Var(\epsilon_{it})}
+\end{align*}
+
+\begin{enumerate}
+	\item Express the GLS estimator in terms of $\bar{X}$, $\dot{X}$, $\bar{y}$, $\dot{y}$, $\lambda$, and $T$.
+	Notation:
+\begin{align*}
+	\dot{X}_{it} &:= X_{it} - \frac{1}{T} \sum_{t=1}^T X_{it} \\
+	X_{it}^* &:= X_{it} - (1 - \lambda) \frac{1}{T} \sum_{t=1}^T X_{it}
+\end{align*}
+where
+\begin{equation*}
+	\lambda^2 := \frac{\text{Var}(e_{it})}{T \text{Var}(\alpha_{i}) + \text{Var}(e_{it})}
+\end{equation*}
+and
+\begin{equation*}
+	\bar{X}_i := \frac{1}{T} \sum_{t=1}^T X_{it}
+\end{equation*}
+Note also
+\begin{equation*}
+	X_{it}^* = \dot{X}_{it} + \lambda \bar{X}_i
+\end{equation*}
+which can be written in stacked form as
+\begin{equation*}
+	X^{*} = \dot{X} + \lambda \mbf{I} \bar{X}
+\end{equation*}
+Then
+\begin{align*}
+	\hat{\beta}_{\text{GLS}} &= (X^*{'} X^*)^{-1} X^*{'} Y^* \\
+	&= ([\dot{X} + \lambda \mbf{I} \bar{X}]' [\dot{X} + \lambda \mbf{I} \bar{X}])^{-1} [\dot{X} + \lambda \mbf{I} \bar{X}]' Y^* \\
+	&= (\dot{X}'\dot{X} + \bar{X}' \mbf{I}' \lambda^2 \mbf{I} \bar{X})^{-1} [\dot{X} + \lambda \mbf{I} \bar{X}]' Y^*
+\end{align*}
+where the cross-product terms $\dot{X}' \lambda \mbf{I} \bar{X}$ cancel as $\dot{X}$ represents the orthogonal component of a projection of $X$ onto its column-by-column time-average; thus
+\begin{equation*}
+	\dot{X}' \mbf{I} \bar{X} = \mbf{0}
+\end{equation*}
+	\item Show that there is a matrix R depending on $\bar{X}$, $\dot{X}$, $\lambda$ and $T$ such that the GLS estimator is a weighted average of the "within" and "between" estimators: 
+	\begin{align*}
+		\hat{\beta}_{GLS} = R \hat{\beta}_{FE} + (I-R)\hat{B}_{W}
+	\end{align*}
+From part (a), we have
+\begin{equation*}
+	\hat{\beta}_{\text{GLS}} = (\dot{X}'\dot{X} + \bar{X}' \mbf{I}' \lambda^2 \mbf{I} \bar{X})^{-1} [\dot{X} + \lambda \mbf{I} \bar{X}]' (\dot{Y} + \lambda \mbf{I} \bar{Y})
+\end{equation*}
+As
+\begin{equation*}
+	\dot{X}' \lambda \mbf{I} \bar{Y} = \mbf{0}
+\end{equation*}
+and
+\begin{equation*}
+	\lambda \bar{X}' \mbf{I}' \dot{Y} = \mbf{0}
+\end{equation*}
+our expression reduces to
+\begin{equation*}
+	\hat{\beta}_{\text{GLS}} = (\dot{X}'\dot{X} + \bar{X}' \mbf{I}' \lambda^2 \mbf{I} \bar{X})^{-1} [\dot{X}' \dot{Y} + \lambda^2 T \bar{X}' \bar{Y}]
+\end{equation*}
+Let
+\begin{equation*}
+	R := (\dot{X}'\dot{X} + \lambda^2 T \bar{X}' \bar{X})^{-1} (\dot{X}'\dot{X})
+\end{equation*}
+and note that
+\begin{equation*}
+	(\dot{X}'\dot{X} + \lambda^2 T \bar{X}' \bar{X})^{-1} (\dot{X}'\dot{X}) + (\dot{X}'\dot{X} + \lambda^2 T \bar{X}' \bar{X})^{-1} \lambda^2 T (\bar{X}'\bar{X}) = I
+\end{equation*}
+Then
+\begin{align*}
+	\hat{\beta}_{\text{GLS}} &= R (\dot{X}'\dot{X})^{-1} \dot{X}' \dot{Y} + (I - R) (\bar{X}'\bar{X})^{-1} \bar{X}' \bar{Y} \\
+	&= R \hat{\beta}_{\text{FE}} + (I - R) \hat{\beta}_{\text{BW}}
+\end{align*}
+\item What happens to the relative weights on the "within" and "between" estimators as we increase the sample size, i.e. $T \to \infty$?
+\newline
+As $T \to \infty$, $R \stackrel{p}{\to} I$. To see this, note that
+\begin{equation*}
+	\lambda^2 \to 0 \ \ \text{ as } T \to \infty
+\end{equation*}
+and, under some finite moment assumptions, for a fixed $n$ and a given $i$,
+\begin{equation*}
+	\bar{X}_i = \frac{1}{T} \sum_{t=1}^T X_{it} \stackrel{p}{\to} \mathbb{E}_i [ X_{it} ]
+\end{equation*}
+and
+\begin{equation*}
+	\bar{X}_i' \bar{X}_i \stackrel{p}{\to} (\mathbb{E}_i [ X_{it} ]) ' \mathbb{E}_i [ X_{it} ]
+\end{equation*}
+Similarly for $\dot{X}_{it}$. Thus the second term in the denominator of $R$ converges to zero, and we have
+\begin{equation*}
+	R \stackrel{p}{\to} I
+\end{equation*}	
+\item Suppose that the random effects assumption $\E{\alpha_{i} \vert x_{i1,...,x_{iT}}} = 0$ does not hold. Characterize the bias of the estimators $\hat{\beta}_{FE}$, $\hat{\beta}_{W}$. (Note: An estimator $\hat{\beta}$ is unbiased if $\E{\hat{\beta}}=\beta$)
+Our estimators are
+\begin{align*}
+	\hat{\beta}_{\text{FE}} &= (\dot{X}'\dot{X})^{-1} \dot{X}' \dot{Y} \\
+	\hat{\beta}_{\text{BW}} &= (\bar{X}'\bar{X})^{-1} \bar{X}' \bar{Y}
+\end{align*}
+Note that
+\begin{align*}
+	\dot{Y} &= Y - \bar{Y} \\
+	&= X \beta + \alpha \iota_T + e - [ \bar{X} \beta + \alpha \iota_T + \bar{e} ] \\
+	&= \dot{X} \beta + \dot{e}
+\end{align*}
+and
+\begin{equation*}
+	\bar{Y} = \bar{X} \beta + \alpha \iota_T + \bar{e}
+\end{equation*}
+Then
+\begin{align*}
+	\hat{\beta}_{\text{FE}} &= (\dot{X}'\dot{X})^{-1} \dot{X}' [\dot{X} \beta + \dot{e}] \\
+	\hat{\beta}_{\text{BW}} &= (\bar{X}'\bar{X})^{-1} \bar{X}' [\bar{X} \beta + \alpha \iota_T + \bar{e}]
+\end{align*}
+or
+\begin{align*}
+	\hat{\beta}_{\text{FE}} &= \beta + (\dot{X}'\dot{X})^{-1} \dot{X}' \dot{e} \\
+	\hat{\beta}_{\text{BW}} &= \beta + (\bar{X}'\bar{X})^{-1} \bar{X}' \alpha \iota_T + (\bar{X}'\bar{X})^{-1} \bar{X}' \bar{e}
+\end{align*}
+For the first term, the mean-independence assumption, $\E[ e_{it} | X_{it}, \alpha_i ] = 0$, yields
+\begin{equation*}
+	\E[ \hat{\beta}_{\text{FE}} | X_{it}, \alpha_i ] = \beta + (\dot{X}'\dot{X})^{-1} \dot{X}' \E [ \dot{e} | X_{it}, \alpha_i ] = \beta
+\end{equation*}
+For the second estimator,
+\begin{equation*}
+	\E[ \hat{\beta}_{\text{BW}} | X_{it}, \alpha_i ] = \beta + \E[ (\bar{X}'\bar{X})^{-1} \bar{X}' \alpha \iota_T | X_{it}, \alpha_i ] + \E [ (\bar{X}'\bar{X})^{-1} \bar{X}' \bar{e} | X_{it}, \alpha_i ] = \beta + (\bar{X}'\bar{X})^{-1} \bar{X}' \E [ \alpha | X ] \iota_T
+\end{equation*}
+\item Use your result from $(d)$ to give a formula for the bias of our random effects estimator $\hat{\beta}_{GLS}$. What happens to the bias as $T \to \infty$.
+\newline
+The bias vanishes as $T \to \infty$, as $R \stackrel{p}{\to} I$.
+\end{enumerate}
+
+## Problem 2 (Coding Exercise)
+
+We observe $N$ observations of the random variable $X_{i}$ where each $X_{i}$ is drawn from the Weibull distribution:
+
+\begin{align*}
+	X_{i} \sim W(\gamma)
+\end{align*}
+
+The probability density function for the Weibull is the following:
+
+\begin{align*}
+	f(x;\gamma) = \gamma x^{\gamma - 1} \exp(-(x^{\gamma})) \;\; ; x \geq 0 , \gamma > 0
+\end{align*}
+
+\begin{enumerate}
+	\item Assume our $N$ observations are independent and identically distributed, what is the log-likelihood function?
+	
+	\begin{align*}
+	  \mathcal{L}(\gamma \vert x_{1},...,x_{N}) &= \sum_{i=1}^{N} log(\gamma) + log(x_{i})(\gamma-1) -(x_{i}^{\gamma})
+	\end{align*}
+	
+	\item Calculate the gradient (or first derivative) of your log-likelihood function.
+	
+	\begin{align*}
+	  \frac{\partial L}{\partial \gamma} &= \sum_{i=1}^{N} \frac{1}{\gamma} + log(x_{i}) - log(x_{i}) x_{i}^{\gamma}
+	\end{align*}
+	
+	\item Using the first order condition, what is the MLE estimator for $\gamma$?
+	
+	\begin{align*}
+	  \frac{\partial L}{\partial \gamma} &=  0 \\
+	\end{align*}
+	
+	This is an implicit function in $\gamma$, we will need to solve it numerically. 
+	
+	
+	\item Verify that the second order condition guarantees a unique global solution. 
+	
+	\begin{align*}
+	  \frac{\partial^{2} L}{\partial \gamma^{2}} &= \sum_{i=1}^{N} \frac{-1}{\gamma^{2}}  - log(x_{i})^{2}x_{i}^{\gamma}
+	\end{align*}
+	
+	This is clearly less than 0 if $\gamma > 0$ and $x_{i} > 0$. 
+	
+	\item In R, I want you to write a function called mle\_weibull that takes two arguments $(X,\gamma)$, where $X$ is a vector of data and $\gamma$ is a scalar. The function returns the value of the log-likelihood function you derived in the last part.
+\end{enumerate}
+	
+```{r,results='hold',comment=''}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Calculate maximum likelihood estimate for 1-parameter
+#  Weibull distribution
+#
+# Inputs :
+#  X      : vector of data 
+#  gamma  : numeric value of parameter guess
+#
+# Outputs :
+#  likeli : value of likelihood for data X evaluated
+#            at gamma
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+mle_weibull = function(gamma,X,noise=10^(-10)){
+  # Calculate number of observations
+  N = length(X)
+  
+  # Calculate three parts of the sum
+  first_term = N*log(gamma+noise)
+  second_term = sum(log(X)*(gamma-1))
+  third_term = sum(X^gamma)
+  
+  # Likelihood is sum of three terms
+  likeli = first_term + second_term - third_term
+  
+  return(-likeli)
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# Calculate gradient of log-likelihood for 1-parameter
+#  Weibull distribution
+#
+# Inputs :
+#  X      : vector of data 
+#  gamma  : numeric value of parameter guess
+#
+# Outputs :
+#  gradient : value of gradient of log-likelihood 
+#              for data X evaluated at gamma
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+gr_weibull = function(gamma,X,noise=10^(-10)){
+  # Calculate number of observations
+  N = length(X)
+
+  # Calculate three parts of the sum
+  first_term = N/(gamma+noise)
+  second_term = sum(log(X))
+  third_term = sum(log(X)*X^(gamma))
+  
+  # Gradient is sum of three terms
+  gradient = first_term + second_term - third_term
+  
+  return(-gradient)
+}
+
+```
+\begin{enumerate}
+	\item Optimiziation routines can either be given a first derivative (or gradient) or the optimization routines calculate numerical derivatives. We will be using the R function $optim$, which accepts the first derivative as an argument $gr$. 
+\end{enumerate}
+\begin{itemize}
+		\item[a.] We first want you to run $optim$ without supplying a first derivative (leaving gr out of the function). Note, to run optim you will need to supply your data $X$ as an additional parameter at the end of the function. We have provided you with simulated data in the file 'prob\_4\_simulation.rda' located in the data folder. 
+		\item[b.]  We now want you to create a new function called gradient, which takes the same two arguments as your likelihood function. Now calculate the MLE using optim with the gradient.
+		\item[c.] Compare both the number of iterations until convergence and your estimated $\gamma$ values from both runs. 
+\end{itemize}
+		
+```{r,results='hold',comment=''}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# ~ Use optim to calculate the MLE estimator of 1-parameter Weibull ~ #
+#
+# ~~~~~~~~~~~~~~        True Value: Gamma = 2          ~~~~~~~~~~~~~~ # 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+
+# Load dataset
+load(paste(data_dir,"prob_4_simulation.rda",sep=''))
+
+# Set initial guess for gamma
+# I am setting initial gamma guess far away from the ture value (gamma = 2)
+#  so that I can show the improvement in performance by with the gradient
+init_gamma = 50
+
+# Run optim using simulated data
+run_mle_noGR =optim(init_gamma,mle_weibull,X=sim,lower=c(1),method=c('L-BFGS-B'))
+run_mle_GR   =optim(init_gamma,fn=mle_weibull,gr=gr_weibull,X=sim,lower=c(1),method=c('L-BFGS-B'))
+
+cat(paste('Numerical Gradient -> MLE Estimate : ',run_mle_noGR$par,' Iterations : ',run_mle_noGR$counts['function'],'\n'))
+cat(paste('Analytical Gradient -> MLE Estimate : ',run_mle_GR$par,' Iterations : ',run_mle_GR$counts['function']))
+```
+
+
+
+
+
