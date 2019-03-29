@@ -1,0 +1,1225 @@
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
+\usetheme{default}
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
+\usepackage{listings}
+
+
+
+
+
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+\begin{document}
+\title{Part 4: Binary Choice}
+\author{Chris Conlon}
+\institute{Microeconometrics}
+\date{\today}
+
+\frame{\titlepage}
+
+\section{Intro}
+
+\begin{frame}
+\frametitle{Binary Choice: Overview}
+Many problems we are interested in look at discrete rather than continuous outcomes:
+\begin{itemize}
+\item Entering a Market/Opening a Store
+\item Working or a not
+\item Being married or not
+\item Exporting to another country or not
+\item Going to college or not
+\item Smoking or not
+\item etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Simplest Example: Flipping a Coin}
+Suppose we flip a coin which is yields heads ($Y=1$) and tails ($Y=0$). We want to estimate the probability $p$ of heads:
+\begin{eqnarray*}
+Y_i =
+\begin{cases}
+1 \mbox{ with probability } p \\
+0 \mbox{ with probability } 1-p
+\end{cases}
+\end{eqnarray*}
+We see some data $Y_1,\ldots,Y_N$ which are (i.i.d.)\\
+\vspace{0.2cm}
+We know that $Y_i \sim Bernoulli(p)$.
+\end{frame}
+
+
+\begin{frame}{Simplest Example: Flipping a Coin}
+We can write the likelihood of $N$ Bernoulli trials as 
+$$Pr(Y_1 = y_1, Y_2=y_2,\ldots,Y _N=y_N )  =  f(y_1,y_2,\ldots,y_N | p ) $$
+\begin{eqnarray*}
+&=& \prod_{i=1}^N p^{y_i} (1-p)^{1-y_i}\\
+&=& p^{\sum_{i=1}^N y_i} (1-p)^{N-\sum{i=1}^N y_i}
+\end{eqnarray*}
+And then take logs to get the \alert{log likelihood}:
+\begin{eqnarray*}
+\ln  f(y_1,y_2,\ldots,y_N | p )  &=& \left( \sum_{i=1}^N y_i \right)  \ln p  + \left(N-\sum_{i=1}^N y_i \right)  (1-p)
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Simplest Example: Flipping a Coin}
+Differentiate the log-likelihood to find the maximum:
+\begin{eqnarray*}
+\ln  f(y_1,y_2,\ldots,y_N | p )  &=& \left( \sum_{i=1}^N y_i \right)  \ln p  + \left(N-\sum_{i=1}^N y_i \right)  \ln(1-p)\\
+\rightarrow 0&=& \frac{1}{\hat{p}}  \left( \sum_{i=1}^N y_i \right) + \frac{-1}{1-\hat{p}}   \left(N-\sum_{i=1}^N y_i \right) \\
+ \frac{\hat{p}}{1-\hat{p}} &=& \frac{\sum_{i=1}^N y_i }{N- \sum_{i=1}^N y_i } = \frac{\overline{Y}}{1-\overline{Y}} \\
+\hat{p}^{MLE} &=& \overline{Y}
+\end{eqnarray*}
+That was a lot of work to get the obvious answer: \alert{fraction of heads}.
+\end{frame}
+
+\begin{frame}{More Complicated Example: Adding Covariates}
+We probably are interested in more complicated cases where $p$ is not the same for all observations but rather $p(X)$ depends on some covariates. Here is an example from the Boston HMDA Dataset:
+\begin{itemize}
+\item 2380 observations from 1990 in the greater Boston area.
+\item Data on: individual Characteristics, Property Characteristics, Loan Denial/Acceptance (1/0).
+\item Mortgage Application process circa 1990-1991:
+\begin{itemize}
+\item Go to bank
+\item Fill out an application (personal+financial info)
+\item Meet with loan officer
+\item Loan officer makes decision
+\begin{itemize}
+\item Legally in race blind way (discrimination is illegal but rampant)
+\item Wants to maximize profits (ie: loan to people who don't end up defeaulting!)
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Loan Officer's Decision}
+Financial Variables:
+\begin{itemize}
+\item $P/I$ ratio
+\item housing expense to income ratio
+\item loan-to-value ratio
+\item personal credit history (FICO score, etc.)
+\item Probably some nonlinearity:
+\begin{itemize}
+\item Very high $LTV > 80\%$ or $>95\%$ is a bad sign (strategic defaults?)
+\item Credit Score Thresholds
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Loan Officer's Decision}
+Goal $Pr(Deny=1 | black, X)$\\
+
+\begin{itemize}
+\item Lots of potential \alert{omitted variables} which are correlated with race
+\begin{itemize}
+\item Wealth, type of employment
+\item family status
+\item credit history
+\item zip code of property
+\end{itemize}
+\item Lots or \alert{redlining} cases hinge on whether or not black applicants were treated in a discriminatory way.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=3.25in]{resources/hmda1.pdf}\\
+\includegraphics[width=3.25in]{resources/hmda2.pdf}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Linear Probability Model}
+First thing we might try is OLS
+\begin{eqnarray*}
+Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{eqnarray*}
+\begin{itemize}
+\item What does $\beta_1$ mean when $Y$ is binary? Is $\beta_1  = \frac{\Delta Y}{\Delta X}$?
+\item What does the line $\beta_0 + \beta_1 X$ when $Y$ is binary?
+\item What does the predicted value $\hat{Y}$ mean when $Y$ is binary? Does $\hat{Y} = 0.26$ mean that someone gets approved or denied for a loan?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Linear Probability Model}
+OLS is called the \alert{linear probability model} 
+\begin{eqnarray*}
+Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i 
+\end{eqnarray*}
+because:
+\begin{eqnarray*}
+E[Y | X] &=& 1 \times Pr(Y=1 | X) + 0 \times Pr(Y=0  | X) \\
+Pr(Y=1 | X) &=& \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{eqnarray*}
+The predicted value is a \alert{probability} and 
+\begin{eqnarray*}
+\beta_1 = \frac{Pr(Y=1 | X =x+\Delta x) - Pr(Y=1 | X=x)}{\Delta x}
+\end{eqnarray*}
+So $\beta_1$ represents the average change in probability that $Y=1$ for a unit change in $X$.
+\end{frame}
+
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=5in]{resources/lpm.pdf}\\
+\end{center}
+\end{frame}
+
+\begin{frame}{That didn't look great}
+\begin{itemize}
+\item Is the marginal effect $\beta_1$ actually constant or does it depend on $X$?
+\item Sometimes we predict $\hat{Y} >1$ or $\hat{Y} <0$. What does that even mean? Is it still a probability?
+\item Fit in the middle seems not so great -- what does $\hat{Y} = 0.5$ mean?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Results}
+\begin{eqnarray*}
+\widehat{deny_i}= -.091& + .559 \cdot \text{P/I ratio} + &.177 \cdot \text{black} \\
+(0.32)&( .098) & (.025)\\
+\end{eqnarray*}
+Marginal Effects: 
+\begin{itemize}
+\item Increasing $P/I$ from $0.3 \rightarrow 0.4$ increases probabilty of denial by $5.59$ percentage points. (True at all level of $P/I$).
+\item At all $P/I$ levels blacks are $17.7$ percentage points more likely to be denied.
+\item But still some omitted factors.
+\item True effects are likely to be \alert{nonlinear} can we add polynomials in $P/I$? Dummies for different levels? 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Moving Away from LPM}
+Problem with the LPM/OLS is that it requires that \alert{marginal effects are constant} or that probability can be written as linear function of parameters.
+\begin{eqnarray*}
+Pr(Y=1 | X) = \beta_0 + \beta_1 X+ \epsilon
+\end{eqnarray*}
+Some desirable properties:
+\begin{itemize}
+\item Can we restrict our predictions to $[0,1]$?
+\item Can we preserve \alert{monotonicity} so that $Pr(Y=1| X)$ is increasing in $X$ for $\beta_1 >0$?
+\item Some other properties (continuity, etc.) \pause
+\item Want a function $F(z): (-\infty,\infty) \rightarrow [0,1]$.
+\item What function will work?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=5in]{resources/probit.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}{Choosing a transformation}
+\begin{eqnarray*}
+Pr(Y=1 | X) = F(\beta_0 + \beta_1 X)
+\end{eqnarray*}
+\begin{itemize}
+\item One $F(\cdot)$ that works is $\Phi(z)$ the normal CDF. This is the \alert{probit} model.
+\begin{itemize}
+\item Actually any CDF would work but the normal is convenient.
+\end{itemize}
+\item One $F(\cdot)$ that works is $\frac{e^z}{1+ e^z}=\frac{1}{1+e^{-z}}$ the logistic function . This is the \alert{logit} model.
+\item Both of these give `S'-shaped curves.
+\item The LPM is $F(\cdot)$ is the \alert{identity function} (which doesn't satisfy my $[0,1]$ property).
+\item This $F(\cdot)$ is often called a \alert{link function}. Why?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Why use the normal CDF?}
+Has some nice properties:
+\begin{itemize}
+\item Gives us more of the `S' shape
+\item $Pr(Y=1|X)$ is increasing in $X$ if $\beta_1>0$.
+\item $Pr(Y=1|X) \in [0,1]$ for all $X$
+\item Easy to use -- you can look up or use computer for normal CDF.
+\item Relatively straightforward interpretation
+\begin{itemize}
+\item $Z=\beta_0 + \beta_1 X$ is the $z$-value.
+\item $\beta_1$ is the change in the $z$-value for a change in $X_1$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=2.5in]{resources/hmda3.pdf}\\
+\includegraphics[width=2.5in]{resources/hmda3a.pdf}\\
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Probit in R}
+\footnotesize
+\begin{semiverbatim}
+bm1 <- glm(deny ~ pi_rat+black, data=hmda, family = binomial(link="probit"))
+coeftest(bm1)
+
+z test of coefficients:
+
+             Estimate Std. Error  z value  Pr(>|z|)    
+(Intercept) -2.258787   0.136691 -16.5248 < 2.2e-16 ***
+pi_rat       2.741779   0.380469   7.2063 5.749e-13 ***
+blackTRUE    0.708155   0.083352   8.4959 < 2.2e-16 ***
+---
+    Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
+
+predict(bm1, data.frame(pi_rat=.3,black=FALSE),type = "response")
+    0.07546516
+predict(bm1, data.frame(pi_rat=.3,black=TRUE),type = "response")
+    0.2332769
+\end{semiverbatim}
+\begin{itemize}
+\item Probit predicts a 7.5\% chance of mortgage denial for non-black applicants, and 23.3\% chance for black ones.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why use the logistic CDF?}
+Has some nice properties:
+\begin{itemize}
+\item Gives us more of the `S' shape
+\item $Pr(Y=1|X)$ is increasing in $X$ if $\beta_1>0$.
+\item $Pr(Y=1|X) \in [0,1]$ for all $X$
+\item Easy to compute: $\frac{1}{1+e^{-z}}=\frac{e^{z}}{1+e^{z}}$ has analytic derivatives too.
+\item Log odds interpretation
+\begin{itemize}
+\item $\log(\frac{p}{1-p}) = \beta_0 + \beta_1 X$
+\item $\beta_1$ tells us how \alert{log odds ratio} responds to $X$.
+\item $\frac{p}{1-p} \in (-\infty,\infty)$ which fixes the $[0,1]$ problem in the other direction.
+\item more common in other fields (epidemiology, biostats, etc.).
+\end{itemize}
+\item Also has the property that $F(z) = 1-F(-z)$.
+\item Similar to probit but different scale of coefficients
+\item Logit/Logistic are sometimes used interchangeably but sometimes mean different things depending on the literature.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Logit in R}
+\footnotesize
+\begin{semiverbatim}
+bm1 <-glm(deny~pi_rat+black,data=hmda, family=binomial(link="logit"))
+coeftest(bm1)
+
+z test of coefficients:
+
+            Estimate Std. Error  z value  Pr(>|z|)    
+(Intercept) -4.12556    0.26841 -15.3701 < 2.2e-16 ***
+pi_rat       5.37036    0.72831   7.3737  1.66e-13 ***
+blackTRUE    1.27278    0.14620   8.7059 < 2.2e-16 ***
+---
+    Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
+
+> predict(bm1, data.frame(pi_rat=.3,black=TRUE),type = "response")
+0.2241459 
+> predict(bm1, data.frame(pi_rat=.3,black=FALSE),type = "response")
+0.07485143  
+\end{semiverbatim}
+\begin{itemize}
+\item Logit predicts a 7.5\% chance of mortgage denial for non-black applicants, and 22.4\% chance for black ones. (Very similar to probit).
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{A quick comparison}
+\begin{itemize}
+\item LPM prediction departs greatly from CDF long before $[0,1]$ limits.
+\item We get probabilities that are too extreme even for $X\hat{\beta}$ ``in bounds''.
+\item Some (MHE) argue that though $\hat{Y}$ is flawed, constant marginal effects are still OK.
+\item Logit and Probit are highly similar
+\end{itemize}
+\begin{center}
+\includegraphics[width=2in]{resources/lpm-probit.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=2.5in]{resources/hmda3.pdf}\\
+\includegraphics[width=2.5in]{resources/hmda3a.pdf}\\
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Latent Variables/ Limited Dependent Variables}
+An alternative way to think about this problem is that there is a continuously distributed $Y^{*}$ that we as the econometrician don't observe.
+\begin{eqnarray*}
+Y_i =
+\begin{cases}
+1 \mbox{ if } Y^{*} >0 \\
+0 \mbox{ if } Y^{*} \leq 0
+\end{cases}
+\end{eqnarray*}
+\begin{itemize}
+\item Instead we only see whether $Y^{*}$ exceeds some threshold (in this case $0$).
+\item We can think about $Y^{*}$ as a \alert{latent variable}.
+\item Sometimes you will see this description in the literature, everything else is the same!
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Index Models}
+We sometimes call these single index models or threshold crossing models
+\begin{eqnarray*}
+Z_i = X_i \beta
+\end{eqnarray*}
+\begin{itemize}
+\item We start with a potentially large number of regressors in $X_i$ but $X_i \beta = Z_i$ is a \alert{scalar}
+\item We can just calculate $F(Z_i)$ for Logit or Probit (or some other CDF).
+\item $Z_i$ is the \alert{index}. if $Z_i = X_i \beta$ we say it is a \alert{linear index} model.
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{What does software do?}
+\begin{itemize}
+\item One temptation might be \alert{nonlinear least squares}:
+\begin{eqnarray*}
+\hat{\beta}^{NLLS} = \arg \min_{\beta} \sum_{i=1}^N (Y_i - \Phi(X_i \beta))^2
+\end{eqnarray*}
+\item Turns out this isn't what people do.
+\item We can't always directly estimate using the log-odds
+\begin{eqnarray*}
+\log\left(\frac{p}{1-p}\right)= \beta X_i + \varepsilon_i
+\end{eqnarray*}
+\item The problem is that $p$ or $p(X_i)$ isn't really observed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{What does software do?}
+\begin{itemize}
+\item Can construct an MLE:
+\begin{eqnarray*}
+\hat{\beta}^{MLE} &=& \arg \max_{\beta} \prod_{i=1}^N F(Z_i)^{y_i} (1-F(Z_i))^{1-{y_i} }\\
+Z_i &=& \beta_0 + \beta_1 X_i
+\end{eqnarray*}
+\item Probit: $F(Z_i) = \Phi(Z_i)$ and its derivative (density) $f(Z_i) = \phi(Z_i)$. \\
+Also is \alert{symmetric} so that $1 - F(Z_i) = F(-Z_i)$.
+\item Logit: $F(Z_i) = \frac{1}{1+e^{-z}}$ and its derivative (density) $f(Z_i) = \frac{e^{-z}}{(1+e^{-z})^2}$ a more convenient property is that $\frac{f(z)}{F(z)} = 1 - F(z)$ this is called the \alert{hazard rate}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{A probit trick}
+Let $q_i = 2 y_i -1$
+\begin{eqnarray*}
+F(q_i \cdot Z_i) = 
+\begin{cases}
+F(Z_i)  &\mbox{ when } y_i=1 \\
+F(-Z_i) = 1-F(Z_i)& \mbox{ when } y_i=0
+\end{cases}
+\end{eqnarray*}
+So that 
+\begin{eqnarray*}
+l(y_1,\ldots, y_n | \beta) = \sum_{i=1}^N \ln F(q_i \cdot Z_i) 
+\end{eqnarray*}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{FOC of Log-Likelihood}
+\begin{eqnarray*}
+l(y_1,\ldots,y_n | \beta) &=& \sum_{i=1}^N y_i \ln F(Z_i) + (1-y_i) \ln(1- F(Z_i)) \\
+\frac{\partial l }{\partial \beta} &=& \sum_{i=1}^N \frac{y_i}{ F(Z_i)} \frac{ d F}{d \beta}(Z_i) - \frac{1-y_i}{1-F(Z_i)}  \frac{ d F}{d \beta} (Z_i)\\
+ &=& \sum_{i=1}^N \frac{y_i \cdot f(Z_i) }{ F(Z_i)} \frac{ d Z_i}{d \beta} -  \sum_{i=1}^N \frac{(1-y_i)\cdot f(Z_i) }{1-F(Z_i)} \frac{ d Z_i}{d \beta} \\
+ &=& \sum_{i=1}^N  \left[ \frac{y_i \cdot f(Z_i) }{ F(Z_i)} X_i -  \frac{(1-y_i)\cdot f(Z_i) }{1-F(Z_i)} X_i \right] \\
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+\frametitle{FOC of Log-Likelihood (Logit)}
+This is the \alert{score} of the log-likelihood:
+\begin{eqnarray*}
+\frac{\partial l }{\partial \beta} = \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right]  \cdot X_i 
+\end{eqnarray*}
+It is technically also a \alert{moment condition}. It is easy for the logit
+\begin{eqnarray*}
+ \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \left[ y_i (1-F(Z_i)) -  (1-y_i) F(Z_i) \right] \cdot X_i \\
+ &=&  \sum_{i=1}^N  \underbrace{\left[ y_i - F(Z_i) \right]}_{\varepsilon_i} \cdot X_i 
+\end{eqnarray*}
+This comes from the hazard rate.
+\end{frame}
+
+\begin{frame}
+\frametitle{FOC of Log-Likelihood (Probit)}
+This is the \alert{score} of the log-likelihood:
+\begin{eqnarray*}
+\frac{\partial l }{\partial \beta} = \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right] \cdot X_i  \\
+ &=&  \sum_{y_i=1}  \frac{\phi(Z_i) }{ \Phi(Z_i)} X_i +\sum_{y_i=0} \frac{-\phi(Z_i) }{1-\Phi(Z_i)} X_i
+\end{eqnarray*}
+Using the $q_i = 2 y_i -1$ trick
+\begin{eqnarray*}
+\nabla_{\beta} \cdot l(\mathbf{y}; \beta)= \sum_{i=1}^N \underbrace{\frac{ q_i \phi(q_i Z_i)}{\Phi(Z_i)}}_{\lambda_i} X_i
+\end{eqnarray*}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Hessian Matrix}
+We could also take second derivatives to get the \alert{Hessian} matrix:
+\begin{eqnarray*}
+\frac{\partial l^2 }{\partial \beta \partial \beta'} = - \sum_{i=1}^N   y_i \frac{ f(Z_i)  f(Z_i) - f'(Z_i) F(Z_i) }{ F(Z_i)^2}  X_i X_i' \\
++  \sum_{i=1}^N   (1-y_i) \frac{f(Z_i)f(Z_i) - f'(Z_i)(1-F(Z_i))}{(1-F(Z_i))^2}  X_i X_i'
+\end{eqnarray*}
+This is a $K\times K$ matrix where $K$ is the dimension of $X$ or $\beta$.
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{The Hessian Matrix (Logit)}
+For the logit this is even easier (use the simplified logit score):
+\begin{eqnarray*}
+\frac{\partial l^2 }{\partial \beta \partial \beta'}  &=& - \sum_{i=1}^N f(Z_i) X_i X_i' \\
+&=& - \sum_{i=1}^N F(Z_i) (1- F(Z_i)) X_i X_i'
+\end{eqnarray*}
+This is \alert{negative semi definite}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Hessian Matrix (Probit)}
+Recall
+\begin{eqnarray*}
+\nabla_{\beta} \cdot l(\mathbf{y}; \beta)= \sum_{i=1}^N \underbrace{\frac{ q_i \phi(q_i Z_i)}{\Phi(Z_i)}}_{\lambda_i} X_i
+\end{eqnarray*}
+Take another derivative and recall $\phi'(z_i) = - z_i \phi(z_i)$
+\begin{eqnarray*}
+\nabla_{\beta}^2 \cdot l(\mathbf{y}; \beta)&=& \sum_{i=1}^N \frac{q_i \phi'(q_i Z_i) \Phi(z_i) - q_i \phi(z_i)^2}{\Phi(z_i)^2}  X_i X_i' \\
+&=& - \lambda_i( z_i + \lambda_i) \cdot X_i X_i'
+\end{eqnarray*}
+Hard to show but this is \alert{negative definite} too.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Estimation}
+\begin{itemize} 
+\item We can try to find the values of $\beta$ which make the average score $=0$ (the FOC).
+\item But no closed form solution!
+\item Recall Taylor's Rule:
+\end{itemize}
+\begin{eqnarray*}
+f(x + \Delta x) =  f(x_0) + f'(x_0) \Delta x + \frac{1}{2} f''(x_0) (\Delta x)^2
+\end{eqnarray*}
+Goal is to find the case where $f'(x) \approx 0$ so take derivative w.r.t $\Delta x$:
+\begin{eqnarray*}
+\frac{d}{d \Delta x} \left[  f(x_0) + f'(x_0) \Delta x + \frac{1}{2} f''(x_0) (\Delta x)^2 \right] = f'(x_0) +  f''(x_0) (\Delta x) = 0
+\end{eqnarray*}
+Solve for $\Delta x$
+\begin{eqnarray*}
+\Delta x  = - f'(x_0) / f''(x_0)
+\end{eqnarray*}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Estimation}
+\begin{itemize} 
+\item In multiple dimensions this becomes:
+\begin{eqnarray*}
+x_{n+1} = x_{n} - \alpha \cdot \left[\mathbf{H}_f (x_n) \right]^{-1} \nabla f(x_n)
+\end{eqnarray*}
+\item $\mathbf{H}_f (x_n)$ is the \alert{Hessian} Matrix. $ \nabla f(x_n)$ is the \alert{gradient}.
+\item $\alpha \in [0,1]$ is a parameter that determines \alert{step size}
+\item Idea is that we approximate the likelihood with a quadratic function and minimize that (because we know how to solve those).
+\item Each step we update our quadratic approximation.
+\item If problem is \alert{convex} this will always converge (and quickly)
+\item Most software ``cheats'' and doesn't compute $\left[\mathbf{H}_f (x_n) \right]^{-1}$ but uses tricks to update on the fly (BFGS, Broyden, DFP, SR1). Mostly you see these options in your software.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Marginal effects}
+\begin{eqnarray*}
+\frac{\partial E[Y_i | X_i] }{\partial X_{ik}} = f (Z_i) \beta_k
+\end{eqnarray*}
+\begin{itemize}
+\item The whole point was that we wanted marginal effects not to be constant
+\item So where do we evaluate?
+\begin{itemize}
+\item Software often plugs in mean or median values for each component
+\item Alternatively we can integrate over $X$ and compute:
+$$
+E_{X_i}[ f (Z_i) \beta_k]
+$$
+\item The right thing to do is probably to plot the response surface (either probability) or change in probability over all $X$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inference}
+\begin{itemize} 
+\item If we have the Hessian Matrix, inference is straightforward.
+\item $\mathbf{H}_f(\hat{\beta}^{MLE})$ tells us about the \alert{curvature} of the log-likelihood around the maximum.
+\begin{itemize}
+\item Function is flat $\rightarrow$ not very precise estimates of parameters
+\item Function is steep $\rightarrow$  precise estimates of parameters
+\end{itemize}
+\item Construct \alert{Fisher Information} $I(\hat{\beta}^{MLE}) = E[H_f(\hat{\beta}^{MLE})]$ where expectation is over the data.
+\begin{itemize}
+\item Logit does not depend on $y_i$ so $E[H_f(\hat{\beta}^{MLE})]=H_f(\hat{\beta}^{MLE})$.
+\item Probit does depend on $y_i$ so $E[H_f(\hat{\beta}^{MLE})]\neq H_f(\hat{\beta}^{MLE})$.
+\end{itemize}
+\item Inverse Fisher information $E[H_f(\hat{\beta}^{MLE})]^{-1}$ is an estimate of the variance covariance matrix for $\hat{\beta}$.
+\item $\sqrt{diag[E[H_f(\hat{\beta}^{MLE})]^{-1}]}$ is an estimate for $SE(\hat{\beta})$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goodness of Fit \#1: Pseudo $R^2$}
+How well does the model fit the data?
+\begin{itemize} 
+\item No $R^2$ measure (why not?).
+\item Well we have likelihood units so average likelihood tells us something but is hard to interpret.
+\item $\rho = 1- \frac{LL(\hat{\beta}^{MLE})}{LL(\beta_0)}$ where $LL(\beta_0)$ is the likelihood of a model with just a constant (unconditional probability of success).
+\begin{itemize}
+\item If we don't do any better than unconditional mean then $\rho=0$.
+\item Won't ever get all of the way to $\rho =1$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goodness of Fit \#2: Confusion Matrix }
+\begin{itemize} 
+\item Machine learning likes to think about this problem more like \alert{classification} then regression.
+\item A caution: these are \alert{regression} models not \alert{classification} models.
+\item Predict either $\hat{y}_i = 1$ or $\hat{y}_i = 0$ for each observation.
+\item Predict $\hat{y}_i =1$ if $Pr(y_i = 1 | X_i =x) \geq0.5$ or $F(X_i \hat{\beta}) > 0.5$.
+\item Imagine for cells Prediction: $\{Success, Failure\}$, Outcome $\{Success, Failure\}$
+\item Can construct this using the R package \texttt{caret} and command \texttt{caret}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{ROC Curve/ AOC}
+\begin{center}
+\includegraphics[width=3in]{resources/confusion.png}\\
+\end{center}
+\end{frame}
+
+
+
+\begin{frame}{ROC Curve/ AOC}
+\begin{center}
+\includegraphics[width=2.5in]{resources/roc_curve.png}\\
+\end{center}
+\begin{itemize}
+\item At each predicted probability calculate both \alert{True Positive Rate} and \alert{False Positive Rate}.
+\item AOC is area under the curve
+\end{itemize}
+\end{frame}
+
+
+%% LINE
+
+
+\begin{frame}
+\frametitle{Binary Choice: Overview}
+Many problems we are interested in look at discrete rather than continuous outcomes.
+\begin{itemize}
+\item We are familiar with limitations of the linear probability model (LPM)
+\begin{itemize}
+\item Predictions outside of $[0,1]$
+\item Estimates of marginal effects need not be consistent.
+\end{itemize}
+\item What about the case where $Y$ is binary and a regressor $X$ is endogenous?
+\begin{itemize}
+\item The usual 2SLS estimator is \alert{NOT consistent}.
+\item Or we can ignore the fact that $Y$ is binary...
+\item Neither seems like a good option
+\end{itemize}
+\item Suppose we have panel data on repeated binary choices
+\begin{itemize}
+\item Adding FE to the probit model produces biased estimates.
+\end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{Problem \#1: Endogeneity}
+Four possible solutions (maybe there are more?)
+\begin{enumerate}
+\item Close eyes, run the LPM with instruments (Suggested by MHE).
+\item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
+\item Control Function Estimation
+\item `Special Regressor' Methods
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Problem \#1: Endogeneity}
+Setup:
+\begin{itemize}
+\item Binary variable $D$: the outcome of interest
+\item $X$ is a vector of observed regressors with coefficient $\beta$ 
+\begin{itemize}
+\item (Can think about $X^e$: endogenous and $X^0$: exogenous).
+\item In an treatment model we might have that $T$ is a binary treatment indicator within $X$
+\end{itemize}
+\item $\epsilon$ is unobserved error. Specifying $f(e)$ can give logit/probit.
+\item Threshold Crossing / Latent Variable Model:
+\begin{eqnarray*}
+D = \mathbf{1}(X \beta + \epsilon \geq 0)
+\end{eqnarray*}
+\item Goal is not usually $\hat{\beta}$ or it's CI, but rather $P(D=1 | X)$ or $\frac{\partial P[D=1 | x] }{\partial X}$ (marginal effects).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Linear Probability Model}
+Consider the LPM with a single continuous regressor
+\begin{itemize}
+\item LPM prediction departs greatly from CDF long before $[0,1]$ limits.
+\item We get probabilities that are too extreme even for $X\hat{\beta}$ ``in bounds''.
+\item Some (MHE) argue that though $\hat{Y}$ is flawed, constant marginal effects are still OK.
+\end{itemize}
+\begin{center}
+\includegraphics[width=2in]{resources/lpm-probit.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}{Some well known textbooks}
+(Baby) Wooldrige:
+\begin{quote}
+``Even with these problems, the linear probability model is useful and often applied in economics. It usually works well for values of the independent variables that are near the averages in the sample.'' (2009, p. 249)
+\end{quote}
+\begin{itemize}
+\item Mentions heteroskedasticity of error (which is binomial given $X$) but does not address the violation of the first LSA.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Some well known textbooks}
+Angrist and Pischke (MHE) 
+\begin{itemize}
+\item several examples where marginal effects of probit and LPM are ``indistinguishable''.
+\end{itemize}
+
+\begin{quote}
+...while a nonlinear model may fit the CEF (conditional expectation function) for LDVs (limited dependent variable models) more closely than a linear model, when it comes to marginal effects, this probably matters little. This optimistic conclusion is not a theorem, but as in the empirical example here, it seems to be fairly robustly true.(2009, p. 107)
+\end{quote}
+and continue...
+\begin{quote}
+...extra complexity comes into the inference step as well, since we need standard errors for marginal effects. (ibid.)
+\end{quote}
+\end{frame}
+
+\begin{frame}
+\frametitle{Linear Probability Model}
+How does the LPM work?
+\begin{eqnarray*}
+D = X \beta + \varepsilon
+\end{eqnarray*}
+\begin{itemize}
+\item Estimated $\hat{\beta}$ are the MFX.
+\item With exogenous $X$ we have $E[D | X] = Pr[D=1 | X] = X \beta$.
+\item If some elements of $X$ (including treatment indicators) are endogenous or mismeasured they will be correlated with $E$.
+\item In that case we can do IV via 2SLS or IV-GMM given some instruments $Z$.
+\item We need the usual $E[\varepsilon  | X]= 0 $ or $E[\varepsilon | Z] = 0$. \pause
+\item An obvious flaw: Given any $\varepsilon | X  $ must equal either $1- X \beta$ or $-X \beta$ which are functions of $X$
+\item \alert{Only the trivial binary $X$ with no other regressors satisfies this!}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\begin{itemize}
+\item LPM is not just about taste and convenience.
+\item Three treated observations, three untreated % \texttt{Treated=1}
+\item Assume that $f(\varepsilon) \sim N(0,\sigma^2)$
+\begin{eqnarray*}
+D = I ( 1 + Treated + R + \varepsilon \geq 0 ) 
+\end{eqnarray*}
+\item Each individual treatment effect given by:
+\begin{eqnarray*}
+ I ( 2 + R + \varepsilon \geq 0 ) -  I ( 1 + R + \varepsilon \geq 0 )  =  I ( 0 \leq 1 + R + \varepsilon \leq 1 ) 
+\end{eqnarray*}
+\item All treatment effects are positive for all $(R,\varepsilon)$.
+\item Construct a sample where true effect $=1$ for 5th individual, 0 otherwise. $ATE= \frac{1}{6}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\tiny
+\begin{semiverbatim}
+. list
+     |     R   Treated   D |
+  1. |  -1.8         0   0 | 
+  2. |   -.9         0   1 |
+  3. |  -.92         0   1 |
+  4. |  -2.1         1   0 |
+  5. | -1.92         1   1 |
+  6. |    10         1   1 |
+
+. reg D Treated R, robust
+
+Linear regression                               Number of obs     =          6
+                                                F(2, 3)           =       1.02
+                                                Prob > F          =     0.4604
+                                                R-squared         =     0.1704
+                                                Root MSE          =     .60723
+
+------------------------------------------------------------------------------
+             |               Robust
+           D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     Treated |  -.1550841   .5844637    -0.27   0.808    -2.015108     1.70494
+           R |   .0484638   .0419179     1.16   0.331    -.0849376    .1818651
+       _cons |   .7251463   .3676811     1.97   0.143    -.4449791    1.895272
+------------------------------------------------------------------------------
+. nlcom _b[Treated]/_b[R]
+       _nl_1:  _b[Treated]/_b[R]
+------------------------------------------------------------------------------
+           D |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       _nl_1 |       -3.2   10.23042    -0.31   0.754    -23.25125    16.85125
+------------------------------------------------------------------------------
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\begin{itemize}
+\item That went well, except that:
+\begin{itemize}
+\item we got the wrong sign of $\beta_T$
+\item $\beta_1/\beta_2$ was the wrong sign and three times too big.
+\end{itemize}
+\item this is not because of small sample size or $\beta_1 \approx 0$.
+\item As $n \rightarrow \infty$ we can get an arbitrarily precise wrong answer.
+\item We don't even get the sign right!
+\item This is still in OLS (not much hope for 2SLS).
+\end{itemize}
+\tiny
+\begin{semiverbatim}
+. expand 30
+(...)
+. reg D Treated R, robust
+
+Linear regression                               Number of obs     =        180
+                                                F(2, 177)         =      59.93
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.1704
+                                                Root MSE          =       .433
+
+------------------------------------------------------------------------------
+             |               Robust
+           D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     Treated |  -.1550841   .0760907    -2.04   0.043    -.3052458   -.0049224
+           R |   .0484638   .0054572     8.88   0.000     .0376941    .0592334
+       _cons |   .7251463    .047868    15.15   0.000     .6306808    .8196117
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution \#0 : LPM}
+
+\begin{block}{Advantages}
+\begin{itemize}
+\item Just like 2SLS.
+\item Computationally easy (no numerical searches)
+\item Missing $Z$ is about efficiency not consistency.
+\item $X^e$ can be discrete or continuous (same estimator)
+\item allows general heteroskedasticity (random coefficients)
+\end{itemize}
+\end{block}
+
+\begin{block}{Disadvantages}
+\begin{itemize}
+\item $\hat{F}_D$ is linear not S-shaped, approximation valid for small range of $X$.
+\item $\hat{F}_D$ can be outside $[0,1]$.
+\item no element of $X$ can have $\infty$ support (e.g. no normally distributed regressors).
+\item $\varepsilon$ not independent of any regressors  (even the exogenous ones). How do we also get $E[X^0 \varepsilon] =0$ ?
+\item Does not nest probit, logit, etc.. Can't compare efficiency
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Solution \#1 : MLE}
+\begin{eqnarray*}
+D = I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \quad X^e = G(Z,\theta,e)
+\end{eqnarray*}
+\begin{itemize}
+\item Fully specified $G$ (could be vector). Could be linear if $X^e$ continuous or probit if $X^e$ binary.
+\item Need to fully specify distribution of $(\varepsilon,e, | Z)$, parametrized.
+\item Implementation (see book), \texttt{biprobit} for joint normal in Stata.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Solution \#1 : MLE}
+
+\begin{block}{Advantages}
+\begin{itemize}
+\item Nests logit, probit, etc. as special cases.
+\item Can have any kind of $X^e$
+\item Allows heteroskedasticity, random coefficients
+\item Asymptotically efficient (if correctly specified)
+\end{itemize}
+\end{block}
+
+\begin{block}{Disadvantages}
+\begin{itemize}
+\item Need to parametrize everything $G$, $F_{\varepsilon,e|Z}$.
+\item Numerical optimization issues
+\item Many nusiance parameters, sometimes poorly identified, especially with discrete $X^e$, correlation between latent $(\varepsilon,e)$.
+\item Need to know all required instruments $Z$. Omitting just one $Z$ causes inconsistency in $G$. (Not sure if something is exogenous, too bad!).
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution \#2 : Control Functions}
+\begin{eqnarray*}
+D &=& I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \\
+ X^e &=& G(Z) +e  \quad \mbox{or}  \quad  X^e = G(Z,e) \quad \mbox{ identified and invertible in $e$}\\
+  \varepsilon  &=&\lambda' e + U \quad \mbox{or}  \quad  \varepsilon = H(U,e) \quad \mbox{ with conditions and } U \bot Z,e.
+\end{eqnarray*}
+Simple Case:
+\begin{itemize}
+\item Estimate a vector of functions $G$ in the $X^e$ models, get estimated errors $\hat{e}$.
+\item Estimate the $D$ model including $\hat{e}$ as additional regressors in addition to $X$.
+\item This ``cleans'' the errors in $U$.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Solution \#2 : Control Functions (Stata Version)}
+\begin{itemize}
+\item \texttt{ivprobit} assumes that $G(Z,e)$ is linear, and $(e,\varepsilon)$ jointly normal, independent of $Z$.
+\item not exactly the semi-parametric flexibility we were looking for...
+\item It is actually Control Function not IV
+\end{itemize}
+\begin{eqnarray*}
+D &=& I ( X^e  \beta_e + X^0 \beta_0+ \varepsilon \geq 0 ) \\
+ X^e &=& \gamma Z + e  
+\end{eqnarray*}
+Run first-stage OLS and get residuals $\hat{e}$. Then plug into
+\begin{eqnarray*}
+D &=& I ( X^e  \beta_e + X^0 \beta_0+ + \lambda \hat{e} + U  \geq 0 )
+\end{eqnarray*}
+and do a conventional probit estimator.
+\begin{itemize}
+\item If you forget a $Z_2$ the resulting model isn't even probit!
+\item God help you if $X^e$ isnt continuous.
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Solution \#2 : Control Functions}
+\begin{eqnarray*}
+D &=& I ( X' \beta + \varepsilon \geq 0 ) , \quad X^e = G(Z,e) ,  \varepsilon = H(U,e),  \quad U \bot X,e.
+\end{eqnarray*}
+Much stronger requirements that 2SLS
+\begin{itemize}
+\item Must be able to solve for errors $e$ in $X^e$ equations (not just orthogonality)
+\item Endogeneity must be caused only by $\varepsilon$ relation to $e$ so after conditioning on $e$ must be that $f(\varepsilon | e, X^{e}) = f( \varepsilon | e)$.
+\item I need a consistent estimator for $e$ which means nothing is omitted.
+\end{itemize}
+Not Quite MLE
+\begin{itemize}
+\item First stage can be semi/non-parametric .
+\item Don't need to fully specify joint distribution of $(\varepsilon,e)$ (Stata does though!).
+\end{itemize}
+
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Solution \#2 : Control Functions}
+\begin{block}{Advantages}
+\begin{itemize}
+\item Nests logit, probit, etc. as special cases
+\item Requires less parametric information than MLE
+\item Some versions are computationally easy without numerical optimization (Bootstrap!)
+\item Less efficient than MLE due to less restrictions,but can be semiparametrically efficient given information.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution \#2 : Control Functions (Disadvantages: Not well known)}
+\begin{itemize}
+\item Only allows limited heteroskedasticity
+\item Need to correctly specify vector $G(Z,e)$ including all $Z$. Omitting a $Z$ or misspecified $G$ causes inconsistency because we need to have joint conditions on $(\varepsilon , e)$.
+\item Generally inconsistent for $X^e$ that is discrete, censored, limited, or not continuous.
+\item If you cannot solve for a latent $e$ in $G(Z,e)$ then you can't get $\hat{e}$ for the censored observations (e.g.: $X^e = \max(0, Z'\gamma + e)$.
+\item An observable $e$ is $e = X^e - E[X^e | Z]$ but for discontinuous $X^e$ that $e$ violates assumptions (except in very strange cases)
+\begin{itemize}
+\item Ex: $\varepsilon =  [ X^e - E[X^e | Z]] \lambda + U$ satisfies CF, but if $X^e$ is discrete then $e$ has some strange distribution that depends on regressors. 
+\item Hard to generate a model of behavior that justifies this!
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Solution \#2 : Control Functions Generalized Residuals}
+What if $X^e$ isn't continuous? Technically possible...
+\begin{itemize}
+\item Given the probit estimate in first stage we could construct a generalized residual (see Imbens and Wooldridge notes) 
+\item $e^g \propto E[\varepsilon | Z, e]$. An estimate $\hat{e}^g$ of $e^g$ can be included as a regressor in the model to fix the endogeneity problem, just as $\hat{e}$ would have been used if the endogenous regressor were continuous.
+\end{itemize}
+Why would you ever want to do this..
+\begin{itemize}
+\item In the linear model we should just do IV with far fewer restrictions
+\item In the nonlinear model, $\hat{e}^g$ requires almost as many assumptions as MLE which is efficient!
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution \#3 : Special Regressor}
+This approach draws on these two papers:
+\begin{itemize}
+\item Lewbel (JoE 2002)
+\item Dong and Lewbel (Econometric Reviews 2015)
+\end{itemize}
+\begin{eqnarray*}
+D &=& I ( X' \beta + V + \varepsilon \geq 0 )
+\end{eqnarray*}
+Special Regressor $V$ has three properties
+\begin{itemize}
+\item Exogenous $E[\varepsilon | V ] =0$
+\item Additively separable in the model
+\item Continuous distribution and large support (such as Normal)
+\item Helpful to have thick-tails (kurtosis). Why? We want to trace $Pr(D | V)$ from $[0,1]$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Learn about SR}
+\small
+Binary, ordered, and multinomial choice, censored regression, selection, and treatment models (Lewbel 1998, 2000, 2007a), truncated regression models (Khan and Lewbel 2007), binary panel models with FE (Honore and Lewbel 2002), dynamic choice models (Heckman and Navarro 2007, Abbring and Heckman 2007), contingent valuation models (Lewbel, Linton, and McFadden 2008), market equilibrium models of multinomial choice (Berry and Haile 2009a, 2009b), models with (partly) nonseparable errors (Lewbel 2007b, Matzkin 2007, Briesch, Chintagunta, and Matzkin 2009).\\
+Other empirical applications: Anton, Fernandez Sainz, and Rodriguez-Poo (2002), Cogneau and Maurin (2002), Goux and Maurin (2005), Stewart (2005), Lewbel and Schennach (2007), and Tiwari, Mohnen, Palm, and van der Loeff (2007).\\
+Precursors: Matzkin (1992, 1994) and Lewbel (1997).\\
+Recent theory: Magnac and Maurin (2007, 2008), Jacho-Ch·vez (2009), Khan and Tamer (2010), and Khan and Nekipelov (2010a, 2010b).
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Solution \#3 : Special Regressor}
+Requirements:
+\begin{eqnarray*}
+D &=& I ( X' \beta + V + \varepsilon \geq 0 )
+\end{eqnarray*}
+\begin{itemize}
+\item Exogenous $E[\varepsilon | V ] =0$ (Strict Exogeneity) \alert{This is the key!} 
+\item Additively separable in the model
+\item Continuous distribution and large support (such as Normal)
+\item NOT interacted with other regressors.
+\item enters LINEARLY, e.g. $V$ must be continuously distributed after conditioning on other regressors
+\item Can normalize its coefficient to $1$
+\item 2SLS Assumptions: $E[ \varepsilon | Z] = 0$ and $E[Z'X]$ is full rank.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution \#3 : Special Regressor: How it works}
+\begin{enumerate}
+\item Demean or center $V$ at zero. 
+\item Assume that $f_v ( V | Z,X^e) = f_v(V | Z)$ and let $\hat{f}_v ( V | Z) $ be a nonparametric kernel estimator of $f_v(V | Z)$. Or just use a kernel of the whole thing $\hat{f}_v ( V | Z,X^e)$
+\item For each observation $i$, Construct $\hat{T}_i = I [D_i -  I(V_i \geq 0)]/ \hat{f_v} (V_i | Z_i)$
+\item Linear 2SLS regression of $\hat{T}$ on $X$ using instruments $Z$ to get the estimated coefficients $\hat{\beta}$.
+\end{enumerate}
+Here $\hat{f}_v(V|Z)$ is high dimensional. So will consider some simpler parametric or semi-parametric version of $f_v$.\\
+By properly adjusting $T_i$ we guarantee to stay in $[0,1]$.
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Solution \#3 : Special Regressor Advantages}
+\begin{itemize}
+\item Unlike LPM it stays ``in bounds'' and is consistent with threshold crossing models.
+\item Unlike MLE and CF, does not require correctly specified first stage model: any valid set of instruments may be used, with only efficiency at stake.
+\item Unlike MLE, the SR method has a linear form, not requiring iterative search
+\item Unlike CF, the SR method can be used when endogenous regressors $X^e$ are discrete or limited; unlike ML there is a single estimation method, regardless of the characteristics of $X^e$
+\item Unlike MLE, the SR method permits unknown heteroskedasticity in the model errors.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solution \#3 : Special Regressor Disadvantages}
+\begin{eqnarray*}
+D &=& I ( X' \beta + V + \varepsilon \geq 0 )
+\end{eqnarray*}
+\begin{itemize}
+\item Because assumptions are weaker we give up a lot of potential efficiency (larger SEs).
+\item Of course this presumes the assumptions were valid and alternatives were consistent.
+\item SR Methods are generally valid under more general conditions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{ The average index function (AIF)/ Propensity Score}
+In the original problem
+\begin{eqnarray*}
+D &=& I ( X' \beta + \varepsilon \geq 0 )
+\end{eqnarray*}
+\begin{itemize}
+\item $V$ is part of $X$ with coefficient $=1$
+\item When $\varepsilon \bot x$ write the propensity score: $E[D | X] = E[D | X \beta] = F_{-\varepsilon} (X \beta)  = Pr(- \varepsilon \leq X \beta)$. 
+\item Under independence $X \bot \varepsilon$ these are the same, under endogeneity or even heteroskedasticity they are not.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{ The average index function (AIF)/ Propensity Score}
+\begin{itemize}
+\item Blundell and Powell (ReStud 2004, this is actually the most important control function paper) use the average structural function (ASF) $= F_{-\varepsilon} (X \beta) $ to summarize choice probabilities. But when $\varepsilon \bot X$ is violated then they have to compute $F_{-\varepsilon | X} (X \beta) $ which is quite difficult (especially semiparametrically).
+\item Lewbel, Dong and Tang (CJE 2012) propose using the AIF estimator $E[D | X \beta]$ instead.
+\item Like ASF the AIF is based on the estimated index $X \beta$ and is equal to the propensity score if $\varepsilon \bot X$. However, when this is violated (endogeneity, heteroskedasticity) the AIF is easier to estimate, via unidimensional nonparametric regression of $D$ on $X \beta$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{ What is the difference}
+\begin{description}
+\item[Propensity Score: ]  Conditions on ALL covariates using $F_{-\varepsilon | X}$.
+\item[ASF: ]  Conditions on no covariates using $F_{-\varepsilon }$.
+\item[AIF: ]  Conditions on index only  using $F_{-\varepsilon | X \beta}$.
+\end{description} 
+
+\begin{itemize}
+\item Unlike ASF, AIF is always identified and easy to estimate.
+\item Unlike Propensity score AIF uses $\beta$ and isn't high dimensional
+\item ASF, AIF and propensity score all coincide under exogeneity.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{ Marginal Effects}
+\begin{itemize}
+\item With exogenous $X$: MFX are $m(X) = p'(X) =  \frac{\partial E[D | X \beta]}{\partial X}$.
+\item Let $f_{-\varepsilon}$ be marginal pdf of $-\varepsilon$. If $D=I(X' \beta + \varepsilon \geq 0)$ with $\varepsilon \bot X$ then:
+\end{itemize}
+\begin{eqnarray*}
+m (X \beta) \beta= \frac{\partial E[D | X]}{\partial X}  = \frac{\partial E[D | X \beta]}{\partial X' \beta}  \beta  = f_{-\varepsilon}(X' \beta) \beta
+\end{eqnarray*}
+
+With endogenous $X$:
+\begin{itemize}
+\item Propensity Score marginal effects are $m(X) = p'(X) =  \frac{\partial E[D | X]}{\partial X}$.
+\item ASF marginal effects are $m(X) =\frac{\partial ASF(X'\beta)}{\partial X'\beta} \beta = f_{-\varepsilon}(X' \beta) \beta.$
+\item AIF marginal effects are $m(X) =\frac{\partial ASF(X'\beta)}{\partial X'\beta} \beta = \frac{\partial E[D | X' \beta ]}{\partial X' \beta} \beta$
+\end{itemize}
+Given $\hat{\beta}$ ASF and AIF mfx require just one dimensional index derivative.
+\end{frame}
+
+\begin{frame}
+\frametitle{Binary Choice with Endogenous Regressors}
+\begin{itemize}
+\item Linear probability models, Maximum Likelihood, and Control functions (including \texttt{ivprobit} have more drawbacks and limitations than are usually recognized.
+\item Special Regressor estimators are a viable alternative (or at least they have completely different drawbacks and may be more generally applicable than has been recognized).
+\item In practice, best might be to try all estimators and check robustness of results. Can use marginal effects to normalize them the same when comparing.
+\item Average Index Functions can be used to construct estimated probabilities and comparable marginal effects across estimators, often simpler to calculate than Average Structural Functions.
+\item Implementation of special regressor in Stata is done in \texttt{sspecialreg}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Example: Dong and Lewbel (2015)}
+\begin{itemize}
+\item Binary dependent variable: does $i$ migrate from one state to another. 
+\item Special Regressor $V_i$: age. Human capital theory suggests it should appear linearly (or at least monotonic) in a threshold crossing model 
+\item Migration is drive by maximizing expected lifetime income and potential gain from a permanent change in income declines linearly in age.
+\item $V_i$ is defined as negative of age, demeaned so that coefficient is positive with mean zero.
+\item Other endogenous regressors: family income pre migration, home ownership.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Example: Dong and Lewbel (2015)}
+As a reminder, normally we would be in trouble here:
+\begin{itemize}
+\item MLE would be very complicated with multiple endogenous variables
+\item Control functions \texttt{ivprobit} won't work with 0/1 homeowner variable.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Example: Dong and Lewbel (2015)}
+1990 PSID
+\begin{itemize}
+\item male head of household (23-59 years), completed education and not-retired (key!)
+\item $D=1$ indicates migration during 1991-1993.
+\item 4689 Individuals, 807 migrants.
+\item Exogenous regressors: years of education, \# of children, white, disabled, married.
+\item Instruments: level of govt benefits in 1989-1990, state median residential tax rate.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Example: Dong and Lewbel (2015)}
+Specifications
+\begin{itemize}
+\item Special Regressors: kernel density vs. sorted data density.
+\item Special Regressor: homoskedastic vs. heteroskedastic errors.
+\item LPM vs 2SLS
+\item Probit (assuming exogeneity)
+\item Control Function (\texttt{ivprobit}) misspecified for \texttt{homeowner} endogenous binary variable.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Empirical Example}
+\begin{center}
+\includegraphics[width=4in]{resources/specialregtable.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Empirical Example: Dong and Lewbel (2015)}
+
+\begin{itemize}
+\item SEs of MFX are computed from 100 bootstrap replications
+\item MFX of special regressor (age) is estimated as positive and significant but LPM and ivprobit estimate negative effects!
+\item household income and home ownership status do not seem to play significant roles in migration decision.
+\item Kernel density estimator seems to give most significant results.
+\end{itemize}
+\end{frame}
+
+
+\end{document}
