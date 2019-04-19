@@ -1,0 +1,159 @@
+---
+title: "Problem Set 5"
+author: "Prof. Conlon"
+date: "Due: 4/12/19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newcommand{\E}[1]{\ensuremath{\mathbb{E}\big[#1\big]}}
+\newcommand{\Emeasure}[2]{\ensuremath{\mathbb{E}_{#1}\big[#2\big]}}
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* ggplot2
+* xtable (build tables quickly)
+* data.table (data tables are computationally efficient and IMHO easier to work with)
+* rdd (package for regression discontinuity designs)
+
+```{r,comment='\t\t',echo=FALSE}
+
+## This is a code chunk: it is outlined in grey and has R code inside of it
+## Note: you can change what is shown in the final .pdf document using arguments 
+##       inside the curly braces at the top {r, comment='\t\t'}. For example, you 
+##       can turn off print statements showing in the .pdf by adding 'echo=False' 
+##       i.e. changing the header to {r, comment='\t\t',echo=FALSE}
+
+## ~~~~~~~~~~~~~~ CODE SETUP ~~~~~~~~~~~~~~ ##
+
+# ~ This bit of code will be hidden after Problem Set 1 ~
+#
+# This section sets up the correct directory structure so that
+#  the working directory for your code is always in the data folder
+
+# Retrieve the code working directory
+#script_dir = dirname(sys.frame(1)$ofile)
+initial_options <- commandArgs(trailingOnly = FALSE)
+render_command <- initial_options[grep('render',initial_options)]
+script_name <- gsub("'", "", 
+                    regmatches(render_command, 
+                               gregexpr("'([^']*)'",
+                               render_command))[[1]][1])
+
+# Determine OS (backslash versus forward slash directory system)
+sep_vals = c(length(grep('\\\\',script_name))>0,length(grep('/',script_name))>0)
+file_sep = c("\\\\","/")[sep_vals]
+
+# Get data directory
+split_str = strsplit(script_name,file_sep)[[1]]
+len_split = length(split_str) - 2
+data_dir = paste(c(split_str[1:len_split],'data',''),collapse=file_sep)
+
+# Check that the data directory contains the files for this weeks assignment
+data_files = list.files(data_dir)
+if(!('olken.csv' %in% data_files)){
+  cat("ERROR: DATA DIRECTORY NOT CORRECT\n")
+  cat(paste("data_dir variable set to: ",data_dir,collapse=""))
+}
+
+```
+
+
+## Problem 1 (Coding Exercise)
+
+The dataset for this exercise comes from a paper by Benjamin Olken entitled "Monitoring Corruption: Evidence from a Field Experiment in Indoneisa". The paper evaluates an attempt to reduce corruption in road building in Indonesia. The treatment we focus on was "accountability meetings". These meetings were held at a village level, and project officials were probed to account for how they spent project funds. Before construction began, residents in the treated villages were encouraged to attend these meetings. The dataset is called "olken.csv".
+
+The outcome we care about is __pct.missing__, the difference between what officials claim they spent on road construction and an independent measure of expenditures. Treatment is given by __treat.invite__ such that:
+
+\begin{align*}
+  \text{treat.invite} = 
+    \begin{cases}
+      1 &\mbox{ if village received intervention} \\
+      0 &\mbox{ if village was control }
+    \end{cases}
+\end{align*}
+
+We have the following four pre-treatment covariates:
+
+\begin{itemize}
+  \item[--] head.edu : the education of the village head
+  \item[--] mosques : mosques per 1000 residents
+  \item[--] pct.poor : the percentage of households below the poverty line
+  \item[--] total.budget : the budget for each project
+\end{itemize}
+
+We now have the following questions:
+
+\begin{itemize}
+
+\item[a.] Create a balance table. For each pretreatment covariate, include comparisons for treated and untreated units in terms of the mean and standard deviation. Report a test, for each covariance, of the hypothesis that the difference in means between treatment conditions is zero.
+
+\item[b.] For each covariate, plot its distribution under treatment and control (either side-by-side using facet\_grid or overlap).
+
+\item[c.] Given your answers to part a and b, do the villagers seem similar in their pre-treatment covariates?
+
+\item[d.] Regress the treatment on the pre-treatment covariates. What do you conclude?
+
+\item[e.] Using the difference-in-means estimator, estimate the ATE and its standard error.
+
+\item[f.] Using a simple regression of outcomes on treatment, estimate the ATE and its standard error. Compare your answer in (f) to (e). Make adjustments to your regression strategy to make (f) and (e) match exactly.
+
+\item[g.] Using the same regression from part (f), include pre-treatment covariates in your regression equation (additively and linearly). Report estimates of treatment effects and its standard error. Do you expect (g) to differ from (f) and (e)? Explain your answer.
+
+\end{itemize}
+
+## Problem 2 (Coding Exercise)
+
+We will be using a dataset that was simulated from real data. Oftentimes due to privacy concerns researchers will provide simulated data from the distribution of real data. The dataset you will be using are from a tutoring program focused on math for 7th graders. The dataset is called "tests_Rd.csv". The tutoring is the treatment variable, __treat__. Tutoring was given to students based on a pretest score, __pretest__ thus the pretest score is the forcing variable. Students that received less than 215 were given a tutor. Our outcome of interest is the test score after tutoring, __posttest__. 
+
+We also have a series of control variables:
+
+\begin{itemize}
+  \item[--] age     : age of student as of September 2010
+  \item[--] gender  : 1 if student's gender is male
+  \item[--] frlunch : 1 if student is eligible a free lunch
+  \item[--] esol    : 1 if student has english as a second language
+  \item[--] white   : 1 if student's race/ethnicity is white
+  \item[--] asian   : 1 if student's race/ethnicity is asian
+  \item[--] black   : 1 if student's race/ethnicity is black
+  \item[--] hispanic: 1 if student's race/ethnicity is hispanic
+\end{itemize}
+
+We ask you to answer the following questions:
+
+
+\begin{enumerate}
+
+\item[a.] We want you to first plot the graph that justifies a sharp RD design. Plot the treatment as a function of the forcing variable. What do you see?
+
+\item[b.] We now want you to plot the graph that justifies our forcing variable. Plot the outcome as a function of the forcing variable. What do you see?
+
+\item[c.]  Estimate the local average treatment effect (LATE) at the threshold using a linear model with common slopes for treated and control units (with no control variables). What are the additional assumptions required for this estimation strategy? Provide a plot of the post test scores (y-axis) and forcing variable (x-axis) in which you show the fitted curves and the underlying scatterplot of the data. Interpret your resulting estimate.
+
+\item[d. ] Re-do c., but use the control variables that are provided in the dataset. Interpret any differences you see. 
+
+\item[e. ] Use the rdd package in R to estimate the LATE at the threshold using a local linear regression with a triangular kernel. Note that the function RDestimate automatically uses the Imbens-Kalyanamaran optimal bandwidth calculation. Report your estimate for the LATE and an estimate of uncertainty.
+
+\item[f. ] How do the estimates of the LATE at the threshold differ based on your results from parts (b) to (e)? In other words, how robust are the results to different specifications of the regression? What other types of robustness checks might be appropriate?
+\end{enumerate}
+
+We are now going to do a series of robustness checks:
+
+\begin{enumerate}
+\item[h. ] Plot the age variable as a function of the forcing variable. What should this graph look like for our RDD to be a valid design? What do you see? How does this relate to the covariate balance exercise we did in Problem 1?
+
+\item[i. ] One type of placebo test is to pick arbitrary cutoffs of your forcing variable and estimate LATE's for those cutoffs. Pick 10 cutoffs and report the average LATE across those cutoffs. Defining $\hat{\tau}$ as your average LATEs, what should the null hypothesis on the population counterpart of this estimator be for our design to be valid. Feel free to use which specification you want for estimating LATE, but please specify it.
+
+\item[k. ] An issue with RD designs is manipulation, or sorting around the cutoff point. To assess this, plot a histogram of the forcing variable, drawing a line at the cutoff point. What would sorting around the cutoff point look like? What do you see? 
+
+
+\end{enumerate}

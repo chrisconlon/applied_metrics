@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Daniel Czarnowske, Florian Heiss, Amrei Stammann" />
+
+<meta name="date" content="2018-03-04" />
+
+<title>bife - Binary Choice Models with Fixed Effects</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">bife - Binary Choice Models with Fixed Effects</h1>
+<h4 class="author"><em>Daniel Czarnowske, Florian Heiss, Amrei Stammann</em></h4>
+<h4 class="date"><em>2018-03-04</em></h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In econometrics, fixed effects binary choice models are important tools for panel data analysis. The package <code>bife</code> provides a new approach suggested by <span class="citation">Stammann, Heiss, and McFadden (2016)</span> to estimate logit and probit panel data models of the following form:</p>
+<p><span class="math display">\[y_{it} = \mathbf{1}\left[\mathbf{x}_{it}\boldsymbol{\beta} + \alpha_{i} + \epsilon_{it} &gt; 0\right] \;,\]</span></p>
+<p>where <span class="math inline">\(i = 1, \dots, N\)</span> and <span class="math inline">\(t = 1, \dots, T_i\)</span> denote different indices. In many applications, <span class="math inline">\(i\)</span> represents individuals, firms or other cross-sectional units and <span class="math inline">\(t\)</span> represents time in a longitudinal data set. But the setup is also useful for instance if <span class="math inline">\(i\)</span> represents ZIP code areas and <span class="math inline">\(t\)</span> is an index of individuals. The dependent variable <span class="math inline">\(y_{it}\)</span> is binary. We observe regressors collected in the vector <span class="math inline">\(\mathbf{x}_{it}\)</span> but we don’t observe the error term <span class="math inline">\(\epsilon_{it}\)</span>.</p>
+<p>We are primarily interested in estimating the parameters <span class="math inline">\(\boldsymbol{\beta}\)</span>, but the model also includes individual fixed effects <span class="math inline">\(\alpha_{i}\)</span>. We assume <span class="math inline">\(E(\epsilon_{it} | \mathbf{X}_{i}, \alpha_{i}) = 0\)</span> but don’t make any assumptions about the marginal distribution of <span class="math inline">\(\alpha_{i}\)</span> or its correlation with the regressors <span class="math inline">\(\mathbf{x}_{i1},\dots, \mathbf{x}_{iT_i}\)</span>.</p>
+<p>The estimator implemented in this package is based on maximum likelihood estimation (ML) of both <span class="math inline">\(\boldsymbol{\beta}\)</span> and <span class="math inline">\(\alpha_1, \dots, \alpha_N\)</span>. It actually is the same estimator as a logistic regression a set of individual dummy variables such as</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(i), <span class="dt">family =</span> <span class="kw">binomial</span>())</code></pre></div>
+<p>The main difference is that In contrast to <code>glm()</code>, <code>bife()</code> applies a pseudo-demeaning algorithm proposed by <span class="citation">Stammann, Heiss, and McFadden (2016)</span><a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Its computational costs are lower by orders of magnitude if <span class="math inline">\(N\)</span> is reasonably large.</p>
+<p>It is well known that as <span class="math inline">\(N\rightarrow\infty\)</span>, the ML estimator is not consistent. This “incidental parameters problem” can be severe if <span class="math inline">\(T\)</span> is small. To tackle this problem, we provide an analytical and a jackknife bias correction for the structural parameters <span class="math inline">\(\boldsymbol{\beta}\)</span> and the average partial effects <span class="citation">(Hahn and Newey 2004)</span>. Thus this package is well suited to analyse big micro-data where <span class="math inline">\(N\)</span> and/or <span class="math inline">\(T\)</span> are large.</p>
+<p>This package provides methods to:</p>
+<ul>
+<li><code>bife()</code> – estimate binary choice models with fixed effects with/-out bias correction</li>
+<li><code>apeff_bife()</code> – compute average partial effects<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> with/-out bias correction</li>
+</ul>
+<p>Both methods utilize the <code>RcppArmadillo</code>-package provided by <span class="citation">Eddelbuettel and Sanderson (2014)</span>.</p>
+<p>An alternative to full ML estimation of all parameters is a conditional maximum likelihood estimator which conditions out <span class="math inline">\(\alpha_1, \dots, \alpha_N\)</span> and only estimates <span class="math inline">\(\boldsymbol\beta\)</span>. It is for example available with <code>survival::clogit()</code> and is consistent under the usual regularity conditions. The problem with this estimator is that its computational burden increases dramatically for larger <span class="math inline">\(T\)</span> values and that partial effects cannot be consistently estimated since this would require estimates of <span class="math inline">\(\alpha_1, \dots, \alpha_N\)</span>.</p>
+</div>
+<div id="computational-advantage" class="section level2">
+<h2>Computational Advantage<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></h2>
+<p>To demonstrate the computational advantage of <code>bife()</code>, we compare it with two popular methods to estimate logit models with fixed effects: <code>glm()</code> and <code>survival::clogit()</code>.<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> To compare these methods, we utilize the data generating process of <span class="citation">Greene (2004)</span> :</p>
+<p><span class="math display">\[y_{it} = \mathbf{1}\left[w_{it} + \epsilon_{it} &gt; 0\right] \;,\]</span> <span class="math display">\[w_{it} = \alpha_{i} + x_{it} + d_{it} \;,\]</span> <span class="math display">\[\alpha_{i} = \sqrt{T} \bar{x_{i}} + a_{i} \;,\]</span> <span class="math display">\[x_{it} \sim \mathcal{N}[0, 1] \;,\]</span> <span class="math display">\[d_{it} = \mathbf{1}\left[x_{it} + h_{it} &gt; 0\right] \;,\]</span> <span class="math display">\[\epsilon_{it} = \log\left[u_{it} / (1 - u_{it})\right] \;,\]</span></p>
+<p>where <span class="math inline">\(x_{it}, h_{it}, a_{i} \sim \mathcal{N}[0, 1]\)</span>, <span class="math inline">\(u_{it} \sim \mathcal{U}[0, 1]\)</span>, <span class="math inline">\(i = 1, \dots, N\)</span>, and <span class="math inline">\(t = 1, \dots, T\)</span>.</p>
+<p>To show how the computational burden changes with <span class="math inline">\(N\)</span> and <span class="math inline">\(T\)</span>, we either fix <span class="math inline">\(N\)</span> and vary <span class="math inline">\(T\)</span> or vice versa. For each of the different combinations we generate 50 datasets and measure the compuational time with the following commands:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">time_bife   &lt;-<span class="st"> </span><span class="kw">system.time</span>(<span class="kw">bife</span>(y <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>d <span class="op">|</span><span class="st"> </span>id, <span class="dt">model =</span> <span class="st">&quot;logit&quot;</span>, <span class="dt">bias_corr =</span> <span class="st">&quot;ana&quot;</span>))[<span class="dv">3</span>]
+time_clogit &lt;-<span class="st"> </span><span class="cf">if</span>(<span class="kw">require</span>(<span class="st">&quot;survival&quot;</span>)) <span class="kw">system.time</span>(<span class="kw">clogit</span>(y <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>d <span class="op">+</span><span class="st"> </span><span class="kw">strata</span>(id)))[<span class="dv">3</span>]
+time_glm    &lt;-<span class="st"> </span><span class="kw">system.time</span>(<span class="kw">glm</span>(y <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>d <span class="op">+</span><span class="st"> </span><span class="dv">0</span> <span class="op">+</span><span class="st"> </span><span class="kw">factor</span>(id), <span class="dt">family =</span> <span class="kw">binomial</span>()))[<span class="dv">3</span>]</code></pre></div>
+<p>The following table reports the average computation time in seconds for each method and all combinations of <span class="math inline">\(N\)</span> and <span class="math inline">\(T\)</span>. Note that <code>bife_corr</code> refers to the results with analytical bias correction.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">N</th>
+<th align="right">T</th>
+<th align="right">bife_corr</th>
+<th align="right">clogit</th>
+<th align="right">glm</th>
+<th align="right">N</th>
+<th align="right">T</th>
+<th align="right">bife_corr</th>
+<th align="right">clogit</th>
+<th align="right">glm</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">100</td>
+<td align="right">10</td>
+<td align="right">0.00880</td>
+<td align="right">0.00736</td>
+<td align="right">0.13450</td>
+<td align="right">100</td>
+<td align="right">10</td>
+<td align="right">0.00870</td>
+<td align="right">0.00746</td>
+<td align="right">0.13430</td>
+</tr>
+<tr class="even">
+<td align="right">200</td>
+<td align="right">10</td>
+<td align="right">0.01220</td>
+<td align="right">0.01216</td>
+<td align="right">0.89906</td>
+<td align="right">100</td>
+<td align="right">20</td>
+<td align="right">0.01174</td>
+<td align="right">0.01412</td>
+<td align="right">0.24614</td>
+</tr>
+<tr class="odd">
+<td align="right">300</td>
+<td align="right">10</td>
+<td align="right">0.01590</td>
+<td align="right">0.01710</td>
+<td align="right">3.06478</td>
+<td align="right">100</td>
+<td align="right">30</td>
+<td align="right">0.01448</td>
+<td align="right">0.02400</td>
+<td align="right">0.34784</td>
+</tr>
+<tr class="even">
+<td align="right">400</td>
+<td align="right">10</td>
+<td align="right">0.01964</td>
+<td align="right">0.02176</td>
+<td align="right">7.53678</td>
+<td align="right">100</td>
+<td align="right">40</td>
+<td align="right">0.01744</td>
+<td align="right">0.03638</td>
+<td align="right">0.40704</td>
+</tr>
+<tr class="odd">
+<td align="right">500</td>
+<td align="right">10</td>
+<td align="right">0.02310</td>
+<td align="right">0.02658</td>
+<td align="right">14.42108</td>
+<td align="right">100</td>
+<td align="right">50</td>
+<td align="right">0.02026</td>
+<td align="right">0.05176</td>
+<td align="right">0.43400</td>
+</tr>
+<tr class="even">
+<td align="right">600</td>
+<td align="right">10</td>
+<td align="right">0.02644</td>
+<td align="right">0.03152</td>
+<td align="right">25.63560</td>
+<td align="right">100</td>
+<td align="right">60</td>
+<td align="right">0.02334</td>
+<td align="right">0.07006</td>
+<td align="right">0.45406</td>
+</tr>
+<tr class="odd">
+<td align="right">700</td>
+<td align="right">10</td>
+<td align="right">0.03046</td>
+<td align="right">0.03620</td>
+<td align="right">39.55658</td>
+<td align="right">100</td>
+<td align="right">70</td>
+<td align="right">0.02624</td>
+<td align="right">0.09234</td>
+<td align="right">0.46582</td>
+</tr>
+<tr class="even">
+<td align="right">800</td>
+<td align="right">10</td>
+<td align="right">0.03402</td>
+<td align="right">0.04122</td>
+<td align="right">58.09904</td>
+<td align="right">100</td>
+<td align="right">80</td>
+<td align="right">0.02924</td>
+<td align="right">0.11644</td>
+<td align="right">0.51412</td>
+</tr>
+<tr class="odd">
+<td align="right">900</td>
+<td align="right">10</td>
+<td align="right">0.03762</td>
+<td align="right">0.04626</td>
+<td align="right">81.24916</td>
+<td align="right">100</td>
+<td align="right">90</td>
+<td align="right">0.03228</td>
+<td align="right">0.14450</td>
+<td align="right">0.60294</td>
+</tr>
+<tr class="even">
+<td align="right">1000</td>
+<td align="right">10</td>
+<td align="right">0.04364</td>
+<td align="right">0.05102</td>
+<td align="right">110.23218</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">0.03512</td>
+<td align="right">0.17500</td>
+<td align="right">0.67712</td>
+</tr>
+</tbody>
+</table>
+<p>Visualizing the results illustrates that the computational time of <code>bife()</code> is linear in both dimensions and hence is well suited to analyse big panel data. The left figure depicts that with <span class="math inline">\(T=10\)</span>, <code>glm()</code> becomes dramatically more computationally intensive as <span class="math inline">\(N\)</span> increases. Besides, <code>glm()</code> is always more time consuming than the other two methods regardless which dimension is varied. Additionally, the right figure already indicates that the computation time of <code>survival::clogit()</code> increases more than linearly with <span class="math inline">\(T\)</span>. In applications with very large <span class="math inline">\(T\)</span>, <code>survival::clogit()</code> can quickly become computationally infeasible in terms of convergence, computation time or technique.</p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="workflow" class="section level2">
+<h2>Workflow</h2>
+<p>This section demonstrates two examples of a typical workflow using <code>bife::</code> with real datasets. The first example uses a balanced panel with many fixed effects (large <span class="math inline">\(N\)</span>) and the second example a unbalanced panel with large <span class="math inline">\(T_i\)</span>.</p>
+<div id="example-hys99-large-n" class="section level3">
+<h3>Example: <span class="citation">Hyslop (1999)</span> — Large <span class="math inline">\(N\)</span></h3>
+<p>The first example is inspired by <span class="citation">Hyslop (1999)</span> who analysed the labor force participation of married women in a “classic” balanced panel. The sample was obtained from the “Panel Study of Income Dynamics” and contains information about <span class="math inline">\(N=1461\)</span> women that were observed over <span class="math inline">\(T=9\)</span> years.</p>
+<p>To analyse the labor force participation of married women, we specify the following model:</p>
+<p><span class="math display">\[LFP_{it} = \mathbf{1}\left[\beta_{1} AGE_{it} + \beta_{2} (INCH / 1000)_{it} + \beta_{3} KID1_{it} 
+  + \beta_{4} KID2_{it} + \beta_{5} KID3_{it} +  \alpha_{i} + \epsilon_{it} &gt; 0\right] \;,\]</span></p>
+<p>where <span class="math inline">\(LFP_{it}\)</span> indicates the labor force participation of a married woman, <span class="math inline">\(AGE_{it}\)</span> refers to the age, <span class="math inline">\((INCH / 1000)_{it}\)</span> is the husbands income in thousand dollars, and the <span class="math inline">\(KID*_{it}\)</span> variables refer to the number of kids in a certain age group.</p>
+<p>We start with a comparison of different methods to estimate logit models with fixed effects similiar to the section before. The following table reports the structural parameters (<span class="math inline">\(\boldsymbol{\beta}\)</span>) and the execution time for each method, where <strong>bife.corr</strong> refers to the results with analytical bias correction.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">bife</th>
+<th align="right">glm</th>
+<th align="right">bife_corr</th>
+<th align="right">clogit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AGE</td>
+<td align="right">0.0378720</td>
+<td align="right">0.0378720</td>
+<td align="right">0.0339453</td>
+<td align="right">0.0336164</td>
+</tr>
+<tr class="even">
+<td>I(INCH / 1000)</td>
+<td align="right">-0.0086599</td>
+<td align="right">-0.0086599</td>
+<td align="right">-0.0076302</td>
+<td align="right">-0.0074680</td>
+</tr>
+<tr class="odd">
+<td>KID1</td>
+<td align="right">-1.1742997</td>
+<td align="right">-1.1742997</td>
+<td align="right">-1.0529849</td>
+<td align="right">-1.0301399</td>
+</tr>
+<tr class="even">
+<td>KID2</td>
+<td align="right">-0.5690298</td>
+<td align="right">-0.5690298</td>
+<td align="right">-0.5091778</td>
+<td align="right">-0.5000720</td>
+</tr>
+<tr class="odd">
+<td>KID3</td>
+<td align="right">-0.0115029</td>
+<td align="right">-0.0115029</td>
+<td align="right">-0.0105624</td>
+<td align="right">-0.0102339</td>
+</tr>
+<tr class="even">
+<td>Time in sec</td>
+<td align="right">0.0350000</td>
+<td align="right">340.2960000</td>
+<td align="right">0.0370000</td>
+<td align="right">0.0770000</td>
+</tr>
+</tbody>
+</table>
+<p>There are two things to highlight in this table. First <code>bife(..., bias_corr = &quot;no&quot;)</code> and <code>glm(..., family = binomial())</code> deliver the same structural parameter estimates, but the execution time of <code>glm(..., family = binomial())</code> is about 10,000 times as long. Second the small <span class="math inline">\(T\)</span> leads to incidental parameters bias, but the analytical bias correction (<code>bife(..., bias_corr = &quot;ana&quot;)</code>) is able to correct the structural parameters such that we get very competitive results compared to the unbiased alternative <code>survival::clogit()</code>.</p>
+<p>Next, we show how to estimate the specification above with <code>bife()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod_logit &lt;-<span class="st"> </span><span class="kw">bife</span>(LFP <span class="op">~</span><span class="st"> </span>AGE <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(INCH <span class="op">/</span><span class="st"> </span><span class="dv">1000</span>) <span class="op">+</span><span class="st"> </span>KID1 <span class="op">+</span><span class="st"> </span>KID2 <span class="op">+</span><span class="st"> </span>KID3 <span class="op">|</span><span class="st"> </span>ID, <span class="dt">data =</span> psid, <span class="dt">bias_corr =</span> <span class="st">&quot;ana&quot;</span>)
+<span class="kw">summary</span>(mod_logit)</code></pre></div>
+<pre><code>## ---------------------------------------------------------------
+## Fixed effects logit model
+## with analytical bias-correction
+## 
+## Estimated model:
+## LFP ~ AGE + I(INCH/1000) + KID1 + KID2 + KID3 | ID
+## 
+## Log-Likelihood= -3045.505 
+## n= 13149, number of events= 9516
+## Demeaning converged after 5 iteration(s)
+## Offset converged after 3 iteration(s)
+## 
+## Corrected structural parameter(s):
+## 
+##               Estimate Std. error t-value  Pr(&gt; t)    
+## AGE           0.033945   0.012990   2.613  0.00898 ** 
+## I(INCH/1000) -0.007630   0.001993  -3.829  0.00013 ***
+## KID1         -1.052985   0.096186 -10.947  &lt; 2e-16 ***
+## KID2         -0.509178   0.084510  -6.025 1.74e-09 ***
+## KID3         -0.010562   0.060413  -0.175  0.86121    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## AIC=  9023.011 , BIC=  19994.7 
+## 
+## 
+## Average individual fixed effects= 0.0122
+## ---------------------------------------------------------------</code></pre>
+<p>The parameters of binary outcome variables are difficult to interpret quantitatively. In econometrics, partial effects <span class="math inline">\(\frac{\partial Pr(y_{it}=1)}{\partial x_{itj}}\)</span> are of more interest. Neither <code>glm()</code> nor <code>survival::clogit()</code> provide a routine to compute partial effects. This package provides the function <code>apeff_bife()</code> to compute average partial effects based on the estimated model provided by <code>bife()</code>. The user simply has to specify which of the variables are discrete and which type of bias correction should be used for the computation of the avarage partial effects. The left column named <code>apeff</code> refers to usual uncorrected average partial effects and the right column named <code>apeff</code> refers to semi-corrected average partial effects following <span class="citation">Stammann, Heiss, and McFadden (2016)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apeff_bife</span>(mod_logit, <span class="dt">discrete =</span> <span class="kw">c</span>(<span class="st">&quot;KID1&quot;</span>, <span class="st">&quot;KID2&quot;</span>, <span class="st">&quot;KID3&quot;</span>), <span class="dt">bias_corr =</span> <span class="st">&quot;ana&quot;</span>)</code></pre></div>
+<pre><code>##                     apeff apeff_corrected
+## AGE           0.006374356     0.006413657
+## I(INCH/1000) -0.001457574    -0.001441662
+## KID1         -0.201850700    -0.205687510
+## KID2         -0.097764269    -0.098640079
+## KID3         -0.001937259    -0.001997014</code></pre>
+<p><code>bife()</code> also offers the opportunity to estimate fixed effects probit models by specifiying <code>model = &quot;probit&quot;</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod_probit &lt;-<span class="st"> </span><span class="kw">bife</span>(LFP <span class="op">~</span><span class="st"> </span>AGE <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(INCH <span class="op">/</span><span class="st"> </span><span class="dv">1000</span>) <span class="op">+</span><span class="st"> </span>KID1 <span class="op">+</span><span class="st"> </span>KID2 <span class="op">+</span><span class="st"> </span>KID3 <span class="op">|</span><span class="st"> </span>ID, 
+                   <span class="dt">data =</span> psid, <span class="dt">bias_corr =</span> <span class="st">&quot;ana&quot;</span>, <span class="dt">model =</span> <span class="st">&quot;probit&quot;</span>)
+<span class="kw">summary</span>(mod_probit)</code></pre></div>
+<pre><code>## ---------------------------------------------------------------
+## Fixed effects probit model
+## with analytical bias-correction
+## 
+## Estimated model:
+## LFP ~ AGE + I(INCH/1000) + KID1 + KID2 + KID3 | ID
+## 
+## Log-Likelihood= -3046.317 
+## n= 13149, number of events= 9516
+## Demeaning converged after 4 iteration(s)
+## Offset converged after 3 iteration(s)
+## 
+## Corrected structural parameter(s):
+## 
+##               Estimate Std. error t-value  Pr(&gt; t)    
+## AGE           0.019508   0.007557   2.582  0.00985 ** 
+## I(INCH/1000) -0.004541   0.001154  -3.935 8.37e-05 ***
+## KID1         -0.621357   0.054957 -11.306  &lt; 2e-16 ***
+## KID2         -0.303336   0.048954  -6.196 5.97e-10 ***
+## KID3         -0.005361   0.034907  -0.154  0.87794    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## AIC=  9024.634 , BIC=  19996.33 
+## 
+## 
+## Average individual fixed effects= 0.0306
+## ---------------------------------------------------------------</code></pre>
+<p>Although the structural parameters are different compared to the logit model due to a different normalization, the average partial effects are similiar:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apeff_bife</span>(mod_probit, <span class="dt">discrete =</span> <span class="kw">c</span>(<span class="st">&quot;KID1&quot;</span>, <span class="st">&quot;KID2&quot;</span>, <span class="st">&quot;KID3&quot;</span>), <span class="dt">bias_corr =</span> <span class="st">&quot;ana&quot;</span>)</code></pre></div>
+<pre><code>##                     apeff apeff_corrected
+## AGE           0.006179070     0.006239579
+## I(INCH/1000) -0.001449039    -0.001452265
+## KID1         -0.198085399    -0.203252498
+## KID2         -0.097063878    -0.099038788
+## KID3         -0.001470504    -0.001715547</code></pre>
+</div>
+<div id="example-acs-pums-2014-large-t" class="section level3">
+<h3>Example: ACS PUMS 2014 — Large T</h3>
+<p>The second example is based on a sample drawn from the American Community Survey (ACS PUMS 2014) were the panel structure is slightly different in comparison to the “classic” structure used in the section before. Instead of individual fixed effects we consider state fixed effects. <span class="math inline">\(N\)</span> can be now considered as the number of groups (states) and <span class="math inline">\(T_i\)</span> as the group size of group <span class="math inline">\(i\)</span>.</p>
+<p>In this example we observe a total of 662,775 married women in <span class="math inline">\(N = 51\)</span> states. Since each state is of different population size, we end up with a highly unbalanced panel were the largest state consists of <span class="math inline">\(T_{\max} = 74,752\)</span> and the smallest of <span class="math inline">\(T_{\min} = 855\)</span> married women.</p>
+<p>The model can be described as follows: <span class="math display">\[LFP_{it} = \mathbf{1}\left[\beta_{1} AGEP_{it} + \beta_{2} (PINCP / 1000)_{it} + \beta_{3} FER_{it} + \alpha_{i} + \epsilon_{it} &gt; 0\right] \;,\]</span></p>
+<p>where <span class="math inline">\(LFP_{it}\)</span> indicates the labor force participation of a married woman, <span class="math inline">\(AGEP_{it}\)</span> refers to the age, <span class="math inline">\((PINCP / 1000)_{it}\)</span> is the total persons income in thousand dollars, and <span class="math inline">\(FER_{it}\)</span> indicates if a woman gave birth to a child within the past 12 months. In this example <span class="math inline">\(i\)</span> refers to one of the states and <span class="math inline">\(t\)</span> refers to one of the individuals observed in this state.</p>
+<p>As before, we start with a comparison of different methods to estimate logit models with fixed effects.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">bife</th>
+<th align="right">glm</th>
+<th align="right">bife_corr</th>
+<th align="right">clogit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AGEP</td>
+<td align="right">-0.0757220</td>
+<td align="right">-0.0757220</td>
+<td align="right">-0.0757159</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>I(PINCP / 1000)</td>
+<td align="right">0.0676899</td>
+<td align="right">0.0676899</td>
+<td align="right">0.0676870</td>
+<td align="right">NA</td>
+</tr>
+<tr class="odd">
+<td>FER</td>
+<td align="right">-1.0004365</td>
+<td align="right">-1.0004365</td>
+<td align="right">-1.0003380</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td>Time in sec</td>
+<td align="right">1.6580000</td>
+<td align="right">18.9230000</td>
+<td align="right">1.9330000</td>
+<td align="right">NA</td>
+</tr>
+</tbody>
+</table>
+<p>There are again two things to highlight. First since the bias of <span class="math inline">\(\boldsymbol{\hat{\beta}}\)</span> obtained from <code>bife(..., bias_corr = &quot;no&quot;)</code> vanishes with large <span class="math inline">\(T\)</span>, the bias correction is redundant. Second since the panel structure consists of very large <span class="math inline">\(T\)</span>, <code>survival::clogit()</code> is not able to handle this dataset:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load data</span>
+acs &lt;-<span class="st"> </span>acs
+
+<span class="kw">print</span>(<span class="kw">try</span>(<span class="cf">if</span>(<span class="kw">require</span>(<span class="st">&quot;survival&quot;</span>)) <span class="kw">clogit</span>(LFP <span class="op">~</span><span class="st"> </span>AGEP <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(PINCP <span class="op">/</span><span class="st"> </span><span class="dv">1000</span>) <span class="op">+</span><span class="st"> </span>FER <span class="op">+</span><span class="st"> </span><span class="kw">strata</span>(ST), <span class="dt">data =</span> acs)))</code></pre></div>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## [1] &quot;Error in fitter(X, Y, strats, offset, init, control, weights = weights,  : \n  (number at risk) * (number tied deaths) is too large\n&quot;
+## attr(,&quot;class&quot;)
+## [1] &quot;try-error&quot;
+## attr(,&quot;condition&quot;)
+## &lt;simpleError in fitter(X, Y, strats, offset, init, control, weights = weights,     method = method, row.names(mf)): (number at risk) * (number tied deaths) is too large&gt;</code></pre>
+<p>Next, we will show how to analyse panel data with <code>bife(..., bias_corr = &quot;no&quot;)</code> following the specification above.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod_logit &lt;-<span class="st"> </span><span class="kw">bife</span>(LFP <span class="op">~</span><span class="st"> </span>AGEP <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(PINCP <span class="op">/</span><span class="st"> </span><span class="dv">1000</span>) <span class="op">+</span><span class="st"> </span>FER <span class="op">|</span><span class="st"> </span>ST, <span class="dt">data =</span> acs, <span class="dt">bias_corr =</span> <span class="st">&quot;no&quot;</span>)
+<span class="kw">summary</span>(mod_logit)</code></pre></div>
+<pre><code>## ---------------------------------------------------------------
+## Fixed effects logit model
+## with no bias-correction
+## 
+## Estimated model:
+## LFP ~ AGEP + I(PINCP/1000) + FER | ST
+## 
+## Log-Likelihood= -287688.2 
+## n= 662775, number of events= 398766
+## Demeaning converged after 7 iteration(s)
+## 
+## Uncorrected structural parameter(s):
+## 
+##                 Estimate Std. error t-value Pr(&gt; t)    
+## AGEP          -0.0757220  0.0002542 -297.88  &lt;2e-16 ***
+## I(PINCP/1000)  0.0676899  0.0002140  316.25  &lt;2e-16 ***
+## FER           -1.0004365  0.0175241  -57.09  &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## AIC=  575484.4 , BIC=  576100.2 
+## 
+## 
+## Average individual fixed effects= 3.0803
+## ---------------------------------------------------------------</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apeff_bife</span>(mod_logit, <span class="dt">discrete =</span> <span class="st">&quot;FER&quot;</span>)</code></pre></div>
+<pre><code>##                      apeff
+## AGEP          -0.010776434
+## I(PINCP/1000)  0.009633341
+## FER           -0.140651136</code></pre>
+<p>Since we estimated a logit model without bias-correction, <code>apeff_bife()</code> delivers only one column with uncorrected average partial effects.</p>
+</div>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<p>For further details on when to use the bias-corrections for structural parameters and average partial effects please consult <span class="citation">Stammann, Heiss, and McFadden (2016)</span> and <span class="citation">Hahn and Newey (2004)</span>.</p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references">
+<div id="ref-cha80">
+<p>Chamberlain, Gary. 1980. “Analysis of Covariance with Qualitative Data.” <em>The Review of Economic Studies</em> 47 (1): 225–38.</p>
+</div>
+<div id="ref-edd14">
+<p>Eddelbuettel, Dirk, and Conrad Sanderson. 2014. “RcppArmadillo: Accelerating R with High-Performance C++ Linear Algebra.” <em>Computational Statistics and Data Analysis</em> 71: 1054–63.</p>
+</div>
+<div id="ref-gre04">
+<p>Greene, William. 2004. “The Behaviour of the Maximum Likelihood Estimator of Limited Dependent Variable Models in the Presence of Fixed Effects.” <em>Econometrics Journal</em> 7 (1): 98–119.</p>
+</div>
+<div id="ref-han04">
+<p>Hahn, Jinyong, and Whitney Newey. 2004. “Jackknife and Analytical Bias Reduction for Nonlinear Panel Models.” <em>Econometrica</em> 72 (4): 1295–1319.</p>
+</div>
+<div id="ref-hys99">
+<p>Hyslop, Dean R. 1999. “State Dependence, Serial Correlation and Heterogeneity in Intertemporal Labor Force Participation of Married Women.” <em>Econometrica</em> 67 (6): 1255–94.</p>
+</div>
+<div id="ref-sta16">
+<p>Stammann, Amrei, Florian Heiss, and Daniel McFadden. 2016. “Estimating Fixed Effects Logit Models with Large Panel Data.”</p>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The proposed pseudo-demeaning algorithm is in spirit of <span class="citation">Greene (2004)</span> and <span class="citation">Chamberlain (1980)</span>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Partial effects are also called marginal effects.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>A more detailed analyses can be found in <span class="citation">Stammann, Heiss, and McFadden (2016)</span><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>We use the <code>base</code>-package version 3.3.1 for all analyses with <code>glm()</code> and the survival-package version 2.39-5 for all analyses with <code>survival::clogit()</code>.<a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

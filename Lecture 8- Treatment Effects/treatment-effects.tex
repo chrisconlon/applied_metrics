@@ -1,0 +1,1169 @@
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
+\usetheme{default}
+\setbeamersize{text margin left=.3in,text margin right=.3in} 
+
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
+
+
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+\begin{document}
+\title{Part 8: Treatment Effects}
+\author{Chris Conlon}
+\institute{Applied Econometrics}
+\date{\today}
+
+\frame{\titlepage}
+
+\section{Intro}
+\frame{\frametitle{Overview}
+This Lecture will cover (roughly) the following papers:\\
+Theory:
+\begin{itemize}
+\item Angrist and Imbens (1994)
+\item Heckman Vytlacil (2005/2007)
+\item Abadie and Imbens (2006)
+\end{itemize}
+And draw heavily upon notes by 
+\begin{itemize}
+\item Guido Imbens
+\item Richard Blundell and Costas Meghir
+\end{itemize}
+
+}
+
+\begin{frame}
+\frametitle{The Evaluation Problem}
+\begin{itemize}
+\item The issue we are concerned about is identifying the effect of a policy or an investment or some individual action on one or more outcomes of interest
+\item This has become the workhorse approach of the applied microeconomics fields (Public, Labor, etc.)
+\item Examples may include:
+\begin{itemize}
+\item The effect of taxes on labor supply
+\item The effect of education on wages
+\item The effect of incarceration on recidivism
+\item The effect of competition between schools on schooling quality
+\item The effect of price cap regulation on consumer welfare
+\item The effect of indirect taxes on demand
+\item The effects of environmental regulation on incomes
+\item The effects of labor market regulation and minimum wages on wages and employment
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Evaluation Problem}
+\begin{itemize}
+\item Define an outcome variable $Y_i$ for each individual
+\item Two \alert{potential outcomes} for each person $\{Y_i(1), Y_i(0)\}$ depending on whether they receive treatment or not.
+\item Call $Y_i(1)- Y_i(0) = \beta_i$ the \alert{Treatment effect}.
+\item Two major problems:
+\begin{itemize}
+\item All individuals have different treatment effects (\alert{heterogeneity}).
+\item We don't actually observe any one person's treatment effect ! (Missing Data problem)
+\end{itemize}
+\item We need strong assumptions in order to recover $f(\beta_i)$ from data.
+\item Instead we can characterize simpler functions such as $E[\beta_i]$ (ATE) or $E[\beta_i | T_i = 1]$ (ATT) or $E[\beta_i | T_i = 0]$ (ATC)  with fewer restrictions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{More Difficulties}
+What is hard here?
+\begin{itemize}
+\item Heterogeneous effect of $\beta_i$ in population.
+\item Selection in treatment may be endogenous. That is $T_i$ depends on $Y_i(1),Y_i(0)$.
+\item Fisher or Roy (1951) model:
+\begin{eqnarray*}
+Y_i = (Y_i(1) - Y_i(0)) T_i + Y_i(0)= \alpha + \beta_i T_i + u_i
+\end{eqnarray*}
+\item Agents usually choose $T_i$ with $\beta_i$ or $u_i$ in mind.
+\item Can't necessarily pool across individuals since $\beta_i$ is not constant.
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Structural vs. Reduced Form}
+\begin{itemize}
+\item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
+\item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
+\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Start with Easy Cases}
+\begin{itemize}
+\item Let's start with the easy cases: run OLS and see what happens.
+\item OLS compares mean of treatment group with mean of control group (possibly controlling for other $X$)
+\begin{eqnarray*}
+\beta^{OLS} &=& E(Y_i | T_i =1) - E(Y_i | T_i=0) \\
+&=& \underbrace{E[\beta_i | T_i =1]}_{\mbox{ATT}} + \left(\underbrace{E[u_i | T_i =1 ] - E[u_i | T_i=0] }_{\mbox{selection bias}}  \right)
+\end{eqnarray*}
+\item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
+\item $Y_i^0 = \alpha + u_i$ may vary within the population (this is quite common).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solutions}
+\begin{enumerate}
+\item Matching
+\item Instrumental Variables
+\item Diference in Difference and Natural Experiments
+\item RCTs
+\item Structural Models
+\end{enumerate}
+\begin{itemize}
+\item Key distinction: the treatment effect of some program (a number) from understanding how and why things work (the mechanism).
+\item Models let us link numbers to mechanisms.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matching}
+\begin{itemize}
+\item Compare treated individuals to un-treated individuals with identical observable characteristics $X_i$.
+\item Key assumption: everything about $Y_i(1) - Y_i(0)$ is captured in $X_i$; or $u_i$ is randomly assigned conditional on $X_i$.
+\item Basic idea: The treatment group and the control group don't have the same distribution of observed characteristics as one another. 
+\item \alert{Re-weight} the un-treated population so that it resembles the treated population.
+\item Once distribution of $X_i$ is the same for both groups $ X_i | T_i \sim X_i$ then we assume all other differences are irrelevant and can just compare means.
+\item Matching assumes \alert{all selection is on observables}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matching}
+\begin{itemize}
+\item Formally the key assumption is the \alert{Conditional Independence Assumption (CIA)}
+\begin{eqnarray*}
+\{Y_i^1,Y_i^0\}  \perp T_i | X_i
+\end{eqnarray*}
+\item Once we know $X_i$ allocation to treatment $T_i$ is as if it is random.
+\item The only difference between treatment and control is composition of the sample.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Matching}
+Let  $F^{1}(x)$ be the distribution of characteristics in the treatment group, we can define the ATE as 
+\begin{eqnarray*}
+&&E[Y(1) - Y(0) | T =1] = E_{F^1(x)} [E(Y(1) -Y(0) | T=1,X)] \\
+&=&  E_{F^1(x)} [E(Y(1) | T=1,X)] -  E_{F^1(x)} [E(Y(0) | T=1,X)] \mbox{ linearity } 
+\end{eqnarray*}
+The first part we observe directly:
+\begin{eqnarray*}
+&=&  E_{F^1(x)} [E(Y(1) | T=1,X)] 
+\end{eqnarray*}
+But the counterfactual mean is not observed!
+\begin{eqnarray*}
+&=&  E_{F^1(x)} [E(Y(0) | T=1,X)] 
+\end{eqnarray*}
+But conditional independence does this for us:
+\begin{eqnarray*}
+ E_{F^1(x)} [E(Y(0) | T=1,X)]  =  E_{F^1(x)} [E(Y(0) | T=0,X)] 
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+\frametitle{A Matching Example}
+Here is an example where I found that matching was helpful in my own work with Julie Mortimer:
+\begin{itemize}
+\item We ran a randomized experiment where we removed Snickers bars from around 60 vending machines in office buildings in downtown Chicago.
+\item We have a few possible control groups:
+\begin{enumerate}
+\item Same vending machine in other weeks (captures heterogeneous tastes in the cross section)
+\item Other vending machines in the same week (might capture aggregate shocks, ad campaigns, etc.)
+\end{enumerate}
+\item We went with \#1 as \#2 was not particularly helpful.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{A Matching Example}
+Major problem was that there was a ton of heterogeneity in the overall level of (potential) weekly sales which we call $M_t$.
+\begin{itemize}
+\item Main source of heterogeneity is how many people are in the office that week, or how late they work.
+\item Based on total sales our average over treatment weeks was in the 74th percentile of all weeks.
+\item This was after removing a product, so we know sales should have gone down!
+\item How do we fix this without running the experiment for an entire year!
+\item Can't use shares instead of quantities. Why?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=4in]{./resources/figure1.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{A Matching Example}
+Ideally we could just observe $M_t$ directly and use that as our matching variable $X$
+\begin{itemize}
+\item We didn't observe it directly and tried a few different measures:
+\begin{itemize}
+\item Sales at the soda machine next to the snack machine
+\item Sales of salty snacks at the same machine (not substitutes for candy bars).
+\item We used k-NN with $k=4$ to select control weeks -- notice we re-weight so that overall sales are approximately same (minus the removed product).
+\end{itemize}
+\item We also tried a more structured approach:
+\begin{itemize}
+\item Define controls weeks as valid IFF
+\item Overall sales were weakly lower
+\item Overall sales were not less than Overall Sales less expected sales less Snickers Sales.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\begin{table}
+\begin{center}
+\tiny
+\label{tab:nonparam}
+\begin{tabular}{|l|rrrcrrcr|}
+\hline
+ & Control  & Control & Treatment& \hspace{-0.3in}& Treatment & Mean & \hspace{-0.3in} & \\
+Product & Mean &  \%ile & Mean& \hspace{-0.3in} & \%ile &  Difference & \hspace{-0.3in}& \% $\Delta$\\
+\hline \hline
+\multicolumn{9}{|l|}{\emph{Vends}} \\ \hline
+Peanut M\&Ms&359.9&73.6&478.3&\hspace{-0.3in}*&99.4&118.4& \hspace{-0.3in}*&32.9\\
+Twix Caramel&187.6&55.3&297.1&\hspace{-0.3in}*&100.0&109.5& \hspace{-0.3in}*&58.4\\
+Assorted Chocolate&334.8&66.7&398.0&\hspace{-0.3in}*&95.0&63.2& \hspace{-0.3in}*&18.9\\
+Assorted Energy&571.9&63.5&616.2& \hspace{-0.3in}&76.7&44.3 & \hspace{-0.3in} &7.8\\
+Zoo Animal Cracker&209.1&78.6&243.7&\hspace{-0.3in}*&98.1&34.6& \hspace{-0.3in}*&16.5\\
+Salted Peanuts&187.9&70.4&216.3&\hspace{-0.3in}*&93.7&28.4 & \hspace{-0.3in} &15.1\\
+Choc Chip Famous Amos&171.6&71.7&193.1&\hspace{-0.3in}*&95.0&21.5& \hspace{-0.3in}*&12.5\\
+Ruger Vanilla Wafer&107.3&59.7&127.9& \hspace{-0.3in}&78.6&20.6& \hspace{-0.3in}*&19.1\\
+Assorted Candy&215.8&43.4&229.6& \hspace{-0.3in}&60.4&13.7& \hspace{-0.3in}&6.4\\
+Assorted Potato Chips&279.6&64.2&292.4&\hspace{-0.3in}*&66.7&12.8& \hspace{-0.3in}&4.6\\
+Assorted Pretzels&548.3&87.4&557.7&\hspace{-0.3in}*&88.7&9.4& \hspace{-0.3in}&1.7\\
+Raisinets&133.3&66.0&139.4& \hspace{-0.3in}&74.2&6.1& \hspace{-0.3in}&4.6\\
+Cheetos&262.2&60.1&260.5& \hspace{-0.3in}&58.2&-1.8& \hspace{-0.3in}&-0.7\\
+Grandmas Choc Chip&77.9&51.3&72.5& \hspace{-0.3in}&37.8&-5.4& \hspace{-0.3in}&-7.0\\
+Doritos&215.4&54.1&203.1& \hspace{-0.3in}&39.6&-12.3& \hspace{-0.3in}*&-5.7\\
+Assorted Cookie&180.3&61.0&162.4& \hspace{-0.3in}&48.4&-17.9& \hspace{-0.3in}&-10.0\\
+Skittles&100.1&62.9&75.1&\hspace{-0.3in}*&30.2&-25.1& \hspace{-0.3in}*&-25.0\\
+Assorted Salty Snack&1382.8&56.0&1276.2&\hspace{-0.3in}*&23.3&-106.7& \hspace{-0.3in}*&-7.7\\
+Snickers&323.4&50.3&2.0&\hspace{-0.3in}*&1.3&-321.4& \hspace{-0.3in}*&-99.4\\ \hline
+Total&5849.6&74.2&5841.3& \hspace{-0.3in}&73.0&-8.3& \hspace{-0.3in}&-0.1\\
+\hline\end{tabular}
+\end{center}
+\tiny
+Notes: Control weeks are selected through the-neighbor matching using four control observations for each treatment week.  Percentiles are relative to the full distribution of control weeks.
+\end{table}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Higher Dimensions}
+So matching works great in dimension 1. But what if $dim(X) > 1$?
+\begin{itemize}
+\item True high-dimensional matching may be infeasible. There may be no set of weights such that:
+$f(X_i | T_i=1) \equiv \int w_i f(X_i | T_i=0) \partial w_i $.
+\item One solution is the nearest-neighbor approach in Abadie Imbens (2006).
+\item This is still cursed in that our nearest neighbors get further away as the dimension grows.
+\item Suppose instead we had a \alert{sufficient statistic}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Propensity Score}
+\begin{itemize}
+\item Rosenbaum and Rubin propose the \alert{propensity score}
+\begin{eqnarray*}
+P(T_i  = 1 | X_i) \equiv P(X_i)
+\end{eqnarray*}
+\item They prove that the propensity score and any function of $X$, $b(X)$ which is finer serves as a \alert{balancing score}.
+\item Finer implies that:
+\begin{eqnarray*}
+b(X^1) = b(X^2) &\implies& P(X^1) = P(X^2)\\
+P(X^1) = P(X^2) & \centernot \implies & b(X^1) = b(X^2)
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Propensity Score}
+\begin{itemize}
+\item Main result: If treatment assignment is strongly ignorable conditional on $X$ (CIA) then it is strongly ignorable $Y(1),Y(0) \perp T | X$ given any balancing score $b(X)$ including the propensity score:
+\begin{align*}
+Pr(T=1 | Y(1), Y(0),P(X))&= E[Pr(T=1| Y(1),Y(0),X) | P(X)] \\
+&= E[Pr(T=1 | x) | P(X) ] = P(X)
+\end{align*}
+\item Also we require that $0 < P(X) < 1$ at each $X$ which is known as the \alert{support condition}.
+\item The theorem implies that given $P(X)$ we have as if random assignment.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Propensity Score}
+\begin{itemize}
+\item Instead of matching on $K$ dimensional $X$ we can now match on a one-dimensional propensity score
+\item Thus the propensity score provides \alert{dimension reduction}
+\item We still have to estimate the propensity score which is a high dimensional problem without \textit{ad-hoc} parametric restrictions.
+\item Let us begin by assuming a can-opener.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Propensity Score}
+Just like in the matching case the problem arises because we do not observe the counterfactual mean:
+\begin{eqnarray*}
+ E_{F^1(x)} [E(Y(0) | T=1,X)] 
+\end{eqnarray*}
+With conditional independence and the propensity score:
+\begin{eqnarray*}
+ E_{F^1(x)} [E(Y(0) | T=1,X)]  &=&  E_{F^1(x)} [E(Y(0) | T=0,X)] \\
+ &=&  E_{F^1(x)} [E(Y(0) | T=0,P(X))] 
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Kernel Matching}
+How do we implement?
+\begin{itemize}
+\item Kernels are an obvious choice
+\begin{eqnarray*}
+\widehat{ATT} = \frac{1}{N_1} \sum_{i \in T=1} \left[Y_i - \frac{\sum_{j \in T=0} Y_j K\left(P(X_i) - P(X_j) \right) }{\sum_{s \in T=0}  K\left(P(X_i) - P(X_s) \right)}   \right]
+\end{eqnarray*}
+ where $N_1$ is the sample size of the treatment group \\
+ and $K(u)$ is a valid Kernel weight (people tend to use Gaussian Kernels here)
+\item As your propensity score gets further away from observation $i$ you get less weight
+\item As $h \rightarrow 0$  (or $\sigma_h$) the window gets smaller and we use fewer neighbors.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Kernel Matching}
+\begin{itemize}
+\item The usual caveats apply: $h$ determines the \alert{bias-variance} tradeoff
+\item Choice of Kernel effects finite-sample properties
+\item Here the \alert{common support} is important. We can only learn about cases where $P(X) \neq 1$ and $P(X) \neq 0$. If you always get treated (or not-treated) we cannot learn from this observation.
+\item We also have to be careful in choosing $X$ so as not to violate CIA (too many $X$'s , too few $X$'s) $\rightarrow$ have to think carefully!
+\item If you use propensity scores you will need a slide convincing us you have thought about why CIA holds for you!
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Gotcha!}
+Under CIA we know
+\begin{eqnarray*}
+G(Y(1),Y(0) | X, T) = G(Y(1),Y(0) | X)
+\end{eqnarray*}
+Suppose we add in $Z$, then we require that:
+\begin{eqnarray*}
+G(Y(1),Y(0) | X, Z, T) = G(Y(1),Y(0) | X, Z)
+\end{eqnarray*}
+However,
+\begin{eqnarray*}
+G(Y(1),Y(0) | X, T) = \int G(Y(1),Y(0) | X, Z, T) dF(Z | X,T) \\
+= G(Y(1),Y(0) | X)
+\end{eqnarray*}
+where the last part follows by CIA.
+\begin{itemize}
+\item Thus each element can depend on $T$ conditional on $Z,X$ but the average may not.
+\item Mindless applications of matching can give you biased results!
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Matching and OLS}
+\begin{itemize}
+\item Recall that OLS is a special case of Kernel regression (and hence matching!)
+\item Think about
+\begin{eqnarray*}
+Y  = \alpha + \beta T_i + u
+\end{eqnarray*}
+\item Assume that $E(u | T,X) = E(u | X)$ which is a conditional mean independence assumption
+\item The we can get $\beta$ consistently (but not other variables) by running the following:
+\begin{eqnarray*}
+Y = \alpha + \beta T_i + \gamma X + v
+\end{eqnarray*}
+\item Again we are in the homogenous treatment world
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{What about IV}
+So what does IV do?
+\begin{itemize}
+\item Let's assume a binary instrument $Z_i = 1$
+\item $Y_i(1),Y_i(0)$ depends on the value of $T_i$
+\item But now we endogenize $T_i(1) ,T_i(0)$ where the argument is the value of $Z_i$.
+\item We observe $\{Z_i, T_i = T_i(Z_i), Y_i = Y_i(T_i(Z_i)) \}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{IV Assumptions}
+So what does IV do?
+\begin{description}
+\item [Independence] $Z_i \perp Y_i(1), Y_i(0), T_i(1), T_i(0)$. Instrument is as if randomly assigned and does not directly affect $Y_i$
+\item This is not implied by random assignment. In that case there would be four potential outcomes $Y_i(z,t)$
+\item [Random Assignment] $Z_i \perp Y_i(0,0), Y_i(0,1), Y_i(1,0), Y_i(1,1), T_i(1), T_i(0)$. 
+\item [Exclusion Restriction] $Y_i(z,t) = Y_i(z',t)$ for all $z,z',t$. 
+\item Thus we require both RA and ER to guarantee Independence. The second assumption is a substantive one.
+\item We only observe $(Z_i,T_i)$ not the pair $T_i(0),T_i(1)$ so we cannot determine compliance types directly! (See the picture)
+\end{description}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{IV Assumptions}
+\includegraphics[width=4in]{./resources/imbens1.pdf}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{IV Assumptions}
+We are stuck without further assumptions, so we assume:
+\begin{description}
+\item [Monotonicity/No Defiers] $T_i(1) \geq T_i(0)$
+\end{description}
+\begin{itemize}
+\item Works in many applications (classical drug compliance).
+\item Implied by many latent index models with constant coefficients
+\item Works as long as sign of $\pi_{1,i}$ doesn't change
+\begin{eqnarray*}
+T_i(z)  = 1 [\pi_0 + \pi_1 z + \varepsilon_i > 0]
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{IV Assumptions}
+\includegraphics[width=4in]{./resources/imbens2.pdf}
+\end{frame}
+
+\begin{frame}
+\frametitle{IV Assumptions}
+\includegraphics[width=4in]{./resources/imbens3.pdf}
+\end{frame}
+
+\begin{frame}
+\frametitle{LATE Derivation}
+\begin{itemize}
+\item We can derive the expression for $\beta_{IV}$ as:
+\begin{eqnarray*}
+\beta_{IV} = \frac{E[Y_i  | Z_i = 1] - E[Y_i | Z_i = 0] }{E[T_i | Z_i=1 ] - E[T_i | Z_i = 0]} = E[Y_i(1) - Y_i(0) | complier]
+\end{eqnarray*}
+\item We can derive the expression for $\pi_c$ (the fraction of compliers):
+\begin{eqnarray*}
+\pi_c = E[T_i | Z_i = 1] - E[T_i | Z_i =0] 
+\end{eqnarray*}
+\item Proof see Angrist and Imbens
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How Close to ATE?}
+Angrist and Imbens give some idea how close to the ATE the LATE is:
+\begin{itemize}
+\item $E[Y_i(0) | \text{never-taker}]$ and  $E[Y_i(1) | \text{always-taker}]$ can be estimated from the data
+\item Compare these to their respective compliers $E[Y_i(0) | \text{complier}]$, $E[Y_i(1) | \text{complier}]$.
+\item When these are close then possibly $ATE \approx LATE$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How Close to ATE?}
+Angrist and Imbens give some idea how close to the ATE the LATE is:
+\begin{eqnarray*}
+\widehat{\beta}_1^{TSLS} \rightarrow^p \frac{E[\beta_{1i} \pi_{1i}]}{E[\pi_{i1}]} = LATE \\
+LATE = ATE + \frac{Cov(\beta_{1i},\pi_{1i})}{E[\pi_{1i}]}
+\end{eqnarray*}
+\begin{itemize}
+\item Weighted average for people with large $\pi_{1i}$.
+\item Late is treatment effect for those whose probability of treatment is most influenced by $Z_i$.
+\item If you always (never) get treated you don't show up in LATE.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How Close to ATE?}
+\begin{itemize}
+\item With different instruments you get different $\pi_{1i}$ and TSLS estimators!
+\item Even with two valid $Z_1, Z_2$
+\begin{itemize}
+\item Can be influential for different members of the population.
+\item Using $Z_1$, TSLS will estimate the treatment effect for people whose probability of treatment $X$ is most influenced by $Z_1$
+\item The LATE for $Z_1$ might differ from the LATE for $Z_2$
+\item A J-statistic might reject even if both $Z_1$ and $Z_2$ are exogenous! (Why?).
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Cardiac Catheterization}
+\begin{itemize}
+\item $Y_i=$ surival time (days) for AMI patients
+\item $X_i=$ whether patient received cadiac catheterization (or not) (intensive treatment)
+\item $Z_i=$ differential distance to CC hospital
+\end{itemize}
+\begin{eqnarray*}
+SurvivalDays_i &=& \beta_0 + \beta_{1i} CardCath_i + u_i\\
+CardCath_i &=& \pi_0 + \pi_{1i} Distance_i + v_i
+\end{eqnarray*}
+\begin{itemize}
+\item For whom does distance have the great effect on probability of treatment?
+\item For those patients what is their $\beta_{1i}$?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Cardiac Catheterization}
+\begin{itemize}
+\item IV estimates causal effect for patients whose value of $X_i$ is most heavily influenced by $Z_i$
+\begin{itemize}
+\item Patients with small positive benefit from CC in the expert judgement of EMT will receive CC if trip to CC hospital is short (\alert{compliers})
+\item Patients that need CC to survive will always get it (\alert{always-takers})
+\item Patients for which CC would be unnecessarily risky or harmful will not receive it (\alert{never-takers})
+\item Patients for who would have gotten CC if they lived further from CC hospital (hopefully don't see) (\alert{defiers})
+\end{itemize}
+\item We mostly weight towards the people with small positive benefits.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Local Average Treatment Effect}
+So how is this useful? 
+\begin{itemize}
+\item It shows why IV can be meaningless when effects are heterogeneous.
+\item It shows that if the monotonicity assumption can be justified, IV
+estimates the effect for a particular subset of the population.
+\item In general the estimates are specific to that instrument and are not
+generalisable to other contexts.
+\item As an example consider two alternative policies that can increase
+participation in higher education.
+\begin{itemize}
+\item Free tuition is randomly allocated to young people to attend college ($Z_1 = 1$ means that the subsidy is available).
+\item The possibility of a competitive scholarship is available for free tuition ($Z_1 = 1$ means that the individual is allowed to compete for the scholarship).
+\end{itemize}
+\end{itemize} 
+\end{frame}
+
+
+\begin{frame}{Local Average Treatment Effect}
+\begin{itemize}
+\item Suppose the aim is to use these two policies to estimate the returns to college education. In this case, the pair $\{Y^1, Y^0\}$ are log earnings, the treatment is going to college, and the instrument is one of the two randomly allocated programs.
+\item First, we need to assume that no one who intended to go to college will be discouraged from doing so as a result of the policy (monotonicity).
+\item This could fail as a result of a General Equilibrium response of the policy; for example, if it is perceived that the returns to college decline as a result of the increased supply, those with better outside opportunities may drop out.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Local Average Treatment Effect}
+\begin{itemize}
+\item Now compare the two instruments.
+\item The subsidy is likely to draw poorer liquidity constrained students into college but not necessarily those with the highest returns.
+\item The scholarship is likely to draw in the best students, who may also have higher returns.
+\item It is not a priori possible to believe that the two policies will identify the same parameter, or that one experiment will allow us to learn about the returns for a broader/different group of individuals.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Local Average Treatment Effect}
+Finally, we need to understand what monotonicity means in terms of restrictions on economic theory. 
+\begin{itemize}
+\item To quote from Vytlacil (2002) Econometrica:\\
+\emph{ ``The LATE assumptions are not weaker than the assumptions of a latent index model, but instead impose the same restrictions on the counterfactual data as the classical selection model if one does not impose parametric functional form or distributional assumptions on the latter.''}
+\item This is important because it shows that the LATE assumptions are equivalent to whatever economic modeling assumptions are required to justify the standard Heckman selection model and has no claim to greater generality.
+\item On the other hand there are no magical solutions to identifying effects when endogeneity/selection is present; this problem is exacerbated when the effects are heterogeneous and individuals select into treatment on the basis of the returns.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Further approaches to evaluation of program effects: \\
+{\small Difference in Differences } }
+\begin{itemize}
+\item Sometimes we may feel we can impose more structure on the problem.
+\item Suppose in particular that we can write the outcome equation as
+\begin{align*}
+ Y_{it} =\alpha_i +d_t +\beta_i T_{it} +u_{it}
+ \end{align*}
+\item In the above we have now introduced a time dimension $t=\{1,2\}$. 
+\item Now suppose that $T_{i1}=0$ for all $i$ and $T_{i2}=1$ for a well defined group of individuals in our population.
+\item This framework allows us to identify the ATT effect under the assumption that the growth of the outcome in the non-treatment state is independent of treatment allocation:
+\begin{align*}
+E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0] 
+\end{align*}
+\item This is known as \alert{parallel trends}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Before and After} 
+An even simpler estimator is the \alert{before and after} or \alert{event study}.
+\begin{itemize}
+\item We look an outcome before or after an event
+\begin{itemize}
+\item A news event: the announcement of a merger or stock split.
+\item A tax change, a new law, etc.
+\end{itemize}
+\begin{align*}
+E[Y_{i2} - Y_{i1} | T_{i2}=1] & = E[Y_{i2}^1 - Y_{i1}^1 | T_{i2}=1] \\
+ &= d_2-d_1 + E[\beta_{i}| T_{i2}=1] 
+\end{align*}
+\item Except under strong conditions $d_2 = d_1$ we shouldn't believe the results of the before and after estimator.
+\item Main Problem: we attribute changes to treatment that might have happened anyway \alert{trend}.
+\item e.g: Cigarette consumption drops 4\% after a tax hike. (But it dropped 3\% the previous four years).
+\item Also worry about: \alert{anticipation}, \alert{gradual rollout}, etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Difference in Differences} 
+Let's try and estimate $d_2- d_1$ directly and then difference it out. Here we use \alert{parallel trends}:
+\begin{align*}
+E[Y_{i2}^0 - Y_{i1}^0 | T_{i2}=1]  &= E[Y_{i2}^0 - Y_{i1}^0 | T_{i2}=0] \\
+E[Y_{i2} - Y_{i1} | T_{i2}=0] & = d_2-d_1
+\end{align*}
+We now obtain an estimator for ATT:
+\begin{align*}
+E[\beta_{i}| T_{i2}=1]  = E[Y_{i2} - Y_{i1} | T_{i2}=1] - E[Y_{i2} - Y_{i1} | T_{i2}=0]  
+\end{align*}
+which can be estimated by the difference in the growth between the treatment and the control group.
+\end{frame}
+
+\begin{frame}{Parallel Trends}
+\begin{figure}
+\centering
+\includegraphics[width=3.5in]{./resources/parallel-trends}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Difference in Differences}
+Now consider the following problem:
+\begin{itemize}
+\item Suppose we wish to evaluate a training program for those with low
+earnings. Let the threshold for eligibility be $B$.
+\item We have a panel of individuals and those with low earnings qualify for
+training, forming the treatment group.
+\item Those with higher earnings form the control group. 
+\item Now the low earning group is low for two reasons
+\begin{enumerate}
+\item They have low permanent earnings ($\alpha_i$ is low) - this is accounted for by diff in diffs.
+\item They have a negative transitory shock ($u_{i1}$ is low) - this is not accounted for by diff in diffs.
+\end{enumerate} 
+\end{itemize}
+\end{frame} 
+
+\begin{frame}{Difference in Differences}
+\begin{itemize}
+\item  \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
+\item To see why note that those participating into the program are such
+that {\small $Y_{i0}^0 < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
+This implies: 
+{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
+For the control group:
+{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
+\item Hence
+\begin{align*}
+& E[Y_{i2}^0 - Y_{i1}^0 | T=1] - E[Y_{i2}^0 - Y_{i1}^0 | T=0] =\\
+&  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
+  \end{align*}
+ \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
+\end{itemize}
+\end{frame} 
+
+\begin{frame}{Difference in Differences}
+Ashefelter (1978) was one of the first to consider difference in differences to evaluate training programs.
+\includegraphics[scale=1]{./resources/ashefelter1.pdf}
+\end{frame}
+
+\begin{frame}{Difference in Differences}
+Ashenfelter (1978) reports the following results.
+\begin{figure}
+\centering
+\includegraphics[scale=.85]{./resources/ashefelter2.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Difference in Differences}
+\begin{itemize}
+\item The assumption on growth of the non-treatment outcome being independent of assignment to treatment may be violated, but it may still be true conditional on $X$.
+\item Consider the assumption
+$$ E[Y_{i2}^0- Y_{i1}^0 | X,T] = E[Y_{i2}^0- Y_{i1}^0 | X] $$ 
+\item This is just matching assumption on a redefined variable, namely the growth in the outcomes. In its simplest form the approach is implemented by running the regression
+$$ Y_{it} = \alpha_i + d_t + \beta_i T_{it} + \gamma_t' X_i + u_{it}$$ 
+which allows for differential trends in the non-treatment growth depending on $X_i$. More generally one can implement propensity score matching on the growth of outcome variable when panel data is available.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Difference in Differences with Repeated Cross Sections}
+\begin{itemize}
+\item Suppose we do not have available panel data but just a random sample from the relevant population in a pre-treatment and a post-treatment period. We can still use difference in differences.
+\item First consider a simple case where {\small $E[Y_{i2}^0- Y_{i1}^0 | T] = E[Y_{i2}^0- Y_{i1}^0]$}.
+\item We need to modify slightly the assumption to
+\vspace{-.5pc}
+\begin{align*}
+E[Y_{i2}^0| \text{\tiny Group receiving training}]&-E[Y_{i1}^0| \text{\tiny Group receiving training in the next period}] \\
+&= E[Y_{i2}^0-Y_{i1}^0]  
+\end{align*}
+which requires, in addition to the original independence
+assumption that conditioned on particular individuals that population we will be sampling from does not change composition.
+\item We can then obtain immediately an estimator for ATT as
+\begin{align*}
+&E[\beta_i |T_{i2}=1] \\ 
+&= E[Y_{i2}| \text{\tiny Group receiving training}]-E[Y_{i1}| \text{\tiny Group receiving training next period}] \\
+&- \{E[Y_{i2} | \text{\tiny Non-trainees}] - E[Y_{i1} | \text{\tiny Group not receiving training next period}]\}
+\end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Difference in Differences with Repeated Cross Sections}
+\begin{itemize}
+\item More generalIy we need an assumption of conditional independence of the form
+\begin{align*}
+E[Y_{i2}^0 & | X, \text{\tiny Group receiving training}]-E[Y_{i1}^0| X, \text{\tiny Group receiving training next period}] \\
+&= E[Y_{i2}^0 | X] - E[Y_{i1}^0 |X]
+\end{align*}
+\item Under this assumption (and some auxiliary parametric assumptions) we can obtain an estimate of the effect of treatment on the treated by the regression
+\begin{align*}
+Y_{it} = \alpha_g + d_t + \beta T_{it} + \gamma' X_{it} + u_{it}
+\end{align*} 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Difference in Differences with Repeated Cross Sections}
+\begin{itemize}
+\item More generalIy we can first run the regression 
+\begin{align*}
+Y_{it} = \alpha_g + d_t + \beta (X_{it}) T_{it} + \gamma' X_{it} + u_{it}
+\end{align*} 
+where $\alpha_g$ is a dummy for the treatment of comparison group, and $\beta (X_{it})$ can be parameterized as $\beta(X_{it}) = \beta' X_{it}$. The ATT can then be estimated as the average of $\beta' X_{it}$ over the (empirical) distribution of $X$.
+\item A non parametric alternative is offered by Blundell, Dias, Meghir and van Reenen (2004).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Difference in Differences and Selection on Unobservables}
+\begin{itemize}
+\item Suppose we relax the assumption of \emph{no selection} on unobservables. 
+\item Instead we can start by assuming that
+\begin{align*}
+E[Y_{i2}^0 | X,Z] - E[Y_{i1}^0 | X,Z] = E[Y_{i2}^0 | X] - E[Y_{i1}^0 | X]
+\end{align*} 
+where $Z$ is an instrument which determines training eligibility say but does not determine outcomes in the non-training state. Take $Z$ as binary (1,0).
+\item Non-Compliance: not all members of the eligible group ($Z = 1$) will take up training and some of those ineligible ($Z = 0$) may obtain training by other means.
+\item A difference in differences approach based on grouping by $Z$ will estimate the impact of being allocated to the eligible group, but not the impact of training itself.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Difference in Differences and Selection on Unobservables}
+\begin{itemize}
+\item Now suppose we still wish to estimate the impact of training on those being trained (rather than just the effect of being eligible)
+\item This becomes an IV problem and following up from the discussion of LATE we need stronger assumptions
+\begin{itemize}
+\item  Independence: for $Z = a, \left\{Y_{i2}^0 - Y_{i1}^0, Y_{i2}^1 - Y_{i1}^1, T(Z=a)\right\}$ is independent of Z.
+\item Monotonicity $T_i(1) \ge T_i(0) \, \forall \, i$
+\end{itemize}
+\item In this case LATE is defined by
+ $$\left [E(\Delta Y | Z = 1) - E(\Delta Y | Z = 0)] / [Pr(T(1) = 1) - Pr(T(0) = 1) \right]$$
+assuming that the probability of training in the first period is zero.
+\end{itemize}              
+\end{frame}
+
+\section*{RDD}
+\begin{frame}{Regression Discontinuity Design}
+\begin{itemize}
+\item Another popular research design is the \alert{Regression Discontinuity Design}.
+\item In some sense this is a special case of IV regression. (RDD estimates a LATE).
+\item Most of this is taken from the JEL Paper by Lee and Lemieux (2010).
+\end{itemize}              
+\end{frame}
+
+\begin{frame}{RDD: Basics}
+\begin{itemize}
+\item We have a \alert{running or forcing variable} $x$ such that 
+\begin{eqnarray*}
+\lim_{x\rightarrow c^{+}} P(T_i | X_i = x) \neq \lim_{x\rightarrow c^{-}}P(T_i | X_i = x)
+\end{eqnarray*}
+\item The idea is that there is a \alert{discontinuous jump} in the \alert{probability of being treated}.
+\item For now we focus on the \alert{sharp discontinuity}:\\
+ $P(T_i | X_i \geq c) =1$ and $P(T_i | X_i < c) =0$
+ \item There is no single $x$ for which we observe treatment and control. (Compare to Propensity Score!).
+\item The most important assumption is that of \alert{no manipulability} $\tau_i \perp D_i$ in some neighborhood of $c$.
+\item Example: a social program is available to people who earned less than \$25,000.
+\begin{itemize}              
+\item If we could compare people earning \$24,999 to people earning \$25,001 we would have as-if random assignment. (MAYBE)
+\item But we might not have that many people...
+\end{itemize}
+\end{itemize}              
+\end{frame}
+
+
+\begin{frame}{RDD: In Pictures}
+\begin{center}
+\includegraphics[width=4.5in]{./resources/ll-fig1}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{RDD: Sharp RD Case}
+RDD uses a set of assumptions distinct from our LATE/IV assumptions. Instead it depends on \alert{continuity}.
+\begin{itemize}
+\item We need that $E[Y^{(1)} | X]$ and $E[Y^{(0)} | X]$ both be continuous at $X=c$.
+\item People just to the left of $c$ are a valid control for those just to the right of $c$.
+\item \alert{This is not a testable assumption} $\rightarrow$ draw pictures!
+\item We could run the regression where $D_i = \mathbf{1}[X_i > c]$.
+\begin{eqnarray*}
+Y_i = \beta_0 + \tau D_i + X_i \beta + \epsilon_i
+\end{eqnarray*}
+\item This puts a lot of restrictions (linearity) on the relationship between $Y$ and $X$.
+\item Also (without additional assumptions) we only learn about $\tau_i$ at the point $X=c$.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{RDD: Nonlinearity}
+First thing to relax is assumption of linearity.
+\begin{eqnarray*}
+Y_i = f(x_i) + \tau D_i  + \epsilon_i
+\end{eqnarray*}
+This is known as \alert{partially linear model}.
+\begin{itemize}
+\item Two options for $f(x_i)$:
+\begin{enumerate}
+\item Kernels: Local Linear Regression
+\item Polynomials: $Y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \cdots + \beta_p x^p + \tau D_i + \epsilon_i$.
+\begin{itemize}
+\item Actually, people suggest different polynomials on each side of cutoff! (Interact everything with $D_i$).
+\end{itemize}
+\end{enumerate}
+\item Same objective. Want to flexibly capture what happens on both sides of cutoff.
+\item Otherwise risk confusing nonlinearity with discontinuity!
+\end{itemize}
+\end{frame}
+	
+\begin{frame}{RDD: Kernel Boundary Problem}
+\begin{center}
+\includegraphics[width=4.5in]{./resources/ll-fig2}
+\end{center}
+\end{frame}
+
+\begin{frame}{RDD: Polynomial Implementation Details}
+To make life easier:
+\begin{itemize}
+\item replace $\tilde{x}_i = x_i - c$.
+\item Estimate coefficients $\beta$: $(1, \tilde{x}, \tilde{x}^2, \ldots, \tilde{x}^p)$ and\\
+ $\tilde{\beta}$: $(D_i, D_i \tilde{x},D_i \tilde{x}^2, \ldots, D_i \tilde{x}^p)$.
+ \item Now treatment effect at $c$ just the coefficient on $D_i$. (We can ignore the interaction terms).
+ \item If we want treatment effect at $x_i > c$ then we have to account for interactions.
+ \begin{itemize}
+ \item Identification away from $c$ is somewhat dubious.
+\end{itemize}
+\item Lee and Lemieux (2010) suggest estimating a coefficient on a dummy for each bin in the polynomial regression $\sum_{k} \phi_k B_k$.
+ \begin{itemize}
+ \item Add polynomials until you can satisfy the test that the joint hypothesis test that $\phi_1 = \cdots \phi_k= 0$.
+\item There are better ways to choose polynomial order...
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+	
+\begin{frame}{RDD: Checklist}
+Most RDD papers follow the same formula (so should yours)
+\begin{itemize}
+\item Plot of $P(D | X)$ so that we can see the discontinuity
+\item Plot of $E[Y | X]$ so that we see discontinuity there also
+\item Plot of $E[W | X ]$ so that we don't see a discontinuity in controls.
+\item Density of $X$ (check for manipulation).
+\item Show robustness to different ``windows''
+\item The OLS RDD estimates
+\item The Local Linear RDD estimates
+\item The polynomial (from each side) RDD estimates
+\item An f-test of ``bins'' showing that the polynomial is flexible enough.
+\end{itemize}
+Read Lee and Lemieux (2010) before you get started.
+\end{frame}
+
+
+\begin{frame}{Application: Lee (2008)}
+Looked at incumbency advantage in the US House of Representatives
+\begin{itemize}
+\item Running variable was vote share in previous election
+\begin{itemize}
+\item Problem of naive approach: good candidates get lots of votes!
+\item Compare outcomes of districts with barely $D$ to barely $R$.
+\end{itemize}
+\item First we plot bin-scatter plots and quartic (from each side) polynomials.
+\item Discussion about how to choose bin-scatter bandwidth (CV).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Lee (2008)}
+\begin{center}
+\includegraphics[width=4.5in]{./resources/binscatter1}
+\end{center}
+\end{frame}
+
+\begin{frame}{Lee (2008)}
+\begin{center}
+\includegraphics[width=4.5in]{./resources/binscatter2}
+\end{center}
+\end{frame}
+
+\begin{frame}{Lee (2008)}
+\begin{center}
+\includegraphics[width=4.5in]{./resources/ll-fig4}
+\end{center}
+\end{frame}
+
+\begin{frame}{Other Examples}
+Luca on Yelp
+\begin{itemize}
+\item Have data on restaurant revenues and yelp ratings.
+\item Yelp produces a yelp score (weighted average rating) to two decimals ie: $4.32$.
+\item Score gets rounded to nearest half star
+\item Compare $4.24$ to $4.26$ to see the impact of an extra half star.
+\item Now there are multiple discontinuities: Pool them? Estimate multiple effects?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fuzzy RD}
+An important extension in the \alert{Fuzzy RD}.   Back to where we started:
+\begin{eqnarray*}
+\lim_{x\rightarrow c^{+}} P(T_i | X_i = x) \neq \lim_{x\rightarrow c^{-}}P(T_i | X_i = x)
+\end{eqnarray*}
+\begin{itemize}
+\item We need a discontinuous jump in probability of treatment, but it doesn't need to be $0 \rightarrow 1$.
+\begin{eqnarray*}
+\tau_i(c) = \frac{\lim_{x\rightarrow c^{+}} P(Y_i | X_i = x) - \lim_{x\rightarrow c^{-}}P(Y_i | X_i = x)}{\lim_{x\rightarrow c^{+}} P(T_i | X_i = x) - \lim_{x\rightarrow c^{-}}P(T_i | X_i = x)}
+\end{eqnarray*}
+\item Under sharp RD everyone was a \alert{complier}, now we have some \alert{always takers} and some \alert{never takers} too.
+\item Now we are estimating the treatment effect only for the population of compliers at $x=c$.
+\item This should start to look familiar. We are going to do IV!
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Related Idea: Kinks}
+ A related idea is that of \alert{kinks}. 
+\begin{itemize}
+\item Instead of a discontinuous jump in the outcome there is a discontinuous jump in $\beta_i$ on $x_i$.
+\item Often things like tax schedules or government benefits have a kinked pattern.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{One quantity to rule them all: MTE}
+Heckman and Vytlacil provide a unifying non-parametric framework to categorize treatment effects. Their approach is known as the \alert{marginal treatment effect} or MTE
+\begin{itemize}
+\item The MTE isn't a number it is a \alert{function}.
+\item All of the other objects (LATE, ATE, ATT, etc.) can be written as integrals (weighted averages) of the MTE.
+\item The idea is to bridge the treatment effect parameters (stuff we get from running regressions) and the structural parameters: features of $f(\beta_i)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{One quantity to rule them all: MTE}
+\begin{itemize}
+\item Consider a treatment effect $\beta_i = Y_{i}(1) - Y_{i}(0)$.
+\item Think about a single-index such that $T_i = 1(v_i \leq Z_i' \gamma)$.
+\item Think about the person for whom $v_i = Z_i'\gamma$ (just barely untreated).
+\begin{eqnarray*}
+\Delta^{MTE}(X_i, v_i) = E[\beta_i | X_i, v_i = Z_i'\gamma] 
+\end{eqnarray*}
+\item MTE is average impact of receiving a treatment for everyone with the same $Z' \gamma$.
+\item For any single index model we can rewrite 
+\begin{eqnarray*}
+T_i = 1(v_i \leq Z_i' \gamma) = 1(u_{is} \leq F(Z_i' \gamma)) \mbox{ for }  u_s \in [0,1]
+\end{eqnarray*}
+\item $F$ is just the cdf of $v_i$
+\item Now we can write $P(Z) = Pr(T=1|Z )= F(Z'\gamma)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{MTE: Derivation}
+Now we can write,
+\begin{eqnarray*}
+Y_0 &=& \gamma_0' X + U_0\\
+Y_1 &=& \gamma_1' X + U_1\\
+\end{eqnarray*}
+$P(T=1 | Z) = P(Z)$ works as our instrument with two assumptions:
+\begin{enumerate}
+\item $(U_0, U_1, u_s) \perp P(Z) | X$. (Exogeneity)
+\item Conditional on $X$ there is enough variation in $Z$ for $P(Z)$ to take on all values $\in(0,1)$.
+\begin{itemize}
+\item This is much stronger than typical \alert{relevance} condition. Much more like the \alert{special regressor} method we will discus next time.
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{MTE: Derivation}
+\footnotesize
+Now we can write,
+\begin{eqnarray*}
+Y &=& \gamma_0' X + T(\gamma_1 - \gamma_0)' X + U_0 + T(U_1 - U_0)\\
+E[Y| X,P(Z)=p] &=& \gamma_0' X + p(\gamma_1 - \gamma_0)'X + E[T(U_1 - U_0)|X,P(Z)=p]
+\end{eqnarray*}
+Observe $T=1$ over the interval $u_s = [0,p]$ and zero for higher values of $u_s$. Let $U_1-U_0 \equiv \eta$.
+\begin{eqnarray*}
+E[T(U_1 - U_0) | P(Z) =p,X] &=& \int_{-\infty}^{\infty} \int_{0}^{p} (U_1 - U_0) f((U_1-U_0) | U_s = u_s) d u_s d(U_1 -U_0)\\
+E[T(\eta) | P(Z) =p,X] &=& \int_{-\infty}^{\infty} \int_{0}^{p} \eta f(\eta | U_s = u_s)  d\, \eta d\, u_s\\
+\end{eqnarray*}
+\begin{eqnarray*}
+\Delta^{MTE}(p) &=& \frac{\partial E[Y | X, P(Z)=p]}{\partial p} = (\gamma_1 - \gamma_0)'X + \int_{-\infty}^{\infty} \eta f(\eta | U_s =p) d\, \eta\\
+&=& (\gamma_1 - \gamma_0)'X + E[\eta | u_s =p]
+\end{eqnarray*}
+What is $E[\eta | u_s =p]$? The expected unobserved gain from treatment of those people who are on the treatment/no-treatment margin $P(Z)=p$.
+\end{frame}
+
+\begin{frame}
+\frametitle{How to Estimate an MTE}
+Easy
+\begin{enumerate}
+\item Estimate $P(Z) = Pr(T=1 | Z)$ nonparametrically (include exogenous part of $X$ in $Z$).
+\item Nonparametric regression of $Y$ on $X$ and $P(Z)$ (polynomials?)
+\item Differentiate w.r.t. $P(Z)$
+\item plot it for all values of $P(Z)=p$.
+\end{enumerate}
+So long as $P(Z)$ covers $(0,1)$ then we can trace out the full distribution of $\Delta^{MTE}(p)$.
+\end{frame}
+
+
+
+\begin{frame}
+\footnotesize
+\frametitle{Everything is an MTE}
+Calculate the outcome given $(X,Z)$ (actually $X$ and $P(Z)=p$).
+\begin{itemize}
+\item ATE : This one is obvious. We treat everyone!
+\begin{eqnarray*}
+\int_{-\infty}^{\infty} \Delta^{MTE}(p) = (\gamma_1 - \gamma_0)'X + \underbrace{\int_{-\infty}^{\infty} E(\eta | u_s) d\, u_s}_{0}
+\end{eqnarray*}
+\item LATE: Fix an $X$ and $P(Z)$ varies from $b(X)$ to $a(X)$ and we integrated over the area between (compliers).
+\begin{eqnarray*}
+LATE(X)=\int_{-\infty}^{\infty} \Delta^{MTE}(p) =  (\gamma_1 - \gamma_0)'X + \frac{1}{a(X)-b(X)} \int_{b(X)}^{a(X)} E(\eta | u_s) d\, u_s
+\end{eqnarray*}
+
+\item ATT 
+\begin{eqnarray*}
+TT(X)=\int_{-\infty}^{\infty} \Delta^{MTE}(p) \frac{Pr(P(Z | X) > p)}{E[P(Z | X)]} d\,p
+\end{eqnarray*}
+
+\item Weights for IV and OLS are a bit more complicated. See the Heckman and Vytlacil paper(s).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Carneiro, Heckman and Vytlacil (AER 2010)}
+\begin{itemize}
+\item Estimate returns to college (including heterogeneity of returns).
+\item NLSY 1979
+\item $Y = \log(wage)$
+\item Covariates $X$: Experience (years), Ability (AFQT Score), Mother's Education, Cohort Dummies, State Unemployment, MSA level average wage.
+\item Instruments $Z$: College in MSA at age 14, average earnings in MSA at 17 (opportunity cost), avg unemployment rate in state.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Carneiro, Heckman and Vytlacil}
+\begin{center}
+\includegraphics[width=4in]{./resources/chv_fig1}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Carneiro, Heckman and Vytlacil}
+\begin{center}
+\includegraphics[width=4in]{./resources/chv_tab4}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Carneiro, Heckman and Vytlacil}
+\begin{center}
+\includegraphics[width=4in]{./resources/chv_tab5}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Carneiro, Heckman and Vytlacil}
+\begin{center}
+\includegraphics[width=4in]{./resources/chv_fig4}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Carneiro, Heckman and Vytlacil}
+\begin{center}
+\includegraphics[width=4in]{./resources/chv_fig6}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Diversion Example}
+I have done some work trying to bring these methods into merger analysis.
+\begin{itemize}
+\item Key quantity: \alert{Diversion Ratio} as I raise my price, how much do people switch to a particular competitor's product
+\begin{eqnarray*}
+D_{jk}(p_j,p_{-j}) = \left| \frac{\partial q_k}{\partial p_j}(p_j,p_{-j}) /  \frac{\partial q_j}{\partial p_j}(p_j,p_{-j}) \right|
+\end{eqnarray*}
+\item We hold $p_{-j}$ fixed and trace out $D_{jk}(p_j)$.
+\item The \alert{treatment} is leaving good $j$.
+\item The $Y_i$ is increased sales of good $k$.
+\item The $Z_i$ is the price of good $j$.
+\item The key is that all changes in sales of $k$ come through people leaving good $j$ (no direct effects).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Diversion for Prius (FAKE!)}
+\begin{center}
+\includegraphics[width=4in]{./resources/sillydiversion.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Diversion Example}
+\begin{eqnarray*}
+\label{weighteddiversion}
+\widehat{D_{jk}^{LATE} }&=& \frac{1}{\Delta q_j} \int_{p_j^{0}}^{p_j^{0}+\Delta p_j} \underbrace{\frac{\partial q_k(p_j,p^{0}_{-j})}{\partial q_j}}_{\equiv D_{jk}(p_j,p^{0}_{-j})} \left| \frac{\partial q_j(p_j,p^{0}_{-j})}{\partial p_j} \right|\, dp_j
+\end{eqnarray*}
+\begin{itemize}
+\item $D_{jk}(p_j,p^{0}_{-j})$ is the MTE.
+\item Weights $w(p_j) = \frac{1}{\Delta q_j} \frac{\partial q_j(p_j,p^{0}_{-j})}{\partial p_j}$ correspond to the lost sales of $j$ at a particular $p_j$ as a fraction of all lost sales.
+\item When is $LATE \approx ATE$? 
+\begin{itemize}
+\item Demand for Prius is steep: everyone leaves right away
+\item $D_{j,k}(p_j)$ is relatively flat.
+\item We might want to think about raising the price to choke price (or eliminating the product from the consumers choice set) same as treating everyone!
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\end{document}
