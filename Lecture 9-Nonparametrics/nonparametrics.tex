@@ -35,6 +35,172 @@
 \end{frame}
 
 
+
+\begin{frame}{Basic Non-parametrics}
+We all are familiar with models like this:
+\begin{eqnarray*}
+E[Y_i | X_i ] = \beta_0 + \beta_1 X_1 + \ldots 
+\end{eqnarray*}
+\begin{itemize}
+\item Why is the conditional expectation function linear? Does it need to be?
+\item Plenty of real-world phenomenon are nonlinear.
+\item We can do things like this:
+\begin{eqnarray*}
+\log y_i = \beta_0 + \beta_1 X_1 + \beta_2 X^2 + \ldots + \varepsilon_i
+\end{eqnarray*}
+\item But this still a \alert{linear model}. Why?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Basic Non-parametrics}
+We've seen some other examples:
+\begin{align*}
+Y_{i} &= 1 \quad \mbox{if } Y_i^* >0\\
+Y_{i} &= 1 \quad \mbox{if } Y_i^* \leq 0\\
+Y_i^* &= \beta_0 + \beta_1 X_{1i} + \ldots + \varepsilon_i \quad \varepsilon_i \sim N (0,\sigma^2)
+\end{align*}
+\begin{itemize}
+\item The probit estimator is a nonlinear function of its parameters.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{How about logit?}
+We've seen some other examples:
+\begin{align*}
+Y_{i} &= 1 \quad \mbox{if } Y_i^* >0\\
+Y_{i} &= 1 \quad \mbox{if } Y_i^* \leq 0\\
+Y_i^* &= \beta_0 + \beta_1 X_{1i} + \ldots + \varepsilon_i \quad \varepsilon_i \sim Type I EV / Gumbel
+\end{align*}
+This is not how we usually write things
+\end{frame}
+
+\begin{frame}{How about logit?}
+Instead we usually write:
+\begin{align*}
+E[Y_i | X_i] &= Pr(Y_i =1 | X_i) = p(x_i)\\
+ Pr(Y_i =1 | X_i)  &= \frac{1}{1+\exp^{\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots}}
+\end{align*}
+Or with the log odds transformation:
+\begin{align*}
+\log \left(\frac{p}{1-p} \right) =\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots
+\end{align*}
+Logit is \alert{linear} again (in parameters). This is a \alert{generalized linear model}.
+\end{frame}
+
+\begin{frame}{How else might we estimate $E[Y_i | X_i]$?}
+Obvious approach:
+\begin{itemize}
+\item With enough data: look at all values for $X_i = x$ and take the mean.
+\item Easy if $X$ is discrete or doesn't take on too many values (Gender, State/Country).
+\item Could work if $X$ is continuous but rounded (test scores, years of school, etc.).
+\item We could cut $x_i$ into distinct bins (like a histogram).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{A Fake Data Example}
+Following the THF textbook example, we can generate some fake data and let: 
+\begin{eqnarray*}
+Y=&ORANGE \mbox{ if } Y* &> 0.5 \\
+Y=&BLUE  \mbox{ if }   Y* &\leq 0.5
+\end{eqnarray*}
+\begin{itemize}
+\item Easiest way to recover $Y*$ is by running OLS on the linear probability model.
+\item Draws from bivariate normal distribution with uncorrelated components but different means (2 overlapping types)
+\item Mixture of 10 low variance (nearly point mass) normal distributions where the individual means were drawn from another normal distribution. (10 nearly distinct types).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Linear Probability Model}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=3.5in]{./resources/classifierOLS.pdf}
+\label{classOLS}
+\end{center}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Alternative}
+\begin{itemize}
+\item Lots of potential alternatives to our decision rule.
+\item A simple idea is to hold a majority vote of neighboring points 
+\begin{eqnarray*}
+Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
+\end{eqnarray*}
+\item To avoid including ``yourself'' in your neighborhood, we often estimate on one sample and validate on another
+\item How many parameters does this model have: None? One? $k$? 
+\item Technically it has something like $N/k$.
+\item As $N \rightarrow \infty$ this means we have an infinite number of parameters! (This is a defining characteristic of non-parametrics).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{15 Nearest Neighbor}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=3.5in]{./resources/classifier15nn.pdf}
+\label{class15nn}
+\end{center}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Extreme: 1 Nearest Neighbor}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=3.5in]{./resources/classifier1nn.pdf}
+\label{class15nn}
+\end{center}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Comparisons}
+\begin{itemize}
+\item What would happen if $K \rightarrow N$?
+\item The k-NN model is locally constant.
+\item The k-NN approach tends to be really bumpy which can be undesirable.
+\item The OLS model is globally linear (is this always true?)
+\end{itemize}
+\end{frame}
+\begin{frame}{What about?}
+\begin{itemize}
+\item If we fixed the fact that there are discrete jumps in who is in the neighborhood by smoothly weighting observations and varying those weights instead (Kernels).
+\item Another drawback of $k-NN$ is that we consider distance in each $X$ dimension on the same scale, perhaps we could rescale the data to improve our ``closeness'' measure.
+\item Instead of fitting a constant locally, we fit a linear function locally (Lowess).
+\item Instead of using a global linear approximation in OLS use a more flexible nonlinear one.
+\item There is a bias/variance tradeoff. \alert{explain}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bias Variance Decomposition}
+We can decompose any estimator into two components
+\begin{eqnarray*}
+\underbrace{E[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( E[\hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{E \left[ \left(\hat{f}(x) - E[\hat{f}(x) \right] \right)^2}_{Variance} 
+\end{eqnarray*}
+\begin{itemize}
+\item In general we face a tradeoff between bias and variance.
+\item In k-NN as $k$ gets large we reduce the variance (each point has less influence) but we increase the bias since we start incorporating far away and potentially irrelevant information.
+\item In OLS we minimize the variance among unbiased estimators assuming that the true $f$ is linear.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bias Variance Decomposition}
+What minimizes MSE?
+\begin{eqnarray*}
+f(x_i) = E[Y_i | X_i] 
+\end{eqnarray*}
+\begin{itemize}
+\item Seems simple enough (but we are back where we started).
+\item How do we compute the expectation ?
+\item k-NN tries to use local information to estimate conditional mean
+\item OLS uses entire dataset and adds structure $ y = x \beta$ to the problem.
+\end{itemize}
+\end{frame}
+
+
+
+
 \begin{frame}{Something Familiar}
 Let's start with something we all know, how to calculate:
 \begin{eqnarray*}
@@ -44,61 +210,61 @@ E[Y_i | X_i ] = \beta_0 + \beta_1 X_1 + \ldots + \varepsilon_i
 \item The Gauss-Markov theorem (remember that?) tells us that OLS is best among linear unbiased estimators.
 \end{itemize}
 \end{frame}
-
-\begin{frame}{Identification}
-What does it mean for a model to be identified?
-\begin{eqnarray*}
-\hat{\beta}_{OLS} = \arg \max_{\beta} (\mathbf{y} - \mathbf{x} \beta)' (\mathbf{y} - \mathbf{x} \beta)
-\end{eqnarray*}
-\begin{itemize}
-\item We need there to be a unique value of $\beta$ that solves the above equation.
-\item For OLS this reduces to solving a linear system of $\dim(X)=k$ equations and unknowns.
-\item The OLS estimator produces $\hat{\beta}_{OLS} = \beta + (X'X)^{-1}X'\varepsilon$.
-\begin{itemize}
-\item Identification: means that we require $(X'X)$ is invertible (no perfect multicollinearity).
-\item When $E[X' \varepsilon ] =0$ then this converges in probability to true $\beta$.
-\end{itemize}
-
-\end{itemize}
-\end{frame}
-
-\begin{frame}{A Little More Complicated}
-\begin{itemize}
-\item For many cases that we care about, $E[X' \varepsilon ] \neq 0$. (Endogeneity)
-\item We know this is not the end of the world if we have an instrument $Z$:
-\item Now we need that $Z'X$ is invertible.
-\end{itemize}
-\begin{eqnarray*}
-E[\mathbf{x}' (\mathbf{y} - \mathbf{x} \beta)] &\neq& 0\\
-E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
-\rightarrow \hat{\beta}_{TSLS} &=& E(Z'X)^{-1} E[Z'Y]
-\end{eqnarray*}
-\end{frame}
-
-
-\begin{frame}{Some more information}
-This leads to the common terminology:
-\begin{itemize}
-\item Under-identified: if $\dim(X) > \dim(Z)$.
-\item Just-identified: if $\dim(X) = \dim(Z)$.
-\item Over-identified: if $\dim(X) < \dim(Z)$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{What does this mean exactly}
-To understand this we usually construct the GMM form of the moment conditions:
-\begin{eqnarray*}
-E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
-f(\beta)&=&  (\mathbf{y} - \mathbf{x} \beta)' \mathbf{z} \cdot W \cdot \mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)
-\end{eqnarray*}
-\begin{itemize}
-\item Because $f(\beta)$ is a quadratic form, and when $W$ is PSD then $f(\beta) \geq 0$.
-\item Just-identified: There is exactly one solution to $f(\beta) = 0$ which does not depend on $W$.
-\item Under-identified: $f(\beta) = 0$ has many solutions because we have fewer instruments (or moment restrictions) than parameters.
-\item Over-identified: There are no solutions and $f(\beta) > 0$. Instead we choose $\beta$ to minimize the distance from zero with distance metric $W$.
-\end{itemize}
-\end{frame}
-
+%
+%\begin{frame}{Identification}
+%What does it mean for a model to be identified?
+%\begin{eqnarray*}
+%\hat{\beta}_{OLS} = \arg \max_{\beta} (\mathbf{y} - \mathbf{x} \beta)' (\mathbf{y} - \mathbf{x} \beta)
+%\end{eqnarray*}
+%\begin{itemize}
+%\item We need there to be a unique value of $\beta$ that solves the above equation.
+%\item For OLS this reduces to solving a linear system of $\dim(X)=k$ equations and unknowns.
+%\item The OLS estimator produces $\hat{\beta}_{OLS} = \beta + (X'X)^{-1}X'\varepsilon$.
+%\begin{itemize}
+%\item Identification: means that we require $(X'X)$ is invertible (no perfect multicollinearity).
+%\item When $E[X' \varepsilon ] =0$ then this converges in probability to true $\beta$.
+%\end{itemize}
+%
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{A Little More Complicated}
+%\begin{itemize}
+%\item For many cases that we care about, $E[X' \varepsilon ] \neq 0$. (Endogeneity)
+%\item We know this is not the end of the world if we have an instrument $Z$:
+%\item Now we need that $Z'X$ is invertible.
+%\end{itemize}
+%\begin{eqnarray*}
+%E[\mathbf{x}' (\mathbf{y} - \mathbf{x} \beta)] &\neq& 0\\
+%E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
+%\rightarrow \hat{\beta}_{TSLS} &=& E(Z'X)^{-1} E[Z'Y]
+%\end{eqnarray*}
+%\end{frame}
+%
+%
+%\begin{frame}{Some more information}
+%This leads to the common terminology:
+%\begin{itemize}
+%\item Under-identified: if $\dim(X) > \dim(Z)$.
+%\item Just-identified: if $\dim(X) = \dim(Z)$.
+%\item Over-identified: if $\dim(X) < \dim(Z)$.
+%\end{itemize}
+%\end{frame}
+%
+%\begin{frame}{What does this mean exactly}
+%To understand this we usually construct the GMM form of the moment conditions:
+%\begin{eqnarray*}
+%E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
+%f(\beta)&=&  (\mathbf{y} - \mathbf{x} \beta)' \mathbf{z} \cdot W \cdot \mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)
+%\end{eqnarray*}
+%\begin{itemize}
+%\item Because $f(\beta)$ is a quadratic form, and when $W$ is PSD then $f(\beta) \geq 0$.
+%\item Just-identified: There is exactly one solution to $f(\beta) = 0$ which does not depend on $W$.
+%\item Under-identified: $f(\beta) = 0$ has many solutions because we have fewer instruments (or moment restrictions) than parameters.
+%\item Over-identified: There are no solutions and $f(\beta) > 0$. Instead we choose $\beta$ to minimize the distance from zero with distance metric $W$.
+%\end{itemize}
+%\end{frame}
+%
 \begin{frame}{The Binary Case}
 Now let's think about a case where $Y \in \{0,1\}$:
 \begin{eqnarray*}
