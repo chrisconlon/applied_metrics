@@ -1,0 +1,129 @@
+---
+title: "Problem Set 5"
+author: "Prof. Conlon"
+date: "Due: 5/5/19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newcommand{\E}[1]{\ensuremath{\mathbb{E}\big[#1\big]}}
+\newcommand{\Emeasure}[2]{\ensuremath{\mathbb{E}_{#1}\big[#2\big]}}
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* ggplot2
+* xtable (build tables quickly)
+* data.table (data tables are computationally efficient and IMHO easier to work with)
+
+
+```{r,comment='\t\t',echo=FALSE}
+
+## This is a code chunk: it is outlined in grey and has R code inside of it
+## Note: you can change what is shown in the final .pdf document using arguments 
+##       inside the curly braces at the top {r, comment='\t\t'}. For example, you 
+##       can turn off print statements showing in the .pdf by adding 'echo=False' 
+##       i.e. changing the header to {r, comment='\t\t',echo=FALSE}
+
+## ~~~~~~~~~~~~~~ CODE SETUP ~~~~~~~~~~~~~~ ##
+
+# ~ This bit of code will be hidden after Problem Set 1 ~
+#
+# This section sets up the correct directory structure so that
+#  the working directory for your code is always in the data folder
+
+# Retrieve the code working directory
+#script_dir = dirname(sys.frame(1)$ofile)
+initial_options <- commandArgs(trailingOnly = FALSE)
+render_command <- initial_options[grep('render',initial_options)]
+script_name <- gsub("'", "", 
+                    regmatches(render_command, 
+                               gregexpr("'([^']*)'",
+                               render_command))[[1]][1])
+
+# Determine OS (backslash versus forward slash directory system)
+sep_vals = c(length(grep('\\\\',script_name))>0,length(grep('/',script_name))>0)
+file_sep = c("\\\\","/")[sep_vals]
+
+# Get data directory
+split_str = strsplit(script_name,file_sep)[[1]]
+len_split = length(split_str) - 2
+data_dir = paste(c(split_str[1:len_split],'data',''),collapse=file_sep)
+
+# Check that the data directory contains the files for this weeks assignment
+data_files = list.files(data_dir)
+if(!('lending_club_07_to_11.csv' %in% data_files)){
+  cat("ERROR: DATA DIRECTORY NOT CORRECT\n")
+  cat(paste("data_dir variable set to: ",data_dir,collapse=""))
+}
+
+```
+
+
+## Problem 1 (Coding Exercise)
+
+This exercise asks you to implement and assess the performance of the bootstrap for the linear regression model. Suppose you have the linear regression model:
+
+\begin{align*}
+  y_{i} = \beta_{0} + \beta_{1}x_{i} + \epsilon_{i}
+\end{align*}
+
+where,
+
+\begin{itemize}
+  \item[-] $x_{i} \sim U[0,2]$
+  \item[-] $\epsilon_{i} \vert x_{i} \sim U[-1,1]$
+  \item[-] $\beta_{0} = \beta_{1} = 1$ 
+\end{itemize}
+
+We ask you to answer the following questions:
+
+\begin{itemize}
+\item[a.] Write a code that generates i.i.d. samples of sizes $n=10,50,200$ from that distribution, computes (1) the least squares estimator for $\beta$, (2) the t-ratio for the least squares coefficient $\beta_{1}$, $t_{n} = \frac{\hat{\beta}_{1,LS} - 1}{\hat{s.e.}(\hat{\beta}_{1,LS})}$, and (3) the least square residuals $\hat{\epsilon}_{i} = y_{i} - \hat{\beta}_{0,LS} - \hat{\beta}_{1,LS} x_{i}$
+
+\item[b.] Write a code for drawing $n$ times at random from the discrete uniform distribution over the estimated residuals $\hat{\epsilon}_{1},...,\hat{\epsilon}_{n}$ (i.e. with replacement).
+
+\item[c.] Use your code from parts (a) and (b) to implement the residual bootstrap - assuming that $\epsilon_{i}$ and $x_{i}$ are independent - to estimate the 95th percentiles of the respective distributions of $\hat{\beta}_{1,LS}$ and $t_{n}$
+
+\item[d.] Repeat part (a) for sample size $n=10,50,200$ with $200$ replications, where you keep the initial draws of $x_{1},..,x_{n}$ from part (a) and only generate new residuals from their conditional distribution. Compute $\hat{\beta}_{1,LS}$ and the statistic $t_{n}$ using $200$ independent samples of size $n$. Use your results to compute a simulated estimate for the 95th percentiles of the respective sampling distributions for $\hat{\beta}_{1,LS}$ and $t_{n}$.
+
+\item[e.] Compare your results from (c) and (d). What do you conclude about the performance of the bootstrap? How does it compare to the 95th percentile of the asymptotic distribution of $t_{n}$?
+\end{itemize}
+
+## Problem 2 (Coding Exercise)
+
+This exercise will walk you through a prediction task. I have downloaded data from a peer-to-peer lending platform, Lending Club. The dataset you will work with is: __lending_club_07_to_11_cleaned.csv__. Lending Club provides detailed characteristic information regarding loans, both information on the borrower, as well as, the loan itself. Your goal will be to build a model to predict the outcome of a loan, i.e. whether an individual paid off a loan or did not pay off a loan. In our case, a good outcome is if the loan is fully paid off, a bad outcome is if the loan is charged off. 
+
+The target variable for the analysis is **loan_status**, where:
+
+\begin{align*}
+  loan\_status = 
+    \begin{cases}
+      1 \mbox{ if loan is paid off } \\
+      0 \mbox{ if loan is not paid off }
+    \end{cases}
+\end{align*}
+
+\begin{itemize}
+
+\item[a.] This is going to be a more DIY style exercise, provide a list of the variables you plan to use for the analysis. Give a short discussion for why you excluded other variables.
+
+\item[b.] Regularization is an important step when using an machine learning algorithm, regularzie the variables that you have included. Briefly, why is regularization important?
+
+\item[c.] Provide a simple correlational table to give you a sense of the relationship between your covariates. Do you notice any interesting patterns?
+
+\item[d.] Split the dataset into a single test and training set, a simple rule of thumb is an 40/60 split. How did you build these two sets?
+
+\item[e.] Using your training set, run a logistic regression, a random forest, and a gradient boosted random forest. To show your results, present both a measure of miscalssification error, accuracy and a confusion matrix.
+
+\item[f.] One easy way to improve model performance is cross-validation. Do a k-fold cross validation, where k=5, using the best performing model from part (e.). Re-report the misclassification error, accuracy and a confusion matrix. 
+
+\end{itemize}

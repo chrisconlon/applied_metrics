@@ -1,4 +1,4 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
 \usetheme{default}
 %\usetheme{Darmstadt}
 %\usepackage{times}
@@ -62,11 +62,41 @@ How do we choose?
 \item Hedonics: What really determines the price of your house?
 \item Prediction: What really determines loan defaults?
 \item Consideration Sets: How many products do consumers really choose among on the shelf?
-\item What elements of financial filings really matter?
+\item Which elements of financial filings really matter?
 \end{itemize}
-
 \end{frame}
 
+
+\begin{frame}
+\frametitle{What do people mostly do in practice?}
+\begin{itemize}
+\item Regress $Y$ on $X$ with all variables included.
+\item Drop some variables if they aren't significant?
+\item Re-run with some things dropped
+\item Add in some other things that may or may not be significant.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nested and Non-nested Models}
+What makes a model \alert{nested} or \alert{non-nested}?
+\begin{align*}
+y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \varepsilon_i 
+\end{align*}
+A nested model can be written as a restricted version of the larger model
+\begin{itemize}
+\item ie: all of the following are nested within the model above
+\begin{align*}
+y_i &= \beta_0 + \beta_1 x_i + \beta_2 w_i + \varepsilon_i  \\
+y_i &= \beta_0 + \beta_1 x_i + \beta_3 z_i + \varepsilon_i  \\
+y_i &= \beta_0 + \beta_2 w_i + \beta_3 z_i + \varepsilon_i  
+\end{align*}
+\item ie: this model is non-nested (because of $s_i$)
+\begin{align*}
+y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \gamma s_i +  \varepsilon_i 
+\end{align*}
+\end{itemize}
+\end{frame}
 
 
 \begin{frame}
@@ -85,6 +115,9 @@ y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
 \item These are designed for strictly \alert{nested} models.
 \end{itemize}
 \end{frame}
+
+
+
 
 \begin{frame}
 \frametitle{Review AIC/BIC}
@@ -177,6 +210,31 @@ H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \
 \end{itemize}
 \end{frame}
 
+
+\begin{frame}
+\frametitle{Things to keep in mind}
+Two major (related) problems:
+\begin{itemize}
+\item Regressors are correlated with one another:
+\begin{itemize}
+\item small changes in the sample: $\beta_1$ goes up, $\beta_2$ goes down. 
+\item large coefficients can lead to wild predictions.
+\item If relationship between $y_i$ and $x_i$ nonlinear, and $x_i,z_i$ are highly correlated then we may attribute some of this nonlinearity to $z_i$, even when it has no effect.
+\end{itemize}
+\item Lots of imprecisely estimated parameters can make prediction tricky
+\begin{itemize}
+\item Small changes in the sample can lead to large changes in $\hat{y}_i | x_i$.
+\end{itemize}
+\end{itemize}
+The big idea: maybe we tolerate some \alert{bias} to greatly reduce \alert{variance}.
+\begin{itemize}
+\item This is where ML and Econometrics diverge!
+\item Everything you learned so far has been focused on \alert{unbiasedness}
+\end{itemize}
+\end{frame}
+
+
+
 \begin{frame}
 \frametitle{Minimizing SSR/AIC: all possible regressions}
 \begin{center}
@@ -227,7 +285,7 @@ QR Decomposition has a matrix form which regression software uses:
 \item $Z$ is the matrix of the orthogonalized residuals $z_j$'s.
 \item $\Gamma$ is upper triangular matrix with entries $\hat{\gamma}_{kj}$
 \item $D$ is diagonal matrix with entries $|| z_j ||$.
-\item $Q$ is $N \times ((p+1)$ orothogonal matrix $Q'Q = I$ 
+\item $Q$ is $N \times ((p+1)$ orthogonal  matrix $Q'Q = I$ 
 \item $R$ is $(p+1) \times (p+1)$ upper triangular matrix.
 \end{itemize}
 \end{frame}
