@@ -26,3 +26,7 @@
 *.synctex.gz
 *.DS_Store
 .DS_Store
+Ignore/assignment_1_answers.pdf
+Ignore/assignment_1_answers.Rmd
+Ignore/assignment_2_answers.pdf
+Ignore/assignment_2_answers.Rmd
