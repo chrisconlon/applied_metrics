@@ -181,7 +181,7 @@ ggplot(gdp, aes(date, price)) + geom_line() +
 \begin{frame}{Notation}
 We observe a sample $\{y_1,y_2,\ldots,y_{t-1},y_{t},y_{t+1}\}$.
 \begin{itemize}
-\item We call $y_{y-1}$ the \alert{first lag} of $y_t$.
+\item We call $y_{t-1}$ the \alert{first lag} of $y_t$.
 \item We call $\Delta y_{t} = y_{t} - y_{t-1}$ the \alert{first difference}
 \item We might also want $\Delta \ln y_{t} = \ln y_{t} - \ln y_{t-1}$
 \item We can approximate percentage change as  $100 \cdot \Delta \ln y_{t}$
@@ -372,7 +372,7 @@ y_t &= \beta_0 + \sum_{k=1}^p \beta_k y_{t-k} + \varepsilon_{t}
 \end{align*}
 Or an $ARMA(p,q)$ which adds moving average terms:
 \begin{align*}
-y_t &= \beta_0 + \sum_{k=1}^p \beta_k y_{t-k} + \sum_{k=1}^p \theta_k \varepsilon_{t-k} 
+y_t &= \beta_0 + \sum_{k=1}^p \beta_k y_{t-k} + \sum_{k=1}^q \theta_k \varepsilon_{t-k} 
 \end{align*}
 \begin{itemize}
 \item An important question is \alert{selecting the order of the lag} $p$
