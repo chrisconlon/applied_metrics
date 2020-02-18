@@ -394,7 +394,7 @@ Before we discuss testing under GMM, let's look at testing under MLE.
 \begin{itemize}
 \item Helpful to define the \alert{likelihood ratio}
 \begin{align*}
-LR \equiv -2 \cdot \frac{\mathcal{L}(\theta_1 | x)}{\mathcal{L}(\theta_2 | x)} = -2 \cdot \left[ \ell(\theta_1 | x) - \ell(\theta_2 | x) \right]
+LR \equiv -2 \cdot \ln \left[ \frac{\mathcal{L}(\theta_1 | x)}{\mathcal{L}(\theta_2 | x)}  \right]= -2 \cdot \left[ \ell(\theta_1 | x) - \ell(\theta_2 | x) \right]
 \end{align*}
 \item Consider $\dim(\theta_1) = q_1$ and $\dim(\theta_2) = q_2$ \alert{number of restrictions}
 \item Often we let $\theta_2$ be the \alert{unrestricted} and $\theta_1$ be the \alert{restricted} model.
