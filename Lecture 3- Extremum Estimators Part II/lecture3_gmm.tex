@@ -394,7 +394,7 @@ Before we discuss testing under GMM, let's look at testing under MLE.
 \begin{itemize}
 \item Helpful to define the \alert{likelihood ratio}
 \begin{align*}
-\Lambda \equiv -2 \cdot \frac{\mathcal{L}(\theta_1 | x)}{\mathcal{L}(\theta_2 | x)} = -2 \cdot \left[ \ell(\theta_1 | x) - \ell(\theta_2 | x) \right]
+LR \equiv -2 \cdot \frac{\mathcal{L}(\theta_1 | x)}{\mathcal{L}(\theta_2 | x)} = -2 \cdot \left[ \ell(\theta_1 | x) - \ell(\theta_2 | x) \right]
 \end{align*}
 \item Consider $\dim(\theta_1) = q_1$ and $\dim(\theta_2) = q_2$ \alert{number of restrictions}
 \item Often we let $\theta_2$ be the \alert{unrestricted} and $\theta_1$ be the \alert{restricted} model.
@@ -427,11 +427,83 @@ The equivalent test in GMM is the \alert{J-test}
 Q_N(\theta)&=g_N(\theta)' W_N  g_N(\theta) \\
 N \cdot Q_N(\theta) &\rightarrow^D \chi^2_{n-k}
 \end{align*}
-
+This is an $LR$-type test statistic.
 \end{frame}
 
 
+\begin{frame}{Inverting LR tests}
+A useful technique is that we can always \alert{invert} a test statistic in order to construct confidence intervals.
+\begin{itemize}
+\item Form an unrestricted estimate $\widehat{\theta}_{MLE}$ or $\widehat{\theta}_{GMM}$
+\item Compute $\ell(\widehat{\theta})$.
+\item Find all of the $\theta$ such that  $CI=\{\theta: \ell(\widehat{\theta}) -  \ell(\theta) < c \}$.
+\item If we do $GMM$ we can use the $J$-stat instead.
+\end{itemize}
+How to choose $c$ the \alert{critical value}.
+\begin{itemize}
+\item Compute the number of degrees of freedom / additional restrictions
+\item Choose a significance level $\alpha$ (ie: $\alpha=0.05$).
+\end{itemize}
+\end{frame}
 
+
+\begin{frame}{Confidence Intervals and Wald Tests}
+The multivariate Wald Test is:
+\begin{align*}
+H_{0}: R \theta=r \quad &
+H_{1}: R \theta \neq r\\
+\left(R \hat{\theta}_{n}-r\right)^{\prime}\left[R\left(\hat{V}_{n} / n\right) R^{\prime}\right]^{-1}\left(R \hat{\theta}_{n}-r\right) \quad &\rightarrow \quad \chi_{Q}^{2}
+\end{align*}
+\begin{itemize}
+\item $R$ is a matrix of $q$ linear restrictions on $K$ parameters.
+\item $\hat{V}_n$ is the covariance matrix for $\widehat{\theta}$.
+\end{itemize}
+You've been constructing CI's this way already
+\begin{align*}
+\widehat{\beta} \pm 1.96 SE(\widehat{\beta})
+\end{align*}
+\end{frame}
+
+\begin{frame}{LM or Score Test}
+There is a third test known as the \alert{Score Test} or \alert{LM Test}
+\begin{align*}
+S(\theta)&=\frac{\partial \ell(\theta | x)}{\partial \theta} \\
+I(\theta)&=-E\left[\frac{\partial^{2}}{\partial \theta^{2}} \ell(X ; \theta) | \theta\right]
+\end{align*}
+\begin{itemize}
+\item Compute the \alert{score of log likelihood}
+\item Compute the \alert{Fisher Information}.
+\item The test statistic\
+\begin{align*}
+S^{T}\left(\hat{\theta}_{0}\right) I^{-1}\left(\hat{\theta}_{0}\right) S\left(\hat{\theta}_{0}\right) \sim \chi_{q}^{2}
+\end{align*}
+Where $q$ is number of restrictions and $\theta_0$ is the true value.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Trinity of Testing}
+\begin{center}
+\includegraphics[height=\textheight]{./resources/lmlrwald.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{What to do in practice?}
+\begin{itemize}
+\item By reporting asymptotic standard errors you are implicitly using \alert{Wald} type statisitics.
+\item If you are comparing models, you should probably try an \alert{LR} type statistic if you can.
+\begin{itemize}
+\item It used to be people didn't do this because $LR$ required maximizing the objective function more than once.
+\item But computers today are pretty good...
+\end{itemize}
+\item For most extremum estimators (MLE, GMM, GEL, etc.) there are all three kinds of test-statistics
+\begin{itemize}
+\item ... and around the true $\theta_0$ as $N\rightarrow \infty$ they should coincide.
+\item but in finite sample... anything can happen!
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
 \section*{Thanks!}
 
 \end{document}
