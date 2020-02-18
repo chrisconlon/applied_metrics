@@ -387,6 +387,51 @@ The challenge is that in general when we estimate $\hat{g}(\hat{\theta})$ and $\
 
 \end{frame}
 
+\section{Testing}
+
+\begin{frame}{Testing with MLE}
+Before we discuss testing under GMM, let's look at testing under MLE.
+\begin{itemize}
+\item Helpful to define the \alert{likelihood ratio}
+\begin{align*}
+\Lambda \equiv -2 \cdot \frac{\mathcal{L}(\theta_1 | x)}{\mathcal{L}(\theta_2 | x)} = -2 \cdot \left[ \ell(\theta_1 | x) - \ell(\theta_2 | x) \right]
+\end{align*}
+\item Consider $\dim(\theta_1) = q_1$ and $\dim(\theta_2) = q_2$ \alert{number of restrictions}
+\item Often we let $\theta_2$ be the \alert{unrestricted} and $\theta_1$ be the \alert{restricted} model.
+\item Define the degrees of \alert{degrees of freedom} $N - \dim(\theta)$.
+\item The $LR$ statistic is distributed:
+\begin{align*}
+ \Lambda \sim \chi^2_{q_1-q_2}
+\end{align*}
+\item If we know $\theta_1$ and $\theta_2$ and we fix significance level $\alpha =0.05$ then \alert{Neyman-Pearson Lemma} says this is \alert{uniformly post powerful test}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Testing with MLE}
+We can consider the more advanced possiblity:
+\begin{align*}
+L R=-2 \ln \left[\frac{\sup _{\theta \in \Theta_{0}} \mathcal{L}(\theta)}{\sup _{\theta \in \Theta} \mathcal{L}(\theta)}\right]
+\end{align*}
+\begin{itemize}
+\item $\Theta_0$ is a restricted version of the larger set $\Theta$.
+\item We can also consider \alert{non nested tests} by looking at differences in \alert{degrees of freedom}
+\begin{itemize}
+\item This is mostly beyond what we will do in this course.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{GMM: J-test}
+The equivalent test in GMM is the \alert{J-test}
+\begin{align*}
+Q_N(\theta)&=g_N(\theta)' W_N  g_N(\theta) \\
+N \cdot Q_N(\theta) &\rightarrow^D \chi^2_{n-k}
+\end{align*}
+
+\end{frame}
+
+
+
 \section*{Thanks!}
 
 \end{document}

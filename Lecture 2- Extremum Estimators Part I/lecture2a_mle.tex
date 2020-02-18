@@ -320,6 +320,7 @@ Tradeoffs
 \end{itemize}
 \end{frame}
 
+
 \begin{frame}{Exponential Example}
 \begin{align*}
 f _ { Y | X } ( y | x , \beta _ { 0 } ) =  { e } ^ { x ^ { \prime } \beta _ { 0 } } \exp \left( - y  { e } ^ { x ^ { \prime } \beta _ { 0 } } \right)
@@ -1047,35 +1048,37 @@ Many problems we are interested in look at discrete rather than continuous outco
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}
-\frametitle{Problem \#1: Endogeneity}
-Four possible solutions (maybe there are more?)
-\begin{enumerate}
-\item Close eyes, run the LPM with instruments (Suggested by MHE).
-\item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
-\item Control Function Estimation
-\item `Special Regressor' Methods
-\end{enumerate}
-\end{frame}
 
-\begin{frame}
-\frametitle{Problem \#1: Endogeneity}
-Setup:
-\begin{itemize}
-\item Binary variable $D$: the outcome of interest
-\item $X$ is a vector of observed regressors with coefficient $\beta$ 
-\begin{itemize}
-\item (Can think about $X^e$: endogenous and $X^0$: exogenous).
-\item In an treatment model we might have that $T$ is a binary treatment indicator within $X$
-\end{itemize}
-\item $\epsilon$ is unobserved error. Specifying $f(e)$ can give logit/probit.
-\item Threshold Crossing / Latent Variable Model:
-\begin{eqnarray*}
-D = \mathbf{1}(X \beta + \epsilon \geq 0)
-\end{eqnarray*}
-\item Goal is not usually $\hat{\beta}$ or it's CI, but rather $P(D=1 | X)$ or $\frac{\partial P[D=1 | x] }{\partial X}$ (marginal effects).
-\end{itemize}
-\end{frame}
+
+%\begin{frame}
+%\frametitle{Problem \#1: Endogeneity}
+%Four possible solutions (maybe there are more?)
+%\begin{enumerate}
+%\item Close eyes, run the LPM with instruments (Suggested by MHE).
+%\item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
+%\item Control Function Estimation
+%\item `Special Regressor' Methods
+%\end{enumerate}
+%\end{frame}
+%
+%\begin{frame}
+%\frametitle{Problem \#1: Endogeneity}
+%Setup:
+%\begin{itemize}
+%\item Binary variable $D$: the outcome of interest
+%\item $X$ is a vector of observed regressors with coefficient $\beta$ 
+%\begin{itemize}
+%\item (Can think about $X^e$: endogenous and $X^0$: exogenous).
+%\item In an treatment model we might have that $T$ is a binary treatment indicator within $X$
+%\end{itemize}
+%\item $\epsilon$ is unobserved error. Specifying $f(e)$ can give logit/probit.
+%\item Threshold Crossing / Latent Variable Model:
+%\begin{eqnarray*}
+%D = \mathbf{1}(X \beta + \epsilon \geq 0)
+%\end{eqnarray*}
+%\item Goal is not usually $\hat{\beta}$ or it's CI, but rather $P(D=1 | X)$ or $\frac{\partial P[D=1 | x] }{\partial X}$ (marginal effects).
+%\end{itemize}
+%\end{frame}
 
 
 \begin{frame}
@@ -1132,7 +1135,6 @@ D = X \beta + \varepsilon
 \item \alert{Only the trivial binary $X$ with no other regressors satisfies this!}
 \end{itemize}
 \end{frame}
-
 \begin{frame}
 \frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
 \begin{itemize}
@@ -1149,6 +1151,90 @@ D = I ( 1 + Treated + R + \varepsilon \geq 0 )
 \item All treatment effects are positive for all $(R,\varepsilon)$.
 \item Construct a sample where true effect $=1$ for 5th individual, 0 otherwise. $ATE= \frac{1}{6}$.
 \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\tiny
+\begin{semiverbatim}
+. list
+     |     R   Treated   D |
+  1. |  -1.8         0   0 | 
+  2. |   -.9         0   1 |
+  3. |  -.92         0   1 |
+  4. |  -2.1         1   0 |
+  5. | -1.92         1   1 |
+  6. |    10         1   1 |
+  \end{semiverbatim}
+  \end{frame}
+  
+\begin{frame}[fragile]
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\tiny
+\begin{semiverbatim}
+. reg D Treated R, robust
+
+Linear regression                               Number of obs     =          6
+                                                F(2, 3)           =       1.02
+                                                Prob > F          =     0.4604
+                                                R-squared         =     0.1704
+                                                Root MSE          =     .60723
+
+------------------------------------------------------------------------------
+             |               Robust
+           D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     Treated |  -.1550841   .5844637    -0.27   0.808    -2.015108     1.70494
+           R |   .0484638   .0419179     1.16   0.331    -.0849376    .1818651
+       _cons |   .7251463   .3676811     1.97   0.143    -.4449791    1.895272
+------------------------------------------------------------------------------
+. nlcom _b[Treated]/_b[R]
+       _nl_1:  _b[Treated]/_b[R]
+------------------------------------------------------------------------------
+           D |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       _nl_1 |       -3.2   10.23042    -0.31   0.754    -23.25125    16.85125
+------------------------------------------------------------------------------
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\begin{itemize}
+\item That went well, except that:
+\begin{itemize}
+\item we got the wrong sign of $\beta_T$
+\item $\beta_1/\beta_2$ was the wrong sign and three times too big.
+\end{itemize}
+\item this is not because of small sample size or $\beta_1 \approx 0$.
+\item As $n \rightarrow \infty$ we can get an arbitrarily precise wrong answer.
+\item We don't even get the sign right!
+\item This is still in OLS (not much hope for 2SLS).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\tiny
+\begin{semiverbatim}
+. expand 30
+(...)
+. reg D Treated R, robust
+
+Linear regression                               Number of obs     =        180
+                                                F(2, 177)         =      59.93
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.1704
+                                                Root MSE          =       .433
+
+------------------------------------------------------------------------------
+             |               Robust
+           D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     Treated |  -.1550841   .0760907    -2.04   0.043    -.3052458   -.0049224
+           R |   .0484638   .0054572     8.88   0.000     .0376941    .0592334
+       _cons |   .7251463    .047868    15.15   0.000     .6306808    .8196117
+\end{semiverbatim}
 \end{frame}
 
 
