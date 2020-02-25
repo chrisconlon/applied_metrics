@@ -164,8 +164,11 @@ The main idea is that $\hat{\theta}^{1*},\ldots, \hat{\theta}^{B*}$ approximates
 \begin{eqnarray*}
 \frac{1}{B-1} \sum_{b=1}^B (\hat{\theta}_{(b)}^* - \overline{\theta^{*}})^2
 \end{eqnarray*}
-
 \item Calculate $E(\hat{\theta}^{*}_{(1)},\ldots, \hat{\theta}^{*}_{(B)}) = \overline{\theta^{*}} = \frac{1}{B} \sum_{b=1}^B \hat{\theta}_{(b)}^*$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bootstrap: Bias Correction}
 \begin{itemize}
 \item We can use the estimated bias to \alert{bias correct} our estimates
 \begin{eqnarray*}
@@ -176,7 +179,6 @@ Recall $\theta = E[\hat{\theta}] - Bias[\hat{\theta}]$:
 \begin{eqnarray*}
 \hat{\theta}- Bias_{bs}(\hat{\theta}) = \hat{\theta}-(\overline{\theta^{*}}-\hat{\theta}) = 2 \hat{\theta} - \overline{\theta^{*}}
 \end{eqnarray*}
-\end{itemize}
 \item Correcting bias isn't for free - variance tradeoff!
 \item Linear models are (hopefully) unbiased, but most nonlinear models are \alert{consistent but biased}.
 \end{itemize}
