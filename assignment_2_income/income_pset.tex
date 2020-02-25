@@ -6,10 +6,11 @@
 \usepackage{graphicx}
 \usepackage[shortlabels]{enumitem}
 
-\title{Applied Econometrics and Panel Data: Problem Set 2}
+\title{Problem Set 2}
 \begin{document}
 \small
 \date{Due date: March 6}
+\author{Prof. Conlon}
 \maketitle
 Your answers should be produced in \LaTeX, and should include all relevant graph and code.  Code should be in the appropriate verbatim environment and properly documented. You are allowed to work in groups but you must turn in your own writeup. Submit your assignment via dropbox link to \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}.
 
@@ -39,7 +40,7 @@ This problem set uses simulated data that is made to look like responses of hous
 Because income is top coded (b) and (c) are tricky. The goal here is to make reasonable assumptions, not ridiculous ones.
 
 \section*{\normalsize Part 1: Method of Moments}
-Let's begin by estimating a log-normal distribution of income. If income is distributed as $y_i  \sim LN (\mu,\sigma)$ then $\ln y_i \sim N(\mu,\sigma)$. We will start with a simple \textit{method of moments} estimator. Here the idea is to compute moments from our sample (means or variances $y_i$) and/or $\ln y_i$ and to use those to solve for parameters.
+Let's begin by estimating a log-normal distribution of income. If income is distributed as $y_i  \sim LN (\mu,\sigma)$ then $\ln y_i \sim N(\mu,\sigma)$. We will start with a simple \textit{method of moments} estimator. Here the idea is to compute moments from our sample (means or variances $y_i$) and/or $\ln y_i$ and to use those to solve for parameters. You may want to look up the moments of the lognormal distribution on Wikipedia or in a textbook.
 
 \begin{enumerate}
 \item Estimate $(\mu,\sigma)$ working with $y_i$.
@@ -51,7 +52,7 @@ Let's begin by estimating a log-normal distribution of income. If income is dist
 
 Now let's consider a \textit{maximum likelihood estimator}. Again assume that the distribution of income is lognormal. 
 \begin{enumerate}
-\setcounter{enumi}{4}
+\setcounter{enumi}{3}
 \item Write the likelihood for the entire sample:  $Pr(y_1,\ldots,y_n | \mu, \sigma)$ or $Pr(\ln y_1,\ldots, \ln y_n | \mu, \sigma)$ \\ (Note: be careful that the coding of bins changes after 2010. Also be-careful to allow for weighted observations $w_i$.)
 \item Write the log-likelihood
 \item Write the score of the log-likelihood for each $i$ and the overall gradient.
@@ -67,9 +68,24 @@ g(y_i | \mu,\sigma) = Pr(40,000 \leq y_i \leq 44,999 | \mu,\sigma) -  \frac{1}{N
 \end{align*} 
 \begin{itemize}
 \item You will have at least one moment per bin.
-\item You will also need to think about how you want to handle the fact that the coding regime is not the same for the entire sample.
+\item You will also need to think about how you want to handle the fact that the income coding regime is not the same for the entire sample.
 \end{itemize}
+\begin{enumerate}
+\setcounter{enumi}{9}
+\item Write the Jacobian of the moment conditions with respect to the parameters $\frac{\partial g(y_i | \mu,\sigma)}{\partial \theta}$.
+\item Estimate $(\mu,\sigma)$ using GMM. You will want to report the first stage estimates and the 2nd stage estimates.
+\item Put all of your MoM, MLE, and GMM estimates into a table. Also compute the mean income in dollars and the 10th percentile and 90th percentile of the corresponding income distribution. How do they compare? How do standard errors compare?
+\end{enumerate}
 
+
+\section*{\normalsize Part 4: Nonparametric Estimates}
+\begin{enumerate}
+\setcounter{enumi}{12}
+\item Plot a histogram of the income data. (It may be difficult to arrange the data into bins).
+\item Plot your lognormal densities together on a single plot (Upper bound MLE, Lower Bound MLE, Mean MLE, and 2-step GMM estimates).
+\item Estimate a kernel density plot for income (using the upper bound, the lower bound, and the mean of the bin) and compare that to your estimated lognormal densities.
+\item Explain how the plots are similar and how they are different.
+\end{enumerate}
 
 \end{document}
 
