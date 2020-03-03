@@ -1,6 +1,6 @@
 \documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
 \usetheme{default}
-%\usetheme{Darmstadt}
+\usetheme{metropolis}
 %\usepackage{times}
 %\usefonttheme{structurebold}
 
@@ -22,7 +22,7 @@
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Part 11: Model Selection}
+\title{Part 6: Model Selection}
 \author{Chris Conlon}
 \institute{Applied Econometrics II}
 \date{\today}
@@ -101,6 +101,7 @@ y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \gamma s_i +  \varepsi
 
 \begin{frame}
 \frametitle{What we teach undergrads}
+\small
 Two traditional ways to select the number of components in a model:\\
 \begin{eqnarray*}
 \overline{R}^2  &=& 1-SSR(p)/TSS - SSR(p)/TSS \cdot \frac{p}{N-p-1} \\
@@ -180,6 +181,7 @@ LR(\hat{\theta},\hat{\gamma}) = L_f(\hat{\theta}) - L_g (\hat{\gamma}) = \sum_{i
 
 \begin{frame}
 \frametitle{Vuong Test}
+\small
 \begin{eqnarray*}
 H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \\
 \rightarrow E_h[\ln(h/g)] - E_h[\ln (h/f)] = 0
@@ -189,8 +191,7 @@ H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \
 \item Same as testing whether two densities $(f,g)$ have same KLIC.
 \item The main result is that (details in 8.5 of CT):
 \begin{eqnarray*}
-\frac{1}{\sqrt{N}} LR(\hat{\theta},\hat{\gamma}) \rightarrow^d N [0,\omega_{*}^2]\\
-\omega_{*}^2 =  V_0 \left[ \ln \frac{f(y| x, \hat{\theta})}{g(y| x, \hat{\gamma})}  \right]
+\frac{1}{\sqrt{N}} LR(\hat{\theta},\hat{\gamma}) \rightarrow^d N [0,\omega_{*}^2],\quad \omega_{*}^2 =  V_0 \left[ \ln \frac{f(y| x, \hat{\theta})}{g(y| x, \hat{\gamma})}  \right]
 \end{eqnarray*}
 \end{itemize}
 \end{frame}
@@ -238,7 +239,7 @@ The big idea: maybe we tolerate some \alert{bias} to greatly reduce \alert{varia
 \begin{frame}
 \frametitle{Minimizing SSR/AIC: all possible regressions}
 \begin{center}
-\includegraphics[width=4in]{./resources/subsetsaic}
+\includegraphics[height=\textheight]{./resources/subsetsaic}
 \end{center}
 \end{frame}
 
@@ -256,6 +257,7 @@ The big idea: maybe we tolerate some \alert{bias} to greatly reduce \alert{varia
 
 \begin{frame}
 \frametitle{Gram-Schmidt/QR Decomposition}
+\small
 \begin{enumerate}
 \item Let $x_0 = z_0 = 1$
 \item For $j = 1,2,\ldots p$: Regress $x_j$ on $z_0,z_1,\ldots,z_{j-1}$  to give you $\hat{\gamma_{jl}} = \langle\, z_l, x_j \rangle/\langle\, z_l, x_l \rangle$ and residual $z_j = x_j  - \sum_{k=0}^{j-1} \hat{\gamma_{kj}} z_k$.
@@ -273,14 +275,15 @@ What does this do?
 
 \begin{frame}
 \frametitle{QR Decomposition (Technical Details)}
+\small
 QR Decomposition has a matrix form which regression software uses:
-
 \begin{eqnarray*}
 \mathbf{X} &=& \mathbf{Z \Gamma} \\
     &=& \mathbf{\underbrace{Z D^{-1}}_{Q} \underbrace{D \Gamma}_{R}} \\
     \hat{\beta} &=& \mathbf{R^{-1} Q' y}\\
     \hat{\mathbf{y}} &=& \mathbf{Q Q'} \mathbf{y}
 \end{eqnarray*}
+\vspace{-0.5cm}
 \begin{itemize}
 \item $Z$ is the matrix of the orthogonalized residuals $z_j$'s.
 \item $\Gamma$ is upper triangular matrix with entries $\hat{\gamma}_{kj}$
@@ -379,7 +382,7 @@ As an alternative consider:
 \begin{frame}
 \frametitle{Stepwise selection proedures}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/subsetstepwise}
+\includegraphics[height=0.9\textheight]{./resources/subsetstepwise}
 \end{center}
 \end{frame}
 
@@ -402,6 +405,7 @@ Suppose we fit a regression model and penalized extra variables all in one go, w
 
 \begin{frame}
 \frametitle{LASSO Regression}
+\small
 \begin{eqnarray*}
 \hat{\beta}^{LASSO} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^K x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^K | \beta_j| \right]
 \end{eqnarray*}
@@ -430,7 +434,7 @@ But... is choosing $\lambda$ any easier than choosing $p$?
 \begin{frame}
 \frametitle{LASSO Path}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/lassopath}
+\includegraphics[height=0.9\textheight]{./resources/lassopath}
 \end{center}
 \end{frame}
 
@@ -453,14 +457,14 @@ Another popular alternative is the $q=2$ case
 \begin{frame}
 \frametitle{Ridge Path}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/ridgepath}
+\includegraphics[width=0.85\textheight]{./resources/ridgepath}
 \end{center}
 \end{frame}
 
 \begin{frame}
 \frametitle{LASSO vs Ridge}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/geometry}
+\includegraphics[width=\textheight]{./resources/geometry}
 \end{center}
 \end{frame}
 
@@ -477,14 +481,17 @@ LASSO:
 \item LASSO is useful for variable/feature selection.
 \item LASSO does not generally posses the \alert{oracle property} though variants such as \alert{adaptive LASSO} may.
 \item LASSO sometimes has the oracle property for $p \gg N$ and cases where the true $\beta$'s are not too large.
-\item People sometimes use LASSO to choose components and then OLS for unbiased coefficient estimated.
+\item People sometimes use LASSO to choose components and then OLS for unbiased coefficient estimateds
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Elastic Net}
 We can actually combine them using \alert{elastic net regression}:
 \begin{eqnarray*}
  P(\lambda_1,\lambda_2,\mathbf{\beta}) =  \lambda _1\sum_{j=1}^K | \beta_j|  +\lambda_2 \sum_{j=1}^K | \beta_j|^2 
  \end{eqnarray*}
+ This includes both the $L_1$ and $L_2$ penalties.
 \end{frame}
-
 
 \begin{frame}
 \frametitle{LASSO vs. Ridge}
@@ -632,7 +639,7 @@ How many components?
 \begin{frame}
 \frametitle{Principal Components}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/princomp2}
+\includegraphics[height=0.9\textheight]{./resources/princomp2}
 \end{center}
 \end{frame}
 
@@ -648,19 +655,20 @@ How many components?
 \begin{eqnarray*}
 \hat{\beta}^{PCR} = \sum_{m=1}^M \hat{\theta}_m v_m
 \end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Principal Components (and Ridge)}
+\begin{itemize}
 \item If $M=P$ (we use all components) then PCR = OLS.
 \item If $M < P$ then we discard the $p-M$ smallest eigenvalue components
 \item This is similar to ridge which shrinks $\beta$'s for components with small eigenvalues.
-\end{itemize}
-\end{frame}
-\begin{frame}
-\frametitle{Principal Components And Ridge}
-\begin{itemize}
 \item Think about the variance matrix $X'X/n$ or $X' X = V D^2 V'$.
 \item First component (largest eigenvalue) is $\mathbf{z_1} = \mathbf{X} v_1 = \mathbf{u_1} d_1$.
 \item Variance is $Var(\mathbf{z_1}) = Var (\mathbf{X} v_1) = \frac{d_1^2}{N}$ ($\mathbf{z_1}$ is first principal component of $\mathbf{X}$).
 \end{itemize}
 \end{frame}
+
 
 
 \begin{frame}
@@ -724,7 +732,7 @@ Ridge is simple too:
 \begin{frame}
 \frametitle{Principal Components}
 \begin{center}
-\includegraphics[width=4.5in]{./resources/pcrridge}
+\includegraphics[height=0.85\textheight]{./resources/pcrridge}
 \end{center}
 \end{frame}
 
@@ -803,7 +811,8 @@ E_t [g(x_{t+i},\theta) f(z_{t,t-1,\ldots,0}) ]  = 0
 \end{frame}
 
 \begin{frame}
-\frametitle{Factor Models: Take Macroeconometrics!}
+\small
+\frametitle{Factor Models}
 \begin{itemize}
 \item Related to PCA is the \alert{factor model}
 \item These are frequently used in finance for asset pricing. 
@@ -821,6 +830,7 @@ r_i = b_0 + b_1 f_1 + b_2 f_2 + \ldots b_p f_p + e_i
 
 \begin{frame}
 \frametitle{Factor Models: Other Examples}
+\small
 \begin{itemize}
 \item \textit{Eigenfaces} reduces your face to the first few eigenvalues -- this is how face detection works!
 \item In psychometrics they use data from multiple tests to measure different forms of intelligence (mathematical reasoning, verbal, logical, spatial, etc.)
