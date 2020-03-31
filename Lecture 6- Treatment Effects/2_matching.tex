@@ -230,8 +230,8 @@ But conditional independence does this for us:
 
 
 \begin{frame}
-\frametitle{Matching in Practice}
-How do we actually do this? (Ex 1: \alert{Caliper Matching})
+\frametitle{Matching in Practice: \alert{Caliper Matching}}
+How do we actually do this?
 \begin{itemize}
 \item For each entry in the treatment $(y_t,x_t)$
 \begin{itemize}
@@ -244,10 +244,28 @@ How do we actually do this? (Ex 1: \alert{Caliper Matching})
 \item Variance can be unpredictable: some $(y_t,x_t)$ have many of matches, others have none
 \item For some $(y_t,x_t)$ may have nothing within $\norm{x_s -x_t}<b_w$? Drop these?
 \end{itemize}
-
+\item Can also use $k$-\alert{nearest neighbors} instead.
 \end{itemize}
 \end{frame}
 
+
+\begin{frame}
+\frametitle{Matching in Practice: \alert{Inverse Probability Weighting}}
+How do we actually do this?
+\begin{itemize}
+\item Calculate a smoothed estimate of the treatment probability $\pi(x) = Pr(T_i =1 | x)$.
+\begin{align*}
+\frac{1}{n}\sum_{t \in \text{Treatment}} \frac{y_t}{\pi(x_t)} - \frac{1}{n} \sum_{s \in \text{Control}} \frac{y_s}{1-\pi(x_s)}
+\end{align*}
+\item How to get $\pi(x)$? Run a logit or probit.
+\item We can stabilize the weights replace $w(x) =\frac{1}{\pi(x)}$ with:
+\begin{align*}
+w(x)=\frac{Pr(T=1)}{\pi(x)}  \mbox{ for } T_i=1 \quad
+w(x)=\frac{Pr(T=0)}{1-\pi(x)} \mbox{ for } T_i=0
+\end{align*}
+\item This sometimes helps crazy big weights when treated group is small.
+\end{itemize}
+\end{frame}
 
 
 \begin{frame}
@@ -390,6 +408,7 @@ Pr(T=1 | Y(1), Y(0),P(X))&= E[Pr(T=1| Y(1),Y(0),X) | P(X)] \\
 \item Thus the propensity score provides \alert{dimension reduction}
 \item We still have to estimate the propensity score which is a high dimensional problem without \textit{ad-hoc} parametric restrictions.
 \item Let us begin by assuming a can-opener.
+\item An easy way would be to use $\pi(x)$ from logit or probit.
 \end{itemize}
 \end{frame}
 
@@ -475,6 +494,23 @@ Y = \alpha + \beta T_i + \gamma X + v
 \item Again we are in the homogenous treatment world
 \end{itemize}
 \end{frame}
+
+
+\begin{frame}
+\frametitle{Exercises}
+\begin{itemize}
+\item This would be a good time to work through the vignette for \texttt{cobalt}
+ \url{https://cran.r-project.org/web/packages/cobalt/vignettes/cobalt_A0_basic_use.html}
+ \item Compare the ATE for the Lalonde data with the IPW, Nearest Neighbor, and Propensity Score estimates.
+ \item Then start the homework
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Up next...}
+Local Average Treatment Effects.
+\end{frame}
+
 
 
 \end{document}
