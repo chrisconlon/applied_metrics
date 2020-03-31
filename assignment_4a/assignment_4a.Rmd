@@ -1,0 +1,138 @@
+---
+title: "Problem Set 4a"
+author: "Prof. Conlon"
+date: "Due: 4/4/20"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+\newcommand{\E}[1]{\ensuremath{\mathbb{E}\big[#1\big]}}
+\newcommand{\Emeasure}[2]{\ensuremath{\mathbb{E}_{#1}\big[#2\big]}}
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* ggplot2
+* data.table (data tables are computationally efficient and IMHO easier to work with)
+* rdd (package for regression discontinuity designs)
+* estimatr (tidy version of lm)
+* knitr (make pretty tables using kable command)
+* extraDistr (package with extra distributions)
+
+```{r,comment='\t\t',echo=FALSE}
+
+## This is a code chunk: it is outlined in grey and has R code inside of it
+## Note: you can change what is shown in the final .pdf document using arguments 
+##       inside the curly braces at the top {r, comment='\t\t'}. For example, you 
+##       can turn off print statements showing in the .pdf by adding 'echo=False' 
+##       i.e. changing the header to {r, comment='\t\t',echo=FALSE}
+
+## ~~~~~~~~~~~~~~ CODE SETUP ~~~~~~~~~~~~~~ ##
+
+# ~ This bit of code will be hidden after Problem Set 1 ~
+#
+# This section sets up the correct directory structure so that
+#  the working directory for your code is always in the data folder
+
+# Retrieve the code working directory
+#script_dir = dirname(sys.frame(1)$ofile)
+initial_options <- commandArgs(trailingOnly = FALSE)
+render_command <- initial_options[grep('render',initial_options)]
+script_name <- gsub("'", "", 
+                    regmatches(render_command, 
+                               gregexpr("'([^']*)'",
+                               render_command))[[1]][1])
+
+# Determine OS (backslash versus forward slash directory system)
+sep_vals = c(length(grep('\\\\',script_name))>0,length(grep('/',script_name))>0)
+file_sep = c("\\\\","/")[sep_vals]
+
+# Get data directory
+split_str = strsplit(script_name,file_sep)[[1]]
+len_split = length(split_str) - 2
+data_dir = paste(c(split_str[1:len_split],'data',''),collapse=file_sep)
+
+# Check that the data directory contains the files for this weeks assignment
+data_files = list.files(data_dir)
+if(!('olken.csv' %in% data_files)){
+  cat("ERROR: DATA DIRECTORY NOT CORRECT\n")
+  cat(paste("data_dir variable set to: ",data_dir,collapse=""))
+}
+
+```
+
+## Problem 1 (Coding Exercise)
+Using the Lalonde dataset and the __cobalt__ package finish the exercise from the slides. 
+
+That is:
+
+Consider three possible matching techniques
+
+\begin{enumerate}
+\item Caliper matching on a single variable (pick the best one)
+\item 4 nearest neighbor matching.
+\item Propensity Score matching using a logit
+\item Propensity Score matching using a kernel
+\end{enumerate}
+
+For each matching approach:
+\begin{itemize}
+\item[a.] Create a balance table. For each pretreatment covariate, include comparisons for treated and untreated units in terms of the mean and standard deviation. Report a test, for each covariate, of the hypothesis that the difference in means between treatment conditions is zero.
+
+\item[b.] For each covariate, plot its distribution under treatment and control
+\item[c.] Estimate the ATT and/or ATE of participating in the job training program
+\item[d.] Can you estimate both ATE or ATT? Why or why not?
+\end{itemize}
+
+## Problem 2 (Coding Exercise)
+
+The dataset for this exercise comes from a paper by Benjamin Olken entitled "Monitoring Corruption: Evidence from a Field Experiment in Indoneisa". The paper evaluates an attempt to reduce corruption in road building in Indonesia. The treatment we focus on was "accountability meetings". These meetings were held at a village level, and project officials were probed to account for how they spent project funds. Before construction began, residents in the treated villages were encouraged to attend these meetings. The dataset is called "olken.csv".
+
+The outcome we care about is __pct.missing__, the difference between what officials claim they spent on road construction and an independent measure of expenditures. Treatment is given by __treat.invite__ such that:
+
+\begin{align*}
+  \text{treat.invite} = 
+    \begin{cases}
+      1 &\mbox{ if village received intervention} \\
+      0 &\mbox{ if village was control }
+    \end{cases}
+\end{align*}
+
+We have the following four pre-treatment covariates:
+
+\begin{itemize}
+  \item[--] head.edu : the education of the village head
+  \item[--] mosques : mosques per 1000 residents
+  \item[--] pct.poor : the percentage of households below the poverty line
+  \item[--] total.budget : the budget for each project
+\end{itemize}
+
+We now have the following questions:
+
+\begin{itemize}
+
+\item[a.] Create a balance table. For each pretreatment covariate, include comparisons for treated and untreated units in terms of the mean and standard deviation. Report a test, for each covariate, of the hypothesis that the difference in means between treatment conditions is zero.
+
+\item[b.] For each covariate, plot its distribution under treatment and control (either side-by-side using facet\_grid or overlap).
+
+\item[c.] Given your answers to part a and b, do the villagers seem similar in their pre-treatment covariates?
+
+\item[d.] Regress the treatment on the pre-treatment covariates. What do you conclude?
+
+\item[e.] Using the difference-in-means estimator, estimate the ATE and its standard error.
+
+\item[f.] Using a simple regression of outcomes on treatment, estimate the ATE and its standard error. Compare your answer in (f) to (e).
+
+\item[g.] Using the same regression from part (f), include pre-treatment covariates in your regression equation (additively and linearly). Report estimates of treatment effects and its standard error. Do you expect (g) to differ from (f) and (e)? Explain your answer.
+
+\end{itemize}
+
+
