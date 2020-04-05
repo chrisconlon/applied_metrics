@@ -32,12 +32,42 @@
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Part 8: Policy Evaluation- Difference in Difference}
+\title{Part 8: Policy Evaluation\\
+ Event Studies and Difference in Difference}
 \author{Chris Conlon}
 \institute{Applied Econometrics}
 \date{\today}
 
 \frame{\titlepage}
+
+\begin{frame}{Motivation}
+Matching estimators had some drawbacks:
+\begin{itemize}
+\item Treated patients were ``matched'' to control patients based only on \alert{observable characteristics}
+\begin{itemize}
+\item Ignored \alert{selection on unobservables}.
+\end{itemize}
+\item Relied purely on \alert{cross sectional} variation to construct a control group.
+\item Often (in this course at least) we have access to \alert{panel data}.
+\begin{itemize}
+\item What if we could use panel data to control for \alert{unobserved heterogeneity} within a treated individual/group?
+\end{itemize}
+\end{itemize}
+Matching estimators had some advantages:
+\begin{itemize}
+\item Limited assumptions on \alert{functional forms}
+\item We could do nearest neighbor matching and use kernels to compute treatment effects
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Motivation}
+IV estimators resolve some of those issues but
+\begin{itemize}
+\item Good IV are in short supply!
+\end{itemize}
+
+\end{frame}
+
 
 
 
