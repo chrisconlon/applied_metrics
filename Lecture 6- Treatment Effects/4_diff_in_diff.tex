@@ -40,73 +40,162 @@
 
 \frame{\titlepage}
 
-\begin{frame}{Motivation}
+\begin{frame}{Motivation: Recap Matching}
+Matching estimators had some advantages:
+\begin{itemize}
+\item Limited assumptions on \alert{functional forms}
+\item We could do nearest neighbor matching and use kernels to compute treatment effects
+\end{itemize}
 Matching estimators had some drawbacks:
 \begin{itemize}
 \item Treated patients were ``matched'' to control patients based only on \alert{observable characteristics}
 \begin{itemize}
 \item Ignored \alert{selection on unobservables}.
 \end{itemize}
-\item Relied purely on \alert{cross sectional} variation to construct a control group.
-\item Often (in this course at least) we have access to \alert{panel data}.
-\begin{itemize}
-\item What if we could use panel data to control for \alert{unobserved heterogeneity} within a treated individual/group?
-\end{itemize}
-\end{itemize}
-Matching estimators had some advantages:
-\begin{itemize}
-\item Limited assumptions on \alert{functional forms}
-\item We could do nearest neighbor matching and use kernels to compute treatment effects
+\item Relied on \alert{cross sectional} variation to construct a control group.
 \end{itemize}
 \end{frame}
+
 
 \begin{frame}{Motivation}
 IV estimators resolve some of those issues but
 \begin{itemize}
 \item Good IV are in short supply!
 \end{itemize}
-
-\end{frame}
-
-
-
-
-\begin{frame}{Further approaches to evaluation of program effects: \\
-{\small Difference in Differences } }
+ Often (in this course at least) we have access to \alert{panel data}.
 \begin{itemize}
-\item Sometimes we may feel we can impose more structure on the problem.
-\item Suppose in particular that we can write the outcome equation as
-\begin{align*}
- Y_{it} =\alpha_i +d_t +\beta_i T_{it} +u_{it}
- \end{align*}
-\item In the above we have now introduced a time dimension $t=\{1,2\}$. 
-\item Now suppose that $T_{i1}=0$ for all $i$ and $T_{i2}=1$ for a well defined group of individuals in our population.
-\item This framework allows us to identify the ATT effect under the assumption that the growth of the outcome in the non-treatment state is independent of treatment allocation:
-\begin{align*}
-E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0] 
-\end{align*}
-\item This is known as \alert{parallel trends}.
+\item What if we could use panel data to control for \alert{unobserved heterogeneity} within a treated individual/group?
+\end{itemize}
+\alert{Difference in Difference} estimators are like the opposite of matching
+\begin{itemize}
+\item \alert{Strong} assumptions on \alert{functional form}
+\item but... allow for \alert{unobservable heterogeneity} in outcomes.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Before and After} 
-An even simpler estimator is the \alert{before and after} or \alert{event study}.
+
+\section{A Famous Example: Card and Krueger (AER 1994)}
+
+\begin{frame}{A Famous Example: Card and Krueger (AER 1994)}
 \begin{itemize}
-\item We look an outcome before or after an event
+\item On April 1, 1992 NJ raises its minimum wage from $\$4.25\rightarrow \$5.05$ per hour.
+\item Question: Econ 101 predicts this will \alert{reduce demand for low wage workers}
+\begin{itemize}
+\item Focus on fast food restaurants (since they pay min wage)
+\item Focus on starting wage (avoid tenure, high turnover)
+\end{itemize}
+\item Survey 410 restaurants in NJ (treated group) and eastern PA (control group).
+\item Idea: Compare \alert{change} in wages in $NJ$ to $PA$:  $\Delta_{DD} = \Delta_{NJ}- \Delta_{PA}$
+\begin{itemize}
+\item Wave 1: February 15-March 4, 1992
+\item Wave 2: November 5 - December 31, 1992
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Balance Table: Covariates}
+\begin{center}
+\includegraphics[width=2.25in]{./resources/ck_tab2b.png}\\
+\includegraphics[width=2.25in]{./resources/ck_tab2c.png}\\
+\includegraphics[width=2.25in]{./resources/ck_tab2a.png}
+\end{center}
+\end{frame}
+
+
+
+\begin{frame}{Distribution of Wages}
+\begin{center}
+\includegraphics[width=2.75in]{./resources/ck_fig1b.png}
+\includegraphics[width=2.5in]{./resources/ck_fig1a.png}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Differences in Wages : 2 x 2 Table}
+\begin{center}
+\includegraphics[width=4.25in]{./resources/ck_tab3.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Outcome Equation}
+\begin{itemize}
+\item Differences lack any covariates (different fast food chains).
+\item Also $\Delta_{PA}<0$ and $\Delta_{NJ} > 0$ (!)
+\item Recall $i$ denotes stores, $t \in {1,2}$. Run the following regression:
+\begin{align*}
+Y_{it}&=\beta X_{it} +\alpha \cdot [i \in \text{NJ}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot NJ_i \times After_{t} +u_{i}\\
+Y_{it}&=\beta X_{it} +\alpha \cdot [\text{wage gap}_{i}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot \text{wage gap}_{i} \times After_{t} +u_{i}
+\end{align*}
+\item $\alpha$ is mean difference between $NJ$ and $PA$
+\item $\gamma$ is mean difference between period $1$ and $2$
+\item $\delta$ is the parameter of interest, the \alert{difference in difference}
+\item $\text{wage gap}_{i} = [\text{min wage}_{i,2}-w_{i1} ]_{+} =\max\{0, \text{min wage}_{i,2}-w_{i1}\} $.\\
+ (How much do you need to raise $t=1$ wages to achieve minimum wage in $t=2$?)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Differences in Wages}
+\begin{center}
+\includegraphics[width=4in]{./resources/ck_tab4.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Before and After} 
+For now let's not bother with a \alert{control group}.
+\begin{itemize}
+\item We look an outcome before or after an event $t \in {1,2}$
+\begin{itemize}
+\item $1$ \alert{before} event happens
+\item $2$ \alert{after} event happens.
+\end{itemize}
+
 \begin{itemize}
 \item A news event: the announcement of a merger or stock split.
 \item A tax change, a new law, etc.
 \end{itemize}
-\begin{align*}
-E[Y_{i2} - Y_{i1} | T_{i2}=1] & = E[Y_{i2}^1 - Y_{i1}^1 | T_{i2}=1] \\
- &= d_2-d_1 + E[\beta_{i}| T_{i2}=1] 
-\end{align*}
 \item Except under strong conditions $d_2 = d_1$ we shouldn't believe the results of the before and after estimator.
 \item Main Problem: we attribute changes to treatment that might have happened anyway \alert{trend}.
 \item e.g: Cigarette consumption drops 4\% after a tax hike. (But it dropped 3\% the previous four years).
 \item Also worry about: \alert{anticipation}, \alert{gradual rollout}, etc.
 \end{itemize}
 \end{frame}
+
+
+\section{A More General Method}
+\begin{frame}{General Case: Difference in Differences }
+\begin{itemize}
+\item Sometimes we may feel we can impose more structure on the problem.
+\item Suppose in particular that we can write the outcome equation as
+\begin{align*}
+ Y_{it} =\alpha_i +\gamma_t +\delta_i T_{it}  + u_{it}
+ \end{align*}
+\item Suppose that $T_{i1}=0$ for all $i$ and $T_{i2}=1$ for a well defined group of individuals in our population.
+\item This framework allows us to identify the ATT effect under the assumption that the growth of the outcome in the non-treatment state is independent of treatment allocation:
+\begin{align*}
+E[Y_{i2}(0) - Y_{i1}(0) | T_{i1}, T_{i2}] = E[Y_{i2}(0) - Y_{i1}(0)] 
+\end{align*}
+\item This is known as \alert{parallel trends}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Some Quick Algebra}
+Recall our regression equation:
+\begin{align*}
+ Y_{it} =\alpha_i +\gamma_t +\delta_i T_{it}  + u_{it}
+ \end{align*}
+ This gives us:
+\begin{align*}
+E[Y_{i2} - Y_{i1} | T_{i2}=1] 
+& = E[Y_{i2}(1) - Y_{i1}(1) | T_{i2}=1] \\
+&= \underbrace{(\alpha_i - \alpha_i)}_{=0} + (\gamma_2-\gamma_1) + \underbrace{E[\delta_i  | T_{i2}=1]}_{ATT}  +  E[u_{i2} - u_{i1}  | T_{i2}=1] 
+\end{align*}
+\end{frame}
+
+
+
+
+
 
 \begin{frame}{Difference in Differences} 
 Let's try and estimate $d_2- d_1$ directly and then difference it out. Here we use \alert{parallel trends}:
