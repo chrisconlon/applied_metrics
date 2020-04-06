@@ -33,7 +33,7 @@
 
 \begin{document}
 \title{Part 8: Policy Evaluation\\
- Event Studies and Difference in Difference}
+ Difference in Difference}
 \author{Chris Conlon}
 \institute{Applied Econometrics}
 \date{\today}
@@ -140,85 +140,119 @@ Y_{it}&=\beta X_{it} +\alpha \cdot [\text{wage gap}_{i}] +  \gamma \cdot \text{A
 \end{center}
 \end{frame}
 
-\begin{frame}{Before and After} 
-For now let's not bother with a \alert{control group}.
-\begin{itemize}
-\item We look an outcome before or after an event $t \in {1,2}$
-\begin{itemize}
-\item $1$ \alert{before} event happens
-\item $2$ \alert{after} event happens.
-\end{itemize}
-
-\begin{itemize}
-\item A news event: the announcement of a merger or stock split.
-\item A tax change, a new law, etc.
-\end{itemize}
-\item Except under strong conditions $d_2 = d_1$ we shouldn't believe the results of the before and after estimator.
-\item Main Problem: we attribute changes to treatment that might have happened anyway \alert{trend}.
-\item e.g: Cigarette consumption drops 4\% after a tax hike. (But it dropped 3\% the previous four years).
-\item Also worry about: \alert{anticipation}, \alert{gradual rollout}, etc.
-\end{itemize}
-\end{frame}
-
 
 \section{A More General Method}
-\begin{frame}{General Case: Difference in Differences }
-\begin{itemize}
-\item Sometimes we may feel we can impose more structure on the problem.
-\item Suppose in particular that we can write the outcome equation as
+\begin{frame}{Difference in Difference: General Approach}
 \begin{align*}
- Y_{it} =\alpha_i +\gamma_t +\delta_i T_{it}  + u_{it}
- \end{align*}
-\item Suppose that $T_{i1}=0$ for all $i$ and $T_{i2}=1$ for a well defined group of individuals in our population.
-\item This framework allows us to identify the ATT effect under the assumption that the growth of the outcome in the non-treatment state is independent of treatment allocation:
-\begin{align*}
-E[Y_{i2}(0) - Y_{i1}(0) | T_{i1}, T_{i2}] = E[Y_{i2}(0) - Y_{i1}(0)] 
+\text{Potential outcome in period } 1&=Y_{i 1}(0)\\
+\text{Potential outcome in period } 2&=\left\{ \begin{array}{ll}Y_{i 2}(1) & \text { if } T_{i 2}=1 \\ Y_{i 2}(0) & \text { if } T_{i 2}=0\end{array}\right\}\\
 \end{align*}
-\item This is known as \alert{parallel trends}.
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline & Treatment & Control \\
+\hline Before & $Y_{i 1}(0)$ & $Y_{i 1}(0)$ \\
+After & $Y_{i 2}(1)$ & $Y_{i 2}(0)$ \\
+\hline
+\end{tabular}
+\end{center}
+We can write the outcome as:
+\begin{align*}
+Y_{i t}=T_{i t} Y_{i t}(1)+\left(1-T_{i t}\right) Y_{i t}(0)=T_{i t}\left(Y_{i t}(1)-Y_{i t}(0) \right)+Y_{i t}(0)
+\end{align*}
+\end{frame}
+
+\begin{frame}{Difference in Difference: General Approach}
+\small
+Consider the first difference $\Delta Y_{it} = Y_{i2} - Y_{i1}$:
+\begin{align*}
+\Delta Y_{it}  = T_{i2} \left(Y_{i2}(1) - Y_{i2}(0) \right) +  Y_{i2}(0) - Y_{i1}(0)
+\end{align*}
+For treated group (first difference):
+\begin{align*}
+E[\Delta Y_{it} | T_{i2}=1]  = \overbrace{E\left[Y_{i2}(1) - Y_{i2}(0) | T_{i2}=1 \right]}^{\alert{ATT}} +  \overbrace{E\left[Y_{i2}(0) - Y_{i1}(0) | T_{i2}=1 \right]}^{\alert{\gamma(1)}}
+\end{align*}
+For control group (second difference):
+\begin{align*}
+E[\Delta Y_{it} | T_{i2}=0]  = \overbrace{E\left[Y_{i2}(0) - Y_{i1}(0) | T_{i2}=0 \right]}^{\alert{\gamma(0)}}
+\end{align*}
+The DiD (difference in difference) estimator
+\begin{align*}
+\Delta_{DD} = E[\Delta Y_{it} | T_{i2}=1]  - E[\Delta Y_{it} | T_{i2}=0]  
+\end{align*}
+\end{frame}
+
+
+
+\begin{frame}{Difference in Difference: Parallel Trends}
+\small
+\begin{itemize}
+\item If $\gamma(1) = \gamma(0)$ then the DiD estimator cancels and we are left with the $\Delta_{DD} = \text{ATT}$.
+\item This is the \alert{parallel trends assumption}
+\begin{align*}
+E\left[Y_{i2}(0) - Y_{i1}(0) | T_{i2}=0 \right] = E\left[Y_{i2}(0) - Y_{i1}(0) | T_{i2}=1 \right]
+\end{align*}
+\item Absent the treatment effect, both treatment and control would evolve identically over time.
+\item But, treatment and control groups can start from very different places...
+\begin{align*}
+E\left[Y_{i t}(0) | T_{i 2}=1\right] \neq E\left[Y_{i t}(0) | T_{i 2}=0\right], t=1,2
+\end{align*}
+\item And have selection on treatment effects...
+\begin{align*}
+E\left[Y_{i 2}(1)-Y_{i 2}(0) | D_{i 2}=1\right] \neq E\left[Y_{i 2}(1)-Y_{i 2}(0) | D_{i 2}=0\right]
+\end{align*}
 \end{itemize}
 \end{frame}
 
-
-\begin{frame}{Some Quick Algebra}
-Recall our regression equation:
-\begin{align*}
- Y_{it} =\alpha_i +\gamma_t +\delta_i T_{it}  + u_{it}
- \end{align*}
- This gives us:
-\begin{align*}
-E[Y_{i2} - Y_{i1} | T_{i2}=1] 
-& = E[Y_{i2}(1) - Y_{i1}(1) | T_{i2}=1] \\
-&= \underbrace{(\alpha_i - \alpha_i)}_{=0} + (\gamma_2-\gamma_1) + \underbrace{E[\delta_i  | T_{i2}=1]}_{ATT}  +  E[u_{i2} - u_{i1}  | T_{i2}=1] 
-\end{align*}
-\end{frame}
-
-
-
-
-
-
-\begin{frame}{Difference in Differences} 
-Let's try and estimate $d_2- d_1$ directly and then difference it out. Here we use \alert{parallel trends}:
-\begin{align*}
-E[Y_{i2}^0 - Y_{i1}^0 | T_{i2}=1]  &= E[Y_{i2}^0 - Y_{i1}^0 | T_{i2}=0] \\
-E[Y_{i2} - Y_{i1} | T_{i2}=0] & = d_2-d_1
-\end{align*}
-We now obtain an estimator for ATT:
-\begin{align*}
-E[\beta_{i}| T_{i2}=1]  = E[Y_{i2} - Y_{i1} | T_{i2}=1] - E[Y_{i2} - Y_{i1} | T_{i2}=0]  
-\end{align*}
-which can be estimated by the difference in the growth between the treatment and the control group.
-\end{frame}
 
 \begin{frame}{Parallel Trends}
 \begin{figure}
 \centering
-\includegraphics[width=3.5in]{./resources/parallel-trends}
+\includegraphics[width=5in]{./resources/common_trend.png}
 \end{figure}
 \end{frame}
 
+
+
+\begin{frame}{Difference in Differences: Limitations}
+\begin{enumerate}
+\item Functional form restrictions
+\begin{itemize}
+\item \alert{Parallel trends} assumes that absent treatment that we add $\gamma_2 - \gamma_1$ to each unit
+\item Because this is \alert{additive} it is not invariant to transformations $f(Y_{it})$ (ie: taking logs)
+\end{itemize}
+\item Parallel Trend Assumption is \alert{not testable}
+\begin{itemize}
+\item Best we can hope is that it looks similar in the pre-period
+\end{itemize}
+\item Compositional Effects: the treatment may affect who is in each group
+\begin{itemize}
+\item Restaurants could close in NJ and open nearby in PA to avoid minimum wage.
+\item A good job training program may lead to migration, etc.
+\item One approach: redefine the population so that it doesn't endogenously respond to treatment
+\begin{itemize}
+\item Recover something, but probably not ATT anymore...
+\end{itemize}
+
+\end{itemize}
+
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Checking Pre-Trend: Card Krueger (2000)}
+\begin{figure}
+\centering
+\includegraphics[width=4.5in]{./resources/card_krueger_2000.png}
+\end{figure}
+\end{frame}
+
+
+
 \begin{frame}{Difference in Differences}
-Now consider the following problem:
+Just like in Card and Kruger, we can write as regression equation:
+\begin{align*}
+ Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}
+ \end{align*}
 \begin{itemize}
 \item Suppose we wish to evaluate a training program for those with low
 earnings. Let the threshold for eligibility be $B$.
@@ -233,63 +267,85 @@ training, forming the treatment group.
 \end{itemize}
 \end{frame} 
 
+\begin{frame}{The ``Ashenfelter Dip'' (Heckman and Smith 2000)}
+\begin{figure}
+\centering
+\includegraphics[width=4.25in]{./resources/ashenfelter_dip.png}
+\end{figure}
+\end{frame}
+
 \begin{frame}{Difference in Differences}
+\small
 \begin{itemize}
-\item  \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
+\item  \#2 above violates the assumption {\small $E[Y_{i2}(0) - Y_{i1}(0) | T] = E[Y_{i2}(0) - Y_{i1}(0)]$}. 
 \item To see why note that those participating into the program are such
-that {\small $Y_{i0}^0 < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
+that {\small $Y_{i0}(0) < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
 This implies: 
-{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
+{\small $$E[Y_{i2}(0)- Y_{i1}(0) | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
 For the control group:
-{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
-\item Hence
+{\small $$E[Y_{i2}(0) - Y_{i1}(0) | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
+\vspace{-1cm}
 \begin{align*}
-& E[Y_{i2}^0 - Y_{i1}^0 | T=1] - E[Y_{i2}^0 - Y_{i1}^0 | T=0] =\\
+& E[Y_{i2}(0) - Y_{i1}(0) | T=1] - E[Y_{i2}(0) - Y_{i1}(0) | T=0] =\\
 &  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
   \end{align*}
  \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
 \end{itemize}
 \end{frame} 
 
-\begin{frame}{Difference in Differences}
-Ashefelter (1978) was one of the first to consider difference in differences to evaluate training programs.
-\includegraphics[scale=1]{./resources/ashefelter1.pdf}
-\end{frame}
-
-\begin{frame}{Difference in Differences}
-Ashenfelter (1978) reports the following results.
-\begin{figure}
-\centering
-\includegraphics[scale=.85]{./resources/ashefelter2.pdf}
-\end{figure}
-\end{frame}
+%\begin{frame}{Difference in Differences}
+%Ashefelter (1978) was one of the first to consider difference in differences to evaluate training programs.
+%\includegraphics[scale=1]{./resources/ashefelter1.pdf}
+%\end{frame}
+%
+%\begin{frame}{Difference in Differences}
+%Ashenfelter (1978) reports the following results.
+%\begin{figure}
+%\centering
+%\includegraphics[scale=.85]{./resources/ashefelter2.pdf}
+%\end{figure}
+%\end{frame}
 
 \begin{frame}{Difference in Differences}
 \begin{itemize}
 \item The assumption on growth of the non-treatment outcome being independent of assignment to treatment may be violated, but it may still be true conditional on $X$.
 \item Consider the assumption
-$$ E[Y_{i2}^0- Y_{i1}^0 | X,T] = E[Y_{i2}^0- Y_{i1}^0 | X] $$ 
+$$ E[Y_{i2}(0)- Y_{i1}(0) | X,T] = E[Y_{i2}(0)- Y_{i1}(0) | X] $$ 
 \item This is just matching assumption on a redefined variable, namely the growth in the outcomes. In its simplest form the approach is implemented by running the regression
 $$ Y_{it} = \alpha_i + d_t + \beta_i T_{it} + \gamma_t' X_i + u_{it}$$ 
 which allows for differential trends in the non-treatment growth depending on $X_i$. More generally one can implement propensity score matching on the growth of outcome variable when panel data is available.
 \end{itemize}
 \end{frame}
 
+\section{Variants}
+
+\begin{frame}{Difference in Difference in Difference}
+The triple difference is also a thing:
+\begin{itemize}
+\item Suppose that we have: before/after, treated-state/untreated-state, treated-group (men)/ untreated-group women.
+\item We can compute two D-i-D here: $\Delta_{DDD} = \Delta_{DD,state} - \Delta_{DD,gender}$ 
+\item Literally difference, the difference in differences estimators.
+\item As a regression: interpret the triple-interaction term (make sure to control for ALL double interactions).
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}{Difference in Differences with Repeated Cross Sections}
+\small
 \begin{itemize}
 \item Suppose we do not have available panel data but just a random sample from the relevant population in a pre-treatment and a post-treatment period. We can still use difference in differences.
-\item First consider a simple case where {\small $E[Y_{i2}^0- Y_{i1}^0 | T] = E[Y_{i2}^0- Y_{i1}^0]$}.
+\item First consider a simple case where {\small $E[Y_{i2}(0)- Y_{i1}(0) | T] = E[Y_{i2}(0)- Y_{i1}(0)]$}.
 \item We need to modify slightly the assumption to
 \vspace{-.5pc}
 \begin{align*}
-E[Y_{i2}^0| \text{\tiny Group receiving training}]&-E[Y_{i1}^0| \text{\tiny Group receiving training in the next period}] \\
-&= E[Y_{i2}^0-Y_{i1}^0]  
+E[Y_{i2}(0) | \text{\tiny Group receiving training}]&-E[Y_{i1}(0) | \text{\tiny Group receiving training in the next period}] \\
+&= E[Y_{i2}(0)-Y_{i1}(0)]  
 \end{align*}
 which requires, in addition to the original independence
 assumption that conditioned on particular individuals that population we will be sampling from does not change composition.
 \item We can then obtain immediately an estimator for ATT as
 \begin{align*}
-&E[\beta_i |T_{i2}=1] \\ 
+E[\beta_i |T_{i2}=1] 
 &= E[Y_{i2}| \text{\tiny Group receiving training}]-E[Y_{i1}| \text{\tiny Group receiving training next period}] \\
 &- \{E[Y_{i2} | \text{\tiny Non-trainees}] - E[Y_{i1} | \text{\tiny Group not receiving training next period}]\}
 \end{align*}
@@ -301,8 +357,8 @@ assumption that conditioned on particular individuals that population we will be
 \begin{itemize}
 \item More generalIy we need an assumption of conditional independence of the form
 \begin{align*}
-E[Y_{i2}^0 & | X, \text{\tiny Group receiving training}]-E[Y_{i1}^0| X, \text{\tiny Group receiving training next period}] \\
-&= E[Y_{i2}^0 | X] - E[Y_{i1}^0 |X]
+E[Y_{i2}(0) & | X, \text{\tiny Group receiving training}]-E[Y_{i1}(0) | X, \text{\tiny Group receiving training next period}] \\
+&= E[Y_{i2}(0) | X] - E[Y_{i1}(0) |X]
 \end{align*}
 \item Under this assumption (and some auxiliary parametric assumptions) we can obtain an estimate of the effect of treatment on the treated by the regression
 \begin{align*}
@@ -327,7 +383,7 @@ where $\alpha_g$ is a dummy for the treatment of comparison group, and $\beta (X
 \item Suppose we relax the assumption of \emph{no selection} on unobservables. 
 \item Instead we can start by assuming that
 \begin{align*}
-E[Y_{i2}^0 | X,Z] - E[Y_{i1}^0 | X,Z] = E[Y_{i2}^0 | X] - E[Y_{i1}^0 | X]
+E[Y_{i2}(0) | X,Z] - E[Y_{i1}(0) | X,Z] = E[Y_{i2}(0) | X] - E[Y_{i1}(0) | X]
 \end{align*} 
 where $Z$ is an instrument which determines training eligibility say but does not determine outcomes in the non-training state. Take $Z$ as binary (1,0).
 \item Non-Compliance: not all members of the eligible group ($Z = 1$) will take up training and some of those ineligible ($Z = 0$) may obtain training by other means.
@@ -340,7 +396,7 @@ where $Z$ is an instrument which determines training eligibility say but does no
 \item Now suppose we still wish to estimate the impact of training on those being trained (rather than just the effect of being eligible)
 \item This becomes an IV problem and following up from the discussion of LATE we need stronger assumptions
 \begin{itemize}
-\item  Independence: for $Z = a, \left\{Y_{i2}^0 - Y_{i1}^0, Y_{i2}^1 - Y_{i1}^1, T(Z=a)\right\}$ is independent of Z.
+\item  Independence: for $Z = a, \left\{Y_{i2}(0) - Y_{i1}(0), Y_{i2}(1) - Y_{i1}(1), T(Z=a)\right\}$ is independent of Z.
 \item Monotonicity $T_i(1) \ge T_i(0) \, \forall \, i$
 \end{itemize}
 \item In this case LATE is defined by
@@ -348,6 +404,94 @@ where $Z$ is an instrument which determines training eligibility say but does no
 assuming that the probability of training in the first period is zero.
 \end{itemize}              
 \end{frame}
+
+\begin{frame}{Changes in Changes: Dealing w Nonlinearity}
+\begin{itemize}
+\item Athey and Imbens (2006) develop a model robust to nonlinearity complaints
+\item Combines nonparametrics with DiD.
+\item Works with \alert{quantile treatment effects} and limits selection on unobservables
+\item Assume that your relative location in distribution is invariant to difference.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Next time}
+What if we can combine the benefits of matching with DiD approaches?
+\end{frame}
+
+
+%
+%\section{Unused}
+%\begin{frame}{Before and After} 
+%For now let's not bother with a \alert{control group}.
+%\begin{itemize}
+%\item We look an outcome before or after an event $t \in {1,2}$
+%\begin{itemize}
+%\item $1$ \alert{before} event happens
+%\item $2$ \alert{after} event happens.
+%\end{itemize}
+%
+%\begin{itemize}
+%\item A news event: the announcement of a merger or stock split.
+%\item A tax change, a new law, etc.
+%\end{itemize}
+%\item Except under strong conditions $d_2 = d_1$ we shouldn't believe the results of the before and after estimator.
+%\item Main Problem: we attribute changes to treatment that might have happened anyway \alert{trend}.
+%\item e.g: Cigarette consumption drops 4\% after a tax hike. (But it dropped 3\% the previous four years).
+%\item Also worry about: \alert{anticipation}, \alert{gradual rollout}, etc.
+%\end{itemize}
+%\end{frame}
+%
+%
+%\begin{frame}{General Case: Difference in Differences }
+%\begin{itemize}
+%\item Sometimes we may feel we can impose more structure on the problem.
+%\item Suppose in particular that we can write the outcome equation as
+%\begin{align*}
+% Y_{it} =\alpha_i +\gamma_t +\delta_i T_{it}  + u_{it}
+% \end{align*}
+%\item Suppose that $T_{i1}=0$ for all $i$ and $T_{i2}=1$ for a well defined group of individuals in our population.
+%\item This framework allows us to identify the ATT effect under the assumption that the growth of the outcome in the non-treatment state is independent of treatment allocation:
+%\begin{align*}
+%E[Y_{i2}(0) - Y_{i1}(0) | T_{i1}, T_{i2}] = E[Y_{i2}(0) - Y_{i1}(0)] 
+%\end{align*}
+%\item This is known as \alert{parallel trends}.
+%\end{itemize}
+%\end{frame}
+%
+%
+%
+%
+%\begin{frame}{Some Quick Algebra}
+%Recall our regression equation:
+%\begin{align*}
+% Y_{it} =\alpha_i +\gamma_t +\delta_i T_{it}  + u_{it}
+% \end{align*}
+% This gives us:
+%\begin{align*}
+%E[Y_{i2} - Y_{i1} | T_{i2}=1] 
+%& = E[Y_{i2}(1) - Y_{i1}(1) | T_{i2}=1] \\
+%&= \underbrace{(\alpha_i - \alpha_i)}_{=0} + (\gamma_2-\gamma_1) + \underbrace{E[\delta_i  | T_{i2}=1]}_{ATT}  +  E[u_{i2} - u_{i1}  | T_{i2}=1] 
+%\end{align*}
+%\end{frame}
+%
+%
+%
+%
+%
+%
+%\begin{frame}{Difference in Differences} 
+%Let's try and estimate $d_2- d_1$ directly and then difference it out. Here we use \alert{parallel trends}:
+%\begin{align*}
+%E[Y_{i2}^0 - Y_{i1}^0 | T_{i2}=1]  &= E[Y_{i2}^0 - Y_{i1}^0 | T_{i2}=0] \\
+%E[Y_{i2} - Y_{i1} | T_{i2}=0] & = d_2-d_1
+%\end{align*}
+%We now obtain an estimator for ATT:
+%\begin{align*}
+%E[\beta_{i}| T_{i2}=1]  = E[Y_{i2} - Y_{i1} | T_{i2}=1] - E[Y_{i2} - Y_{i1} | T_{i2}=0]  
+%\end{align*}
+%which can be estimated by the difference in the growth between the treatment and the control group.
+%\end{frame}
+%
 
 
 
