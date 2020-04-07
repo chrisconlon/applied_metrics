@@ -16,17 +16,18 @@ These are more advanced treatments:
 
 The rough outline of the course is as follows:
 1. Introductory Time Series
-2. Panel Data I: Fixed Effects, Random Effects, Clustering
-3. Panel Data II: Dynamic Panel Data, Causal FE, Empirical Bayes
-4. Nonlinear Estimation: GMM and MLE
-5. Discrete Choice and Multinomial Choice
-6. Bayesian Methods and MCMC
-7. Treatment Effects and Potential Outcomes (Part I): Matching, Propensity Scores, LATE
-8. Treatment Effects and Potential Outcomes (Part II): Difference in Difference, RDD, etc.
-9. Nonparametric Methods: Kernels, KNN, Bootstrap
-10. Nonparametric Methods: Kernels, KNN, Bootstrap
-11. Machine Learning: Regulaarization, Model Selection, Data Reduction (Ridge, LASSO, PCA)
-12. Additional Topics Based on Interest
+2. Extremeum Estimation I: MLE and M-estimators
+3. Extremum Estimation II: GMM Estimators
+4. Delta Method and Bootstrap
+5. Intro to Nonparametrics: kNN, kernels, etc.
+6. Model Selection and Validation / Intro to ML: Lasso, Ridge, PCA.
+7. Program Evaluation I: Potential Outcomes and Selection
+8. Program Evaluation II: Matching, Propensity Scores, and LATE Theorem
+9. Program Evaluation III: Difference in Difference, Regression Discontinuity
+10. Program Evaluation IV: Synthetic Control and Marginal Treatment Effects
+11. Advanced Machine Learning: Boosting, Bagging, and Decision Trees
+12. Discrete Choice: Multiple Discrete Choice, and Discrete Choice w Endogeneity
+13. Advanced Panel Data: Causal FE? Dynamic Panel
 
 ## My Students
 Over the course of the semester I expect each of my students to find at least two typos or other errors and fix them via a pull request.
