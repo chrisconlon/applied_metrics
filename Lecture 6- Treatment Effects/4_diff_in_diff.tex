@@ -249,7 +249,7 @@ E\left[Y_{i 2}(1)-Y_{i 2}(0) | D_{i 2}=1\right] \neq E\left[Y_{i 2}(1)-Y_{i 2}(0
 
 
 \begin{frame}{Difference in Differences}
-Just like in Card and Kruger, we can write as regression equation:
+Just like in Card and Kruger, we can write as a regression equation:
 \begin{align*}
  Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}
  \end{align*}
@@ -279,15 +279,15 @@ training, forming the treatment group.
 \begin{itemize}
 \item  \#2 above violates the assumption {\small $E[Y_{i2}(0) - Y_{i1}(0) | T] = E[Y_{i2}(0) - Y_{i1}(0)]$}. 
 \item To see why note that those participating into the program are such
-that {\small $Y_{i0}(0) < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
+that {\small $Y_{i0}(0) < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - \gamma_1$}. 
 This implies: 
-{\small $$E[Y_{i2}(0)- Y_{i1}(0) | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
+{\small $$E[Y_{i2}(0)- Y_{i1}(0) | T=1] = \gamma_2 = \gamma_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - \gamma_1]$$}
 For the control group:
-{\small $$E[Y_{i2}(0) - Y_{i1}(0) | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
+{\small $$E[Y_{i2}(0) - Y_{i1}(0) | T=1] = \gamma_2 = \gamma_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - \gamma_1]$$}
 \vspace{-1cm}
 \begin{align*}
 & E[Y_{i2}(0) - Y_{i1}(0) | T=1] - E[Y_{i2}(0) - Y_{i1}(0) | T=0] =\\
-&  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
+&  E[u_{i1} | u_{i1} >  B-\alpha_i - \gamma_1] - E[u_{i1} | u_{i1} < B-\alpha_i - \gamma_1]  >0
   \end{align*}
  \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
 \end{itemize}
@@ -312,7 +312,7 @@ For the control group:
 \item Consider the assumption
 $$ E[Y_{i2}(0)- Y_{i1}(0) | X,T] = E[Y_{i2}(0)- Y_{i1}(0) | X] $$ 
 \item This is just matching assumption on a redefined variable, namely the growth in the outcomes. In its simplest form the approach is implemented by running the regression
-$$ Y_{it} = \alpha_i + d_t + \beta_i T_{it} + \gamma_t' X_i + u_{it}$$ 
+$$ Y_{it} = \alpha_i + \gamma_t + \delta_i T_{it} + \beta_t' X_i + u_{it}$$ 
 which allows for differential trends in the non-treatment growth depending on $X_i$. More generally one can implement propensity score matching on the growth of outcome variable when panel data is available.
 \end{itemize}
 \end{frame}
@@ -327,8 +327,65 @@ The triple difference is also a thing:
 \item Literally difference, the difference in differences estimators.
 \item As a regression: interpret the triple-interaction term (make sure to control for ALL double interactions).
 \end{itemize}
+\end{frame}
+
+\begin{frame}{What does the panel regression give?}
+In practice we often have \alert{multiple treatments}
+\begin{align*}
+ Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}\\
+ Y_{it} =\alpha_{i0} + \alpha_i \times t +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}
+ \end{align*}
+  \begin{itemize}
+ \item Allow time dummies and/or group specific trends (w some collinearity)
+ \begin{itemize}
+\item States roll out tax/policy changes at different times.
+\item Natural disasters hit different places at different times.
+\item Judges hand down rulings in different jurisdictions.
+\end{itemize}
+\item Previously treated observations can act as \alert{controls} through $\gamma_t$.
+\item Recent work by Goodman-Bacon (2019) says that $\widehat{\delta}$ gives a variance weighted average of all possible $2\times 2$ diff-in-diff designs.
+\end{itemize}
 
 \end{frame}
+
+\begin{frame}{Panel Regression DiD (Conlon and Rao 2014/2019)}
+In some of my recent work with Nirupama Rao
+\begin{itemize}
+\item Looked at \alert{price posting laws} which required that alcohol wholesalers post prices 30 days in advance of selling, and prohibited short term price cuts.
+\item Look at apparent consumption to NIAAA (ethanol gallons per capita)
+\item States got rid of laws at different times (often because they lost court cases).
+\item All specifications have state and time FE
+\begin{itemize}
+\item Lots of variation across states in consumption of beer vs. wine vs. spirits
+\item Lots of variation across time in consumption of beer vs. wine vs. spirits.
+\item Trends in consumption also vary across states.
+\end{itemize}
+\item Which states do we learn from?
+\begin{itemize}
+\item States without policy changes mostly inform $\beta X_{it}$ and $\gamma_t$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Variation in Timing (Conlon and Rao 2014/2019)}
+\begin{figure}
+\centering
+\includegraphics[width=2.8in]{./resources/conlon_rao_table2.png}
+\end{figure}
+\end{frame}
+
+
+
+\begin{frame}{Panel Regression DiD (Conlon and Rao 2014/2019)}
+\begin{figure}
+\centering
+\includegraphics[width=3.5in]{./resources/conlon_rao_dd.png}
+\end{figure}
+\end{frame}
+
+
+
 
 \begin{frame}{Difference in Differences with Repeated Cross Sections}
 \small
@@ -362,7 +419,7 @@ E[Y_{i2}(0) & | X, \text{\tiny Group receiving training}]-E[Y_{i1}(0) | X, \text
 \end{align*}
 \item Under this assumption (and some auxiliary parametric assumptions) we can obtain an estimate of the effect of treatment on the treated by the regression
 \begin{align*}
-Y_{it} = \alpha_g + d_t + \beta T_{it} + \gamma' X_{it} + u_{it}
+Y_{it} = \alpha_g + \gamma_t + \gamma T_{it} + \beta' X_{it} + u_{it}
 \end{align*} 
 \end{itemize}
 \end{frame}
@@ -371,9 +428,9 @@ Y_{it} = \alpha_g + d_t + \beta T_{it} + \gamma' X_{it} + u_{it}
 \begin{itemize}
 \item More generalIy we can first run the regression 
 \begin{align*}
-Y_{it} = \alpha_g + d_t + \beta (X_{it}) T_{it} + \gamma' X_{it} + u_{it}
+Y_{it} = \alpha_g + \gamma_t + \delta (X_{it}) T_{it} + \beta' X_{it} + u_{it}
 \end{align*} 
-where $\alpha_g$ is a dummy for the treatment of comparison group, and $\beta (X_{it})$ can be parameterized as $\beta(X_{it}) = \beta' X_{it}$. The ATT can then be estimated as the average of $\beta' X_{it}$ over the (empirical) distribution of $X$.
+where $\alpha_g$ is a dummy for the treatment of comparison group, and $\delta (X_{it})$ can be parameterized as $\delta(X_{it}) = \delta' X_{it}$. The ATT can then be estimated as the average of $\delta' X_{it}$ over the (empirical) distribution of $X$.
 \item A non parametric alternative is offered by Blundell, Dias, Meghir and van Reenen (2004).
 \end{itemize}
 \end{frame}
@@ -400,7 +457,9 @@ where $Z$ is an instrument which determines training eligibility say but does no
 \item Monotonicity $T_i(1) \ge T_i(0) \, \forall \, i$
 \end{itemize}
 \item In this case LATE is defined by
- $$\left [E(\Delta Y | Z = 1) - E(\Delta Y | Z = 0)] / [Pr(T(1) = 1) - Pr(T(0) = 1) \right]$$
+\begin{align*}
+\frac{E(\Delta Y_{it} | Z_{it} = 1) - E(\Delta Y_{it} | Z_{it} = 0)}{ Pr(T_{it}= 1| Z_{it}=1) - Pr(T_{it} = 1 | Z_{it} =0)}
+\end{align*}
 assuming that the probability of training in the first period is zero.
 \end{itemize}              
 \end{frame}
