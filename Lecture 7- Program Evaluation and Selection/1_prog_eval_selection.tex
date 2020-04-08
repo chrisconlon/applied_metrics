@@ -1,0 +1,259 @@
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{default}
+\usetheme{metropolis}
+\setbeamersize{text margin left=.3in,text margin right=.3in} 
+
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
+
+
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+\begin{document}
+\title{Program Evaluation(a):
+The Selection Problem}
+\author{Chris Conlon}
+\institute{Applied Econometrics}
+\date{\today}
+
+\frame{\titlepage}
+
+\section{Intro}
+\frame{\frametitle{Overview}
+This set of lectures will cover (roughly) the following papers:\\
+Theory:
+\begin{itemize}
+\item Angrist and Imbens (1994)
+\item Heckman Vytlacil (2005/2007)
+\item Abadie and Imbens (2006)
+\end{itemize}
+And draw heavily upon notes by 
+\begin{itemize}
+\item Guido Imbens
+\item Richard Blundell and Costas Meghir
+\end{itemize}
+
+}
+
+\begin{frame}
+\frametitle{The Evaluation Problem}
+\begin{itemize}
+\item The issue we are concerned about is identifying the effect of a policy or an investment or some individual action on one or more outcomes of interest
+\item This has become the workhorse approach of the applied microeconomics fields (Public, Labor, etc.)
+\item Examples may include:
+\begin{itemize}
+\item The effect of taxes on labor supply
+\item The effect of education on wages
+\item The effect of incarceration on recidivism
+\item The effect of competition between schools on schooling quality
+\item The effect of price cap regulation on consumer welfare
+\item The effect of indirect taxes on demand
+\item The effects of environmental regulation on incomes
+\item The effects of labor market regulation and minimum wages on wages and employment
+\end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}
+\frametitle{Example: Borjas (1987)}
+\begin{itemize}
+\item Consider two countries $(0/1)$ (source and host).
+\begin{align*}
+\ln w_0 &= \alpha_0 + u_0 \quad \mbox{ with } u_0 \sim N(0,\sigma_0^2) \mbox{ source country}\\
+\ln w_1 &= \alpha_1 + u_1 \quad \mbox{ with } u_1 \sim N(0,\sigma_1^2) \mbox{ host country}
+\end{align*}
+\item Now we allow for migration cost of $C$ which he writes in hours: $\pi = \frac{C}{w_0}$.
+\item Assume workers know everything; you only see $u_0$ \alert{OR} $u_1$ depending on country.
+\item Correlation in earnings is $\rho=\frac{\sigma_{01}}{\sigma_{0} \sigma_{1}}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example: Borjas (1987)}
+\begin{itemize}
+\item Workers will migrate if:
+\begin{align*}
+\left( \alpha_{1}-\alpha_{0}-\pi\right)+\left(u_{1}-u_{0}\right)>0
+\end{align*}
+\item Who migrates? Probability of migration. Define $\nu = u_1-u_0$.
+\begin{align*}
+P &=\operatorname{Pr}\left[\nu>\left(\alpha_{0}-\alpha_{1}+\pi\right)\right] =\operatorname{Pr}\left[\frac{\nu}{\sigma_{\nu}}>\frac{\left(\alpha_{0}-\alpha_{1}+\pi\right)}{\sigma_{\nu}}\right] \\
+&=1-\Phi\left(\frac{\left(\alpha_{0}-\alpha_{1}+\pi\right)}{\sigma_{\nu}}\right) \equiv 1-\Phi(z)
+\end{align*}
+\item Higher $z$ $\rightarrow$ less migration.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Borjas (1987): How does selection work?}
+Construct \alert{counterfactual wages} for workers in \alert{source} country for those who immigrate:
+\begin{itemize}
+\item For now ignore mean differences $\alpha_0 = \alpha_1 = \alpha$.
+\begin{align*}
+E\left(w_{0} | \text { Immigrate }\right) &=\alpha+E\left(\varepsilon_{0} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+&=\alpha+\sigma_{0} E\left(\frac{\varepsilon_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right)
+\end{align*}
+\item Wages depend on:
+\begin{enumerate}
+\item Mean earnings in the source country
+\item Both error terms $\left(u_{0}, u_{1}\right)$ through $\nu$
+\item Implicitly, it also depends on the correlation between the error terms.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Borjas (1987): How does selection work?}
+\begin{itemize}
+\item If everything is normal, we just run univariate regression $E\left(u_{0} | \nu\right)=\frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \nu$:
+\begin{align*}
+E\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}\right) &= \frac{1}{\sigma_{0}}\cdot \frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \cdot \frac{\sigma_{\nu}^{2}}{\sigma_{\nu}^{2}} \cdot \nu  
+=\frac{\sigma_{0 \nu}}{\sigma_{0} \sigma_{\nu}} \frac{\nu}{\sigma_{\nu}}  =\rho_{0 \nu} \frac{\nu}{\sigma_{\nu}} 
+\end{align*}
+\begin{align*}
+E\left(w_{0} | \text { Immigrate }\right) 
+&=\alpha_{0}+\sigma_{0} E\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+ &=\alpha_{0}+\rho_{0 \nu} \sigma_{0} E\left(\frac{\nu}{\sigma_{\nu}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+  &=\alpha_{0}+\rho_{0 \nu} \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) 
+\end{align*}
+\item This hazard rate of the standard normal has a special name \alert{Inverse Mills Ratio} $E[x | x > z]$.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Borjas (1987): How does selection work?}
+\begin{itemize}
+\item A similar expression for those who do immigrate:
+\begin{align*}
+E\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+E\left(u_{1} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+&=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{\Phi(-z)}\right)
+\end{align*}
+\item We can re-write both expressions in terms of the \alert{Inverse Mills Ratio}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Inverse Mills Ratio}
+\begin{align*}
+E\left(w_{0} | \text { Immigrate }\right) &=\alpha_{0}+\rho_{0 \nu} \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+&=\alpha_{0}+\frac{\sigma_{0} \sigma_{1}}{\sigma_{\nu}}\left(\rho-\frac{\sigma_{0}}{\sigma_{1}}\right)\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+E\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+&=\alpha_{1}+\frac{\sigma_{0} \sigma_{1}}{\sigma_{\nu}}\left(\frac{\sigma_{1}}{\sigma_{0}}-\rho\right)\left(\frac{\phi(z)}{1-\Phi(z)}\right)
+\end{align*}
+Where $\rho=\sigma_{01} / \sigma_{0} \sigma_{1}$.
+\end{frame}
+
+
+
+\begin{frame}{Positive Hierarchical Sorting}
+Let $Q_{0}=E\left(u_{0} | I=1\right), Q_{1}=E\left(u_{1} | I=1\right)$ (expected \alert{skill} of immigrants).
+\begin{itemize}
+\item Immigrants are positively selected and above average $(Q_0,Q_1) > 0$ and $\frac{\sigma_{1}}{\sigma_{0}}>1 \text { and } \rho>\frac{\sigma_{0}}{\sigma_{1}}$
+\begin{itemize}
+\item $\frac{\sigma_{1}}{\sigma_{0}}>1$ returns to ``skill'' are higher in host country.
+\item $\rho>\frac{\sigma_{0}}{\sigma_{1}}$ correlation between valued skills in both counties is high (similar skills valued in both countries).
+\end{itemize}
+\item Best and brightest leave because returns to skill are too low in home country.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Negative Hierarchical Sorting}
+We swap the standard deviations:
+\begin{itemize}
+\item Immigrants are negatively selected and below average $(Q_0,Q_1) < 0$ and $\frac{\sigma_{1}}{\sigma_{0}}>1 \text { and } \rho>\frac{\sigma_{0}}{\sigma_{1}}$
+\begin{itemize}
+\item $\frac{\sigma_{0}}{\sigma_{1}}>1$ returns to ``skill'' are lower in host country.
+\item $\rho>\frac{\sigma_{1}}{\sigma_{0}}$ correlation between valued skills in both counties is high (similar skills valued in both countries).
+\end{itemize}
+\item Compressed wage structure attracts the low skill types because it provides ``insurance'' or ``subsidizes'' low wage workers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Refugee/Superman Sorting?}
+\begin{itemize}
+\item Immigrants are below average at home and above average in host $(Q_0<0 ,Q_1>1)$ and $\frac{\sigma_{1}}{\sigma_{0}}>1$:
+\begin{itemize}
+\item $\rho<\min \left(\frac{\sigma_{1}}{\sigma_{0}}, \frac{\sigma_{0}}{\sigma_{1}}\right)$ being below average in source country makes you above average in host country.
+\end{itemize}
+\item You are a nerdy intellectual in a country that values physical labor, or are otherwise discriminated against in the labor market.
+\end{itemize}
+The missing (fourth) case:
+\begin{itemize}
+\item Mathematically impossible $\rho>\max \left(\frac{\sigma_{1}}{\sigma_{0}}, \frac{\sigma_{0}}{\sigma_{1}}\right)$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Evaluation Problem}
+\begin{itemize}
+\item Define an outcome variable $Y_i$ for each individual
+\item Two \alert{potential outcomes} for each person $\{Y_i(1), Y_i(0)\}$ depending on whether they receive treatment or not.
+\item Call $Y_i(1)- Y_i(0) = \beta_i$ the \alert{Treatment effect}.
+\item Two major problems:
+\begin{itemize}
+\item All individuals have different treatment effects (\alert{heterogeneity}).
+\item We don't actually observe any one person's treatment effect ! (Missing Data problem)
+\end{itemize}
+\item We need strong assumptions in order to recover $f(\beta_i)$ from data.
+\item Instead we can characterize simpler functions such as $E[\beta_i]$ (ATE) or $E[\beta_i | T_i = 1]$ (ATT) or $E[\beta_i | T_i = 0]$ (ATC)  with fewer restrictions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{More Difficulties}
+What is hard here?
+\begin{itemize}
+\item Heterogeneous effect of $\beta_i$ in population.
+\item Selection in treatment may be endogenous. That is $T_i$ depends on $Y_i(1),Y_i(0)$.
+\item Fisher or Roy (1951) model:
+\begin{eqnarray*}
+Y_i = (Y_i(1) - Y_i(0)) T_i + Y_i(0)= \alpha + \beta_i T_i + u_i
+\end{eqnarray*}
+\item Agents usually choose $T_i$ with $\beta_i$ or $u_i$ in mind.
+\item Can't necessarily pool across individuals since $\beta_i$ is not constant.
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Structural vs. Reduced Form}
+\begin{itemize}
+\item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
+\item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
+\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Start with Easy Cases}
+\begin{itemize}
+\item Let's start with the easy cases: run OLS and see what happens.
+\item OLS compares mean of treatment group with mean of control group (possibly controlling for other $X$)
+\begin{eqnarray*}
+\beta^{OLS} &=& E(Y_i | T_i =1) - E(Y_i | T_i=0) \\
+&=& \underbrace{E[\beta_i | T_i =1]}_{\mbox{ATT}} + \left(\underbrace{E[u_i | T_i =1 ] - E[u_i | T_i=0] }_{\mbox{selection bias}}  \right)
+\end{eqnarray*}
+\item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
+\item $Y_i^0 = \alpha + u_i$ may vary within the population (this is quite common).
+\end{itemize}
+\end{frame}
+\end{document}
