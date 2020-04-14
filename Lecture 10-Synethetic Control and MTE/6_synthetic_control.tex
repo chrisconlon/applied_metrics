@@ -266,6 +266,20 @@ Other things can go wrong
 \end{itemize}
 \end{frame}
 
+\begin{frame}{In practice}
+\begin{itemize}
+\item The R package \texttt{synth} and accompanying examples are a good start.
+\item The R package \texttt{MSCMT} fixes some of the optimization issues in \texttt{synth}.
+\begin{itemize}
+\item When there is no set of feasible weights and the non-negativity constraint binds -- the problem is tricky to solve
+\item \texttt{synth} can produce sub-optimal solutions (and slowly).
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}
+
+
 \begin{frame}{A more unified view}
 We can ask -- what are the implied regression weights for linear regression? What is $E[Y_{1,t}(0) | \mathbf{X}]$?
 \begin{itemize}
