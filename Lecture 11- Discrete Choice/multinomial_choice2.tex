@@ -242,14 +242,14 @@ There are more potential generalizations though they are less frequently used:
 We relax the IIA property by mixing over various logits:
 \begin{eqnarray*}
 u_{ijt} &=& x_j \beta + \mu_{ij} + \varepsilon_{ij} \\
-s_{ij} &=& \int \frac{\exp[x_{j} \beta + \mu_{ij} ]}{1+\sum_k \exp[x_{k} \beta + \mu_{ik} ]} f(\mu_i | \theta)
+s_{ij} &=& \int \frac{\exp[x_{j} \beta + \mu_{ij} ]}{1+\sum_k \exp[x_{k} \beta + \mu_{ik} ]} f(\boldsymbol{\mu_i} | \theta)
 \end{eqnarray*}
  \begin{itemize}
- \item Each individual draws a vector $\mu_i$ of $\mu_{ij}$ (separately from $\varepsilon$).
- \item Conditional on $\mu_i$ each person follows an IIA logit model.
+ \item Each individual draws a vector $\boldsymbol{\mu_i}$ of $\mu_{ij}$ (separately from $\varepsilon$).
+ \item Conditional on $\boldsymbol{\mu_i}$ each person follows an IIA logit model.
  \item However we integrate (or mix) over many such individuals giving us a \alert{mixed logit} or \alert{heirarchical model} (if you are a statistician)
  \item In practice these are not that different from linear \alert{random effects models} you have learned about previously.
- \item It helps to think about fixing $\mu_i$ first and then integrating out over $\varepsilon_i$
+ \item It helps to think about fixing $\boldsymbol{\mu_i}$ first and then integrating out over $\varepsilon_i$
  \end{itemize}
 \end{frame}
 
@@ -360,7 +360,7 @@ s_{ij}(\theta) = \int \frac{ e^{V_{ij}(\nu_i,\theta)}}{\sum_k e^{V_{ik}(\nu_i,\t
 \item Quadrature is great in low dimensions -- but scales badly in high dimensions.
 \item If we need $N_a$ points to accurately approximate the integral in $d=1$ then we need $N_a^d$ points in dimension $d$ (using the tensor product of quadrature rules).
 \item There is some research on quadrature rules that nest and also how to carefully eliminate points so that the number doesn't grow so quickly.
-\item Try \url{sparse-grids.de}
+\item Try \url{http://sparse-grids.de}
 \end{itemize}
 \end{frame}
 
@@ -375,7 +375,7 @@ How do we actually estimate these models?
 \item When doing nested logit or random coefficients logit, it generally is non-convex which can make life difficult.
 \item The tough part is generally working out what $\frac{\partial \log s_{ij}}{\partial \theta}$ is, especially when we need to simulate to obtain $s_{ij}$.
 \item It turns out that MSLE actually has consistent problems for fixed $S$. Why?
-\item Alternative? MSM/MoM type estimators (next time).
+\item Alternative? MSM/MoM type estimators
 \end{itemize}
 \end{frame}
 
@@ -404,7 +404,7 @@ s_{ij} &=& \int \frac{\exp[x_{j} \beta_i  ]}{1+\sum_k \exp[x_{k} \beta_i  ]} f(\
 \end{eqnarray*}
  \begin{itemize}
 \item Option 1: Monte Carlo integration.  Draw $NS=1000$ or so samples of $\nu_i$ from the standard normal and set $w_i = \frac{1}{NS}$.
-\item Option 2: Quadrature. Choose $\nu_i$ and $w_i$ according to a Gaussian quadrature rule. Like \texttt{quad} in MATLAB.
+\item Option 2: Quadrature. Choose $\nu_i$ and $w_i$ according to a Gaussian quadrature rule. Like \texttt{quad} in MATLAB or \texttt{mvquad} in R.
 \item Personally I get nervous about integrals in dimension greater than 5. People routinely have 20 or more though.
  \end{itemize}
 \end{frame}
@@ -504,14 +504,14 @@ s_{ij} &=& \int \frac{\exp[x_{j} \beta_i  ]}{1+\sum_k \exp[x_{k} \beta_i  ]} f(\
 \frame{\frametitle{Nested Logit Model}
 \begin{exampleblock}{FIML Nested Logit Model is Non-Convex}
 \begin{eqnarray*}
-\min_{\theta} \sum_j q_j \ln P_j(\theta) \quad \mbox{s.t.} \quad  P_j(\theta) = \frac{e^{x_j \beta/ \lambda}( \sum_{k \in g_l} e^{x_j \beta/ \lambda})^{\lambda-1}}{\sum_{\forall l'} ( \sum_{k \in g_l'} e^{x_j \beta/ \lambda})^{\lambda} }
+\min_{\theta} \sum_j q_j \ln S_j(\theta) \quad \mbox{s.t.} \quad  S_j(\theta) = \frac{e^{x_j \beta/ \lambda}( \sum_{k \in g_l} e^{x_j \beta/ \lambda})^{\lambda-1}}{\sum_{\forall l'} ( \sum_{k \in g_l'} e^{x_j \beta/ \lambda})^{\lambda} }
 \end{eqnarray*}
-This is a pain to show but the problem is with the cross term $\frac{\partial^2 P_j}{\partial \beta \partial \lambda}$ because $\exp[x_j \beta / \lambda]$ is not convex.
+This is a pain to show but the problem is with the cross term $\frac{\partial^2 S_j}{\partial \beta \partial \lambda}$ because $\exp[x_j \beta / \lambda]$ is not convex.
 \end{exampleblock}
 \begin{exampleblock}{A Simple Substitution Saves the Day:  let $\gamma = \beta / \lambda$}
 \begin{eqnarray*}
-\min_{\theta} \sum_j q_j \ln P_j(\theta) \quad \mbox{s.t.} \quad  
-P_j(\theta) = \frac{e^{x_j \gamma}( \sum_{k \in g_l} e^{x_j \gamma})^{\lambda-1}}{\sum_{\forall l'} ( \sum_{k \in g_l'} e^{x_j \gamma})^{\lambda} }
+\min_{\theta} \sum_j q_j \ln S_j(\theta) \quad \mbox{s.t.} \quad  
+S_j(\theta) = \frac{e^{x_j \gamma}( \sum_{k \in g_l} e^{x_j \gamma})^{\lambda-1}}{\sum_{\forall l'} ( \sum_{k \in g_l'} e^{x_j \gamma})^{\lambda} }
 \end{eqnarray*}
 This is much better behaved and easier to optimize.
 \end{exampleblock}
