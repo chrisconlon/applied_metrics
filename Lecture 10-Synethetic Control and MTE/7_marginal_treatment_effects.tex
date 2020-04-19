@@ -42,9 +42,9 @@ We started with by talking about two approaches to program evaluation for $\Delt
 \item In the \alert{structural approach} the goal was to recover the full distribution $f(\Delta_i)$, and with that recover whichever objects we wanted
 \item The other approach focused on characterizing particular moments of the distribution
 \begin{align*}
-ATT(x) &= E[ \Delta_i | T_{i}=1]\\
-ATU(x) &= E[ \Delta_i | T_{i}=0]\\
-LATE(x) &= E[ \Delta_i | T_{i}(z_i=1) > T_{i}(z_i = 0)]
+ATT(x) &= E[ \Delta_i | X_i=x, T_{i}=1]\\
+ATU(x) &= E[ \Delta_i |  X_i=x,  T_{i}=0]\\
+LATE(x) &= E[ \Delta_i |  X_i=x,  T_{i}(z_i=1) > T_{i}(z_i = 0)]
 \end{align*}
 
 \item But how exactly are these approaches linked?
@@ -61,7 +61,7 @@ The answer is through a \alert{nonparametric function} known as the \alert{margi
 \begin{eqnarray*}
 \Delta^{MTE}(x, v_i) = E[\Delta_i | X_i=x, v_i = Z_i'\gamma] 
 \end{eqnarray*}
-\item Now instead of being \alert{a number} like LATE, the MTE: $\Delta^{MTE}(X_i, v_i)$ is a \alert{function} of $v_i$
+\item Now instead of being \alert{a number} like LATE, the MTE: $\Delta^{MTE}(x, v)$ is a \alert{function} of $v$
 \item It is the average impact of receiving a treatment for everyone with the same $Z_i' \gamma$.
 \end{itemize}
 \end{frame}
