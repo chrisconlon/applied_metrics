@@ -309,12 +309,7 @@ Coefficients:
 x            \alert{1.4135577}  0.0181815  77.747   <2e-16 ***
 
 summary(glm(yl ~ x+factor(id_fe), data = panels, family = "binomial"))
-
-Coefficients:
-                                    Estimate Std. Error z value Pr(>|z|)    
-(Intercept)                        -16.98216 2852.76747  -0.006    0.995    
-x                                    0.67514    0.06317  10.688   <2e-16 ***
-factor(id_fe)-2.19154983530808      17.05281 2852.76773   0.006    0.995 
+Estimates:  Estimate Std. error z value Pr(> |z|)    x  \alert{1.36383}    0.02852   47.82    <2e-16 ***
 ...
 \end{semiverbatim}
 The latter takes 10+ minutes and often FE make things worse.
@@ -471,12 +466,10 @@ Notice that we've now eliminated the FE!
 
 
 \begin{frame}[fragile]{In practice \texttt{clogit} in R }
-\begin{verbatim}
+\begin{semiverbatim}
 library(survival)
-fe <- clogit (yl ~ x + strata(id_fe), data = panels)
-summary(fe)
-
-\end{verbatim}
+> summary(clogit(yl~ x +strata(id_fe), data=panels))Call:coxph(formula = Surv(rep(1, 25000L), yl) ~ x + strata(id_fe),     data = panels, method = "exact")  n= 25000, number of events= 12517      coef exp(coef) se(coef)     z Pr(>|z|)    x \alert{1.04162}   2.83381  0.02405 43.31   <2e-16 ***
+\end{semiverbatim}
 \end{frame}
 \section*{Thanks!}
 
