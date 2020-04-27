@@ -44,21 +44,22 @@ Many problems we are interested in look at discrete rather than continuous outco
 \item Predictions outside of $[0,1]$
 \item Estimates of marginal effects need not be consistent.
 \end{itemize}
+\item Suppose we have panel data on repeated binary choices
+\begin{itemize}
+\item When $N$ is large and $T$ is small.
+\item Adding FE to the logit/probit model produces biased (and inconsistent) estimates.
+\end{itemize}
 \item What about the case where $Y$ is binary and a regressor $X$ is endogenous?
 \begin{itemize}
 \item The usual 2SLS estimator is \alert{NOT consistent}.
 \item Or we can ignore the fact that $Y$ is binary...
 \item Neither seems like a good option
 \end{itemize}
-\item Suppose we have panel data on repeated binary choices
-\begin{itemize}
-\item When $N$ is large and $T$ is small.
-\item Adding FE to the logit/probit model produces biased (and inconsistent) estimates.
-\end{itemize}
 \end{itemize}
 \end{frame}
 
-\section*{Problem \#1: Failures of the LPM}
+\section*{Problem \#1:\\
+ Failures of the LPM}
 \begin{frame}
 \frametitle{Linear Probability Model}
 Consider the LPM with a single continuous regressor
@@ -209,10 +210,11 @@ r           0.0763806  0.0009495   80.44   <2e-16 ***
 \end{frame}
 
 
-\section*{Incidental Parameters Problem}
+\section*{Problem \#2:\\
+Incidental Parameters Problem}
 
 \begin{frame}
-\frametitle{Problem \#1: Fixed Effects and Incidental Parameters}
+\frametitle{Problem \#2: Fixed Effects and Incidental Parameters}
 Threshold Crossing / Latent Variable Model:
 \begin{eqnarray*}
 y_{it} = \mathbf{1}(X_{it} \beta + \epsilon_{it} \geq 0)
@@ -298,17 +300,23 @@ panels <- fabricate(
 
 \begin{frame}[fragile]{How bad is it? An example}
 \scriptsize
-\begin{verbatim}
+\begin{semiverbatim}
 summary(glm(yl ~ x, data = panels, family = "binomial"))
 
-Coefficients:              Estimate Std. Error z value Pr(>|z|)    (Intercept) -0.0002284  0.0162293  -0.014    0.989    x            1.4135577  0.0181815  77.747   <2e-16 ***
+Coefficients:
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -0.0002284  0.0162293  -0.014    0.989    
+x            \alert{1.4135577}  0.0181815  77.747   <2e-16 ***
 
 summary(glm(yl ~ x+factor(id_fe), data = panels, family = "binomial"))
 
-Coefficients:                                    Estimate Std. Error z value Pr(>|z|)    (Intercept)                        -16.98216 2852.76747  -0.006    0.995    x                                    0.67514    0.06317  10.688   <2e-16 ***
+Coefficients:
+                                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                        -16.98216 2852.76747  -0.006    0.995    
+x                                    0.67514    0.06317  10.688   <2e-16 ***
 factor(id_fe)-2.19154983530808      17.05281 2852.76773   0.006    0.995 
 ...
-\end{verbatim}
+\end{semiverbatim}
 The latter takes 10+ minutes and often FE make things worse.
 \end{frame}
 
@@ -336,23 +344,54 @@ What does \texttt{bife} do?
 
 \begin{frame}[fragile]{\texttt{bife} First the inconsistent model}
 \scriptsize
-\begin{verbatim}
+\begin{semiverbatim}
 res<-bife(yl ~ x | id_fe, data = panels, 'logit')
 
-binomial - logit linkyl ~ x | id_feEstimates:  Estimate Std. error z value Pr(> |z|)    x  1.36383    0.02852   47.82    <2e-16 ***---Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1residual deviance= 15933.43,null deviance= 22929.24,nT= 16540, N= 3308( 8460 observation(s) deleted due to perfect classification )
+binomial - logit link
+
+yl ~ x | id_fe
+
+Estimates:
+  Estimate Std. error z value Pr(> |z|)    
+x  \alert{1.36383}    0.02852   47.82    <2e-16 ***
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+residual deviance= 15933.43,
+null deviance= 22929.24,
+nT= 16540, N= 3308
+
+( 8460 observation(s) deleted due to perfect classification )
 
 ...
-\end{verbatim}
+\end{semiverbatim}
 \end{frame}
 
 
 \begin{frame}[fragile]{\texttt{bife} Analytic Bias Correction (Ex-post)}
 \scriptsize
-\begin{verbatim}
-> summary(bias_corr(res))binomial - logit linkyl ~ x | id_feEstimates:  Estimate Std. error z value Pr(> |z|)    x  1.02455    0.02483   41.26    <2e-16 ***---Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1residual deviance= 16089.15,null deviance= 22929.24,nT= 16540, N= 3308( 8460 observation(s) deleted due to perfect classification )Number of Fisher Scoring Iterations: 5 
+\begin{semiverbatim}
+> summary(bias_corr(res))
+binomial - logit link
+
+yl ~ x | id_fe
+
+Estimates:
+  Estimate Std. error z value Pr(> |z|)    
+x  \alert{1.02455}    0.02483   41.26    <2e-16 ***
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+residual deviance= 16089.15,
+null deviance= 22929.24,
+nT= 16540, N= 3308
+
+( 8460 observation(s) deleted due to perfect classification )
+
+Number of Fisher Scoring Iterations: 5 
 
 
-\end{verbatim}
+\end{semiverbatim}
 \end{frame}
 
 
@@ -430,5 +469,15 @@ Notice that we've now eliminated the FE!
 \end{itemize}
 \end{frame}
 
+
+\begin{frame}[fragile]{In practice \texttt{clogit} in R }
+\begin{verbatim}
+library(survival)
+fe <- clogit (yl ~ x + strata(id_fe), data = panels)
+summary(fe)
+
+\end{verbatim}
+\end{frame}
+\section*{Thanks!}
 
 \end{document}
