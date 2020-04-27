@@ -1,14 +1,18 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
 \usetheme{default}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
+\usetheme{metropolis}
+\usepackage{minted}
+\usepackage{mathtools}
+\setbeamersize{text margin left=.3in,text margin right=.3in} 
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 
 \usepackage[english]{babel}
-%\usepackage[table]{xcolor}
 \usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace,centernot,MnSymbol}
+\usepackage{amsmath,amssymb,setspace,centernot}
 \usepackage[latin1]{inputenc}
+\usepackage{pgf,tikz}
 \usepackage[T1]{fontenc}
 \usepackage{relsize}
 \usepackage{pdfpages}
