@@ -16,7 +16,7 @@ These are more advanced treatments:
 
 The rough outline of the course is as follows:
 1. Introductory Time Series
-2. Extremeum Estimation I: MLE and M-estimators
+2. Extremum Estimation I: MLE and M-estimators
 3. Extremum Estimation II: GMM Estimators
 4. Delta Method and Bootstrap
 5. Intro to Nonparametrics: kNN, kernels, etc.
@@ -25,8 +25,8 @@ The rough outline of the course is as follows:
 8. Program Evaluation II: Matching, Propensity Scores, and LATE Theorem
 9. Program Evaluation III: Difference in Difference, Regression Discontinuity
 10. Program Evaluation IV: Synthetic Control and Marginal Treatment Effects
-11. Advanced Machine Learning: Boosting, Bagging, and Decision Trees
-12. Discrete Choice: Multiple Discrete Choice, and Discrete Choice w Endogeneity
+11. Discrete Choice: Multiple Discrete Choice, and Discrete Choice w Endogeneity
+12. Advanced Machine Learning: Boosting, Bagging, and Decision Trees
 13. Advanced Panel Data: Causal FE? Dynamic Panel
 
 ## My Students

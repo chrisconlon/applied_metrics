@@ -1,5 +1,5 @@
 ---
-title: "Problem Set 4a"
+title: "Problem Set 5"
 author: "Prof. Conlon"
 date: "Due: 4/4/20"
 output:
@@ -136,3 +136,49 @@ We now have the following questions:
 \end{itemize}
 
 
+## Problem 3 (Coding Exercise)
+
+We will be using a dataset that was simulated from real data. Oftentimes due to privacy concerns researchers will provide simulated data from the distribution of real data. The dataset you will be using are from a tutoring program focused on math for 7th graders. The dataset is called "tests_Rd.csv". The tutoring is the treatment variable, __treat__. Tutoring was given to students based on a pretest score, __pretest__ thus the pretest score is the forcing variable. Students that received less than 215 were given a tutor. Our outcome of interest is the test score after tutoring, __posttest__. 
+
+We also have a series of control variables:
+
+\begin{itemize}
+  \item[--] age     : age of student as of September 2010
+  \item[--] gender  : 1 if student's gender is male
+  \item[--] frlunch : 1 if student is eligible a free lunch
+  \item[--] esol    : 1 if student has english as a second language
+  \item[--] white   : 1 if student's race/ethnicity is white
+  \item[--] asian   : 1 if student's race/ethnicity is asian
+  \item[--] black   : 1 if student's race/ethnicity is black
+  \item[--] hispanic: 1 if student's race/ethnicity is hispanic
+\end{itemize}
+
+We ask you to answer the following questions:
+
+
+\begin{enumerate}
+
+\item[a.] We want you to first plot the graph that justifies a sharp RD design. Plot the treatment as a function of the forcing variable. What do you see?
+
+\item[b.] We now want you to plot the graph that justifies our forcing variable. Plot the outcome as a function of the forcing variable. What do you see?
+
+\item[c.]  Estimate the local average treatment effect (LATE) at the threshold using a linear model with common slopes for treated and control units (with no control variables). What are the additional assumptions required for this estimation strategy? Provide a plot of the post test scores (y-axis) and forcing variable (x-axis) in which you show the fitted curves and the underlying scatterplot of the data. Interpret your resulting estimate.
+
+\item[d. ] Re-do c., but use the control variables that are provided in the dataset. Interpret any differences you see. 
+
+\item[e. ] Use the rdd package in R to estimate the LATE at the threshold using a local linear regression with a triangular kernel. Note that the function RDestimate automatically uses the Imbens-Kalyanamaran optimal bandwidth calculation. Report your estimate for the LATE and an estimate of uncertainty.
+
+\item[f. ] How do the estimates of the LATE at the threshold differ based on your results from parts (b) to (e)? In other words, how robust are the results to different specifications of the regression? What other types of robustness checks might be appropriate?
+\end{enumerate}
+
+We are now going to do a series of robustness checks:
+
+\begin{enumerate}
+\item[h. ] Plot the age variable as a function of the forcing variable. What should this graph look like for our RDD to be a valid design? What do you see? How does this relate to the covariate balance exercise we did in Problem 1?
+
+\item[i. ] One type of placebo test is to pick arbitrary cutoffs of your forcing variable and estimate LATE's for those cutoffs. Pick 10 cutoffs and report the average LATE across those cutoffs. Defining $\hat{\tau}$ as your average LATEs, what should the null hypothesis on the population counterpart of this estimator be for our design to be valid. Feel free to use which specification you want for estimating LATE, but please specify it.
+
+\item[k. ] An issue with RD designs is manipulation, or sorting around the cutoff point. To assess this, plot a histogram of the forcing variable, drawing a line at the cutoff point. What would sorting around the cutoff point look like? What do you see? 
+
+
+\end{enumerate}
