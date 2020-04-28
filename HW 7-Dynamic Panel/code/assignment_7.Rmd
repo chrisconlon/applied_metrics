@@ -1,0 +1,111 @@
+---
+title: "Problem Set 7"
+author: "Prof. Conlon"
+date: "Due: 5/10/20"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+## Packages to Install
+
+
+**The packages used this week are**
+
+* estimatr (Tidyverse version of lm function)
+* plm (Panel Data package)
+
+## Problem 1 (Analytical Exercise)
+
+Assume we have the following dynamic panel model:
+
+\begin{align*}
+	y_{i,t} = \gamma y_{i,t-1} + \alpha_{i} + \epsilon_{i,t} \mbox{,   }
+\end{align*}
+
+We have the following assumptions:
+
+\begin{align*}
+	\vert \gamma \vert &< 1 \\
+	y_{i,0} &\mbox{  is known (i.e. non-random)} \\
+	\mathbb{E}_{T}[\epsilon_{i,t} \vert y_{i,t-1},...,y_{i,0},\alpha_{i}] &= 0 \mbox{ (Sequential Exogeneity)} 
+\end{align*}
+
+Our goal is to consistently estimate $\gamma$. 
+
+\begin{enumerate}
+	\item Show that the first-difference estimator of $\gamma$ is unbiased if $\alpha_{i} = 0$.
+	\newline
+	(Hint: To show unbiased, show that the $\mathbb{E}[\hat{\alpha){i}}] = \alpha_{i}$.)
+	\item Is the first difference estimator of $\gamma$ still unbiased if $\alpha_{i} \neq 0$? 
+	\newline
+	(Hint: Try showing that $cov(\epsilon_{i,t},y_{i,t+1})\neq0$. Why is this condition useful?)
+	\item Let $\Delta y_{i,t} = y_{i,t} - y_{i,t-1}$, what is $cov(\Delta \epsilon_{i,t}, y_{i,t-2})$? What is $cov(\Delta y_{i,t}, y_{i,t-2})$? 
+	\item Using your answer from part (4), propose a strategy to consistently estimate $\gamma$?
+	\newline
+	(Hint: The estimator will be a 2SLS (or IV regression).)
+\end{enumerate}	
+
+## Problem 2 (Coding Exercise)
+
+For this exercise we will be using data on cigarette sales available in the __plm__ package. To load this dataset, simply use the following command: 
+
+```{r,echo=TRUE,comment=''}
+# ~ Load Cigar dataset from plm package ~ #
+data(Cigar,package="plm")
+```
+
+The data has the following columns:
+
+\begin{itemize}
+  \item[--] \textbf{sales} -- cigarette sales in packs per capita
+  \item[--] \textbf{pimin} -- minimum price in adjoining states per pack of cigarettes
+  \item[--] \textbf{ndi} -- per capita disposable income
+  \item[--] \textbf{cpi} -- consumer price index (1983=100)
+  \item[--] \textbf{pop16} -- population above the age of 16
+  \item[--] \textbf{pop} -- population
+  \item[--] \textbf{price} -- price per page of cigarettes
+  \item[--] \textbf{year} -- the year
+  \item[--] \textbf{state} -- number for the state
+\end{itemize}
+
+We will be estimating a series of panel models trying to estimate the price elasticity of demand. 
+
+\begin{enumerate}
+
+\item The price elasticity of cigarette demand, $E_{d}$ is the percentage change of sales of cigarettes divided by the percentage change of price of cigarettes. Let $S_{t}$ be sales of cigarettes at time $t$ and $p_{t}$ be price of cigarettes at time $t$, then the price elasticity of demand is:
+
+\begin{align*}
+  E_{d} = \frac{\Delta S_{t}/S_{t}}{\Delta p_{t}/p_{t}}
+\end{align*}
+
+To estimate price elasticities in a linear regression, turn sales and price into logs. Why do we do this?
+
+\item Assume that we are estimating the following cross-sectional regression:
+
+\begin{align*}
+  log(S_{i,t}) = \gamma + \beta log(p_{i,t}) + \alpha_{1} ndi_{i,t} + \alpha_{2} cpi_{i,t} + \alpha_{3} pop16_{i,t} + \epsilon_{i,t} 
+\end{align*}
+
+Estimate this regression, reporting the price elasticity of demand? What is potentially wrong with this regression?
+
+\item One important issue could be heterogeneity in sales across states, $\gamma$ varies across states. However, we may not know whether we want to model this as a fixed effect or a random effect. One test often used is the Hausman-Wu test, available as phtest in the plm package. Estimate a within estimator, a random effect estimator and then use a Hausman-Wu test to report which specification is the correct one. Be sure to understand what the null and alternative hypothesis of this test are in order to report the correct interpretation of the test.
+
+\item We begin to believe that not only heterogeneity in mean sales, but dynamics are important, so we decide to estimate the following model:
+
+\begin{align*}
+  log(S_{i,t}) = \gamma_{i} + \tau log(S_{i,t-1}) + \beta log(p_{i,t}) + \alpha_{1} ndi_{i,t} + \alpha_{2} cpi_{i,t} + \alpha_{3} pop16_{i,t} + \epsilon_{i,t} 
+\end{align*}
+
+We are first going to have you implement the Anderson-Hsiao estimator:
+
+\item Create a vector of first differences for each term in the regression above. 
+
+\item Let $\Delta S_{i,t} = log(S_{i,t}) - log(S_{i,t-1})$, we will be running the following two-stage least squares regression. In your first stage, use $log(S_{i,t-1})$ as an instrument for $\Delta S_{i,t}$, then run a 2SLS to get a new estimate for the price elasticity. Report any differences.
+
+An issue with the Anderson-Hsiao estimator is that it is not efficient because it does not use all available information. The reason is quite simple, if $log(S_{i,t-1})$ is a valid instrument for $\Delta S_{i,t}$ and $log(S_{i,t-1})$ depends on $log(S_{i,t-2})$ then $log(S_{i,t-2})$ is also a valid instrument for $\Delta S_{i,t}$. This idea is the logic underpinning the Arellano-Bond estimator. This estimator is quite hard to code up, but luckily plm includes this estimator as the pgmm function.
+
+\item Using a generalized method of moments estimator (Arellano-Bond), re-estimate the model. Report any differences.   
+
+\end{enumerate}
