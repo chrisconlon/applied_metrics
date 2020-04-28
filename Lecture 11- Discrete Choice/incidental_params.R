@@ -18,8 +18,14 @@ panels <- fabricate(
     yl= logit_prob>runif(N)
   )
 )
-res<-bife(yl ~ x | id_fe, data = panels, 'logit')
-bias_corr(res)
 
+# ignore the FE
 summary(glm(yl ~ x, data = panels, family = "binomial"))
-summary(glm(yl ~ x+factor(id_fe), data = panels, family = "binomial"))
+# LSDV approach (very slow)
+# summary(glm(yl ~ x+factor(id_fe), data = panels, family = "binomial"))
+# Do the LSDV quickly
+res<-bife(yl ~ x | id_fe, data = panels, 'logit')
+summary(res)
+summary(bias_corr(res))
+# Chamberlain conditional approach
+summary(clogit(yl~ x +strata(id_fe), data=panels))

@@ -33,6 +33,14 @@
 
 \frame{\titlepage}
 
+\begin{frame}{Readings}
+\begin{itemize}
+\item CF Methods: Blundell Powell (2004)
+\item SR Methods: Lewbel (2002) Lewbel, Dong and Tang (2014)
+\item  SR Methods: Baum, Dong, Lewbel, Yang (2012)
+ \end{itemize}
+\end{frame}
+
 \section{Endogeneity}
 
 \begin{frame}
@@ -149,21 +157,22 @@ Simple Case:
 
 
 \begin{frame}
-\frametitle{Solution \#2 : Control Functions (Stata Version)}
+\frametitle{Solution \#2 : Control Functions (\texttt{ivprobit} in Stata, maybe R?)}
+\small
 \begin{itemize}
 \item \texttt{ivprobit} assumes that $G(Z,e)$ is linear, and $(e,\varepsilon)$ jointly normal, independent of $Z$.
 \item not exactly the semi-parametric flexibility we were looking for...
 \item It is actually Control Function not IV
 \end{itemize}
-\begin{eqnarray*}
-D &=& I ( X^e  \beta_e + X^0 \beta_0+ \varepsilon \geq 0 ) \\
- X^e &=& \gamma Z + e  
-\end{eqnarray*}
-Run first-stage OLS and get residuals $\hat{e}$. Then plug into
-\begin{eqnarray*}
-D &=& I ( X^e  \beta_e + X^0 \beta_0+ + \lambda \hat{e} + U  \geq 0 )
-\end{eqnarray*}
-and do a conventional probit estimator.
+\begin{align*}
+D &= I ( X^e  \beta_e + X^0 \beta_0+ \varepsilon \geq 0 ) \\
+ X^e &= \gamma Z + e  
+\end{align*}
+Run first-stage OLS and get residuals $\hat{e}$. Then plug into and do a conventional probit estimator.
+\begin{align*}
+D &= I ( X^e  \beta_e + X^0 \beta_0+ + \lambda \hat{e} + U  \geq 0 )
+\end{align*}
+\vspace{-.2cm}
 \begin{itemize}
 \item If you forget a $Z_2$ the resulting model isn't even probit!
 \item God help you if $X^e$ isnt continuous.
@@ -320,6 +329,8 @@ D &=& I ( X' \beta + V + \varepsilon \geq 0 )
 \end{itemize}
 \end{frame}
 
+\section*{Now What?}
+
 \begin{frame}
 \frametitle{ The average index function (AIF)/ Propensity Score}
 In the original problem
@@ -387,6 +398,7 @@ Given $\hat{\beta}$ ASF and AIF mfx require just one dimensional index derivativ
 \end{itemize}
 \end{frame}
 
+\section*{Empirical Example}
 \begin{frame}
 \frametitle{Empirical Example: Dong and Lewbel (2015)}
 \begin{itemize}
@@ -450,5 +462,7 @@ Specifications
 \end{itemize}
 \end{frame}
 
+
+\section*{Thanks!}
 
 \end{document}
