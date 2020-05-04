@@ -1,23 +1,19 @@
-\documentclass[aspectratio=169]{beamer}
-\usetheme{focus}
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{default}
+\usetheme{metropolis}
+\usepackage{minted}
+\usepackage{mathtools}
+\setbeamersize{text margin left=.3in,text margin right=.3in} 
 
-%\usepackage{beamerthemesplit}
-%\beamertemplatenavigationsymbolsempty
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{latexsym}
-\usepackage{graphicx}
-\usepackage{fancybox}
-\usepackage{dsfont}
-\usepackage{multirow} 
-\usepackage{multicol}
-\usepackage{booktabs} 
-\usepackage{dcolumn}
-\usepackage{soul}
-\usepackage[cache=false]{minted}
-\usepackage{MnSymbol}
-\usepackage{stmaryrd}
+\usepackage[english]{babel}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage{pgf,tikz}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
 
 
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -69,7 +65,7 @@
 
 
 % \usepackage{slashbox}
-\title{Lecture 5:  Advanced Panel Data}
+\title{Lecture 5:  Advanced Panel Data: Dynamic Panel}
 \author{Chris Conlon }
 \institute{NYU Stern }
 
@@ -91,187 +87,6 @@
 
 \begin{document}
 \maketitle
-
-\section*{Causal FE}
-
-\begin{frame}
-\frametitle{Recall the FE Assumptions}
-\begin{eqnarray*}
-y_{it} =  x_{it}'\beta + \eta_i + \varepsilon_{it}
-\end{eqnarray*}
-\begin{itemize}
-\item $\eta_i$ is a \alert{fixed effect}.
-\item To estimate everything consistently, we need $E[ \varepsilon_{it} | x_{it}, \eta_i]=0$
-\item Mostly this is not true. Instead usually treat $\eta_i$ as a \alert{control variable} or \alert{nuisance parameter}.
-\begin{itemize}
-\item A nuisance parameter is one that we estimate but don't care about interpreting.
-\item If we only care about $\beta$ then $\eta_i$ is a nuisance parameter.
-\end{itemize}
-\item With a control or nuisance parameter we only require that $E[ \varepsilon_{it} | \eta_{i}]=E[ \varepsilon_{it} | x_{it}, \eta_i]$ \alert{conditional mean independence}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Recall the FE Assumptions}
-\begin{eqnarray*}
-y_{it} =  x_{it}'\beta + \eta_i + \varepsilon_{it}
-\end{eqnarray*}
-\begin{itemize}
-\item $\eta_i$ is a \alert{fixed effect}.
-\item To estimate everything consistently, we need $E[ \varepsilon_{it} | x_{it}, \eta_i]=0$
-\item Mostly this is not true. Instead usually treat $\eta_i$ as a \alert{control variable} or \alert{nuisance parameter}.
-\begin{itemize}
-\item A nuisance parameter is one that we estimate but don't care about interpreting.
-\item If we only care about $\beta$ then $\eta_i$ is a nuisance parameter.
-\end{itemize}
-\item With a control or nuisance parameter we only require that $E[ \varepsilon_{it} | \eta_{i}]=E[ \varepsilon_{it} | x_{it}, \eta_i]$ \alert{conditional mean independence}.
-\item Once we condition on $\eta_i$ it is as if $\varepsilon_{it}$ and $x_{it}$ are uncorrelated.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Causal FE}
-\begin{itemize}
-\item We can get away with conditional mean independence if we don't care about $\eta_i$.
-\item But suppose that we care about $\widehat{\eta}_i$?
-\begin{itemize}
-\item Teacher FE
-\item Physician/Hospital FE
-\item Location/County FE
-\item Suppose we take someone from the $10th$ percentile and move them to the $90th$ percentile
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Causal FE}
-\begin{itemize}
-\item Now we have to really believe $E[ \varepsilon_{it} | x_{it}, \eta_i]=0$
-\item We should worry about the conventional \alert{omitted variable bias} problem.
-\item Suppose there exists a variable $w_{it}$ so that:
-\begin{eqnarray*}
-y_{it} =  x_{it}'\beta +  w_{it}'\gamma + \eta_i + \varepsilon_{it}
-\end{eqnarray*}
-\item Recall the conditions for OVB
-\begin{itemize}
-\item $w_{it}$ is correlated with $x_{it}$
-\item $w_{it}$ is a determinant of $y_{it}$
-\end{itemize}
-\item New one:  $w_{it}$ is correlated with $\eta_i$
-\begin{itemize}
-\item This is easy to satisfy!
-\item $w_{it}$ needs to be uncorrelated with anything about the individual $i$.
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}{Example: Test Scores}
-\begin{itemize}
-\item Students $s$, Teachers $t$
-\item Want to measure effect of \alert{Teachers} on \alert{Test Scores}
-\begin{eqnarray*}
-TestScore_{st} = \beta x_s +\gamma w_t+  \eta_{t} + \varepsilon_{st}
-\end{eqnarray*}
-\item We observe some features of students but not all of them (parent's education, household income, language spoken at home).
-\item We also observe some school specific variables $w_t$ but not all of them (district spending per pupil, \% free lunch, etc.).
-\item But we don't observe other things (jackhammering outside the classroom, which students have disruptive home lives,etc.).
-\begin{itemize}
-\item If the mean of those things varies across teachers $\rightarrow$ we are screwed!
-\item Can't get an accurate estimate of $\eta_i$.
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Example: Test Scores}
-We need a better design:
-\begin{itemize}
-\item We probably need random assignment of students to teachers.
-\item Ideally we would be able to control for student and school unobservables.
-\item Might want to see many students match with many teachers.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Healthcare Exceptionalism: Static Reallocation}
-Is \alert{quality} (or productivity) correlated with \alert{marketshare}?
-\begin{align*}
-\ln \left(N_{h}\right)=\beta_{0}^{s}+\beta_{1}^{s} q_{h}+\gamma_{M}^{S}+\varepsilon_{h}^{s}
-\end{align*}
-\begin{itemize}
-\item $N_h$ measures market size for hospital $h$
-\item $\gamma_M^s$ are market FE
-\item $q_h$ is measure of hospital quality
-\item Goal: Is $\beta_1^s>0$ or not. $\beta_1^s<0$ is usually only Soviet countries or 1970's steel.
-\item $\beta_1^s>0$ means allocation towards productive firms (or just returns to scale?)
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Healthcare Exceptionalism: Dynamic Reallocation}
-\begin{align*}
-\Delta_{h}&=\beta_{0}^{d}+\beta_{1}^{d} q_{h}+\gamma_{M}^{d}+\varepsilon_{h}^{d}\\
-\Delta_{h}&=\frac{N_{h, 2010}-N_{h, 2008}}{\frac{1}{2}\left(N_{h, 2010}+N_{h, 2008}\right)}
-\end{align*}
-\begin{itemize}
-\item $\beta_1^d>0$ means growth towards productive firms (not just returns to scale)
-\item Same idea but now we capture \alert{dynamics}.
-\item Patients may still be attracted to \alert{unobservables correlated with quality}.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Healthcare Exceptionalism}
-\begin{center}
-\includegraphics[width=4in]{./resources/hc1.png}
-\end{center}
-\end{frame}
-
-\begin{frame}{Healthcare Exceptionalism}
-\begin{center}
-\includegraphics[width=4in]{./resources/hc2.png}
-\end{center}
-\end{frame}
-
-\begin{frame}{Healthcare Exceptionalism}
-\begin{center}
-\includegraphics[width=4in]{./resources/hc3.png}
-\end{center}
-\end{frame}
-
-\begin{frame}{Healthcare Exceptionalism}
-\begin{center}
-\includegraphics[width=4in]{./resources/hc4.png}
-\end{center}
-\end{frame}
-
-
-\begin{frame}{Healthcare Exceptionalism: Production Function}
-Hospital Production Function:
-\begin{align*}
-y_{p}^{s}=a_{h}+\sum_{k} \lambda_{k} r_{p k}+\mu x_{p}+\xi_{p}
-\end{align*}
-\begin{itemize}
-\item $a_h$ is \alert{hospital productivity} (a FE) and variable of interest
-\item $y_p$ is a patient outcome (survival-days, etc.)
-\item $x_p$ are (log) hospital inputs
-\item $r_{pk}$ are patient risk factors.
-\item This has interpretation as a \alert{production function}. Why?
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Healthcare Exceptionalism}
-\begin{center}
-\includegraphics[width=4in]{./resources/hc7.png}
-\end{center}
-\end{frame}
-
-\begin{frame}{Healthcare Exceptionalism: EB Adjustment}
-\begin{center}
-\includegraphics[width=4in]{./resources/hc_a2.png}
-\end{center}
-\end{frame}
 
 
 
@@ -352,13 +167,17 @@ y_{3}-y_{2}=\alpha\left(y_{2}-y_{1}\right)+\beta_{0}\left(x_{3}-x_{2}\right)+\be
 \item $E\left(x_{i s} \Delta \varepsilon_{i 3}\right)=0$ has three instruments $(x_{i1},x_{i2},x_{i3})$.
 \item The model is \alert{just identified} with 3 parameters $(\alpha,\beta_0,\beta_1)$.
 \item The challenge with this approach is often that it suffers from \alert{weak instruments}.
+\begin{itemize}
+\item We need a lot of variation in $x_{is}$ across $t$ to make this work.
+\item A constant trend isn't going to help either.
+\end{itemize}
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Becker, Grossman, Murphy (1994)}
 Study annual cigarette consumption with state-level data:
 \begin{align*}
-c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
+c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t+1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
 \end{align*}
 A model of (forward looking) \alert{rational addiction}:
 \begin{itemize}
@@ -373,7 +192,7 @@ A model of (forward looking) \alert{rational addiction}:
 
 \begin{frame}{Becker, Grossman, Murphy (1994)}
 \begin{align*}
-c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
+c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t+1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
 \end{align*}
 \begin{itemize}
 \item Marginal utility of wealth can show up in $\gamma$ or $\eta_i$.
@@ -386,7 +205,7 @@ c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \
 
 \begin{frame}{Becker, Grossman, Murphy (1994)}
 \begin{align*}
-c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t-1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
+c_{it} = \theta c_{i,t-1} +\beta \theta c_{i,t+1} + \gamma p_{it} + \eta_{i} + \delta_t + v_{it}
 \end{align*}
 \begin{itemize}
 \item Identify $(\theta,\beta,\gamma)$ from the assumption that prices are strictly exogenous
@@ -504,7 +323,25 @@ E\left[\Delta x_{it} \left(\Delta y_{i t}-\rho \Delta y_{i(t-1)}-\Delta x_{i t}^
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Recap: Dynamic Panel}
+\begin{itemize}
+\item Arellano Bond estimators are quite popular for a number of reasons:
+\begin{itemize}
+\item Easy to estimate (Linear IV)
+\item Construct instruments out of the model itself.
+\end{itemize}
+\item Blundell Bond estimators are somewhat less popular
+\begin{itemize}
+\item System GMM isn't a single Linear IV problem anymore (requires full GMM).
+\item Should be more efficient (more moment conditions)
+\item The additional moments aren't any less reasonable that AB moments.
+\end{itemize}
+\item But how much do we trust using lags and levels as IV for each other?
+\end{itemize}
+\end{frame}
 
+
+\section*{Thanks!}
 
 
 \end{document}
