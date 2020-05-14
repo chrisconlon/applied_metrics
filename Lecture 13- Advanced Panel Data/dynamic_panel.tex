@@ -288,9 +288,9 @@ Idea: Use higher lags of $y_{it}$:
 \begin{itemize}
 \item $[t=2]$ or $[t=1]$: no instruments,
 \item $[t=3]$:  valid instrument for $\Delta y_{i2} = (y_{i2}-y_{i1})$ is $y_{i1}$.
-\item $[t=4]$:  valid instruments for $\Delta y_{i3} = (y_{i3}-y_{i2})$ is $(y_{i2}, y_{i1})$
-\item$[t=5]$:  valid instruments for $\Delta y_{i5} = (y_{i5}-y_{i4})$ is $(y_{i1},\ldots, y_{i4})$.
-\item$[t=T]$:  valid instruments for $\Delta y_{iT} = (y_{iT}-y_{i,T-1})$ is $(y_{i1},\ldots, y_{i,T-1})$.
+\item $[t=4]$:  valid instruments for $\Delta y_{i3} = (y_{i3}-y_{i2})$ is $(y_{i1}, y_{i2})$
+\item$[t=5]$:  valid instruments for $\Delta y_{i4} = (y_{i4}-y_{i3})$ is $(y_{i1}, y_{i2}, y_{i3})$.
+\item$[t=T]$:  valid instruments for $\Delta y_{iT-1} = (y_{i,T-1}-y_{i,T-2})$ is $(y_{i1},\ldots, y_{i,T-2})$.
 \end{itemize}
 Thus there are $T/(T-1)/2$ instruments
 \end{frame}
