@@ -1,0 +1,158 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+\usepackage{amsmath,amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+%\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 1: Review and Simulation Methods}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{Introduction}
+Consider a linear regression:
+\begin{align*}
+Y_{i} &= X_{i}'\beta + \varepsilon_{i} \quad \text{ with } \quad \mathbb{E}[\varepsilon_i | X_i]=0 
+\end{align*}
+We've discussed the \alert{least squares estimator}:
+\begin{align*}
+\widehat{\beta}_{ols} &= \arg \min_{\beta} \sum_{i=1}^N (Y_i - X_i' \beta)^2\\
+\widehat{\beta}_{ols} &= (\mathbf{X}'\mathbf{X})^{-1} \mathbf{X}' \mathbf{Y}
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{Regression ``Fit''}
+How ``well'' does this regression perform?
+\begin{itemize}
+\item $R^2 = 1 - \frac{\sum_{i=1}^N (y_i-\hat{y_i})^2}{\sum_{i=1}^N (y_i-\overline{y})^2}$: fraction of variance explained by $X_i$ (and the fraction explained by $\varepsilon_i$).
+\item Alternative: \alert{mean squared error} (MSE) $\frac{1}{N}\sum_{i=1}^N (y_i -\hat{y}_i)^2$.
+\begin{itemize}
+\item This is of course what least-squares is actually minimizing!
+\end{itemize}
+\item Alternative: \alert{root mean squared error} (RMSE) $\sqrt{\frac{1}{N}\sum_{i=1}^N (y_i -\hat{y}_i)^2}$.
+\begin{itemize}
+\item The average distance from a point to the line of best fit.
+\end{itemize}
+\item Alternative: \alert{mean absolute deviation} (MAD) $ \frac{1}{N} \sum_{i=1}^N \left(| y_i -\hat{y}_i | \right)$.
+\begin{itemize}
+\item The average residual.
+\end{itemize}
+\item Alternative: \alert{median absolute error} (MAE) $ \text{median}\left(| y_i -\hat{y}_i| \right)$.
+\begin{itemize}
+\item The median residual (insensitive to outliers).
+\end{itemize}
+\item If you read enough econometrics papers, you will see enough of these.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Regression ``Fit'' (continued)}
+\begin{itemize}
+\item Nearly all of those measures will improve as we add parameters to the model
+\item If we choose the model with the lowest $RMSE$ or highest $R^2$ we will nearly always choose a model with more parameters!
+\item We might be worried about \alert{overfitting}: choosing a regression model that fits our particular sample $(y_i,x_i)$ well but might not perform well on a new but similar sample.
+\item A common solution is \alert{penalization}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Penalized Regression}
+\begin{align*}
+\min_{\beta} \sum_{i=1}^N (y_i - X_i \beta)^2 + f(\beta) 
+\end{align*}
+Idea if $\beta$ has too many nonzero elements, or elements are too large -- increase the penalty:
+\begin{itemize}
+\item AIC and BIC set $f(\beta)$ as penalty in terms of number of nonzero elements of $\beta$ the so called $L_0$ norm.
+\item Lasso penalizes the $L_1$ norm $\sum_{k=1}^K | \beta_k|$.
+\item Ridge penalizes the $L_2$ norm $\sum_{k=1}^K | \beta_k|^2$.
+\item We will talk about penalization later, but this prevents us from selecting models that are ``too complicated''.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Splitting the Sample}
+Researchers in Machine learning split their sample into (2-3) parts
+\begin{description}
+\item[Training Data] this is where we use $(y_i,x_i)$ and estimate $\widehat{\theta}$
+\item[Validation Data] this is where we choose which parameters to include, or how much penalization to apply using out of sample fit (MSE, etc).
+\item[Test Data] this is completely new data where we compare the fit of various approaches (but change nothing).
+\end{description}
+The goal is to avoid \alert{overfitting} with too complicated models with  \alert{low bias} but \alert{high variance}.
+\end{frame}
+
+\begin{frame}{Cross Validation}
+Other ways to evaluate fit involve using \alert{hold out} samples. 
+\begin{itemize}
+\item ie: Estimate $\hat{\theta}$ using 80\% of the \alert{training} data. Use the other 20\% (\alert{test data}) to predict $E[y_i | x_i, \widehat{\theta}]=\hat{y}_i$ and compute MAD, MSE, etc.
+\item Of course the 20\% we initially withheld was arbitrary. So we could repeat the exercise dropping a different 20\% each time. Fit the parameters $\widehat{\theta}$ on the training data, and use \alert{validation data} to select model complexity.
+\item These are known as \alert{folds} and the overall procedure is what is known as \alert{cross validation}. Often $5$-fold $10$-fold, $k$-fold, etc.
+\item An extreme version is LOOCV (leave one out) which is similar to the jackknife.
+\end{itemize}
+\end{frame}
+
+
+
+\section*{Thanks!}
+
+\end{document}
