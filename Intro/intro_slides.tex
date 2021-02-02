@@ -1,9 +1,7 @@
 \documentclass[aspectratio=169]{beamer}
-\usetheme{focus}
+\usetheme{metropolis}
 
-%\usepackage{beamerthemesplit}
-%\beamertemplatenavigationsymbolsempty
-\usepackage{amsmath}
+\usepackage{amsmath,amsfonts}
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{latexsym}
@@ -14,8 +12,7 @@
 \usepackage{multicol}
 \usepackage{booktabs} 
 \usepackage{dcolumn}
-\usepackage{soul}
-\usepackage[cache=false]{minted}
+%\usepackage[cache=false]{minted}
 \usepackage{MnSymbol}
 \usepackage{stmaryrd}
 
@@ -40,7 +37,6 @@
 \usepackage{etoolbox}
 \usepackage{pdflscape}
 \usepackage{booktabs}
-\usepackage{threeparttable}
 \usepackage[skip=0.2\baselineskip]{caption}
 
 % command for inputting raw latex
@@ -48,28 +44,11 @@
 \newcommand\primitiveinput[1]{\@@input #1 }
 \makeatother
 
-% common table command
-\newcommandx{\tablecontent}[4]{
-    \begin{threeparttable}[!ht]
-        \centering
-        \caption{#3}
-        \vspace{-1em}
-        \footnotesize
-        \begin{tabular}{#1}
-            \primitiveinput{../tables/#2.tex}
-        \end{tabular}
-        \vspace{-0.2em}
-        \begin{tablenotes}[flushleft]
-            #4
-        \end{tablenotes}
-    \end{threeparttable}
-}
-
 
 
 
 % \usepackage{slashbox}
-\title{Lecture 1: Time Series}
+\title{Lecture 0: Intro}
 \author{Chris Conlon }
 \institute{NYU Stern }
 
@@ -107,7 +86,13 @@
 
 \begin{frame}[fragile]{Course Organization}
 \begin{itemize}
-\item I will try and have a break in our (very long) lecture
+\item My goal is to teach this \alert{flipped}.
+\begin{itemize}
+\item Watch about 90 minutes of video before each class
+\item Come with questions about material
+\item Work on exercises in class.
+\end{itemize}
+
 \item This is a small class-- please ask plenty of questions
 \item If you are lost - don't panic - so is everyone else!
 \item I will post slides and code examples to Github on the day of class
