@@ -151,6 +151,33 @@ Other ways to evaluate fit involve using \alert{hold out} samples.
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Monte Carlo Studies}
+A common technique to assess performance:
+\begin{align*}
+y_i = \alpha + \beta_1 x_{i1} + \beta_2 x_{i2} + u_i
+\end{align*}
+\begin{itemize}
+\item Draw $x_{i1},x_{i2}$ from some distribution (say $U[0,1]$).
+\item Draw $u_i$ from some distribution (with mean zero or subtract $u_i - \overline{u}$).
+\item Choose some coefficients $(\alpha_,\beta_1,\beta_2) = (3,-2,1)$.
+\item Calculate $y_i$.
+\item Regress $y_i$ on $(x_{i1},x_{i2})$ and obtain $\widehat{\beta}$.
+\item Calculate goodness of fit statistics, standard errors, etc.
+\item Do this around 1000$\times$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Monte Carlo Studies}
+What's the point? Now we have a bunch of $\widehat{\beta}_s$ samples:
+\begin{itemize}
+\item How do asymptotic standard errors compare to $Var(\widehat{\beta}_s)$?
+\item How does $R^2$ change when we add variance to $u_i$? to $x_i$?
+\item How does variance change with sample size $N$?
+\item What is \alert{coverage} of 95\% CI?
+\end{itemize}
+Now we try it ourselves.
+\end{frame}
+
 
 
 \section*{Thanks!}
