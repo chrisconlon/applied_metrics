@@ -513,7 +513,7 @@ This procedure is known as Iteratively Re-weighted Least Squares \alert{IRLS}
 \begin{frame}{GLS and FGLS}
 There is no reason to require that $W$ be diagonal. This gives us \alert{Generalized Least Squares}
 \begin{align*}
-\widehat{\beta}_{GLS} = (\tilde{X}'\tilde{X})^{-1}\tilde{X}'\tilde{Y} = (X' \Omega  X)^{-1} \Omega' W Y
+\widehat{\beta}_{GLS} = (\tilde{X}'\tilde{X})^{-1}\tilde{X}'\tilde{Y} = (X' \Omega  X)^{-1} X' \Omega Y
 \end{align*}
 The idea is to use the \alert{inverse covariance matrix} of residuals. But this is high dimensional $(N \times N)$ and estimating it is harder than our original problem!
 
