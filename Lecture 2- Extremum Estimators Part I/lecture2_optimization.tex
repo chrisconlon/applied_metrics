@@ -16,6 +16,7 @@
 \usepackage{dcolumn}
 \usepackage{soul}
 \usepackage[cache=false]{minted}
+\renewcommand{\MintedPygmentize}{/Users/cconlon/anaconda3/bin/pygmentize}
 \usepackage{MnSymbol}
 \usepackage{stmaryrd}
 
@@ -174,6 +175,38 @@ A _ { k }
 \end{itemize}
 \end{frame}
 
+\section{EM Algorithm and Mixtures}
+
+\begin{frame}
+\frametitle{Estimating Finite Mixtures}
+\begin{itemize}
+\item In practice estimating finite mixture models can be tricky.
+\item A simple example is the mixture of normals (incomplete data likelihood)
+\begin{eqnarray*}
+f(x_1,\ldots,x_n | \theta) = \prod_{i=1}^N \sum_{k=1}^K \pi_k f(x_i | \mu_k, \sigma_k)
+\end{eqnarray*}
+\item We need to find both mixture weights $\pi_k = Pr(z_k)$ and the components $(\mu_k,\sigma_k)$ the weights define a valid probabiltiy measure $\sum_k \pi_k = 1$.
+\item Easy problem is \alert{label switching}. Usually it helps to order the components by say decreasing $\pi_1 > \pi_2 > \ldots$ or  $\mu_1 > \mu_2 > \ldots$ 
+\item The real problem is that which component you belong to is unobserved. We can add an extra indicator variable $z_{ik} \in \{0,1\}$.
+\item We don't care about $z_{ik}$ per-se so they are \alert{nuisance parameters}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimating Finite Mixtures}
+\begin{itemize}
+\item We can write the complete data log-likelihood (as if we observed $z_{ik}$):
+\begin{eqnarray*}
+\ell(x_1,\ldots,x_n | \theta) = \sum_{i=1}^N  \log \left( \sum_{k=1}^K I[z_i = k]  \pi_k f(x_i , \mu_k, \sigma_k) \right)
+\end{eqnarray*}
+\item We can instead maximized the expected log-likelihood where we take the expectation $E_{z|\theta}$
+\begin{eqnarray*}
+\alpha_{ik}(\theta) = Pr(z_{ik} =1 | x_i,\theta) = \frac{f_k(x_i,z_k,\mu_k,\sigma_k) \pi_k }{\sum_{m=1}^K f_m(x_i,z_m,\mu_m,\sigma_m) \pi_m}
+\end{eqnarray*}
+\item Now we have a probability $\hat{\alpha}_{ik}$ that gives us the probability that $i$ came from component $k$. We also compute $\hat{\pi}_k = \frac{1}{N} \sum_{i=1}^N \alpha_{ik}$
+\end{itemize}
+\end{frame}
+
 \begin{frame}
 \frametitle{EM Algorithm}
 \begin{itemize}
@@ -199,7 +232,6 @@ A _ { k }
 \item This means it can be slow, but sometimes $\nabla_{\theta} f (\cdot)$ is really complicated.
 \end{itemize}
 \end{frame}
-
 
 \section*{Thanks!}
 

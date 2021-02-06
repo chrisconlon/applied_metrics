@@ -323,22 +323,6 @@ Tradeoffs
 \end{frame}
 
 
-\begin{frame}{Exponential Example}
-\begin{align*}
-f _ { Y | X } ( y | x , \beta _ { 0 } ) =  { e } ^ { x ^ { \prime } \beta _ { 0 } } \exp \left( - y  { e } ^ { x ^ { \prime } \beta _ { 0 } } \right)
-\end{align*}
-With log likelihood
-\begin{align*}
-\ell( \beta ) = \sum _ { i = 1 } ^ { N } \ln f _ { Y | X } \left( y _ { i } | x _ { i } , \beta \right) = \sum _ { i = 1 } ^ { N } X _ { i } ^ { \prime } \beta - y _ { i } \cdot \exp \left( x _ { i } ^ { \prime } \beta \right)
-\end{align*}
-And Score, Hessian, and Information Matrix:
-\begin{align*}
-\mathcal { S }_i ( y_i, x_i , \beta ) &= x_i ^ { \prime } \left( 1 - y_i \exp \left( x_i ^ { \prime } \beta \right) \right)\\
-\mathcal { H }_i ( y_i , x_i , \beta ) &= - y_i x_i x_i ^ { \prime } \exp \left( x_i ^ { \prime } \beta \right)\\
-% WHERE DOES THIS COME FROM
-\mathcal { I } \left( \beta _ { 0 } \right) &= \mathbb { E } \left[ Y X X ^ { \prime } \exp \left( X ^ { \prime } \beta _ { 0 } \right) \right] = \mathbb { E } \left[ X X ^ { \prime } \right]
-\end{align*}
-\end{frame}
 
 
 \section*{Thanks!}
