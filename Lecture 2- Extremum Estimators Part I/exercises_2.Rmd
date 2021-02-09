@@ -1,0 +1,77 @@
+---
+title: 'Exercises: Week 2'
+author: "Prof. Conlon"
+date: 'Due: 2/8/21'
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+1. Let's load the Boston HMDA data.
+
+The function should take the following arguments:
+
+  * dir: debt to income ratio
+  * hir : housing to income ratio
+  * single : dummy for single borrower
+  * self : dummy for self-employed
+
+ 
+```{r}
+library("Ecdat")
+data("Hmda")
+
+probit <- glm(deny ~ dir + hir + single + self, data = Hmda, family = binomial(link = "probit"))
+logit <- glm(deny ~ dir + hir + single + self, data = Hmda, family = binomial(link = "logit"))
+
+summary(logit)
+```
+
+2. Consider the regression model of the logit regression:
+$$
+deny_i = F(\beta_1\cdot dir_i + \beta_2\cdot hir_i + \beta_3\cdot single_i + \beta_4 \cdot self_i)
+$$
+For a single observation compute the contribution to the log-likelihood (analytically)
+
+3. For a single observation compute the Score (analytically).
+
+4. Compute the Hessian Matrix and Fisher information (analytically).
+
+5. Code up the Fisher Information for the logit model above $I(\widehat{\beta})$ using the Hessian Matrix.
+
+6. Code up the Fisher Information for the logit model above $I(\widehat{\beta})$ using the score method.
+
+7. Compute the standard errors from the Fisher information and compare them to the standard errors reported from the regression. How do they compare?
+
+8. Generate $n=100$ observations where $\lambda = 15$ from a poisson model:
+
+$$ Y_i \sim Pois(\lambda)$$
+
+9. The poisson distribution is a discrete distribution for count data where the p.m.f. is given by:
+
+$$Pr(Y_i =k )=\frac{\lambda^k e^{-\lambda}}{k!}a$$
+
+10. Write the log-likelihood $\ell(y_1,\ldots,y_n; \lambda)$ (analytically).
+
+11. Write the Score contribution $\mathcal{S}_i(y_i; \lambda)$ (analytically).
+
+12. Write the Hessian Contribution $\mathcal{H}_i(y_i; \lambda)$ (analytically).
+
+13. Code up the log-likelihood function
+
+```{r}
+pois_log_lik <- function(lambda,y){
+  
+  return(ll)
+}
+```
+
+14. Find the value of $\lambda$ that maximizes your log likelihood using \texttt{optim} in R.
+
+15. Write a function that returns the standard error of $\hat\lambda$:
+
+```{r}
+pois_se <- function(lambda_hat,y){
+  
+  return(se)
+}
