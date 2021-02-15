@@ -1,0 +1,171 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+%\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 3: Generalized Method of Moments}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\section*{\normalsize  Common Questions/Extensions}
+
+\begin{frame}{Semiparametric Efficiency}
+In a famous paper, Chamberlain (1987) showed that GMM obtained the semi-parametric efficiency bound asymptotically. That means as our sample gets large and without making additional parametric assumptions (such as placing distributions on error terms) the efficient GMM provides the most efficient estimator.
+\end{frame}
+
+\begin{frame}{My first stage estimates look ok, but my second stage estimates look like garbage}
+This means there is a problem with your weighting matrix. 
+\begin{itemize}
+\item Make sure you are subtracting off the average $g_N(\theta)$ when computing the covariance. 
+\item Another problem appears is when you take the inverse. There is a statistic known as the \textit{condition number} which measures the ratio of the minimum and maximum eigenvalue of a matrix.
+\begin{itemize}
+\item When these eigenvalues are close together then small errors in $A+\epsilon$ lead to small errors in $(A+\epsilon)^{-1}$.
+\item Software sometimes reports either the condition number, or its inverse.
+\item In an ideal world this would be $\approx 1$. 
+\item If the condition number is $10^{\pm 13}$ it approaches the numerical precision of your computer. 
+\item Then even tiny (sampling) errors can lead to nearly infinite weighting matrices.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What causes these problems?}
+\begin{itemize}
+\item Usually this happens if the gradient of $Q_n(\theta)$ is not close to zero in a particular dimension 
+\item or the average Jacobian $D(\theta)=\frac{1}{N} \sum_{i=1}^N \frac{\partial g(w_i,\theta)}{\partial \theta}$ is not close to zero in some dimension.
+\end{itemize}
+You are not an optimum of $Q_n(\theta)$!
+\end{frame}
+
+
+\begin{frame}{My point estimates look okay, but my standard errors look crazy}
+\begin{itemize}
+\item You have probably dropped a $\frac{1}{N}$ or $\frac{1}{\sqrt{N}}$ somewhere.
+\item  You can ignore the $N$'s when obtaining point estimates because scaling $Q_n(\theta)$ or $W_n$ does not affect the location of $\hat{\theta}$, but you need to be more careful in computing $V_{\theta}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{If 2 step GMM is good, is 3-step GMM better?}
+\begin{itemize}
+\item Asymptotically the answer is no
+\item Even with a sub-optimal choice of weighting matrix, your first stage  $\hat{\theta} \overset{p}{\to}\theta_0$ as $N \rightarrow \infty$.
+\item  This means that in the limit, you always recover the efficient choice of $\hat{W}$.
+\item  In finite sample, anything can happen, but numerous studies have found little to no improvement from considering a $K$-step GMM estimator.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What about Infinite-step GMM?}
+ There isn't such a thing. But there is the \alert{Continuously Updating GMM} estimator of Hansen Heaton and Yaron (1996). In this case we let \\
+\begin{align*}
+W(\theta)&=\left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\theta) - g_N(\theta)) (g(w_i,\theta)-g_N(\theta))' \right) \\
+Q_n(\theta)^{CUE} &= g_N(\theta)' \left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\theta) - g_N(\theta)) (g(w_i,\theta)-g_N(\theta))' \right) g_N(\theta)
+\end{align*}
+\begin{itemize}
+\item Because the weighting matrix now changes with $\theta$, even for linear models this becomes very difficult to estimate. 
+\item The original GMM problem was a quadratic optimization problem. The CUE problem is no longer a convex optimization problem. Quasi-Newton approaches are no longer guaranteed to work.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Advanced Asymptotics}
+\small
+CUE has some additional advantages over GMM. We see this by examining the GMM FOC. 
+\begin{eqnarray*}
+\hat{D}(\theta) W_n \hat{g}_N(\hat{\theta}) =0
+\end{eqnarray*}
+If we take an Edgeworth expansion we can see how the  \alert{asymptotic bias} term looks:
+\begin{eqnarray*}
+\frac{1}{N^2}\sum_{i=1}^N E[g(w_i,\theta) W_n g(w_i,\theta)]
+\end{eqnarray*}
+As long as the variance is finite we can see that this bias disappears as $N \rightarrow \infty$. However it also tends to grow linearly with $q$ the number of moment restrictions. This is often referred to as the \textit{too many moments} or \textit{many instruments} problem.
+
+The challenge is that in general when we estimate $\hat{g}(\hat{\theta})$ and $\hat{D}(\hat{\theta})$ we construct them so that they are mechanically correlated with one another. It turns out the CUE estimator fixes this in exactly the right way. How is beyond the scope of this note (and course). If you are really interested you should look at Newey and Smith (2004).
+
+\end{frame}
+\section*{Thanks!}
+
+\end{document}

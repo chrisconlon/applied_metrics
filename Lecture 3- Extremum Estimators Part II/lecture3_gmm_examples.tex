@@ -1,0 +1,234 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+%\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 3: Generalized Method of Moments}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+ 
+
+\begin{frame}{Review Definitions}
+
+\begin{itemize}
+\item Sample average moment conditions: $g_N(\theta) \in \mathbb{R}^q$, where $g_N(\theta)$ is a $q$-dimensional vector of moment conditions.
+\begin{eqnarray*}
+\mathbb{E}[g(w_i, \theta )] \approx \frac{1}{N} \sum_{i=1}^N g(w_i, \theta)  \equiv g_N(\theta)
+\end{eqnarray*}
+\item At the truth $\theta_0$: $\mathbb{E}[g(w_i, \theta_0 )] =\mathbf{0}_q$
+\item Choose $\widehat{\theta}_{gmm}$ to minimize $$Q_N(\theta)=g_N(\theta)' \cdot W_N \cdot  g_N(\theta)$$
+\item Have to choose a weighting matrix $W_n$.
+\item Jacobian: $D(\theta) \equiv \mathbb{E}[\frac{\partial g(w_i,\theta)}{\partial \theta}]$, which is a $q \times k$ matrix.
+\item  Evaluated at the optimum, $\frac{1}{\sqrt{N}} \sum_{i=1}^N g(w_i,\theta_0) \overset{d}{\to} N(0,S)$ where $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is a $q \times q$ matrix.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{GMM: Linear IV}
+For the linear IV problem this becomes:
+\begin{eqnarray*}
+g_N(\theta)' W_N  g_N(\theta) &=& \frac{1}{N^2} \cdot (\mathbf{Z}' (\mathbf{Y} - \mathbf{X} \beta))' W_N (\mathbf{Z}' (\mathbf{Y} - \mathbf{X} \beta)) \\
+&=& \frac{1}{N^2}\cdot [Y'Z W_N Z' Y - 2 \beta X' Z W_N Z' Y + \beta' X' Z W_N Z' X \beta]
+\end{eqnarray*}
+We can ignore the $\frac{1}{N^2}$ and take the first-order condition:
+\begin{eqnarray*}
+2 X'Z W_N Z' Y &=& 2 X'Z W_N Z' X \beta\\
+\hat{\beta}_{GMM} &=& (X'Z W_N Z' X)^{-1} X' Z W_N Z'Y
+\end{eqnarray*}
+\alert{Hopefully this looks familiar}
+\end{frame}
+
+\begin{frame}{GMM: OLS}
+\begin{itemize}
+\item Suppose that we do not have any excluded instruments so that $Z=X$ (and thus $q=k$). 
+\item Also suppose that $W_N = \mathbf{I}_q$ (the identity matrix). 
+\item Then we can see that:
+\begin{eqnarray*}
+\hat{\beta}_{GMM} &=& (X'X \mathbf{I}_q X' X)^{-1} X' X \mathbf{I}_q X'Y\\
+ &=& (X'X X' X)^{-1} X' X X'Y\\
+ &=& (X'X)^{-1} (X' X)^{-1} (X' X) X'Y =  (X'X)^{-1} X'Y = \hat{\beta}_{OLS}
+\end{eqnarray*}
+
+\item In other words, OLS is a special case of the GMM estimator.
+\item  Also, the identification condition $D=\frac{\partial g(w_i,\theta)}{\partial \theta} =\frac{1}{N} \sum_{i=1}^N z_i' x_i = \frac{1}{N} \sum_{i=1}^N x_i' x_i$ becomes that $rank(X'X) = k$ the well-known OLS rank condition.\\
+\end{itemize}
+\end{frame}
+
+\begin{frame}{2SLS Estimator}
+Suppose that we do have excluded instruments so that $dim(Z) = q > dim(X) = k$ and that $W_N = (Z'Z)^{-1}$. It immediately follows that:
+\begin{eqnarray*}
+\hat{\beta}_{GMM} &=& (X'Z (Z'Z)^{-1} Z' X)^{-1} X' Z (Z'Z)^{-1} Z'Y = \hat{\beta}_{2SLS}
+\end{eqnarray*}
+If $dim(Z) = q = dim(X) = k$ then $(X'Z)$ is square (and invertible). This expression further simplifies:
+\begin{eqnarray*}
+(X'Z (Z'Z)^{-1} Z' X)^{-1} = (Z'X)^{-1} (Z'Z) (X'Z)^{-1}\\
+\rightarrow \hat{\beta}_{GMM} = (Z'X)^{-1} (Z'Z) (X'Z)^{-1}  X' Z (Z'Z)^{-1} Z'Y = (Z'X)^{-1} Z'Y = \hat{\beta}_{IV}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Efficient GMM}
+An important question remains how one should choose the weighting matrix $W_N$. We've already seen two options: 
+\begin{enumerate}
+\item The identity matrix $\mathbf{I}_q$ equally penalizes violations of all $q$ moments
+\item  the TSLS weighting matrix $(Z'Z)^{-1}$ which can be thought about as the inverse of the covariance of the instruments. 
+\item The choice of weighting matrix only matters in the \alert{overidentified} case $q > k$. Why?
+\end{enumerate}
+We are interested in \alert{efficient GMM} which is the GMM estimator with the lowest variance.
+
+\end{frame}
+
+\begin{frame}{Efficient GMM}
+ In order to find the $W_N$ which minimizes the variance of $\hat{\theta}_{GMM}$ we recall the asymptotic variance of the GMM estimator:
+\begin{eqnarray*}
+V_{\theta} =(D W D')^{-1} (D W S W' D') (D W D')^{-1}
+\end{eqnarray*}
+It turns out that the best choice of $W_N = S^{-1}$ (which sets $filling = bread$). This is easy to see, because $W_N$ is positive semi-definite.
+\begin{eqnarray*}
+(D S^{-1} D')^{-1} (D S^{-1} S S^{-1'} D') (D S^{-1} D')^{-1} = (D S^{-1} D')^{-1} (D S^{-1} D') (D S^{-1} D')^{-1} = (D S^{-1} D')^{-1}
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Efficient GMM: Discussion}
+This gives us some insight into what we are looking for from moment conditions. 
+
+\begin{itemize}
+\item We want $S$ to be small (we want the sampling variation/noise of our moments to be as small as possible). 
+\item We also want $D$ (the Jacobian of the moments) to be large. 
+\begin{itemize}
+\item This means that small violations in moment conditions lead to large changes in the objective function. 
+\item In practical terms, the problem is well identified when the objective function is steep around $\theta_0$.
+\item When the problem becomes flat, it becomes hard to distinguish one $\theta$ in favor of another.
+\end{itemize}
+\item The problem is that $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is not something that we readily observe from our data. In fact, the asymptotic covariance evaluated at $\theta_0$ is \alert{infeasible}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Efficient GMM: Feasible Weight Matrix}
+The best we can hope for is to use some sample analogue $W_N=\hat{S}^{-1}$ in its place. One way to compute that is the covariance of the moments estimated at some $\hat{\theta}$ for an initial guess of $W$:
+\begin{eqnarray*}
+\hat{W} = \hat{S}^{-1} = \left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))  \, (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))'\right)^{-1}
+\end{eqnarray*}
+Because $E[g(w_i,\theta_0)]=0$ at $\theta_0$ there is a tendency to use $\left(\frac{1}{N} \sum_{i=1}^N g(w_i,\hat{\theta}) \, g(w_i,\hat{\theta} )'\right)^{-1}$ (without de-meaning the moments). In theory this would work fine, but in practice \alert{it is nearly always a bad idea}.\\
+\end{frame}
+
+\begin{frame}{Efficient GMM: Review}
+
+\noindent The overall procedure works as follows:
+\begin{enumerate}
+\item Pick some initial weighting matrix $W_0$: often $\mathbf{I}_q$ or $(Z'Z)^{-1}$.
+\item Solve $\hat{\theta} = \arg \min_{\theta} g_N(\theta)' W_0  g_N(\theta)$.
+\item Update $\hat{W} = \left(\frac{1}{N} \sum_{i=1}^N (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))  \, (g(w_i,\hat{\theta}) - g_N(\hat{\theta}))'\right)^{-1}$
+\item Solve $\hat{\theta}_{GMM} = \arg \min_{\theta}\, g_N(\theta)' \, \hat{W} \, g_N(\theta)$.
+\item Compute $D(\hat{\theta}_{GMM})$ and $S(\hat{\theta}_{GMM})$ and compute standard errors.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Estimating the Variance Matrix}
+For the linear IV estimator when $i$ is independent then $g(w_i,\theta) = z_i \epsilon_i$ and $E[z_i \epsilon_i]=0$
+\begin{eqnarray*}
+\hat{S}=\frac{1}{N} \sum_{i=1}^N z_i z_i' \epsilon_i^2
+\end{eqnarray*}
+\begin{itemize}
+\item When there is homoskedastic variance $E[\epsilon_i^2 | z_i] = \sigma^2$ and the covariance of the moments becomes $\frac{\sigma^2}{N} \sum_{i=1}^N z_i z_i'$.
+\item Because scaling weighting matrix by a constant has no effect on the maximum this is equivalent to the 2SLS weight matrix: $\sum_{i=1}^N z_i z_i'$ or $Z'Z$
+\begin{itemize}
+\item  2SLS is only the efficient estimator under \alert{homoskedasticity}.
+\item  Likewise, if all regressors are exogenous then $X=Z$ and we are left with the GMM formula coincides with the covariance for heteroskedasticity robust standard errors.
+\item Similarly, when appropriate we can consider extensions such as \alert{clustered standard errors} which are robust to weaker forms of independence.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimating the Variance Matrix}
+ As a practical matter, we should always use the \alert{sandwich} form when calculating the GMM standard errors, rather than the simpler \alert{bread} version which is only correct at $\theta_0$ under asymptotic optimality conditions.
+\end{frame}
+\section*{Thanks!}
+
+\end{document}
