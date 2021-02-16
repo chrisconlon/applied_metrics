@@ -6,10 +6,10 @@
 \usepackage{graphicx}
 \usepackage[shortlabels]{enumitem}
 
-\title{Problem Set 2}
+\title{Problem Set 1}
 \begin{document}
 \small
-\date{Due date: March 6}
+\date{Due date: March 2}
 \author{Prof. Conlon}
 \maketitle
 Your answers should be produced in \LaTeX, and should include all relevant graph and code.  Code should be in the appropriate verbatim environment and properly documented. You are allowed to work in groups but you must turn in your own writeup. Submit your assignment via dropbox link to \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}.
@@ -22,16 +22,15 @@ This problem set uses simulated data that is made to look like responses of hous
 \item[household\_code] a unique panelist identifier
 \item[hh\_income] an income ``bin'' coded as below
 \item[year\_regime] either `early' or `late' which denotes which bin assignments to use.
-\item[projection\_weight] an (optional) weight for each household to make the overall sample more demographically representative. [Note: these weights do not sum to one, but you should ensure that they do].
+\item[number\_of\_hh] number of households in each ``bin''.
 \end{description}
 
 \begin{center}
 \includegraphics[width=4in]{./income_1.png}\\
 \includegraphics[width=4in]{./income_2.png}
 \end{center}
-\noindent You will want to produce two versions of all results, one using the \textbf{weighted sample} and one using the \textbf{unweighted sample}.\\
 
-\noindent For each method, we will want to estimate the lognormal parameters under three assumptions:
+\noindent For the first two method, we will want to estimate the lognormal parameters under three assumptions:
 \begin{enumerate}[(a)]
 \item Assuming each household earns the lowest income in each bin.
 \item Assuming each household earns the highest income in each bin.
@@ -53,10 +52,10 @@ Let's begin by estimating a log-normal distribution of income. If income is dist
 Now let's consider a \textit{maximum likelihood estimator}. Again assume that the distribution of income is lognormal. 
 \begin{enumerate}
 \setcounter{enumi}{3}
-\item Write the likelihood for the entire sample:  $Pr(y_1,\ldots,y_n | \mu, \sigma)$ or $Pr(\ln y_1,\ldots, \ln y_n | \mu, \sigma)$ \\ (Note: be careful that the coding of bins changes after 2010. Also be-careful to allow for weighted observations $w_i$.)
+\item Write the likelihood for the entire sample:  $Pr(y_1,\ldots,y_n | \mu, \sigma)$ or $Pr(\ln y_1,\ldots, \ln y_n | \mu, \sigma)$ \\ (Note: be careful that the coding of bins changes after 2010.)
 \item Write the log-likelihood
 \item Write the score of the log-likelihood for each $i$ and the overall gradient.
-\item Estimate $(\mu,\sigma)$ for each assumption about coding income using the dataset.
+\item Estimate $(\mu,\sigma)$ correctly coding income before and after 2010.
 \item Estimate the standard errors of $(\widehat{\mu}_{MLE},\widehat{\sigma}_{MLE})$ using the Fisher Information/Hessian Matrix.
 \item Discuss your results so far. How sensitive are they to assumptions about the income bins? How sensitive are they to using the weighted vs. unweighted sample?
 \end{enumerate}
