@@ -229,6 +229,54 @@ For the linear IV estimator when $i$ is independent then $g(w_i,\theta) = z_i \e
 \begin{frame}{Estimating the Variance Matrix}
  As a practical matter, we should always use the \alert{sandwich} form when calculating the GMM standard errors, rather than the simpler \alert{bread} version which is only correct at $\theta_0$ under asymptotic optimality conditions.
 \end{frame}
+
+
+\begin{frame}{Example: Gravity Equation}
+\begin{itemize}
+\item An important set of models in international trade talk about \alert{Gravity Equations}
+\item They are called gravity because trade declines with distance (or distance$^2$).
+\end{itemize}
+\begin{align*}
+T_{ij}  = \alpha_0 Y_i^{\alpha_1} Y_j^{\alpha_2} D_{ij}^{\alpha_3} \eta_{ij}
+\end{align*}
+Take Logs
+\begin{align*}
+\ln T_{ij}  =  \ln \alpha_0  +\alpha_1 \ln Y_i + \alpha_2 \ln Y_j + \alpha_3 \ln D_{ij} + \ln \eta_{ij}
+\end{align*}
+\begin{itemize}
+\item $T_{ij}$  (Exports from $i$ to $j$)
+\item $(Y_i,Y_j)$ GDP of each country
+\item $D_{ij}$ distance between two countries
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example: Gravity Equation}
+If the moment condition holds then everything is good:
+\begin{align*}
+E[ln (\eta_{ij}) | Y_i, Y_j D_{ij} ]=0
+\end{align*}
+Some problems
+\begin{itemize}
+\item Lots of Zeros in $T_{ij}$ (so we can't take logs).
+\item If $( Y_i, Y_j D_{ij},\eta_{ij})$ has heteroskedasticity then moment condition is violated.
+\item Why?  Expectation is \alert{linear operator} but $\log(\cdot)$ not so much.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Gravity: Part 2}
+Rearrange things so that:
+\begin{align*}
+T_{i j}&=\exp \left(\beta_{0}+\alpha_{1} \log \left(Y_{i}\right)+\alpha_{2} \log \left(Y_{j}\right)+\alpha_{3} \log \left(D_{i j}\right)\right) \eta_{i j} \\
+T_{i j}&=\exp \left(x_{i} \beta\right) \eta_{i j}
+\end{align*}
+This gives us our moment condition:
+\begin{align*}
+E[ T_{i j} - \exp \left(x_{i} \beta\right) | x_i]=0
+\end{align*}
+This works as long as we are okay with \alert{proportional variance}
+
+\end{frame}
 \section*{Thanks!}
 
 \end{document}
