@@ -1,0 +1,135 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{amsmath}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+
+%\usepackage{pxfonts}
+
+\usepackage[absolute,overlay]{textpos} 
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+
+\title [Bootstrap]{Delta Method}
+\author{C.Conlon}
+\institute{Applied Econometrics II}
+\date{\today}
+\setbeamerfont{equation}{size=\tiny}
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Bootstrap and Delta Method}
+\begin{itemize}
+\item We know how to construct confidence intervals for parameter estimates:  $\hat{\theta}_k \pm 1.96 SE(\hat{\theta}_k)$
+\item Often we are asked to construct standard errors or confidence intervals around model outputs that are not just parameter estimates: ie:  $g(x_i,\hat{\theta})$.
+\item Sometimes we can't even write $g(x_i,\theta)$ as an explicit function of $\theta$ ie: $\Psi(g(x_i,\theta),\theta) = 0$.
+\item Two options:
+\begin{enumerate}
+\item Delta Method
+\item Bootstrap
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Delta Method}
+Delta method works by considering a \alert{Taylor Expansion} of $g(x_i,\theta)$.
+\begin{eqnarray*}
+g(z) \approx g(z_0) + g'(z_0)(z-z_0) + o(||z-z_0||)
+\end{eqnarray*}
+Assume that $\theta_n$ is asymptotically normally distributed so that:
+\begin{eqnarray*}
+\sqrt{n} (\theta_n - \theta_0) \sim N(0,\Sigma)
+\end{eqnarray*}
+(How do we get this: OLS? GMM? MLE?).\\
+
+Then we have that 
+\begin{eqnarray*}
+\sqrt{n} (g(\theta_n) - g(\theta_0)) \sim N(0,D(\theta)' \Sigma  D(\theta))
+\end{eqnarray*}
+Where $D(\theta) = \frac{\partial g(x_i, \theta)}{\partial \theta}$ is the Jacobian of $g$ with respect to theta evaluated at $\theta$.\\
+We need $g$ to be continuously differentiable around the center of our expansion $\theta$.
+\end{frame}
+
+
+\begin{frame}{Delta Method: Examples}
+Start with something simple: $g(\theta)= \overline{X}_1\cdot \overline{X}_2$ with $(X_{1i},X_{2i}) \sim IID$.
+We know the CLT applies so that:
+\begin{eqnarray*}
+\sqrt{n}
+\begin{pmatrix}
+\overline{X}_1 - \mu_1\\
+\overline{X}_2 - \mu_2
+\end{pmatrix} &\sim  N
+\begin{bmatrix}
+\begin{pmatrix}
+0\\
+0
+\end{pmatrix},
+\Sigma
+\end{bmatrix}
+\end{eqnarray*}
+The Jacobian is just $D(\theta) =  \begin{pmatrix}\frac{\partial g(\theta)}{\partial \theta_1} \\ \frac{\partial g(\theta)}{\partial \theta_2}  \end{pmatrix} =  \begin{pmatrix}s_2\\ s_1 \end{pmatrix}$\\
+So,
+\begin{eqnarray*}
+V(Y) = D(\theta)' \Sigma D(\theta) =\begin{pmatrix} \mu_2 & \mu_1 \end{pmatrix}  \begin{pmatrix} \sigma_{11} & \sigma_{12} \\ \sigma_{21} & \sigma_{22} \end{pmatrix} \begin{pmatrix} \mu_2 \\\mu_1  
+\end{pmatrix} \\
+\sqrt{n} ( \overline{X}_1 \overline{X}_2 - \mu_1 \mu_2) \sim N(0,\mu_2^2 \sigma_{11}^2 + 2 \mu_1 \mu_2 \sigma_{12}  + \mu_1^2 \sigma_{22}^2)
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Delta Method: Examples}
+Think about a simple logit:
+\begin{eqnarray*}
+P(Y_i=1 | X_i ) = \frac{\exp^{\beta_0 + \beta_1 X_i}}{1+\exp^{\beta_0 + \beta_1 X_i}}  \quad P(Y_i=0 | X_i ) = \frac{1}{1+\exp^{\beta_0 + \beta_1 X_i}} 
+\end{eqnarray*}
+Remember the ``trick'' to use GLM (log-odds):
+\begin{eqnarray*}
+\log P(Y_i=1 | X_i) - \log P(Y_i=0 | X_i) = \beta_0 + \beta_1 X_i
+\end{eqnarray*}
+\begin{itemize}
+\item Suppose that we have estimated $\hat{\beta_0},\hat{\beta_1}$ via GLM/MLE but we want to know the confidence interval for the probability: $P(Y_i=1 | X_i,\hat{\theta})$
+\item The derivatives are a little bit tricky, but the idea is the same.
+\item This is what STATA should be doing when you type: \tt{mfx, compute}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Delta Method: Other Examples}
+Often we have a regression like:
+\begin{eqnarray*}
+log Y_i = \beta_0 + \beta_1 X_i + \gamma Income_i + \epsilon_i
+\end{eqnarray*}
+And we are interested in $\beta_1 / \gamma$ so that we have $\beta_i$ in units of ``dollars''. Again Delta Method Works fine here.\\
+\end{frame}
+
+
+\begin{frame}{Delta Method: Some Failures}
+But we need to be careful.  Suppose that $\theta \approx 0$ and 
+\begin{itemize}
+\item $g(x)  = |X|$
+\item $g(x)  = 1/X$
+\item $g(x)  = \sqrt{X}$
+\end{itemize}
+These situations can arise in practice when we have weak instruments or other problems.
+\end{frame}
+
+
+
+\end{document}
