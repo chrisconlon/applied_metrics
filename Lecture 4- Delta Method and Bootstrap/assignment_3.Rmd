@@ -1,7 +1,6 @@
 ---
 title: "Problem Set "
 author: "Prof. Conlon"
-date: "Due: 3/27/20"
 output:
   pdf_document: default
   html_document: default
