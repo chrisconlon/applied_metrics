@@ -1,0 +1,168 @@
+\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{metropolis}
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{amsmath}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+
+%\usepackage{pxfonts}
+
+\usepackage[absolute,overlay]{textpos} 
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+
+\title [Nonparametrics]{Nonparametrics and Local Methods: Nearest Neighbor}
+\author{C.Conlon}
+\institute{Applied Econometrics}
+\date{\today}
+\setbeamerfont{equation}{size=\tiny}
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+
+\begin{frame}{Bias Variance Decomposition}
+We can decompose any estimator into two components
+\begin{align*}
+\underbrace{E[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( E[\hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{E \left[ \left(\hat{f}(x) - E[\hat{f}(x) \right] \right)^2}_{Variance} 
+\end{align*}
+\begin{itemize}
+\item In general we face a tradeoff between bias and variance.
+\item More complicated models reduce \alert{bias}, but at the expense of higher \alert{variance}.
+%\item In k-NN as $k$ gets large we reduce the variance (each point has less influence) but we increase the bias since we start incorporating far away and potentially irrelevant information.
+%\item In OLS we minimize the variance among unbiased estimators assuming that the true $f$ is linear.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bias Variance Decomposition}
+What minimizes MSE?
+\begin{align*}
+f(x_i) = E[Y_i | X_i] 
+\end{align*}
+\begin{itemize}
+\item Seems simple enough (but we are back where we started).
+\item How do we compute the expectation ?
+\begin{itemize}
+\item OLS uses entire dataset and adds structure $ y = x \beta$ to the problem.
+\item Can use polynomials in $x$.
+\item k-NN tries to use local information to estimate conditional mean
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{How about logit?}
+We write:
+\begin{align*}
+E[Y_i | X_i] &= Pr(Y_i =1 | X_i) = p(x_i)\\
+ Pr(Y_i =1 | X_i)  &= \frac{1}{1+\exp^{\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots}}
+\end{align*}
+Or with the log odds transformation:
+\begin{align*}
+\log \left(\frac{p}{1-p} \right) =\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots
+\end{align*}
+Logit is \alert{linear} again (in parameters). This is a \alert{generalized linear model}.
+\end{frame}
+
+\begin{frame}{How else might we estimate $E[Y_i | X_i]$?}
+Obvious approach:
+\begin{itemize}
+\item With enough data: look at all values for $X_i = x$ and take the mean.
+\item Easy if $X$ is discrete or doesn't take on too many values (Gender, State/Country).
+\item Could work if $X$ is continuous but rounded (test scores, years of school, etc.).
+\item We could cut $x_i$ into distinct bins (like a histogram).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{A Fake Data Example}
+Following the THF textbook example, we can generate some fake data and let: 
+\begin{eqnarray*}
+Y=&ORANGE \mbox{ if } Y^{*} &> 0.5 \\
+Y=&BLUE  \mbox{ if }   Y^{*} &\leq 0.5
+\end{eqnarray*}
+\begin{itemize}
+\item Easiest way to recover $Y^{*}$ is by running OLS on the linear probability model.
+\item Draws from bivariate normal distribution with uncorrelated components but different means (2 overlapping types)
+\item Mixture of 10 low variance (nearly point mass) normal distributions where the individual means were drawn from another normal distribution. (10 nearly distinct types).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Linear Probability Model}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[height=0.9\textheight]{./resources/classifierOLS.pdf}
+\label{classOLS}
+\end{center}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Alternative}
+\begin{itemize}
+\item Lots of potential alternatives to our decision rule.
+\item A simple idea is to hold a majority vote of neighboring points 
+\begin{eqnarray*}
+Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
+\end{eqnarray*}
+\item To avoid including ``yourself'' in your neighborhood, we often estimate on one sample and validate on another
+\item How many parameters does this model have: None? One? $k$? 
+\item Technically it has something like $N/k$.
+\item As $N \rightarrow \infty$ this means we have an infinite number of parameters! (This is a defining characteristic of non-parametrics).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{15 Nearest Neighbor}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[height=0.95\textheight]{./resources/classifier15nn.pdf}
+\label{class15nn}
+\end{center}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Extreme: 1 Nearest Neighbor}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[height=0.95\textheight]{./resources/classifier1nn.pdf}
+\label{class15nn}
+\end{center}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Comparisons}
+\begin{itemize}
+\item What would happen if $K \rightarrow N$?
+\item The k-NN model is locally constant.
+\item The k-NN approach tends to be really bumpy which can be undesirable.
+\end{itemize}
+\end{frame}
+\begin{frame}{What about?}
+\begin{itemize}
+\item If we fixed the fact that there are discrete jumps in who is in the neighborhood by smoothly weighting observations and varying those weights instead (Kernels).
+\item Another drawback of $k-NN$ is that we consider distance in each $X$ dimension on the same scale, perhaps we could rescale the data to improve our ``closeness'' measure.
+\item Instead of fitting a constant locally, we fit a linear function locally (Lowess).
+\item Instead of using a global linear approximation in OLS use a more flexible nonlinear one.
+\item There is a bias/variance tradeoff. \alert{explain}.
+\end{itemize}
+\end{frame}
+
+
+\end{document}
