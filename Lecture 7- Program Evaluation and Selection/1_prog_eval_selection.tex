@@ -33,6 +33,41 @@ The Selection Problem}
 
 \frame{\titlepage}
 
+\section{Intro}
+\frame{\frametitle{Overview}
+This set of lectures will cover (roughly) the following papers:\\
+Theory:
+\begin{itemize}
+\item Angrist and Imbens (1994)
+\item Heckman Vytlacil (2005/2007)
+\item Abadie and Imbens (2006)
+\end{itemize}
+And draw heavily upon notes by 
+\begin{itemize}
+\item Guido Imbens
+\item Richard Blundell and Costas Meghir
+\end{itemize}
+
+}
+
+\begin{frame}
+\frametitle{The Evaluation Problem}
+\begin{itemize}
+\item The issue we are concerned about is identifying the effect of a policy or an investment or some individual action on one or more outcomes of interest
+\item This has become the workhorse approach of the applied microeconomics fields (Public, Labor, etc.)
+\item Examples may include:
+\begin{itemize}
+\item The effect of taxes on labor supply
+\item The effect of education on wages
+\item The effect of incarceration on recidivism
+\item The effect of competition between schools on schooling quality
+\item The effect of price cap regulation on consumer welfare
+\item The effect of indirect taxes on demand
+\item The effects of environmental regulation on incomes
+\item The effects of labor market regulation and minimum wages on wages and employment
+\end{itemize}
+\end{itemize}
+\end{frame}
 \begin{frame}
 \frametitle{Example: Borjas (1987)}
 \begin{itemize}
@@ -165,18 +200,60 @@ The missing (fourth) case:
 \end{frame}
 
 
-\begin{frame}{Takeaway}
-What can we learn here?
+\begin{frame}
+\frametitle{The Evaluation Problem}
 \begin{itemize}
-\item Heckman won a Nobel Prize for his work on selection...
-\item You need to know what an \alert{inverse Mills ratio is}
-\item But today it is hard to get away with strong parametric assumptions (bivariate normal) on error terms.
-\item Doing MLE with a fully normal model is not a terrible place to start sometimes
+\item Define an outcome variable $Y_i$ for each individual
+\item Two \alert{potential outcomes} for each person $\{Y_i(1), Y_i(0)\}$ depending on whether they receive treatment or not.
+\item Call $Y_i(1)- Y_i(0) = \beta_i$ the \alert{Treatment effect}.
+\item Two major problems:
 \begin{itemize}
-\item Sometimes helpful to know how bad the selection problem might be.
+\item All individuals have different treatment effects (\alert{heterogeneity}).
+\item We don't actually observe any one person's treatment effect ! (Missing Data problem)
 \end{itemize}
-\item R package is \texttt{sampleSelection} and see \url{https://rpubs.com/hacamvan/316839} and \url{https://cran.r-project.org/web/packages/sampleSelection/vignettes/selection.pdf}.
+\item We need strong assumptions in order to recover $f(\beta_i)$ from data.
+\item Instead we can characterize simpler functions such as $E[\beta_i]$ (ATE) or $E[\beta_i | T_i = 1]$ (ATT) or $E[\beta_i | T_i = 0]$ (ATC)  with fewer restrictions.
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{More Difficulties}
+What is hard here?
+\begin{itemize}
+\item Heterogeneous effect of $\beta_i$ in population.
+\item Selection in treatment may be endogenous. That is $T_i$ depends on $Y_i(1),Y_i(0)$.
+\item Fisher or Roy (1951) model:
+\begin{eqnarray*}
+Y_i = (Y_i(1) - Y_i(0)) T_i + Y_i(0)= \alpha + \beta_i T_i + u_i
+\end{eqnarray*}
+\item Agents usually choose $T_i$ with $\beta_i$ or $u_i$ in mind.
+\item Can't necessarily pool across individuals since $\beta_i$ is not constant.
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Structural vs. Reduced Form}
+\begin{itemize}
+\item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
+\item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
+\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Start with Easy Cases}
+\begin{itemize}
+\item Let's start with the easy cases: run OLS and see what happens.
+\item OLS compares mean of treatment group with mean of control group (possibly controlling for other $X$)
+\begin{eqnarray*}
+\beta^{OLS} &=& E(Y_i | T_i =1) - E(Y_i | T_i=0) \\
+&=& \underbrace{E[\beta_i | T_i =1]}_{\mbox{ATT}} + \left(\underbrace{E[u_i | T_i =1 ] - E[u_i | T_i=0] }_{\mbox{selection bias}}  \right)
+\end{eqnarray*}
+\item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
+\item $Y_i^0 = \alpha + u_i$ may vary within the population (this is quite common).
+\end{itemize}
+\end{frame}
 \end{document}
