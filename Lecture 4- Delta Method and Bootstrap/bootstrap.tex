@@ -24,7 +24,7 @@
 \DeclareMathSizes{10}{10}{6}{6} 
 
 
-\title [Bootstrap]{Delta Method, Bootstrap, and Cross Validation}
+\title [Bootstrap]{Bootstrap and Subsampling}
 \author{C.Conlon}
 \institute{Applied Econometrics II}
 \date{\today}
@@ -33,101 +33,6 @@
 
 \begin{frame}
 \titlepage
-\end{frame}
-
-
-\begin{frame}{Bootstrap and Delta Method}
-\begin{itemize}
-\item We know how to construct confidence intervals for parameter estimates:  $\hat{\theta}_k \pm 1.96 SE(\hat{\theta}_k)$
-\item Often we are asked to construct standard errors or confidence intervals around model outputs that are not just parameter estimates: ie:  $g(x_i,\hat{\theta})$.
-\item Sometimes we can't even write $g(x_i,\theta)$ as an explicit function of $\theta$ ie: $\Psi(g(x_i,\theta),\theta) = 0$.
-\item Two options:
-\begin{enumerate}
-\item Delta Method
-\item Bootstrap
-\end{enumerate}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Delta Method}
-Delta method works by considering a \alert{Taylor Expansion} of $g(x_i,\theta)$.
-\begin{eqnarray*}
-g(z) \approx g(z_0) + g'(z_0)(z-z_0) + o(||z-z_0||)
-\end{eqnarray*}
-Assume that $\theta_n$ is asymptotically normally distributed so that:
-\begin{eqnarray*}
-\sqrt{n} (\theta_n - \theta_0) \sim N(0,\Sigma)
-\end{eqnarray*}
-(How do we get this: OLS? GMM? MLE?).\\
-
-Then we have that 
-\begin{eqnarray*}
-\sqrt{n} (g(\theta_n) - g(\theta_0)) \sim N(0,D(\theta)' \Sigma  D(\theta))
-\end{eqnarray*}
-Where $D(\theta) = \frac{\partial g(x_i, \theta)}{\partial \theta}$ is the Jacobian of $g$ with respect to theta evaluated at $\theta$.\\
-We need $g$ to be continuously differentiable around the center of our expansion $\theta$.
-\end{frame}
-
-
-\begin{frame}{Delta Method: Examples}
-Start with something simple: $Y= \overline{X}_1\cdot \overline{X}_2$ with $(X_{1i},X_{2i}) \sim IID$.
-We know the CLT applies so that:
-\begin{eqnarray*}
-\sqrt{n}
-\begin{pmatrix}
-\overline{X}_1 - \mu_1\\
-\overline{X}_2 - \mu_2
-\end{pmatrix} &\sim  N
-\begin{bmatrix}
-\begin{pmatrix}
-0\\
-0
-\end{pmatrix},
-\Sigma
-\end{bmatrix}
-\end{eqnarray*}
-The Jacobian is just $D(\theta) =  \begin{pmatrix}\frac{\partial g(\theta)}{\partial \theta_1} \\ \frac{\partial g(\theta)}{\partial \theta_2}  \end{pmatrix} =  \begin{pmatrix}s_2\\ s_1 \end{pmatrix}$\\
-So,
-\begin{eqnarray*}
-V(Y) = D(\theta)' \Sigma D(\theta) =\begin{pmatrix} \mu_2 & \mu_1 \end{pmatrix}  \begin{pmatrix} \sigma_{11} & \sigma_{12} \\ \sigma_{21} & \sigma_{22} \end{pmatrix} \begin{pmatrix} \mu_2 \\\mu_1  
-\end{pmatrix} \\
-\sqrt{n} ( \overline{X}_1 \overline{X}_2 - \mu_1 \mu_2) \sim N(0,\mu_2^2 \sigma_{11}^2 + 2 \mu_1 \mu_2 \sigma_{12}  + \mu_1^2 \sigma_{22}^2)
-\end{eqnarray*}
-\end{frame}
-
-\begin{frame}{Delta Method: Examples}
-Think about a simple logit:
-\begin{eqnarray*}
-P(Y_i=1 | X_i ) = \frac{\exp^{\beta_0 + \beta_1 X_i}}{1+\exp^{\beta_0 + \beta_1 X_i}}  \quad P(Y_i=0 | X_i ) = \frac{1}{1+\exp^{\beta_0 + \beta_1 X_i}} 
-\end{eqnarray*}
-Remember the ``trick'' to use GLM (log-odds):
-\begin{eqnarray*}
-\log P(Y_i=1 | X_i) - \log P(Y_i=0 | X_i) = \beta_0 + \beta_1 X_i
-\end{eqnarray*}
-\begin{itemize}
-\item Suppose that we have estimated $\hat{\beta_0},\hat{\beta_1}$ via GLM/MLE but we want to know the confidence interval for the probability: $P(Y_i=1 | X_i,\hat{\theta})$
-\item The derivatives are a little bit tricky, but the idea is the same.
-\item This is what STATA should be doing when you type: \tt{mfx, compute}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Delta Method: Other Examples}
-Often we have a regression like:
-\begin{eqnarray*}
-log Y_i = \beta_0 + \beta_1 X_i + \gamma Income_i + \epsilon_i
-\end{eqnarray*}
-And we are interested in $\beta_1 / \gamma$ so that we have $\beta_i$ in units of ``dollars''. Again Delta Method Works fine here.\\
-\end{frame}
-
-
-\begin{frame}{Delta Method: Some Failures}
-But we need to be careful.  Suppose that $\theta \approx 0$ and 
-\begin{itemize}
-\item $g(x)  = |X|$
-\item $g(x)  = 1/X$
-\item $g(x)  = \sqrt{X}$
-\end{itemize}
-These situations can arise in practice when we have weak instruments or other problems.
 \end{frame}
 
 \begin{frame}{Bootstrap}
@@ -252,114 +157,50 @@ The bootstrap I have presented is sometimes known as the \alert{nonparametric bo
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Cross Validation}
-Cross Validation appears superficially similar to bootstrap but asks a different question.
+
+\begin{frame}{Subsampling}
+The bootstrap has a close cousin \alert{subsampling}.
 \begin{itemize}
-\item Bootstrap tries to construct an empirical analogue to the sampling distribution of $\hat{\theta}$.
-\item CV tries to measure what the expected out of sample (OOS or EPE) prediction error of a new never seen before dataset.
-\item The main consideration is to prevent \alert{overfitting}.
-\begin{itemize}
-\item In sample fit is always going to be maximized by the most complicated model.
-\item OOS fit might be a different story.
-\item 1-NN might do really well in-sample, but with a new sample might perform badly.
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Sample Splitting/Holdout Method and CV}
-Cross Validation is actually a more complicated version of \alert{sample splitting} that is one of the organizing principles in machine learning literature.
-
-\begin{description}
-\item[Training Set] This is where you estimate parameter values.
-\item[Validation Set] This is where you choose a model- a bandwidth $h$ or tuning parameter $\lambda$ by computing the error.
-\item[Test Set] You are only allowed to look at this after you have chosen a model. \alert{Only Test Once}: compute the error again on fresh data.
-\end{description}
-\begin{itemize}
-\item Conventional approach is to allocate 50-80\% to training and 10-20\% to Validation and Test.
-\item Sometimes we don't have enough data to do this reliably.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Sample Splitting/Holdout Method}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/split-sample}
-\end{center}
-\end{frame}
-
-\begin{frame}{Challenge with Sample Splitting}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/validation-10fold}
-\end{center}
-\end{frame}
-
-
-\begin{frame}{Cross Validation}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/split-cv5}
-\end{center}
-\end{frame}
-
-\begin{frame}{$k$-fold Cross Validation}
-\begin{itemize}
-\item Break the dataset into $k$ equally sized ``folds'' (at random).
-\item Withhold $i=1$ fold
-\begin{itemize}
-\item Estimate the model parameters $\hat{\theta}^{(-i)}$ on the remaining $k-1$ folds
-\item Predict $\hat{y}^{(-i)}$ using $\hat{\theta}^{(-i)}$ estimates for the $i$th fold (withheld data).
-\item Compute $MSE_i =\frac{1}{k \cdot N} \sum_j (y^{(-i)}_j -\hat{y}^{(-i)}_j)^2$.
-\item Repeat for $i=1,\ldots,k$.
-\end{itemize}
-\item Construct $\widehat{MSE}_{k,CV} = \frac{1}{k} \sum_i MSE_{i}$
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Leave One Out Cross Validation (LOOCV)}
-Same as $k$-fold but with $k=N$.
-\begin{itemize}
-\item Withhold a single observation $i$
-\item Estimate $\hat{\theta}_{(-i)}$.
-\item Predict $\hat{y}_i$ using $\hat{\theta}^{(-i)}$ estimates
-\item Compute $MSE_i =\frac{1}{N} \sum_j (y_i -\hat{y}_i(\hat{\theta}^{(-i)}))^2$.
-\end{itemize}
-\vspace{0.2cm}
-Note: this requires estimating the model $N$ times which can be costly.
-\end{frame}
-
-
-
-\begin{frame}{Cross Validation}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/comparison-cv}
-\end{center}
-\end{frame}
-
-\begin{frame}{Cross Validation}
-\begin{itemize}
-\item Main advantage of cross validation is that we use all of the data in both \alert{estimation} and in \alert{validation}.
-\begin{itemize}
-\item For our purposes validation is mostly about choosing the right bandwidth or tuning parameter.
-\end{itemize}
-\item We have much lower variance in our estimate of the OOS mean squared error.
-\begin{itemize}
-\item Hopefully our bandwidth choice doesn't depend on randomness of splitting sample.
-\end{itemize}
+\item  In practice it looks similar, but the underlying theory is quite different.
+\item It relies on weaker assumptions and works even in some cases where the bootstrap fails.
+\item Again ``fails'' means that the 95\% confidence interval has coverage that isn't very close to 95\%.
 \end{itemize}
 \end{frame}
 
 
-
-\begin{frame}{Test Data}
+\begin{frame}{Subsampling: How does it work?}
+\begin{enumerate}
+\item Draw a \alert{smaller} sample $X^*=(X_1^*,\ldots,X_{a_n}^*)$ \alert{without replacement} of size $a_n$ where as $n \rightarrow \infty$ we have $a_n \rightarrow \infty$ and $\frac{a_n}{n} \rightarrow 0$.
 \begin{itemize}
-\item In Statistics/Machine learning there is a tradition to withhold 10\% of the data as \alert{Test Data}.
-\item This is \alert{completely new data} that was not used in the CV procedure.
-\item The idea is to report the results using this test data because it most accurately simulates true OOS performance.
-\item We don't do much of this in economics.\\
- (Should we do more?)
+\item e.g. $a_n = \log n$ or $a_n = \sqrt{n}$. Note that $a_n / 10$ doesn't work.
 \end{itemize}
+\item Compute the relevant statistic $\theta(X^*)$ or $g(\theta(X^*))$.
+\item Repeat this $B$ times and construct the CDF:
+\begin{align*}
+L_n(t) = \frac{1}{B} \sum_{b=1}^B \mathbf{I} \left( \sqrt{a_n}(\widehat{\theta}_b - \widehat{\theta}_n  )  \leq t \right)
+\end{align*}
+\item Calculate the quantiles of the CDF and CI:
+\begin{align*}
+\hat{t}_{\alpha / 2}&=L_{n}^{-1}(\alpha / 2), \quad \hat{t}_{1-\alpha / 2}=L_{n}^{-1}(1-\alpha / 2)\\
+C_{n}&=\left[\hat{\theta}_{n}-\frac{\hat{t}_{1-\alpha / 2}}{\sqrt{n}}, \hat{\theta}_{n}-\frac{\hat{t}_{\alpha / 2}}{\sqrt{n}}\right]
+\end{align*}
+\end{enumerate}
 \end{frame}
 
 
 
+\begin{frame}{Subsampling: Caveats}
+\begin{itemize}
+\item The proof for \alert{why} subsampling works is complicated. See \url{https://web.stanford.edu/~doubleh/lecturenotes/lecture13.pdf}.
+\item Downsides:
+\begin{itemize}
+\item Subsampling really leans on $n \rightarrow \infty$ more than bootstrap. People often use bootstrap to understand finite sample performance (is this a good idea though?).
+\item Choice of $a_n$ is difficult. Calculating the optimal value can be quite complicated and there aren't great rules of thumb.
+\end{itemize}
+\item But if you're in a weird case where bootstrap fails (parameter on the boundary, etc.) try subsampling and see!
+\end{itemize}
+\end{frame}
 
 
+\section*{Thanks!}
 \end{document}

@@ -1,0 +1,256 @@
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{default}
+\usetheme{metropolis}
+\setbeamersize{text margin left=.3in,text margin right=.3in} 
+
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
+\usepackage{dcolumn}
+\usepackage{booktabs}
+
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+\begin{document}
+\title{Program Evaluation(a): Intro and Notation}
+\author{Chris Conlon}
+\institute{Applied Econometrics}
+\date{\today}
+
+\frame{\titlepage}
+
+\frame{\frametitle{Overview}
+This set of lectures will cover (roughly) the following papers:\\
+Theory:
+\begin{itemize}
+\item Angrist and Imbens (1994)
+\item Heckman Vytlacil (2005/2007)
+\item Abadie and Imbens (2006)
+\end{itemize}
+And draw heavily upon notes by 
+\begin{itemize}
+\item Guido Imbens
+\item Richard Blundell and Costas Meghir
+\end{itemize}
+
+}
+
+\begin{frame}
+\frametitle{The Evaluation Problem}
+\begin{itemize}
+\item The issue we are concerned about is identifying the effect of a policy or an investment or some individual action on one or more outcomes of interest
+\item This has become the workhorse approach of the applied microeconomics fields (Public, Labor, etc.)
+\item Examples may include:
+\begin{itemize}
+\item The effect of taxes on labor supply
+\item The effect of education on wages
+\item The effect of incarceration on recidivism
+\item The effect of competition between schools on schooling quality
+\item The effect of price cap regulation on consumer welfare
+\item The effect of indirect taxes on demand
+\item The effects of environmental regulation on incomes
+\item The effects of labor market regulation and minimum wages on wages and employment
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Potential Outcomes}
+\begin{itemize}
+\item Consider a binary treatment $T_i \in \{0,1\}$. 
+\begin{itemize}
+\item Some people use $D_i \in \{0,1\}$ instead.
+\end{itemize}
+\item We observe the outcome $Y_i$. But there are two \alert{potential outcomes}
+\begin{itemize}
+\item $Y_i(1)$ the outcome for $i$ if they  \alert{are treated}.
+\item $Y_i(0)$ the outcome for $i$ if they \alert{are not treated} (control).
+\end{itemize}
+\item We are generally interested in $\beta_i \equiv  Y_i(1)-Y_i(0)$ which we call the \alert{treatment effect}.
+\begin{itemize}
+\item Individuals have \alert{heterogeneous treatment effects}.
+\item In an ideal world we could fully characterize $f(\beta_i)$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Some Challenges}
+Stable unit treatment value assumption (SUTVA)
+\begin{itemize}
+\item We assume a \textit{ceteris paribus} version of treatment effects
+\item We need $\beta_i$ to be a policy invariant (structural) parameter.
+\item Your $\beta_i$ doesn't respond to whether or not another individual is treated.
+\item Two common limitations:
+\begin{itemize}
+\item Peer effects: Whether you respond to job training program depends on whether your spouse is also treated.
+\item Equilibrium effects: if we sent everyone to college, returns to college would be quite different.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Some Challenges}
+\begin{columns}[T] % align columns
+\begin{column}{.65\textwidth}
+Fundamental Problem of Causal Inference
+\begin{itemize}
+\item We don't observe the \alert{counterfactual} $Y_i(T_i)$.
+\item For a single individual we either observe $Y_i(1)$ \alert{or} $Y_i(0)$ but never both!
+\begin{itemize}
+\item ex: We don't see what your wage would have been if you didn't attend college.
+\item ex: We might know your cholesterol before you took Lipitor, but we don't know what it would be today if you didn't take Lipitor.
+\end{itemize}
+\end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.38\textwidth}
+
+  \vspace{20pt}
+  
+  $Y_{i} = T_{i}Y_{i}(1) + (1-T_{i})Y_{i}(0)$\\
+  \vspace{20pt}
+  \begin{tabular}{ccccc}
+    \toprule
+    i & $Y_{i}(1)$ &  $Y_{i}(0)$ & $T_{i}$ & $Y_{i}$ \\
+    \midrule
+    1 &     1      &     \alert{?}      &   1   & 1 \\
+    2 &     0      &     \alert{?}      &   1   & 0 \\
+    3 &     \alert{?}      &     0      &   0   & 0 \\
+     & &  \vdots & & \\
+    $n$ &     \alert{?}      &     1      &   0   & 1 \\    
+  \end{tabular}
+\end{column}%
+\end{columns}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Structural vs. Reduced Form}
+\begin{itemize}
+\item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
+\item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
+\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Treatment Effects Parameters}
+Most approaches to estimating treatment effects will recover some moments of $f(\beta_i)$ instead of the entire distribution
+\begin{description}
+\item[Average Treatment Effect (ATE)] corresponds to $\mathbb{E}[\beta_i]$.
+\item[Average Treatment on Treated (ATT)] corresponds to $\mathbb{E}[\beta_i | T_i = 1]$.
+\item[Average Treatment on Control/Untreated (ATUT)] corresponds to $\mathbb{E}[\beta_i | T_i = 0]$.
+\end{description}
+We also have that if the probability of treatment $ Pr(T_i=1) = \pi$
+\begin{align*}
+ATE = \pi \cdot ATT + (1-\pi) \cdot ATUT
+\end{align*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Local Average Treatment Effects}
+Another important object is the \alert{Wald Estimator}
+\begin{align*}
+Wald = \frac{\mathbb{E}[Y_i | Z_i =1] - \mathbb{E}[Y_i | Z_i =0]}{\mathbb{E}[T_i  | Z_i =1] - \mathbb{E}[T_i | Z_i =0]} 
+\end{align*}
+This is useful because under some conditions it corresponds to the 2SLS estimate of $Y_i$ on $T_i$ with binary instrument $Z_i$.
+\begin{align*}
+Y_i &= \alpha + \beta_i \cdot T_i + u_i \\
+T_i &= \lambda + \pi_i \cdot Z_i + e_i
+\end{align*}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Intent to Treat}
+We can decompose the numerator and the denominator of the \alert{Wald Estimator}
+\begin{align*}
+Wald = \frac{\mathbb{E}[Y_i | Z_i =1] - \mathbb{E}[Y_i | Z_i =0]}{\mathbb{E}[T_i  | Z_i =1] - \mathbb{E}[T_i | Z_i =0]}  = \frac{ITT}{ITT_d}
+\end{align*}
+\begin{itemize}
+\item \alert{Intent to Treat} (numerator) tells us how outcome responds directly to the instrument.
+\item \alert{Intent to Treat ``D''} (denominator) tells us how treatment probability responds directly to the instrument.
+\end{itemize}
+Often people we report the numerator in addition to other parameters.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Local Average Treatment Effects}
+Under conditions we will explore later in detail 2SLS delivers the \alert{local average treatment effect (LATE)}:
+\begin{align*}
+\widehat{\beta}_1^{TSLS} &\rightarrow^p \frac{\mathbb{E}[\beta_{i} \pi_{i}]}{\mathbb{E}[\pi_{i}]} = LATE \\
+LATE &= ATE + \frac{Cov(\beta_{i},\pi_{i})}{\mathbb{E}[\pi_{i}]}
+\end{align*}
+\begin{itemize}
+\item Weighted average for individuals for whom $Z_i$ pushes them into treatment (compliers).
+\item Places more weight on individuals with larger $\pi_i$
+\item Relationship to ATE depends on correlation between $(\beta_i, \pi_i)$.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Selection Problem}
+\begin{itemize}
+\item Let's start with the easy cases: run OLS and see what happens.
+\begin{align*}
+Y_i = \alpha + \beta_i \cdot T_i + u_i
+\end{align*}
+\item OLS compares mean of treatment group with mean of control group (possibly controlling for other $X$)
+\begin{eqnarray*}
+\beta^{OLS} &=& E(Y_i | T_i =1) - E(Y_i | T_i=0) \\
+&=& \underbrace{E[\beta_i | T_i =1]}_{\mbox{ATT}} + \left(\underbrace{E[u_i | T_i =1 ] - E[u_i | T_i=0] }_{\mbox{selection bias}}  \right)
+\end{eqnarray*}
+\item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
+\item $Y_i^0 = \alpha + u_i$ may vary within the population (this is quite common).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Why worry about selection?}
+Unless we have random assignment...
+\begin{itemize}
+\item People often choose $D_i$ with $\beta_i$ in mind.
+\item The problem: $D_i \perp u_i$ and/or $D_i \perp \beta_i$ are likely violated.
+\item We can get positive or negative selection bias:
+\begin{itemize}
+\item e.g. Who goes to college? those likely to benefit more than most!
+\item e.g. who gets risky surgeries/drugs? people who are very sick.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{What's next?}
+Even the simple cases here are pretty tough (Binary treatment, binary (or no) instrument).\\
+
+How do we construct counterfactuals that we don't observe?
+\begin{itemize}
+\item Matching
+\item Regression Adjustment
+\item Instrumental Variables
+\item Panel Data
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\end{document}

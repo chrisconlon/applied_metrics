@@ -1,0 +1,94 @@
+---
+title: "exercises_3.Rmd"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r packages}
+library(AER)
+library(gmm)
+library(stargazer)
+data("PSID1976")
+df <- subset(PSID1976, participation=="yes")
+```
+
+## Estimate the relationship between:
+
+$$
+\log(wage_i) = \beta_0 + \beta_1 educ_i + \beta_2 exper_i + \beta_3 exper_i^2 + \varepsilon_i
+$$
+First we ignore the endogeneity of "education"
+```{r ols, echo=TRUE}
+iv_results1 <- lm(log(wage) ~ education + experience + I(experience^2), data = df)
+
+exog_ols <- cbind(df$education, df$experience, I(df$experience^2))
+gmm_results1 <- gmm(log(wage) ~ education + experience + I(experience^2),
+              x = exog_ols, data = df)
+
+summary(iv_results1)
+summary(gmm_results1)
+```
+
+1. How come the point estimates $\widehat{\beta}$ are the same but the standard errors are different?
+
+Where we have mother's and father's education as instruments for the endogenous variable (education):
+
+```{r iv, echo=TRUE}
+iv_results <- ivreg(log(wage) ~ education + experience + I(experience^2) |
+                   .-education + feducation + meducation, data = df)
+
+exog <- cbind(df$feducation, df$meducation, df$experience, I(df$experience^2))
+gmm_results <- gmm(log(wage) ~ education + experience + I(experience^2),
+              x = exog, data = df)
+
+summary(iv_results)
+summary(gmm_results)
+```
+
+2. Why do both the point estimates and the standard errors differ now?
+
+3. Let's write our own linear IV GMM estimator
+a. a function that recovers $\widehat{\beta}$
+b. a function that returns the GMM objective function $Q(\theta)$
+c. a function that returns the sandwich standard errors $SE(\widehat{\beta})$
+d. a function that returns an updated weighting matrix $\hat{W}$.
+```{r code, echo=TRUE}
+gmm_estimates<- function(Y, X, Z, W){
+  return 
+} 
+
+gmm_obj<- function(Y, X, Z, W, beta){
+  return 
+} 
+
+gmm_se<- function(Y, X, Z, W, beta){
+  return 
+} 
+
+gmm_W<- function(Y, X, Z, W, beta){
+  return 
+} 
+```
+
+4. Put your GMM estimates in a table with the following:
+a. OLS estimates
+b. OLS (GMM) estimates
+c. IV estimates
+d. IV (GMM) estimates
+e. Your estimates of one-step GMM using Identity weights
+f. Your estimates of two-step GMM starting at Identity weights
+g. Your estimates of one-step GMM using 2SLS weights
+h. Your estimates of two-step GMM starting at 2SLS weights
+i. Use the (GMM) package to estimate continuously updating GMM (type='cue')
+

@@ -1,0 +1,217 @@
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{metropolis}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
+
+
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+\begin{document}
+\title{Part 6: Model Selection and Intro to ML}
+\author{Chris Conlon}
+\institute{Applied Econometrics II}
+\date{\today}
+
+\frame{\titlepage}
+\section{AIC/BIC and KLIC}
+\frame{\frametitle{Overview}
+How many components should we include in our model?
+\begin{itemize}
+\item Too few: under-fitting and large residuals.
+\item Too many: over-fitting and poor out of sample prediction.
+\end{itemize}
+How do we choose?
+\begin{itemize}
+\item $X$ variables.
+\item Instrumental Variables.
+\end{itemize}
+}
+
+
+\begin{frame}
+\frametitle{When do we have too much data?}
+\begin{itemize}
+\item On the internet!
+\item Hedonics: What really determines the price of your house?
+\item Prediction: What really determines loan defaults?
+\item Consideration Sets: How many products do consumers really choose among on the shelf?
+\item Which elements of financial filings really matter?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{What do people mostly do in practice?}
+\begin{itemize}
+\item Regress $Y$ on $X$ with all variables included.
+\item Drop some variables if they aren't significant?
+\item Re-run with some things dropped
+\item Add in some other things that may or may not be significant.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nested and Non-nested Models}
+What makes a model \alert{nested} or \alert{non-nested}?
+\begin{align*}
+y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \varepsilon_i 
+\end{align*}
+A nested model can be written as a restricted version of the larger model
+\begin{itemize}
+\item ie: all of the following are nested within the model above
+\begin{align*}
+y_i &= \beta_0 + \beta_1 x_i + \beta_2 w_i + \varepsilon_i  \\
+y_i &= \beta_0 + \beta_1 x_i + \beta_3 z_i + \varepsilon_i  \\
+y_i &= \beta_0 + \beta_2 w_i + \beta_3 z_i + \varepsilon_i  
+\end{align*}
+\item ie: this model is non-nested (because of $s_i$)
+\begin{align*}
+y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \gamma s_i +  \varepsilon_i 
+\end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{What we teach undergrads?}
+Start with sum of squared errors (If you want $\frac{1}{n}$'s imagine them):
+\begin{align*}
+\underbrace{\sum_{i=1}^{n}\left(y_{i}-\bar{y}\right)^{2}}_{\text{total sum of squares}}
+=\underbrace{\sum_{i=1}^{n}\left(y_{i}-\hat{y}_{i}(\theta)\right)^{2}}_{\text{residual sum of squares}}
++\underbrace{\sum_{i=1}^{n}\left(\hat{y}_{i}(\theta)-\bar{y}\right)^{2}}_{\text{explained sum of squares}}
+\end{align*}
+Let $\dim(\theta)=p$ (the number of parameters).
+
+
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{What we teach undergrads}
+Three traditional ways to select the number of components in a model:\\
+\begin{eqnarray*}
+\overline{R}^2  &=& 1-SSR(p)/TSS - SSR(p)/TSS \cdot \frac{p}{N-p-1} \\
+AIC(p) &=& \ln\left(\frac{SSR(p)}{N}\right) + (p+1)\frac{2}{N}\\
+BIC(p) &=& \ln \left(\frac{SSR(p)}{N} \right) + (p+1)\frac{\ln N}{N}
+\end{eqnarray*}
+These are designed for strictly \alert{nested} models.
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{Review AIC/BIC}
+\begin{itemize}
+\item AIC tends to select larger models than BIC since it penalizes the number of parameters less heavily.
+\item These usually depend on ordering potential models by $p$ the number of components and then sequentially fitting them.
+\item AIC is not consistent: as $N \rightarrow \infty$ it may still select too many parameters.
+\item BIC is consistent: as $N \rightarrow \infty$ it will select the correct number of parameters.
+\item Of course for finite-sample $N < \infty$ anything can happen.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{What is KLIC?}
+Kullback-Leibler information criterion:
+\begin{align*}
+KLIC(f,g) &=\int \mathbf{f}(\mathbf{y}) \log \left(\frac{\mathbf{f}(\mathbf{y})}{\mathbf{g}(\mathbf{y})}\right) d \mathbf{y}\\
+&= \int  f(y) \log(f(y)) \partial y - \int  f(y) \log(g(y)) \partial y  \\
+&= C_f - \mathbb{E}_f  \log(g(y))
+\end{align*}
+Observe $KLIC(f,g) \geq 0$ and $KLIC(f,g)=0$ IFF $f,g$ are the same distribution!\\
+$C_f$ we ignore (doesn't depend on $g$).
+\end{frame}
+
+\begin{frame}
+\frametitle{Where does it come from?}
+How do we come up with these penalized regressions?
+\begin{itemize}
+\item AIC/BIC arise from considering the likelihood ratio test (LRT) of a maximum likelihood estimator and making a lot of assumptions.
+\item AIC arises from minimizing the Expected KLIC.
+\item Picking a model with best AIC means picking a model based on (estimated) expected KLIC (if $g$ includes the correct model).
+\item Low values of KLIC mean the models are similar.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Where does it come from?}
+How do we come up with these penalized regressions?
+\begin{itemize}
+\item Recall that OLS is a ML estimator in the case where $\varepsilon$ is normally distributed.
+\begin{eqnarray*}
+D = - 2 \ln \left (\frac{\mbox{Likelihood  } H_0}{\mbox{ Likelihood  }H_a} \right) = -2 \ln \underbrace{\left(\frac{(\sup L(\theta | x) : \theta \in \Theta_0)}{(\sup L(\theta | x) : \theta \in \Theta)}\right)}_{\Lambda(x)}
+\end{eqnarray*}
+\item If the models are \alert{nested} then $\Theta_0 \subset \Theta$ and $\dim(\Theta) -\dim(\Theta_0) = q$ then as $N\rightarrow \infty$ we have that $D \rightarrow^d \chi^2(q)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-nested cases}
+Many cases we are interested in are \alert{not strictly nested}
+\begin{itemize}
+\item Should I include $x_2$ OR $x_3$ in my regression? (partially overlapping)
+\item Is the correct distribution $f(y | x, \theta)$ normal or log-normal? (non-overlapping)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-nested cases}
+\begin{itemize}
+\item Cox (1961) suggested the following (often infeasible solution) by assuming that $F_{\theta}$ is the true model.
+\begin{eqnarray*}
+LR(\hat{\theta},\hat{\gamma}) = L_f(\hat{\theta}) - L_g (\hat{\gamma}) = \sum_{i=1}^N \ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}
+\end{eqnarray*}
+\item Depending on which the true model is you could reject $F_{\theta}$ for $G_{\gamma}$ and vice versa!
+\item Deriving the test statistic is hard (and specific to $F_{\theta}$) because we must obtain $E_f [\ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}]$.
+\item Similar to AIC in that we are minimizing KLIC over $F_{\theta}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Vuong Test}
+\small
+\begin{eqnarray*}
+H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \\
+\rightarrow E_h[\ln(h/g)] - E_h[\ln (h/f)] = 0
+\end{eqnarray*}
+\begin{itemize}
+\item Instead of taking expectation with respect to one of two distributions, we take it with respect to $h(y |x)$ the unknown but \alert{true distribution}.
+\item Same as testing whether two densities $(f,g)$ have same KLIC.
+\item The main result is that (details in 8.5 of CT):
+\begin{eqnarray*}
+\frac{1}{\sqrt{N}} LR(\hat{\theta},\hat{\gamma}) \rightarrow^d N [0,\omega_{*}^2],\quad \omega_{*}^2 =  V_0 \left[ \ln \frac{f(y| x, \hat{\theta})}{g(y| x, \hat{\gamma})}  \right]
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Model Comparison}
+\begin{itemize}
+\item Model selection is not the same thing as significance of $\beta$.
+\item AIC/BIC (even $\overline{R}^2$) compare models based on goodness of fit.
+\item BIC selects model on highest posterior probability of being the true model.
+\item AIC selects model that minimizes expected KLIC to the data. 
+\item In practice both assume something like a likelihood and construct a penalty term.
+\end{itemize}
+
+\end{frame}
+
+
+
+\end{document}

@@ -1,0 +1,232 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+%\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 3: Generalized Method of Moments}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{GMM: Intro}
+In the most basic setup we begin with some data $w_i$ where $i=1,\ldots,N$. Our economic model provides the following restriction on our data:
+\begin{align*}
+\mathbb{E}[g(w_i, \theta_0) ] =0
+\end{align*}
+\begin{itemize}
+\item At the true parameter value $\theta_0\in \mathbb{R}^k$ our moment conditions $g(w_i,\theta)$ are on average equal to zero. 
+\item What does ``on average'' mean?  In theory, $g(w_i,\theta_0)$ is a random variable and we are making a statement about its first moment.  This is what we mean when we write $\mathbb{E}[\cdot]$.
+\end{itemize}
+ \end{frame}
+ 
+ \begin{frame}{GMM: IID Normal}
+ Let's estimate the parameters of an IID normal $(x_1, \ldots, x_n)$. Recall the moments of the normal:
+ \begin{align*}
+ \mathbb{E}[X_i] = \mu \quad \mathbb{E}[X_i^2] = \mu^2 + \sigma^2
+ \end{align*}
+ We could form two moments by solving the expressions above for zero:
+ \begin{align*}
+ g_n^1(x_1,\ldots,x_n, \mu,\sigma)  &=  \left(\frac{1}{n} \sum_{i=1}^n x_i\right) - \mu\\
+ g_n^2(x_1,\ldots,x_n, \mu,\sigma)  &=  \left(\frac{1}{n} \sum_{i=1}^n x_i^2 \right) - \mu^2 - \sigma^2
+% g_n^{2'}(x_1,\ldots,x_n, \mu,\sigma)  &=  \left(\frac{1}{n} \sum_{i=1}^n x_i^2 \right) - \left(\frac{1}{n} \sum_{i=1}^n x_i\right)^2- \sigma^2
+ \end{align*}
+ This gives us two equations and two unknowns which we can solve for $(\mu,\sigma^2)$.\\
+ Of course you probably knew how to estimate the parameters of a normal...
+ \end{frame}
+ 
+ \begin{frame}{GMM: IID Normal}
+ Let's estimate the parameters of an IID normal $(x_1, \ldots, x_n)$. Recall the moments of the normal:
+ \begin{align*}
+ \mathbb{E}[X_i] = \mu \quad \mathbb{E}[X_i^2] = \mu^2 + \sigma^2
+ \end{align*}
+ We could form two moments by solving the expressions above for zero:
+ \begin{align*}
+ g_n^1(x_1,\ldots,x_n, \mu,\sigma)  &=  \left(\frac{1}{n} \sum_{i=1}^n x_i\right) - \mu\\
+ %g_n^2(x_1,\ldots,x_n, \mu,\sigma)  &=  \left(\frac{1}{n} \sum_{i=1}^n x_i^2 \right) - \mu^2 - \sigma^2\\
+ g_n^{2'}(x_1,\ldots,x_n, \mu,\sigma)  &=  \left(\frac{1}{n} \sum_{i=1}^n x_i^2 \right) - \left(\frac{1}{n} \sum_{i=1}^n x_i\right)^2- \sigma^2
+ \end{align*}
+ This gives us two equations and two unknowns which we can solve for $(\mu,\sigma^2)$.\\
+ Of course you probably knew how to estimate the parameters of a normal...
+ \end{frame}
+ 
+\begin{frame}{GMM: Sample Moments}
+In practice, it is helpful to consider the sample analogue, which we abbreviate with the shorthand $g_N(\theta) \in \mathbb{R}^q$, where $g_N(\theta)$ is a $q$-dimensional vector of moment conditions.
+\begin{eqnarray*}
+\mathbb{E}[g(w_i, \theta )] \approx \frac{1}{N} \sum_{i=1}^N g(w_i, \theta)  \equiv g_N(\theta)
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}{Other Definitions}
+\begin{itemize}
+\item We define the Jacobian: $D(\theta) \equiv \mathbb{E}[\frac{\partial g(w_i,\theta)}{\partial \theta}]$, which is a $q \times k$ matrix.
+\item  Evaluated at the optimum, $\frac{1}{\sqrt{N}} \sum_{i=1}^N g(w_i,\theta_0) \overset{d}{\to} N(0,S)$ where $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is a $q \times q$ matrix.\footnote{Technical conditions to establish this are written down later.} 
+\item In other words, the moment conditions which are $0$ in expectation at $\theta_0$ are normally distributed with some covariance $S$
+\item Later, we will refer to a weighting matrix $W_N$ which is a $q \times q$ positive semi-definite matrix. It tells us how much to penalize the violations of one moment condition relative to another (in quadratic distance).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Examples}
+It is easy to see some very simple examples:
+\begin{description} 
+\item[OLS] Here $y_i = x_i \beta + \epsilon_i$. Exogeneity implies that $E[x_i' \epsilon_i]=0$. We can write this in terms of just observables and parameters as $E[x_i' (y_i - x_i \beta)]=0$ so that $g(y_i,x_i, \beta) = x_i' (y_i - x_i \beta)$.
+\item[IV]  Again $y_i = x_i \beta + \epsilon_i$. Now, endogeneity implies that $E[x_i' \epsilon_i]\neq0$. However there are some instruments $z_i$ which may be partly contained in $x_i$ and partly excluded from $y_i$, so that $E[z_i' \epsilon_i]=0$. $E[z_i' (y_i - x_i \beta)]=0$ so that $g(y_i,x_i,z_i, \beta) = z_i' (y_i - x_i \beta)$.
+\end{description}
+\end{frame}
+
+\begin{frame}{Examples (continued)}
+\textbf{Maximum Likelihood}\\
+ $g(w_i,\theta) =  \frac{\partial \log f(w_i,\theta)}{\partial \theta}$ where $f(w_i,\theta)$ is the density function so that $\log f(w_i,\theta)$ is the contribution of observation $i$ to the log-likelihood. Here we set the expected (average) derivative of the log-likelihood (score) function to zero.
+\end{frame}
+
+
+\begin{frame}{Examples (continued)}
+\textbf{Euler Equations}\\
+Assume we have a CRRA utility function $u(c) = \frac{c^{1-\gamma} -1}{1-\gamma}$ and an agent who maximizes the expected discounted value of their stream of consumption. This leads to an Euler Equation:
+\begin{eqnarray*}
+E \left[\beta \left( \frac{c_{t+1}}{c_t} \right)^{-\gamma} R_{t+1} -1 | \Omega_t \right] =0
+\end{eqnarray*}
+where $\Omega_t$ is the ``Information Set'' (sigma algebra) of everything known to the agent up until time $t$ (include full histories). We can write a moment restriction of the form for any measurable $z_t \in \Omega_t$.
+\begin{eqnarray*}
+E \left[z_t \left(\beta  \left( \frac{c_{t+1}}{c_t} \right)^{-\gamma} R_{t+1} -1\right) \right] =0
+\end{eqnarray*}
+In the original work by Hansen (1982) on GMM, this $g(c_t,c_{t+1},R_{t+1},\beta,\gamma)$ was used to estimate $(\beta,\gamma)$.
+\end{frame}
+
+\begin{frame}{GMM Estimator}
+Here is the GMM estimator:
+\begin{eqnarray*}
+\hat{\theta} = \arg \min_{\theta}  Q_N(\theta) \quad Q_N(\theta)=g_N(\theta)' W_N  g_N(\theta)
+\end{eqnarray*}
+
+\end{frame}
+
+
+\begin{frame}{Technical Conditions}
+\textit{These are a set of sufficient conditions to establish consistency and asymptotic normality of the GMM estimator. These conditions are stronger than necessary, but they establish the requisite LLN and CLT.}
+\begin{enumerate}
+\item $\theta \in \Theta$ is compact.
+\item $W_N \overset{p}{\to} W$.
+\item $g_N(\theta) \overset{p}{\to} E[g(z_i,\theta)]$ (uniformly)
+\item $E[g(z_i,\theta)]$ is continous.
+\item We need that $E[g(z_i,\theta_0)]=0$ and $W_N E[g(z_i,\theta)] \neq 0$ for $\theta \neq \theta_0$ (global identification condition).
+\item $g_N(\theta)$ is twice continuously differentiable about $\theta_0$.
+\item $\theta_0$ is not on the boundary of $\Theta$.
+\item $D(\theta_0) W D(\theta_0)'$ is invertible (non-singular).
+\item $g(z_i,\theta)$ has at least two moments finite and finite derivatives at all $\theta \in \Theta$.
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{GMM: Asymptotics}
+The first five conditions give us consistency $\hat{\theta} \overset{p}{\to} \theta_0$ as $N \rightarrow \infty$. All nine conditions give us asymptotic normality.
+\begin{eqnarray*}
+\sqrt{N}(\hat{\theta}-\theta)  &\overset{d}{\to}& N(0,V_{\theta})\\
+V_{\theta} &=& \underbrace{(D W D')^{-1}}_{\mbox{bread}} \underbrace{(D W S W' D')}_{\mbox{filling}}\underbrace{(D W D')^{-1}}_{\mbox{bread}} 
+\end{eqnarray*}
+It is common to refer parts of the variance as the \textit{bread} and the \textit{filling} or \textit{meat}, together this is referred to as the \textit{sandwich} estimator of the variance.
+\end{frame}
+
+\begin{frame}{GMM: Identification}
+
+\begin{itemize}
+\item The global identification condition is difficult to understand, for the linear model we can replace it with a (local) condition on Jacobian of the moment conditions. 
+\item Recall the Jacobian: $D \equiv \frac{\partial g(w_i,\theta)}{\partial \theta}$, which is a $q \times k$ matrix. 
+\item We call the problem \alert{under-identified} if $rank(D) < k$, \alert{just-identified} if $rank(D) = k$ and \alert{over-identified} if $rank(D) > k$.
+\begin{itemize}
+\item In the under-identified case, there may be many such $\hat{\theta}$ where $g(w_i,\hat{\theta}) =0$.
+\item In the just-identified case, it should be possible to find a $\hat{\theta}$ where $g_N(\hat{\theta})=0$. 
+\item We are primarily interested in the over-identified case where we will generally not find $\hat{\theta}$ which satisfies the moment conditions $g_N(\hat{\theta})\neq0$.
+\end{itemize}
+\item Instead, we search for $\hat{\theta}$ which minimizes the violations of the moment conditions. We write this as a quadratic form for some positive definite matrix $W_N$ which is $q \times q$.
+\begin{eqnarray*}
+\hat{\theta} = \arg \min_{\theta}  Q_N(\theta) \quad Q_N(\theta)=g_N(\theta)' W_N  g_N(\theta)
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+\section*{Thanks!}
+
+\end{document}

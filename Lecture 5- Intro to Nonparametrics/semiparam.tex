@@ -1,0 +1,156 @@
+\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{metropolis}
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{amsmath}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+
+%\usepackage{pxfonts}
+
+\usepackage[absolute,overlay]{textpos} 
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+
+\title [Nonparametrics]{Nonparametrics and Local Methods: Semiparametrics}
+\author{C.Conlon}
+\institute{Applied Econometrics}
+\date{\today}
+\setbeamerfont{equation}{size=\tiny}
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+
+ \frame{\frametitle{The
+Seminonparametric Approach}
+\begin{itemize}
+\item If we are ``pretty sure'' that $f$ is almost $f_{m,\sigma}$ for some
+family of densities indexed by  $(m,\sigma)$, then we can choose a family of positive functions of increasing complexity  $P^1_\theta,P^2_\theta,\ldots$
+\item Choose some $M$ that goes to infinity as $n$ does (more slowly), and
+maximize over $(m,\sigma,\theta)$ the loglikelihood
+
+\[
+\sum_{i=1}^n \log f_{m,\sigma}(y_i)P^M_\theta(y_i).
+\]
+It works\ldots but it is hard to constrain it to be a density for
+large $M$. \end{itemize}}
+
+
+
+\frame{\frametitle{Mixtures of Normals}
+
+\pause
+
+A special case of seminonparametrics, and
+usually a very good approach: Let $y|x$ be drawn from
+
+\pause
+
+\begin{description}
+\item[] $N(m_1(x,\theta),\sigma^2_1(x,\theta))$ with probability
+$q_1(x,\theta)$;
+\item[] \ldots
+\item[] $N(m_K(x,\theta),\sigma^2_K(x,\theta))$ with probability
+$q_K(x,\theta).$
+\end{description}
+where you choose some parameterizations, and the $q_k$'s are positive
+and sum to 1.
+
+\pause
+
+Can be estimated by maximum-likelihood:
+
+
+\[
+\max_{\theta} \sum_{i=1}^n  \log\left(
+\sum_{k=1}^K
+\frac{q_k(x_i,\theta)}{\sigma_k(x,\theta)}
+\phi\left(\frac{y_i-m_k(x_i,\theta)}{\sigma_k(x_i,\theta)}\right)\right).
+\]
+
+
+\pause
+
+Usually works very well with $K\leq 3$ (perhaps after transforming
+$y$ to $\log y$, e.g).
+
+
+}
+
+
+
+ 
+\frame{\frametitle{Splines: trading off fit and smoothness}
+
+\pause
+
+Choose some $0<\lambda<\infty$ and
+\[
+\min_{m(.)} \sum_i (y_i-m(x_i))^2+\lambda J(m),
+\]
+
+\pause
+
+Then we ``obtain'' the
+natural cubic spline with knots=$(x_1,\ldots,x_n)$:
+
+\pause
+
+\begin{itemize}[<+->]
+\item $m$ is a cubic polynomial between consecutive $x_i$'s
+\item it is linear out-of-sample
+\item it is $C^2$ everywhere. 
+\end{itemize}
+
+\pause
+
+``Consecutive'' implies one-dimensional\ldots harder to generalize to
+$p_x>1$.
+
+\pause
+
+\textbf{Orthogonal polynomials:} check out Chebyshev, $1, x,
+2x^2-1,4x^3-3x\ldots$ (on $[-1,1]$ here.)
+}
+
+
+\begin{frame}
+\frametitle{Additive models}
+\pause
+{\em Additive model:} $y=\alpha+\sum_{j=1}^p + f_j (X_j) + +\epsilon$\\
+\pause
+{\em Backfitting algorithm:} start with $\hat{a}=\overline{y}_n$, and some zero--mean
+guesses  $\hat{f}_j \equiv 0 $.
+\pause
+Then for $j=1,\ldots,p,\ldots ,1,2,\ldots,p,\ldots$,
+\pause
+\begin{enumerate}[<+->]
+\item   Define 
+\begin{eqnarray*}
+f_j &\leftarrow& S_j[\{y_i - \hat{\alpha} - \sum_{k\neq j} \hat{f}_k (x_{ik})\}_1^N ]\\
+f_j &\leftarrow&  \hat{f}_j - \frac{1}{N} \sum_{i=1}^N \hat{f}_j (x_{ij}).
+\end{eqnarray*}
+\item Regress $\hat{y}$ on $x_j$ to get $R_j$; then replace $\hat{r}_j$ with $R_j-\frac{1}{n}\sum_i \hat{r}_j(x_{ji})$ (where $S_j$ is some cubic smoothing spline).
+\item Iterate until $\hat{f}_j$ doesn't change.
+\end{enumerate}
+\end{frame}
+
+
+
+\end{document}
+

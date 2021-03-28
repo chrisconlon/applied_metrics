@@ -1,0 +1,238 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+\usepackage[cache=false]{minted}
+\renewcommand{\MintedPygmentize}{/Users/cconlon/anaconda3/bin/pygmentize}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 2: Maximum Likelihood and Friends}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\section*{Computing Maximum Likelihood Estimators}
+
+\begin{frame}{Newton's Method for Root Finding}
+Consider the Taylor series for $f(x)$ approximated around $f(x_0)$:
+\begin{align*}
+f(x) \approx f(x_0) + f'(x_0) \cdot (x-x_0) + f''(x_0) \cdot (x-x_0)^2 + o_p(3)
+\end{align*}
+Suppose we wanted to find a \alert{root} of the equation where $f(x^{*})=0$ and solve for $x$:
+\begin{align*}
+0 &= f(x_0) + f'(x_0) \cdot (x-x_0) \\
+x_1 &= x_0-\frac{f(x_0)}{f'(x_0)} 
+\end{align*}
+This gives us an \alert{iterative} scheme to find $x^{*}$:
+\begin{enumerate}
+\item Start with some $x_k$. Calculate $f(x_k),f'(x_k)$
+\item Update using $x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)} $
+\item Stop when $|x_{k+1}-x_{k}| < \epsilon_{tol}$.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Newton-Raphson for Minimization}
+We can re-write \alert{optimization} as \alert{root finding};
+\begin{itemize}
+\item We want to know $\hat{\theta} = \arg \max_{\theta} \ell(\theta)$.
+\item Construct the FOCs $\frac{\partial \ell}{\partial \theta}=0 \rightarrow$  and find the zeros.
+\item How? using Newton's method! Set $f(\theta) = \frac{\partial \ell}{\partial \theta}$
+\end{itemize}
+\begin{align*}
+\theta_{k+1} &= \theta_k -  \left[ \frac{\partial^2 \ell}{\partial \theta^2}(\theta_k) \right]^{-1} \cdot \frac{\partial \ell}{\partial \theta}(\theta_k)
+\end{align*}
+The SOC is that $ \frac{\partial^2 \ell}{\partial \theta^2} >0$. Ideally at all $\theta_k$.\\
+This is all for a \alert{single variable} but the \alert{multivariate} version is basically the same.
+\end{frame}
+
+
+\begin{frame}{Newton's Method: Multivariate}
+Start with the objective $Q(\theta) = - \ell(\theta)$:
+\begin{itemize}
+\item Approximate $Q(\theta)$ around some initial guess $\theta_0$ with a quadratic function
+\item Minimize the quadratic function (because that is easy) call that $\theta_1$
+\item Update the approximation and repeat.
+\begin{align*}
+\theta_{k+1} = \theta_k - \left[ \frac{\partial^2 Q}{\partial \theta \partial \theta'} \right]^{-1}\frac{\partial Q}{\partial \theta}(\theta_k)
+\end{align*}
+\item The equivalent SOC is that the {Hessian Matrix} is \alert{positive semi-definite}  (ideally at all $\theta$).
+\item In that case the problem is \alert{globally convex} and has a \alert{unique maximum} that is easy to find.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Newton's Method}
+We can generalize to Quasi-Newton methods:
+\begin{align*}
+\theta_{k+1} = \theta_k -  \lambda_k \underbrace{\left[ \frac{\partial^2 Q}{\partial \theta \partial \theta'} \right]^{-1}}_{A_k} \frac{\partial Q}{\partial \theta}(\theta_k)
+\end{align*}
+Two Choices:
+\begin{itemize}
+\item Step length $\lambda_k$
+\item Step direction $d_k=A_k \frac{\partial Q}{\partial \theta}(\theta_k)$
+\item Often rescale the direction to be unit length $\frac{d_k}{\norm{d_k}}$.
+\item If we use $A_k$ as the true Hessian and $\lambda_k=1$ this is a \alert{full Newton step}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Newton's Method: Alternatives}
+Choices for $A_k$
+\begin{itemize}
+\item $A_k= I_{k}$ (Identity) is known as \alert{gradient descent} or \alert{steepest descent}
+\item BHHH. Specific to MLE. Exploits the \alert{Fisher Information}.
+\begin{align*}
+A _ { k } 
+&= \left[ \frac { 1 } { N } \sum _ { i = 1 } ^ { N } \frac { \partial \ln f } { \partial \theta } \left( \theta _ { k } \right) \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( \theta _ { k } \right) \right] ^ { - 1 }\\
+&=- \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta ^ { \prime } } \left( Z , \theta ^ { * } \right) \right] 
+= \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( Z , \theta ^ { * } \right) \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( Z , \theta ^ { * } \right) \right]
+\end{align*}
+\item Alternatives \alert{SR1} and \alert{DFP} rely on an initial estimate of the Hessian matrix and then approximate an update to $A_k$.
+\item Usually updating the Hessian is the costly step.
+\item Non invertible Hessians are bad news.
+\end{itemize}
+\end{frame}
+
+\section{EM Algorithm and Mixtures}
+
+\begin{frame}
+\frametitle{Estimating Finite Mixtures}
+\begin{itemize}
+\item In practice estimating finite mixture models can be tricky.
+\item A simple example is the mixture of normals (incomplete data likelihood)
+\begin{eqnarray*}
+f(x_1,\ldots,x_n | \theta) = \prod_{i=1}^N \sum_{k=1}^K \pi_k f(x_i | \mu_k, \sigma_k)
+\end{eqnarray*}
+\item We need to find both mixture weights $\pi_k = Pr(z_k)$ and the components $(\mu_k,\sigma_k)$ the weights define a valid probabiltiy measure $\sum_k \pi_k = 1$.
+\item Easy problem is \alert{label switching}. Usually it helps to order the components by say decreasing $\pi_1 > \pi_2 > \ldots$ or  $\mu_1 > \mu_2 > \ldots$ 
+\item The real problem is that which component you belong to is unobserved. We can add an extra indicator variable $z_{ik} \in \{0,1\}$.
+\item We don't care about $z_{ik}$ per-se so they are \alert{nuisance parameters}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimating Finite Mixtures}
+\begin{itemize}
+\item We can write the complete data log-likelihood (as if we observed $z_{ik}$):
+\begin{eqnarray*}
+\ell(x_1,\ldots,x_n | \theta) = \sum_{i=1}^N  \log \left( \sum_{k=1}^K I[z_i = k]  \pi_k f(x_i , \mu_k, \sigma_k) \right)
+\end{eqnarray*}
+\item We can instead maximized the expected log-likelihood where we take the expectation $E_{z|\theta}$
+\begin{eqnarray*}
+\alpha_{ik}(\theta) = Pr(z_{ik} =1 | x_i,\theta) = \frac{f_k(x_i,z_k,\mu_k,\sigma_k) \pi_k }{\sum_{m=1}^K f_m(x_i,z_m,\mu_m,\sigma_m) \pi_m}
+\end{eqnarray*}
+\item Now we have a probability $\hat{\alpha}_{ik}$ that gives us the probability that $i$ came from component $k$. We also compute $\hat{\pi}_k = \frac{1}{N} \sum_{i=1}^N \alpha_{ik}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{EM Algorithm}
+\begin{itemize}
+\item Treat the $\hat{\alpha}_k(\theta^{(q)})$ as data and maximize to find $\mu_k,\sigma_k$ for each $k$
+\begin{eqnarray*}
+\hat{\theta}^{(q+1)} = \arg \max_{\theta}  \sum_{i=1}^N  \log \left( \sum_{k=1}^K \hat{\alpha}_k(\theta^{(q)}) f(x_i | z_{ik}, \theta ) \right)
+\end{eqnarray*}
+\item We iterate between updating $\hat{\alpha}_k(\theta^{(q)})$ (E-step) and $\hat{\theta}^{(q+1)}$ (M-step)
+\item For the mixture of normals we can compute the M-step very easily:
+\begin{eqnarray*}
+\mu_k^{(q+1)} &=& \frac{1}{N} \sum_{i=1}^N \hat{\alpha}_k(\theta^{(q)}) x_{i}\\
+\sigma_k^{(q+1)} &=& \frac{1}{N} \sum_{i=1}^N \hat{\alpha}_k(\theta^{(q)}) (x_{i} - \overline{x})^2 \\
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{EM Algorithm}
+\begin{itemize}
+\item EM algorithm has the advantage that it avoids complicated integrals in computing the expected log-likelihood over the missing data.
+\item For a large set of families it is proven to converge to the MLE
+\item That convergence is \alert{monotonic} and \alert{linear}. (Newton's method is quadratic)
+\item This means it can be slow, but sometimes $\nabla_{\theta} f (\cdot)$ is really complicated.
+\end{itemize}
+\end{frame}
+
+\section*{Thanks!}
+
+\end{document}

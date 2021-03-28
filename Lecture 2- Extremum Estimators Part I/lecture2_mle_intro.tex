@@ -1,0 +1,330 @@
+\documentclass[aspectratio=169]{beamer}
+\usetheme{metropolis}
+
+%\usepackage{beamerthemesplit}
+%\beamertemplatenavigationsymbolsempty
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage{dsfont}
+\usepackage{multirow} 
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{dcolumn}
+\usepackage{soul}
+\usepackage[cache=false]{minted}
+\usepackage{MnSymbol}
+\usepackage{stmaryrd}
+
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand{\X}{\mathtt{X}}
+\newcommand{\Y}{\mathtt{Y}}
+
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\E}{\mathbb{E}}
+%\newcommand{\V}{\mathbb{V}}
+\newcommand{\p}{\mathbb{P}}
+\newcommand*\df{\mathop{}\!\mathrm{d}}
+\newcommand{\del}{\partial}
+
+
+% imports
+\usepackage{xargs}
+\usepackage{xpatch}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage[skip=0.2\baselineskip]{caption}
+
+% command for inputting raw latex
+\makeatletter
+\newcommand\primitiveinput[1]{\@@input #1 }
+\makeatother
+
+% common table command
+\newcommandx{\tablecontent}[4]{
+    \begin{threeparttable}[!ht]
+        \centering
+        \caption{#3}
+        \vspace{-1em}
+        \footnotesize
+        \begin{tabular}{#1}
+            \primitiveinput{../tables/#2.tex}
+        \end{tabular}
+        \vspace{-0.2em}
+        \begin{tablenotes}[flushleft]
+            #4
+        \end{tablenotes}
+    \end{threeparttable}
+}
+
+
+
+
+% \usepackage{slashbox}
+\title{Lecture 2: Maximum Likelihood and Friends}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+
+
+\newcommand{\fp}{\frame[plain]}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+
+\begin{frame}{Review: What is a Likelihood?}
+Suppose we write down the joint distribution of our data $(y_i,x_i)$ for $i=1,\ldots,n$.
+\begin{align*}
+Pr(y_1,\ldots,y_n, x_1,\ldots,x_n ; \theta)
+\end{align*}
+If  $(y_i,x_i)$ are I.I.D then we can write this as:
+\begin{align*}
+ Pr(y_1,\ldots,y_n, x_1,\ldots,x_n ; \theta) = \prod_{i=1}^N Pr(y_i, x_i ; \theta) 
+ \propto \prod_{i=1}^N Pr(y_i | x_i ; \theta)
+ =L( \mathbf{y}| \mathbf{x} ; \theta )
+\end{align*}
+We call this $L( \mathbf{y}| \mathbf{x} ; \theta )$ the \alert{likelihood} of the observed data.
+\end{frame}
+
+
+\begin{frame}{MLE: Example}
+Consider a linear regression with $\varepsilon_i | X_i \sim N(0,\sigma^2)$
+\begin{align*}
+Y_{it} &= X_{i}'\beta_i + \varepsilon_{i}
+\end{align*}
+We've discussed the \alert{least squares estimator}:
+\begin{align*}
+\widehat{\beta}_{ols} &= \arg \min_{\beta} \sum_{i=1}^N (Y_i - X_i' \beta)^2\\
+\widehat{\beta}_{ols} &= (\mathbf{X}'\mathbf{X})^{-1} \mathbf{X}' \mathbf{Y}
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{MLE: Example}
+If we know the distribution of $\varepsilon_i$ we can construct a \alert{maximum likelihood estimator}
+\begin{align*}
+(\widehat{\beta}_{MLE},\widehat{\sigma}^2_{MLE}) &= \arg \min_{\beta,\sigma^2} L(\beta,\sigma^2)
+\end{align*}
+Where 
+\begin{align*} 
+L(\beta,\sigma^2) &= \prod_{i=1}^N p(y_i | X_i,\beta,\sigma^2) \\
+                  &= \prod_{i=1}^N \frac{1}{\sqrt{2 \pi \sigma^2}} \exp \left[-\frac{1}{2\sigma^2}(y_i - X_i' \beta)^2 \right]\\
+\ell(\beta,\sigma^2) &= \sum_{i=1}^N -\frac{1}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i=1}^N(y_i - X_i' \beta)^2
+\end{align*}
+\end{frame}
+
+\begin{frame}{MLE: FOC's}
+Take the FOC's
+\begin{align*}
+\ell(\beta,\sigma^2) &= -\frac{N}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i=1}^N(y_i - X_i' \beta)^2
+\end{align*}
+Where 
+\begin{align*} 
+\frac{ \partial \ell(\beta,\sigma^2) }{\partial \beta}&= \frac{1}{ \sigma^2}\sum_{i=1}^N(y_i - X_i' \beta) = 0 \rightarrow \widehat{\beta}_{MLE}= \widehat{\beta}_{OLS}\\ 
+\frac{ \partial \ell(\beta,\sigma^2) }{\partial \sigma^2}&= -N \frac{1}{2 \sigma^2}  -  \frac{1}{2 \sigma^4} \sum_{i=1}^N(y_i - X_i' \beta)^2 = 0 \\
+\sigma^2_{MLE} &= \frac{1}{N} \sum_{i=1}^N (y_i - X_i' \beta)^2
+\end{align*}
+Note: the unbiased estimator uses $\frac{1}{N-K-1}$.
+\end{frame}
+
+\begin{frame}{MLE: General Case}
+\begin{enumerate}
+\item Start with the \alert{joint density of the data} $Z_1,\ldots,Z_N$ with density $f_Z(z ; \theta)$
+\item Construct the likelhood function of the sample $\boldsymbol{z}=(z_1,\ldots,z_n)$
+\begin{align*}
+L(\boldsymbol{z} ; \theta) = \prod_{i=1}^N f_Z(z_i; \theta)
+\end{align*}
+\item Construct the \alert{log likelihood} (this has the same $\arg \max$)
+\begin{align*}
+\ell(\boldsymbol{z};  \theta) = \sum_{i=1}^N \ln f_Z(z_i; \theta)
+\end{align*}
+\item Take the FOC's to find $\widehat{\theta}_{MLE}$
+\begin{align*}
+\theta : \frac{\partial \ell(\theta)}{\partial \theta} =0
+\end{align*}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{MLE in Detail}
+Basic Setup: we know $F(z ; \theta_0)$ but not $\theta_0$. We know $\theta_0 \in \Theta \subset \mathbb{R}^K$.
+\begin{itemize}
+\item Begin with a sample of $z_i$ from $i=1,\ldots,N$ which are I.I.D. with CDF $F(z ; \theta_0)$.
+\item The MLE chooses
+\begin{align*}
+\widehat{\theta}_{MLE} = \arg \max_{\theta} \ell(\theta) = \arg \max_{\theta} \sum_{i=1}^N \ln f_Z(z_i; \theta)
+\end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{MLE: Technical Details}
+\begin{enumerate}
+\item Consistency. When is it true that for $\epsilon>0$?
+\begin{align*}
+\lim _ { N \rightarrow \infty } \operatorname { Pr } \left( \left\| \hat { \theta } _ { m l e } - \theta _ { 0 } \right\| > \varepsilon \right) = 0
+\end{align*}
+\item Asymptotic Normality. What else do we need to show?
+\begin{align*}
+\sqrt { N } \left( \hat { \theta } _ { m l e } - \theta _ { 0 } \right) \stackrel { d } { \longrightarrow } \mathcal { N } \left( 0 , - \left[ E \frac { \partial ^ { 2 } } { \partial \theta \partial \theta ^ { \prime } } \left( Z _ { i } , \theta _ { 0 } \right) \right] ^ { - 1 } \right)
+\end{align*}
+\item Optimization. How to we obtain $\widehat{\theta}_{MLE}$ anyway?
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{MLE: Example \# 1}
+\begin{itemize}
+\item $Z_i \sim N(\theta_0,1)$ and $\Theta = (-\infty,\infty)$. In this case:
+\begin{align*}
+\ell ( \theta ) = - N \cdot \ln ( 2 \pi ) - \sum _ { i = 1 } ^ { N } \left( z _ { i } - \theta \right) ^ { 2 } / 2
+\end{align*}
+\item MLE is $\widehat{\theta}_{MLE}=\overline{z}$ which is consistent for $\theta_0 = E[Z_i]$
+\item Asymptotic distribution is $\sqrt{N} ( \overline{z}-\theta_0) \sim N(0,1)$.
+\item Calculating mean is easy!
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{MLE: Example \# 2}
+\begin{itemize}
+\item $Z_i = (Y_i, X_i)$---   $X_i$ has finite mean and variance (but arbitrary distribution)
+\item $(Y_i | X_i  =x) \sim N(x' \beta_0, \sigma_0^2)$
+\begin{align*}
+\widehat{\beta}_{MLE} &= (X'X)^{-1} X'Y\\
+\widehat{\sigma}^2_{MLE} &= \frac{1}{N} \sum (y_i - x_i \widehat{\beta}_{MLE})^2
+\end{align*}
+\item We already have shown consistency and AN for linear regression with normally distributed errors...
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{MLE: Example \# 3}
+\begin{itemize}
+\item $Z_i = (Y_i, X_i)$---   $X_i$ has finite mean and variance (but arbitrary distribution)
+\item $Pr(Y_i=1 | X_i =x) =  \frac{e^{x' \theta_0}}{1+ e^{x'\theta_0}}$
+\item Solution is the \alert{logit} model.
+\item No simple MLE solution, establishing properties is not obvious...
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Jensen's Inequality}
+Let $g(z)$ be a convex function. Then $\mathbb { E }[g(Z)] \geq g(\mathbb { E }[Z])$, with equality only in the case of a linear function.
+\end{frame}
+
+\begin{frame}{More Technical Details}
+Define $Y$ as the ratio of the density at $\theta$ to the density at the true value $\theta_0$ both evaluated at $Z$
+\begin{align*}
+Y = \frac{f_Z(Z;\theta)}{f_Z(Z;\theta_0)}
+\end{align*}
+\begin{itemize}
+\item Let $g(a) = -\ln(a)$ so that $g'(a) = \frac{-1}{a}$ and $g''(a) =\frac{1}{a^2}$.
+\item Then by \alert{Jensen's Inequality} $\mathbb{E}[- \ln Y] \geq - \ln \mathbb{E}[Y]$.
+\item This gives us
+\begin{align*}
+\mathbb { E }_z \left[ - \ln \left( \frac { f _ { Z } ( Z ; \theta ) } { f _ { Z } \left( Z ; \theta _ { 0 } \right) } \right) \right] \geq - \ln \left( \mathbb { E }_z \left[ \frac { f _ { Z } ( Z ; \theta ) } { f _ { Z } \left( Z ; \theta _ { 0 } \right) } \right] \right)
+\end{align*}
+\item The RHS is
+\begin{align*}
+\mathbb { E }_z \left[ \frac { f _ { Z } ( Z ; \theta ) } { f _ { Z } \left( Z ; \theta _ { 0 } \right) } \right] = \int \frac { f _ { Z } ( z ; \theta ) } { f _ { Z } \left( z ; \theta _ { 0 } \right) } \cdot f _ { Z } \left( z ; \theta _ { 0 } \right) d z = \int f _ { Z } ( z ; \theta ) d z = 1
+\end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{More Technical Details}
+Because $\log(1)=0$ this implies:
+\begin{align*}
+\mathbb { E }_z \left[ - \ln \left( \frac { f _ { Z } ( Z ; \theta ) } { f _ { Z } \left( Z ; \theta _ { 0 } \right) } \right) \right] \geq 0
+\end{align*}
+Therefore 
+\begin{align*}
+- \mathbb { E } \left[ \ln f _ { Z } ( Z ; \theta ) \right] &+ \mathbb { E } \left[ \ln f _ { Z } \left( Z ; \theta _ { 0 } \right) \right] \geq 0\\
+\mathbb { E } \left[ \ln f _ { Z } \left( Z ; \theta _ { 0 } \right) \right] &\geq \mathbb { E } \left[ \ln f _ { Z } ( Z ; \theta ) \right]
+\end{align*}
+\begin{itemize}
+\item We maximize the expected value of the log likelihood at the true value of $\theta$!
+\item Helpful to work with $\mathbb{E}[\log f(z; \theta)]$ sometimes.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Information Matrix Equality}
+We can relate the \alert{Fisher Information} to the Hessian of the log-likelihood
+\begin{align*}
+\mathcal { I } \left( \theta _ { 0 } \right) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta } \left( z ; \theta _ { 0 } \right) \right] 
+= \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \times \frac { \partial \ln f } { \partial \theta  } \left( z ; \theta _ { 0 } \right)' \right]
+\end{align*}
+\begin{itemize}
+    \item This is sometimes known as the \alert{outer product of scores}.
+    \item This matrix is \alert{negative definite}
+    \item Recall that $ \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \right]\approx 0$ at the maximum
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Proof}
+\begin{align*}
+1 = \int _ { z } f _ { Z } ( z ; \theta ) d z \Rightarrow 0 = \frac { \partial } { \partial \theta } \int _ { z } f _ { Z } ( z ; \theta ) d z
+\end{align*}
+With some regularity conditions
+\begin{align*}
+0 = \int _ { z } \frac { \partial f _ { Z } } { \partial \theta } ( z ; \theta ) d z = \underbrace{\int _ { z } \frac { \partial \ln f _ { Z } } { \partial \theta } ( z ; \theta ) \cdot f _ { Z } ( z ; \theta ) d z}_{\mathbb { E } \left[ \frac { \partial \ln f _ { Z } } { \partial \theta } \left( z ; \theta _ { 0 } \right) \right]}
+\end{align*}
+
+\begin{itemize}
+    \item This gives us the FOC we needed.
+    \item Can get information identity with another set of derivatives.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{The Cramer-Rao Bound}
+We can relate the \alert{Fisher Information} to the Hessian of the log-likelihood
+\begin{align*}
+\mathcal { I } ( \theta ) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta ^ { \prime } } ( Z ; \theta ) \right]
+\end{align*}
+It turns out this provides a bound on the variance
+\begin{align*}
+\operatorname { Var } ( \hat { \theta } ( Z ) ) \geq \mathcal { I } \left( \theta _ { 0 } \right) ^ { - 1 }
+\end{align*}
+Because we can't do better than Fisher Information we know that MLE is most efficient estimator!
+\end{frame}
+
+\begin{frame}{MLE: Discussion}
+Tradeoffs
+\begin{itemize}
+\item How does this compare to GM Theorem?
+\item If MLE is most efficient estimate, why ever use something else?
+\end{itemize}
+\end{frame}
+
+
+
+
+\section*{Thanks!}
+
+\end{document}
