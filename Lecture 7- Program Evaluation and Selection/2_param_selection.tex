@@ -70,8 +70,8 @@ Construct \alert{counterfactual wages} for workers in \alert{source} country for
 \begin{itemize}
 \item For now ignore mean differences $\alpha_0 = \alpha_1 = \alpha$.
 \begin{align*}
-E\left(w_{0} | \text { Immigrate }\right) &=\alpha+E\left(\varepsilon_{0} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
-&=\alpha+\sigma_{0} E\left(\frac{\varepsilon_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right)
+\mathbb{E} \left(w_{0} | \text { Immigrate }\right) &=\alpha+\mathbb{E}\left(u_{0} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+&=\alpha+\sigma_{0} \cdot \mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right)
 \end{align*}
 \item Wages depend on:
 \begin{enumerate}
@@ -86,18 +86,18 @@ E\left(w_{0} | \text { Immigrate }\right) &=\alpha+E\left(\varepsilon_{0} | \fra
 \begin{frame}
 \frametitle{Example: Borjas (1987): How does selection work?}
 \begin{itemize}
-\item If everything is normal, we just run univariate regression $E\left(u_{0} | \nu\right)=\frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \nu$:
+\item If everything is normal, we just run univariate regression $\mathbb{E}\left(u_{0} | \nu\right)=\frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \nu$:
 \begin{align*}
-E\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}\right) &= \frac{1}{\sigma_{0}}\cdot \frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \cdot \frac{\sigma_{\nu}^{2}}{\sigma_{\nu}^{2}} \cdot \nu  
+\mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}\right) &= \frac{1}{\sigma_{0}}\cdot \frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \cdot \frac{\sigma_{\nu}^{2}}{\sigma_{\nu}^{2}} \cdot \nu  
 =\frac{\sigma_{0 \nu}}{\sigma_{0} \sigma_{\nu}} \frac{\nu}{\sigma_{\nu}}  =\rho_{0 \nu} \frac{\nu}{\sigma_{\nu}} 
 \end{align*}
 \begin{align*}
-E\left(w_{0} | \text { Immigrate }\right) 
-&=\alpha_{0}+\sigma_{0} E\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
- &=\alpha_{0}+\rho_{0 \nu} \sigma_{0} E\left(\frac{\nu}{\sigma_{\nu}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
-  &=\alpha_{0}+\rho_{0 \nu} \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) 
+\mathbb{E}\left(w_{0} | \text { Immigrate }\right) 
+&=\alpha_{0}+\sigma_{0} \cdot \mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+ &=\alpha_{0}+\rho_{0 \nu} \cdot \sigma_{0} \cdot \mathbb{E}\left(\frac{\nu}{\sigma_{\nu}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+  &=\alpha_{0}+\rho_{0 \nu} \cdot \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) 
 \end{align*}
-\item This hazard rate of the standard normal has a special name \alert{Inverse Mills Ratio} $E[x | x > z]$.
+\item This hazard rate of the standard normal has a special name \alert{Inverse Mills Ratio} $\mathbb{E}[x | x > z]$.
 \end{itemize}
 \end{frame}
 
@@ -107,7 +107,7 @@ E\left(w_{0} | \text { Immigrate }\right)
 \begin{itemize}
 \item A similar expression for those who do immigrate:
 \begin{align*}
-E\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+E\left(u_{1} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+\mathbb{E}\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\mathbb{E}\left(u_{1} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
 &=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{\Phi(-z)}\right)
 \end{align*}
 \item We can re-write both expressions in terms of the \alert{Inverse Mills Ratio}
@@ -116,9 +116,9 @@ E\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+E\left(u_{1} | \frac{\nu}
 
 \begin{frame}{Inverse Mills Ratio}
 \begin{align*}
-E\left(w_{0} | \text { Immigrate }\right) &=\alpha_{0}+\rho_{0 \nu} \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+\mathbb{E}\left(w_{0} | \text { Immigrate }\right) &=\alpha_{0}+\rho_{0 \nu} \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
 &=\alpha_{0}+\frac{\sigma_{0} \sigma_{1}}{\sigma_{\nu}}\left(\rho-\frac{\sigma_{0}}{\sigma_{1}}\right)\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
-E\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+\mathbb{E}\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
 &=\alpha_{1}+\frac{\sigma_{0} \sigma_{1}}{\sigma_{\nu}}\left(\frac{\sigma_{1}}{\sigma_{0}}-\rho\right)\left(\frac{\phi(z)}{1-\Phi(z)}\right)
 \end{align*}
 Where $\rho=\sigma_{01} / \sigma_{0} \sigma_{1}$.
