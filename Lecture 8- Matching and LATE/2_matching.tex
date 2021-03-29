@@ -39,37 +39,6 @@
 \frame{\titlepage}
 
 \begin{frame}
-\frametitle{Solutions}
-\begin{enumerate}
-\item \alert{Matching}
-\item Instrumental Variables
-\item Diference in Difference and Natural Experiments
-\item RCTs
-\item Structural Models
-\end{enumerate}
-\begin{itemize}
-\item Key distinction: the treatment effect of some program (a number) from understanding how and why things work (the mechanism).
-\item Models let us link numbers to mechanisms.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Recall the Selection Problem}
-\begin{itemize}
-\item Let's start with the easy cases: run OLS and see what happens.
-\item OLS compares mean of treatment group with mean of control group (possibly controlling for other $X$)
-\begin{eqnarray*}
-\beta^{OLS} &=& E(Y_i | T_i =1) - E(Y_i | T_i=0) \\
-&=& \underbrace{E[\beta_i | T_i =1]}_{\mbox{ATT}} + \left(\underbrace{E[u_i | T_i =1 ] - E[u_i | T_i=0] }_{\mbox{selection bias}}  \right)
-\end{eqnarray*}
-\item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
-\item $Y_i^0 = \alpha + u_i$ may vary within the population (this is quite common).
-\item \alert{Unobservables} $u_i$ are correlated with \alert{treatment} $T_i$.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
 \frametitle{Suppose we ran a RCT}
 \begin{itemize}
 \item Imagine we ran a \alert{randomized controlled trial}
@@ -175,6 +144,29 @@ y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + u_i
 \begin{center}
 \includegraphics[height=0.7\textheight]{./resources/dag-match.png}
 \end{center}
+\end{frame}
+
+\begin{frame}{Nonparametric Matching ( $k$-NN )}
+For each observation $T_i$, we observe $Y_i(T_i)$ compute a \alert{counterfactual} $\hat{Y}_i(1-T_i)$:
+\begin{align*}
+\begin{array}{l}
+\widehat{Y}_{i}(0)=\left\{\begin{array}{cl}
+Y_{i} & \text { if } T_{i}=0 \\
+\frac{1}{\# \mathcal{J}_{M}(i)} \sum_{l \in \mathcal{J}_{M}(i)} Y_{l} & \text { if } T_{i}=1
+\end{array}\right. \\
+\widehat{Y}_{i}(1)=\left\{\begin{array}{cc}
+\frac{1}{\# \mathcal{J}_{M}(i)} \sum_{l \in \mathcal{J}_{M}(i)} Y_{l} & \text { if } T_{i}=0 \\
+Y_{i} & \text { if } T_{i}=1
+\end{array}\right.
+\end{array}
+\end{align*}
+\begin{itemize}
+\item $\# \mathcal{J}_{M}(i)$ is the number of matches for $i$ of opposite treatment assignment $T_l =1-T_i$.
+\item $M$ is the ``number of matches'' within some distance of $|X_l -X_i|< d_M$.
+\item If there are ties $\# \mathcal{J}_{M}(i) > M$.
+\item This is just $k$-NN matching.
+\end{itemize}
+
 \end{frame}
 
 

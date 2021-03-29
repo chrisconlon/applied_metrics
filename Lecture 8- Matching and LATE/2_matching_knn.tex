@@ -1,0 +1,213 @@
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\usetheme{default}
+\usetheme{metropolis}
+\usepackage{minted}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{dcolumn}
+
+\setbeamersize{text margin left=.3in,text margin right=.3in} 
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+
+%\usetheme{Darmstadt}
+%\usepackage{times}
+%\usefonttheme{structurebold}
+
+\usepackage[english]{babel}
+%\usepackage[table]{xcolor}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,setspace,centernot}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{relsize}
+\usepackage{pdfpages}
+\usepackage[absolute,overlay]{textpos} 
+
+
+\newenvironment{reference}[2]{% 
+  \begin{textblock*}{\textwidth}(#1,#2) 
+      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
+
+\DeclareMathSizes{10}{10}{6}{6} 
+
+\begin{document}
+\title{Program Evaluation (b)- Matching}
+\author{Chris Conlon}
+\institute{Applied Econometrics}
+\date{\today}
+
+\frame{\titlepage}
+
+\begin{frame}{Matching Solution to Fundamental Problem}
+\begin{columns}[T] 
+\begin{column}{.65\textwidth}
+We don't observe the \alert{counterfactual} $Y_i(T_i)$.
+\begin{itemize}
+\item Find observations with similar $X_i$ and opposite $T_i$ and hope they can be used as counterfactuals.
+\item Idea: Conditional on $X_i$, $T_i$ is as good as randomly assigned.
+\end{itemize}
+\end{column}%
+\hfill%
+\begin{column}{.38\textwidth}
+
+  \vspace{20pt}
+  
+  $Y_{i} = T_{i}\cdot Y_{i}(1) + (1-T_{i}) \cdot Y_{i}(0)$\\
+  \vspace{20pt}
+  \begin{tabular}{ccccc}
+    \toprule
+    i & $Y_{i}(1)$ &  $Y_{i}(0)$ & $T_{i}$ & $X_{i}$ \\
+    \midrule
+    1 &     1      &     \alert{?}      &   1   & 1 \\
+    2 &     0      &     \alert{?}      &   1   & 2 \\
+    3 &     \alert{?}      &     0      &   0   & 1 \\
+     & &  \vdots & & \\
+    $n$ &     \alert{?}      &     1      &   0   & 3 \\    
+  \end{tabular}
+\end{column}%
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matching}
+\begin{itemize}
+\item Compare treated individuals to un-treated individuals with identical observable characteristics $X_i$.
+\item Key assumption: everything about $Y_i(1) - Y_i(0)$ is captured in $X_i$; or $u_i$ is randomly assigned conditional on $X_i$.
+\item Basic idea: The treatment group and the control group don't have the same distribution of observed characteristics as one another. 
+\item \alert{Re-weight} the un-treated population so that it resembles the treated population.
+\item Once distribution of $X_i$ is the same for both groups $ X_i | T_i \sim X_i$ then we assume all other differences are irrelevant and can just compare means.
+\item Matching assumes \alert{all selection is on observables}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Matching}
+\begin{itemize}
+\item Formally the key assumption is the \alert{Conditional Independence Assumption (CIA)}
+\begin{eqnarray*}
+\{Y_i(1),Y_i(0)\}  \perp T_i | X_i
+\end{eqnarray*}
+\item Once we know $X_i$ allocation to treatment $T_i$ is as if it is random.
+\item The only difference between treatment and control is composition $f(X_i | T_i)$ of the sample.
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Nonparametric $k$-NN Matching: Abadie and Imbens (2002)}
+For each observation $T_i$, we observe $Y_i(T_i)$ compute a \alert{counterfactual} $\hat{Y}_i(1-T_i)$:
+\begin{align*}
+\begin{array}{l}
+\widehat{Y}_{i}(0)=\left\{\begin{array}{cl}
+Y_{i} & \text { if } T_{i}=0 \\
+\frac{1}{\# \mathcal{J}_{M}(i)} \sum_{l \in \mathcal{J}_{M}(i)} Y_{l} & \text { if } T_{i}=1
+\end{array}\right. \\
+\widehat{Y}_{i}(1)=\left\{\begin{array}{cc}
+\frac{1}{\# \mathcal{J}_{M}(i)} \sum_{l \in \mathcal{J}_{M}(i)} Y_{l} & \text { if } T_{i}=0 \\
+Y_{i} & \text { if } T_{i}=1
+\end{array}\right.
+\end{array}
+\end{align*}
+\begin{itemize}
+\item $\# \mathcal{J}_{M}(i)$ is the number of matches for $i$ of opposite treatment assignment $T_l =1-T_i$.
+\item $M$ is the ``number of matches'' within some distance of $|X_l -X_i|< d_M(i)$.
+\item If there are ties $\# \mathcal{J}_{M}(i) > M$.
+\item This is just $k$-NN matching.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Nonparametric $k$-NN Matching: Abadie and Imbens (2002)}
+Each observation $i$ gets a weight based on how often it is used as a match for other observations $l$:
+\begin{align*}
+K_{M}(i)=\sum_{l=1}^{N} 1\left\{i \in \mathcal{J}_{M}(l)\right\} \frac{1}{\# \mathcal{J}_{M}(l)}
+\end{align*}
+ Observations used in lots of matches get more weight. $\sum_{i=1}^N K_{M}(i) = N$.\\
+ 
+This is just a weighted average of $Y_i$ values (aka a \alert{kernel}!):
+\begin{align*}
+ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left[ \widehat{Y}_{i}(1)-\widehat{Y}_{i}(0)\right]=\frac{1}{N} \sum_{i=1}^{N} \underbrace{\left(2 T_{i}-1\right)\left[1+K_{M}(i)\right]}_{w_{i,M}} Y_{i}
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{Nonparametric $k$-NN Matching: Alternatives}
+Different weighting schemes give different parameters:
+\begin{align*}
+K_{M}(i)^{ATE}&=\frac{1}{N} \sum_{i=1}^{N} \left(2 T_{i}-1\right)\left[1+K_{M}(i)\right] Y_{i} \\
+K_{M}(i)^{ATT}&=\sum_{i=1}^{N_1} \left[T_{i}-(1-T_i) \cdot K_{M}(i)\right] Y_{i}\\
+K_{M}(i)^{ATUT}&=\sum_{i=1}^{N_0} \left[T_{i}\cdot K_{M}(i) -(1-T_i) \right] Y_{i}
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{Nonparametric $k$-NN Matching: Bias Correction}
+We can use weighted least squares to adjust the predictions $\hat{Y}_i(T_i)$:
+\begin{align*}
+\left(\widehat{\beta}_{t, 0}, \widehat{\beta}_{t, 1}\right)=\operatorname{argmin}_{\left\{\beta_{t, 0}, \beta_{t, 1}\right\}} \sum_{i: T_{i}=t} K_{M}(i)\left(Y_{i}-\beta_{t, 0}-\beta_{t, 1}^{\prime} X_{i}\right)^{2}
+\end{align*}
+Where $\widehat{\mu}_1(X_i),\widehat{\mu}_0(X_i)$ are the regression functions for treatment and control.
+\begin{align*}
+\tilde{Y}_{i}(0)=\left\{\begin{array}{cc}
+Y_{i} & \text { if } T_{i}=0 \\
+\frac{1}{\# \mathcal{J}_{M}(i)} \sum_{l \in \mathcal{J}_{M}(i)}\left\{Y_{l}+\widehat{\mu}_{0}\left(X_{i}\right)-\widehat{\mu}_{0}\left(X_{l}\right)\right\} & \text { if } T_{i}=1
+\end{array}\right. \\
+\tilde{Y}_{i}(1)=\left\{\begin{array}{cc}
+\frac{1}{\# \mathcal{J}_{M}(i)} \sum_{l \in \mathcal{J}_{M}(i)}\left\{Y_{l}+\widehat{\mu}_{1}\left(X_{i}\right)-\widehat{\mu}_{1}\left(X_{l}\right)\right\} & \text { if } T_{i}=0 \\
+Y_{i} & \text { if } T_{i}=1
+\end{array}\right.
+\end{align*}
+So that the ATE is given by: $ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left\{\tilde{Y}_{i}(1)-\tilde{Y}_{i}(0)\right\}$
+\end{frame}
+
+%\begin{frame}
+%\frametitle{Matching in Practice: \alert{Caliper Matching}}
+%How do we actually do this?
+%\begin{itemize}
+%\item For each entry in the treatment $(y_i,x_i)$
+%\begin{itemize}
+%\item Find all $x_s$ from the control group that is ``close enough''  $\norm{x_s -x_t}<b_w$.
+%\item For each treated observation compute $\beta(x_t) = y_t - E[y_s |  I \left( \norm{x_s -x_t}<b_w\right)]$.
+%\item Compute the mean of $\beta(x_t)$
+%\end{itemize}
+%\item Some pitfalls
+%\begin{itemize}
+%\item Variance can be unpredictable: some $(y_t,x_t)$ have many of matches, others have none
+%\item For some $(y_t,x_t)$ may have nothing within $\norm{x_s -x_t}<b_w$? Drop these?
+%\end{itemize}
+%\end{frame}
+
+
+
+
+\begin{frame}{What about higher dimensions?}
+\begin{itemize}
+\item We know that nearest neighbor is \alert{cursed} in high dimensions.
+\begin{itemize}
+\item Usual caveats apply: may be doing \alert{extrapolation}.
+\item Even more reason to use regression/bias adjustment.
+\end{itemize}
+\item Given two vectors $\mathbf{x}$ and $\mathbf{y}$, how to choose $d(\mathbf{x},\mathbf{y})$ the \alert{distance} function?
+\item Papers mostly use \alert{Mahalanobis distance}: $d(\mathbf{x},\mathbf{y}) = (\mathbf{x}-\mathbf{y}) S^{-1} (\mathbf{x}-\mathbf{y})'$.
+\begin{itemize}
+\item Quadratic distance with inverse covariance matrix as ``weights''.
+\item Generalizes Euclidean distance (diagonal $S$).
+\end{itemize}
+\item Older papers use \alert{caliper matching} anything within $\norm{\mathbf{x_s} -\mathbf{x_t}}<b$ is match
+\begin{itemize}
+\item Now number of matches varies from observation to observation.
+\item Variance can be unpredictable: some $(\mathbf{y_i},\mathbf{x_i})$ have many of matches, others have none
+\item Some obs may have nothing within $\norm{\mathbf{x_s} -\mathbf{x_t}}<b_w$? Drop these?
+\item Probably avoid this unless you have a good reason...
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
