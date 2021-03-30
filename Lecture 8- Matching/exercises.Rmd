@@ -1,0 +1,65 @@
+---
+title: "Program Evaluation and Matching"
+author: "Chris Conlon"
+date: "3/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### This weeks packages
+
+
+```{r cars}
+library(sampleSelection)
+library(MatchIt)
+```
+
+### Selection Example
+The code for this example can be found at:
+https://cran.r-project.org/web/packages/sampleSelection/vignettes/selection.pdf
+
+1. In this case we are going to work backwards. I will give you the code that esimates the section model, and you will write down the equations (with estimated coefficients) and explain what is the selection problem, and how is it addressed here.
+
+```{r code Mroz}
+data( "Mroz87" )
+Mroz87$kids <- ( Mroz87$kids5 + Mroz87$kids618 > 0 )
+greeneTS <- selection( lfp ~ age + I( age^2 ) + faminc + kids + educ,
+    wage ~ exper + I( exper^2 ) + educ + city,
+    data = Mroz87, method = "2step" )
+summary(greeneTS)
+```
+
+```{r code MLE}
+greeneML <- selection( lfp ~ age + I( age^2 ) + faminc + kids + educ,
+    wage ~ exper + I( exper^2 ) + educ + city, data = Mroz87,
+    maxMethod = "BHHH", iterlim = 500 )
+summary(greeneML)
+```
+
+2. Explain the difference between the two-step and MLE estimates above. How does the procedure differ? Which do you prefer and why?
+
+3. Now compare these results to a naive OLS regression of just the outcome (wages) that does not account for the selection effects from labor force participation. How do the coefficients in the outcome equation change?
+
+4. Plot the distribution of observed wages and predicted wages for college graduates (educataion >= 16) for the model with and without selection for labor force participation.
+
+
+
+### Matching
+
+Following the vignette at: https://cran.r-project.org/web/packages/MatchIt/vignettes/MatchIt.html#assessing-the-quality-of-matches
+
+1. Discuss the balance table using the following unadjusted sample
+
+```{r match1}
+m.out0 <- matchit(treat ~ age + educ + race + married + 
+                   nodegree + re74 + re75, data = lalonde,
+                 method = NULL, distance = "glm")
+summary(m.out0)
+```
+
+2. Perform 4 nearest neighbor matching using the Mahalbanois distance and the above covariates for real earnings in 1978. Give me your best estimate of the ATE and ATT of the treatment status. 
+
+3. Is the ATE greater or less than the ATT, explain why this is a sensible outcome and what this implies for the ATUT.
