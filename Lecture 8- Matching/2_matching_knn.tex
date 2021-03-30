@@ -33,7 +33,7 @@
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Program Evaluation (b)- Matching}
+\title{Program Evaluation (c)- $k$-NN Matching}
 \author{Chris Conlon}
 \institute{Applied Econometrics}
 \date{\today}
@@ -138,9 +138,9 @@ ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left[ \widehat{Y}_{i}(1)-\widehat{Y}_{i}(0)\rig
 \begin{frame}{Nonparametric $k$-NN Matching: Alternatives}
 Different weighting schemes give different parameters:
 \begin{align*}
-K_{M}(i)^{ATE}&=\frac{1}{N} \sum_{i=1}^{N} \left(2 T_{i}-1\right)\left[1+K_{M}(i)\right] Y_{i} \\
-K_{M}(i)^{ATT}&=\sum_{i=1}^{N_1} \left[T_{i}-(1-T_i) \cdot K_{M}(i)\right] Y_{i}\\
-K_{M}(i)^{ATUT}&=\sum_{i=1}^{N_0} \left[T_{i}\cdot K_{M}(i) -(1-T_i) \right] Y_{i}
+ATE_M&=\frac{1}{N} \sum_{i=1}^{N} \left(2 T_{i}-1\right)\left[1+K_{M}(i)\right] \cdot Y_{i} \\
+ATT_M&=\sum_{i=1}^{N_1} \left[T_{i}-(1-T_i) \cdot K_{M}(i)\right] \cdot  Y_{i}\\
+ATUT_M&=\sum_{i=1}^{N_0} \left[T_{i}\cdot K_{M}(i) -(1-T_i) \right] \cdot Y_{i}
 \end{align*}
 \end{frame}
 
@@ -205,6 +205,17 @@ So that the ATE is given by: $ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left\{\tilde{Y}_{
 \item Probably avoid this unless you have a good reason...
 \end{itemize}
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Implementation}
+\begin{itemize}
+\item Base case is easy enough to do on your own using a canned $k$-NN package.
+\item Even regression/bias adjustment is pretty easy
+\item Computing ATE, ATT, ATUT is relatively straightforward on the matched sample
+\item \texttt{MatchIt} in \texttt{R} (by Gary King et. al)  or \texttt{nnmatch} in Stata (by Abadie and Imbens et al)
+\item Documentation here is pretty good: \url{https://scholar.harvard.edu/files/imbens/files/sjpdf-1.html_.pdf}.
+\end{itemize}
+
 \end{frame}
 
 

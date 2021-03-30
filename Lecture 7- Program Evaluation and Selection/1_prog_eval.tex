@@ -225,9 +225,13 @@ Y_i = \alpha + \beta_i \cdot T_i + u_i
 \begin{frame}
 \frametitle{Why worry about selection?}
 Unless we have random assignment...
+\begin{align*}
+Y_i = \alpha + \beta_i T_i + u_i
+\end{align*}
+
 \begin{itemize}
-\item People often choose $D_i$ with $\beta_i$ in mind.
-\item The problem: $D_i \perp u_i$ and/or $D_i \perp \beta_i$ are likely violated.
+\item People often choose $T_i$ with $\beta_i$ in mind.
+\item The problem: $T_i \perp u_i$ and/or $T_i \perp \beta_i$ are likely violated.
 \item We can get positive or negative selection bias:
 \begin{itemize}
 \item e.g. Who goes to college? those likely to benefit more than most!
