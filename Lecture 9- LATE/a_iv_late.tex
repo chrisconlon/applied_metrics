@@ -3,8 +3,20 @@
 \usetheme{default}
 \usetheme{metropolis}
 \usepackage{ulem}
-\usepackage{minted}
+%\usepackage{minted}
 \usepackage{mathtools}
+\usepackage{tikz}
+% Tikz settings optimized for causal graphs.
+% Just copy-paste this part
+\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
+
 \setbeamersize{text margin left=.3in,text margin right=.3in} 
 
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}%
@@ -33,7 +45,7 @@
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Part 8: Program Evaluation (c)\\
+\title{Part 9: Program Evaluation\\
 Local Average Treatment Effects}
 \author{Chris Conlon}
 \institute{Applied Econometrics}
@@ -44,16 +56,17 @@ Local Average Treatment Effects}
 
 
 \begin{frame}{What about IV?}
-Recall the simple IV estimator with $\beta_i = \beta$:
+Good old $\beta_{IV}$ if $\mathbb{E}[u_i | T_i] \neq 0$ but $\mathbb{E}[u_i | Z_i] = 0$
 \begin{align*}
-Y_i(0) &= \beta_0 + u_i(0)\\
-Y_i(1) &= \beta_0 + \beta1 T_i +  u_i(1)\\
-Y_i &= Y_{i0} + \beta_1 T_i  + \underbrace{[u_i(1) - u_i(0)]}_{\eta_i}
+Y_i(0) &= \alpha + u_i(0)\\
+Y_i(1) &= \alpha + \beta_i\cdot T_i +  u_i(1)\\
+Y_i &= Y_{i0} + \beta_i \cdot T_i  + \underbrace{[u_i(1) - u_i(0)]}_{\eta_i}
 \end{align*}
-We are interested in the \alert{treatment effect} $\beta_1 = Y_i(1) - Y_i(0)$
+We are interested in the \alert{treatment effect} $\beta_i = Y_i(1) - Y_i(0)$
 \begin{itemize}
 \item But $E[\eta_i |  T_i] \neq 0$ because of \alert{selection problem}
-\item IV $Z_i$ gives us $\beta_1 = \frac{Cov(Y_i,Z_i)}{Cov(T_i,Z_i)}$ if $Z_i$ is ``excluded''...
+\item Recall the simple IV estimator with $\beta_i = \beta$ (homogeneous TE)
+\item IV $Z_i$ gives us $\widehat{\beta}_{IV}= \frac{Cov(Y_i,Z_i)}{Cov(T_i,Z_i)}$ if $Z_i$ is ``excluded''...
 \item But what does that mean?
 \end{itemize}
 \end{frame}
@@ -61,11 +74,29 @@ We are interested in the \alert{treatment effect} $\beta_1 = Y_i(1) - Y_i(0)$
 \begin{frame}
 \frametitle{What about IV?}
 \begin{itemize}
-\item Note the absence of direct path between $z \rightarrow y$. This is the \alert{exclusion restriction}.
-\item The fact hat $z \rightarrow x$ is the \alert{relevance} condition.
+\item Note the absence of direct path between $Z \rightarrow Y$. This is the \alert{exclusion restriction}.
+\item $Z \rightarrow X$ is the \alert{relevance} condition.
 \end{itemize}
+\vspace{0.5cm}
 \begin{center}
-\includegraphics[width=3in]{./resources/dag-iv.png}
+\begin{tikzpicture}
+    % x node set with absolute coordinates
+    \node[state] (x) at (0,0) {$X$};
+
+    \node[state] (y) [right =of x] {$Y$};
+    \node[state] (u) [above =of x] {$u$};
+    \node[state] (z) [left =of x] {$Z$};
+
+    % Directed edge
+    \path (x) edge (y);
+    \path (u) edge (y);
+    \path (u) edge (x);
+    \path (z) edge (x);
+    
+    % Bidirected edge
+    \path[bidirected] (z) edge[bend right=60] node[below] {excluded} (y);
+
+\end{tikzpicture}
 \end{center}
 
 \end{frame}
@@ -77,9 +108,9 @@ Now let's think about \alert{heterogeneous treatment effects} $\beta_i = Y_i(1) 
 \begin{itemize}
 \item Let's assume a binary instrument $Z_i=1$
 \item $Y_i(1),Y_i(0)$ depends on the value of $T_i$
-\item But now we allow $T_i(1),T_i(0)$ wher ehte argument is the value of $Z_i$
+\item But now we allow $T_i(1),T_i(0)$ where the argument is the value of $Z_i$
 \item We observe $\{Z_i, T_i = T_i(Z_i), Y_i = Y_i(T_i(Z_i))\}$.
-\item ``Reduced form'' is regression of $y_i \sim z_i$ or $E[Y_i | Z_i =1] - E[Y_i | Z_i =0]$\\
+\item \alert{Reduced Form} or \alert{Intent to treat} is regression of $y_i \sim z_i$ or $E[Y_i | Z_i =1] - E[Y_i | Z_i =0]$\\
 (Nothing about $T_i$!)
 \end{itemize}
 \end{frame}
@@ -158,9 +189,9 @@ We are stuck without further assumptions, so we assume:
 \item Works in many applications (classical drug compliance).
 \item Implied by many latent index models with constant coefficients
 \item Works as long as sign of $\pi_{1,i}$ doesn't change
-\begin{eqnarray*}
-T_i(z)  = 1 [\pi_0 + \pi_1 z + \varepsilon_i > 0]
-\end{eqnarray*}
+\begin{align*}
+T_i(z)  = 1 [\pi_0 + \pi_{1,i} z + \varepsilon_i > 0]
+\end{align*}
 \end{itemize}
 \end{frame}
 
@@ -324,11 +355,12 @@ participation in higher education.
 
 \begin{frame}{Local Average Treatment Effect}
 \begin{itemize}
-\item Suppose the aim is to use these two policies to estimate the returns to college education. In this case, the pair $\{Y^1, Y^0\}$ are log earnings, the treatment is going to college, and the instrument is one of the two randomly allocated programs.
+\item Suppose the aim is to use these two policies to estimate the returns to college education. In this case, the pair $\{Y_i(1), Y_i(0)\}$ are log earnings, the treatment is going to college, and the instrument is one of the two randomly allocated programs.
 \item First, we need to assume that no one who intended to go to college will be discouraged from doing so as a result of the policy (monotonicity).
 \item This could fail as a result of a General Equilibrium response of the policy; for example, if it is perceived that the returns to college decline as a result of the increased supply, those with better outside opportunities may drop out.
 \end{itemize}
 \end{frame}
+
 
 \begin{frame}{Local Average Treatment Effect}
 \begin{itemize}
@@ -339,29 +371,18 @@ participation in higher education.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{A Classic Example}
+\begin{frame}{Failures}
+Easy to see that \alert{monotonicity can fail}  (de Chaisemartin ``Tolerating Defiers'' (2017))
 \begin{itemize}
-\item What is the effect of prices on quantity demanded?
-\item But a regression of $Q_t  = \beta_0 + \beta_1 P_T + u_t$ is going to be flawed.
-\item For one thing, how do we know that relationship represents supply or demand?
-\item Imagine an instrument $Z_t \in \{0,1\}$ that reduces supply but does not effect demand.
-\item What about?
+\item Judges: some are more strict on certain crimes and more lenient on others.
+\item Siblings (Angrist Evan 1998): two same-sex siblings increase probability of a third child (but if you want two boys or two girls you become \alert{defier}).
+\item Informational or Encouragement designs can backfire.
+\end{itemize}
+\alert{Exclusion restriction failing} is actually quite common
 \begin{itemize}
-\item Monotonicity?
-\item Heterogeneity in treatemnt effects?
-\item Exclusion Restriction?
+\item Even ``random'' experiments may not satisfy independence and exclusion.
 \end{itemize}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{LATE at the Fulton Fish Market (Graddy 1995)}
-
-\begin{center}
-\includegraphics[width=3.5in]{./resources/graddy}
-\end{center}
-
+ 
 \end{frame}
 
 
