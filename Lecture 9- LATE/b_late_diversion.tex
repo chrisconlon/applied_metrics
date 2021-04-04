@@ -9,14 +9,6 @@
 \usepackage{booktabs}
 % Tikz settings optimized for causal graphs.
 % Just copy-paste this part
-\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
-\tikzset{
-    -Latex,auto,node distance =1 cm and 1 cm,semithick,
-    state/.style ={ellipse, draw, minimum width = 0.7 cm},
-    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
-    bidirected/.style={Latex-Latex,dashed},
-    el/.style = {inner sep=2pt, align=left, sloped}
-}
 
 \setbeamersize{text margin left=.3in,text margin right=.3in} 
 
@@ -60,7 +52,8 @@
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Local Average Treatment Effects: Demand Curves}
+\title{Part 9: Local Average Treatment Effects Application:\\
+ Demand Curves}
 \author{Chris Conlon}
 \institute{Applied Econometrics}
 \date{\today}
