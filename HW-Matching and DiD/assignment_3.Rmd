@@ -1,7 +1,7 @@
 ---
-title: "Problem Set 5"
+title: "Problem Set 3"
 author: "Prof. Conlon"
-date: "Due: 4/4/20"
+date: "Due: 4/20/20"
 output:
   pdf_document: default
   html_document: default
