@@ -2,7 +2,6 @@
 \documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
 \usetheme{default}
 \usetheme{metropolis}
-\usepackage{minted}
 \usepackage{mathtools}
 \setbeamersize{text margin left=.3in,text margin right=.3in} 
 
@@ -329,60 +328,61 @@ The triple difference is also a thing:
 \end{itemize}
 \end{frame}
 
-\begin{frame}{What does the panel regression give?}
-In practice we often have \alert{multiple treatments}
-\begin{align*}
- Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}\\
- Y_{it} =\alpha_{i0} + \alpha_i \times t +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}
- \end{align*}
-  \begin{itemize}
- \item Allow time dummies and/or group specific trends (w some collinearity)
- \begin{itemize}
-\item States roll out tax/policy changes at different times.
-\item Natural disasters hit different places at different times.
-\item Judges hand down rulings in different jurisdictions.
-\end{itemize}
-\item Previously treated observations can act as \alert{controls} through $\gamma_t$.
-\item Recent work by Goodman-Bacon (2019) says that $\widehat{\delta}$ gives a variance weighted average of all possible $2\times 2$ diff-in-diff designs.
-\end{itemize}
+%
+%\begin{frame}{What does the panel regression give?}
+%In practice we often have \alert{multiple treatments}
+%\begin{align*}
+% Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}\\
+% Y_{it} =\alpha_{i0} + \alpha_i \times t +\gamma_t +\beta X_{it} + \delta_i T_{it}  + u_{it}
+% \end{align*}
+%  \begin{itemize}
+% \item Allow time dummies and/or group specific trends (w some collinearity)
+% \begin{itemize}
+%\item States roll out tax/policy changes at different times.
+%\item Natural disasters hit different places at different times.
+%\item Judges hand down rulings in different jurisdictions.
+%\end{itemize}
+%\item Previously treated observations can act as \alert{controls} through $\gamma_t$.
+%\item Recent work by Goodman-Bacon (2019) says that $\widehat{\delta}$ gives a variance weighted average of all possible $2\times 2$ diff-in-diff designs.
+%\end{itemize}
+%
+%\end{frame}
 
-\end{frame}
-
-\begin{frame}{Panel Regression DiD (Conlon and Rao 2014/2019)}
-In some of my recent work with Nirupama Rao
-\begin{itemize}
-\item Looked at \alert{price posting laws} which required that alcohol wholesalers post prices 30 days in advance of selling, and prohibited short term price cuts.
-\item Look at apparent consumption to NIAAA (ethanol gallons per capita)
-\item States got rid of laws at different times (often because they lost court cases).
-\item All specifications have state and time FE
-\begin{itemize}
-\item Lots of variation across states in consumption of beer vs. wine vs. spirits
-\item Lots of variation across time in consumption of beer vs. wine vs. spirits.
-\item Trends in consumption also vary across states.
-\end{itemize}
-\item Which states do we learn from?
-\begin{itemize}
-\item States without policy changes mostly inform $\beta X_{it}$ and $\gamma_t$
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Variation in Timing (Conlon and Rao 2014/2019)}
-\begin{figure}
-\centering
-\includegraphics[width=2.8in]{./resources/conlon_rao_table2.png}
-\end{figure}
-\end{frame}
-
-
-
-\begin{frame}{Panel Regression DiD (Conlon and Rao 2014/2019)}
-\begin{figure}
-\centering
-\includegraphics[width=3.5in]{./resources/conlon_rao_dd.png}
-\end{figure}
-\end{frame}
+%\begin{frame}{Panel Regression DiD (Conlon and Rao 2014/2019)}
+%In some of my recent work with Nirupama Rao
+%\begin{itemize}
+%\item Looked at \alert{price posting laws} which required that alcohol wholesalers post prices 30 days in advance of selling, and prohibited short term price cuts.
+%\item Look at apparent consumption to NIAAA (ethanol gallons per capita)
+%\item States got rid of laws at different times (often because they lost court cases).
+%\item All specifications have state and time FE
+%\begin{itemize}
+%\item Lots of variation across states in consumption of beer vs. wine vs. spirits
+%\item Lots of variation across time in consumption of beer vs. wine vs. spirits.
+%\item Trends in consumption also vary across states.
+%\end{itemize}
+%\item Which states do we learn from?
+%\begin{itemize}
+%\item States without policy changes mostly inform $\beta X_{it}$ and $\gamma_t$
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
+%
+%
+%\begin{frame}{Variation in Timing (Conlon and Rao 2014/2019)}
+%\begin{figure}
+%\centering
+%\includegraphics[width=2.8in]{./resources/conlon_rao_table2.png}
+%\end{figure}
+%\end{frame}
+%
+%
+%
+%\begin{frame}{Panel Regression DiD (Conlon and Rao 2014/2019)}
+%\begin{figure}
+%\centering
+%\includegraphics[width=3.5in]{./resources/conlon_rao_dd.png}
+%\end{figure}
+%\end{frame}
 
 
 
