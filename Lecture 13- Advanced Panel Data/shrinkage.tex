@@ -211,14 +211,45 @@ We also try a beta prior so that $\hat{D}_{jk} = (1-\lambda) p_k + \lambda\cdot 
 \end{center}
 \end{frame}
 
-\begin{frame}{Fully Hierarchical Models}
+\begin{frame}{Fully Hierarchical Models: What's the point}
+Suppose we want to estimate a lognormal distribution for income in different places
 \begin{itemize}
-\item .
+\item Fully Pooled: estimate a single $(\mu,\sigma)$
+\item Non-Pooled: estimate a separate $(\mu_k,\sigma_k)$ for each zip code
+\item Paritally-Pooled: some combination of the two?
+\begin{itemize}
+\item Allow $\mu_k \sim F(\mu,\sigma)$.
+\item estimate both the common (hyper) parameter and the group specific one.
+\item Limit high variance from small groups.
 \end{itemize}
-
+\end{itemize}
 \end{frame}
 
 
+\begin{frame}{Fully Hierarchical Models}
+Suppose we have several groups, each with their own mean:
+\begin{align*}
+b_{i} & \sim \mathcal{N}\left(0, \sigma_{b}^{2}\right) \\
+\mu_{i} &=\mu+b_{i} \\
+y_{i j} & \sim \mathcal{N}\left(\mu_{i}, \sigma_{y}^{2}\right)
+\end{align*}
+Or we could have written:
+\begin{align*}
+y_{i j}=\mu+\underbrace{b_{i}}_{\sim \mathcal{N}\left(0, \sigma_{b}^{2}\right)}+\underbrace{\epsilon_{i j}}_{\sim \mathcal{N}\left(0, \sigma_{y}^{2}\right)}
+\end{align*}
+That is there is a common mean $\mu$ and a group specific mean $b_i$.
+\end{frame}
+
+\begin{frame}{Fully Hierarchical Models}
+\begin{align*}
+y_{i j}=\mu+\underbrace{b_{i}}_{\sim \mathcal{N}\left(0, \sigma_{b}^{2}\right)}+\underbrace{\epsilon_{i j}}_{\sim \mathcal{N}\left(0, \sigma_{y}^{2}\right)}
+\end{align*}
+\begin{itemize}
+\item Sometimes we interpret $b_i$ as a \alert{random effect}
+\item In any case we will get some \alert{shrinkage} to the overall mean $\mu$
+\item We could estimate by MLE if we know which $b_i$ corresponded to which $y_{ij}$ otherwise via Bayesian methods.
+\end{itemize}
+\end{frame}
 
 
 \section*{Thanks!}
@@ -227,3 +258,4 @@ We also try a beta prior so that $\hat{D}_{jk} = (1-\lambda) p_k + \lambda\cdot 
 
 
 \end{document}
+https://www.matteoparadisi.com/#Teaching
