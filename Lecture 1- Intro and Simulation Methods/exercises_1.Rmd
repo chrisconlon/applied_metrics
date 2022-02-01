@@ -1,7 +1,7 @@
 ---
 title: 'Exercises: Week 1'
 author: "Prof. Conlon"
-date: 'Due: 2/8/21'
+date: 'Due: 2/8/22'
 output:
   pdf_document: default
   html_notebook: default
