@@ -75,23 +75,23 @@ We are interested in the \alert{treatment effect} $\beta_i = Y_i(1) - Y_i(0)$
 \frametitle{What about IV?}
 \begin{itemize}
 \item Note the absence of direct path between $Z \rightarrow Y$. This is the \alert{exclusion restriction}.
-\item $Z \rightarrow X$ is the \alert{relevance} condition.
+\item $Z \rightarrow T$ is the \alert{relevance} condition.
 \end{itemize}
 \vspace{0.5cm}
 \begin{center}
 \begin{tikzpicture}
     % x node set with absolute coordinates
-    \node[state] (x) at (0,0) {$X$};
+    \node[state] (t) at (0,0) {$T$};
 
-    \node[state] (y) [right =of x] {$Y$};
-    \node[state] (u) [above =of x] {$u$};
-    \node[state] (z) [left =of x] {$Z$};
+    \node[state] (y) [right =of t] {$Y$};
+    \node[state] (u) [above =of t] {$u$};
+    \node[state] (z) [left =of t] {$Z$};
 
     % Directed edge
-    \path (x) edge (y);
+    \path (t) edge (y);
     \path (u) edge (y);
-    \path (u) edge (x);
-    \path (z) edge (x);
+    \path (u) edge (t);
+    \path (z) edge (t);
     
     % Bidirected edge
     \path[bidirected] (z) edge[bend right=60] node[below] {excluded} (y);
