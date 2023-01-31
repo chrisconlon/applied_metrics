@@ -1,3 +1,4 @@
+% !TEX options=--shell-escape
 \documentclass[aspectratio=169]{beamer}
 \usetheme{metropolis}
 
@@ -16,7 +17,7 @@
 \usepackage{dcolumn}
 \usepackage{soul}
 \usepackage[cache=false]{minted}
-\renewcommand{\MintedPygmentize}{/Users/christopherconlon/anaconda3/bin/pygmentize}
+\renewcommand{\MintedPygmentize}{/opt/homebrew/Caskroom/miniforge/base/envs/np_veclib/bin/pygmentize}
 \usepackage{MnSymbol}
 \usepackage{stmaryrd}
 
@@ -101,9 +102,9 @@ library(tidyverse)
 # for SE's
 library(estimatr)
 library(broom)
-# for Panel
-library(lfe)
-library(plm)
+# for regressions
+library(fixest)
+library(sandwich)
 \end{minted}
 \end{frame}
 
@@ -126,9 +127,9 @@ y_i = \beta_0 + \beta x_i + u_i
 \end{align*}
 Recall the three basic OLS assumptions
 \begin{enumerate}
-\item $E(u_i |X_i ) = 0$
+\item $\mathbb{E}(u_i |X_i ) = 0$
 \item $(X_i,Y_i)$, $i =1,\ldots,n$, are i.i.d.
-\item Large outliers are rare $E[Y^4]< \infty$ and $E[X^4]<\infty$.
+\item Large outliers are rare $\mathbb{E}[Y^4]< \infty$ and $\mathbb{E}[X^4]<\infty$.
 \end{enumerate}
 \end{frame}
 
@@ -151,12 +152,12 @@ Recall the three basic OLS assumptions
 \begin{frame}{Bias Variance Decomposition}
 We can decompose any estimator into two components
 \begin{eqnarray*}
-\underbrace{E[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( E[ \hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{E \left[ \left(  \hat{f}(x) - E[\hat{f}(x)]  \right)^2 \right]}_{Variance} 
+\underbrace{\mathbb{E}[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( \mathbb{E}[ \hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{\mathbb{E} \left[ \left(  \hat{f}(x) - \mathbb{E}[\hat{f}(x)]  \right)^2 \right]}_{Variance} 
 \end{eqnarray*}
 \begin{itemize}
 \item What minimizes MSE?
 \begin{eqnarray*}
-f(x_i) = E[Y_i | X_i]  
+f(x_i) = \mathbb{E}[Y_i \mid X_i]  
 \end{eqnarray*}
 \item In general we face a tradeoff between bias and variance.
 \item In OLS we minimize the variance among unbiased estimators assuming that the true $f(x_i)= X_i \beta$ is linear. (But is it?)
@@ -218,7 +219,7 @@ Gauss Markov Adds two assumptions:
 \begin{enumerate}
 \item $E(u_i |X_i ) = 0$
 \item $(X_i,Y_i)$, $i =1,\ldots,n$, are i.i.d.
-\item Large outliers are rare $E[Y^4]< \infty$ and $E[X^4]<\infty$.
+\item Large outliers are rare $\E[Y^4]< \infty$ and $\E[X^4]<\infty$.
 \item $Var(u_i) = \sigma^2$ (homoskedasticity)
 \item $u_i \sim N(0,\sigma^2)$ (normal errors)
 \end{enumerate}
@@ -231,12 +232,12 @@ Under these assumptions you learned that OLS is \alert{BLUE}
 \begin{frame}{Variance of $\widehat{\beta}$}
 Start with the variance of the residuals to form a \alert{diagonal} matrix $D$:
 \begin{align*}
-\operatorname { Var } ( \mathbf{u} | \mathbf { X } ) &= \mathbb { E } \left( \mathbf{u u} ^ { \prime } | \mathbf { X } \right){ = } \mathbf { D }\\
+\operatorname { Var } ( \mathbf{u} | \mathbf { X } ) &= \mathbb { E } \left( \mathbf{u u} ^ { \prime } \mid \mathbf { X } \right){ = } \mathbf { D }\\
 \mathbf { D } &= \operatorname { diag } \left( \sigma _ { 1 } ^ { 2 } , \ldots , \sigma _ { n } ^ { 2 } \right) = \left( \begin{array} { c c c c } { \sigma _ { 1 } ^ { 2 } } & { 0 } & { \cdots } & { 0 } \\ { 0 } & { \sigma _ { 2 } ^ { 2 } } & { \cdots } & { 0 } \\ { \vdots } & { \vdots } & { \ddots } & { \vdots } \\ { 0 } & { 0 } & { \cdots } & { \sigma _ { n } ^ { 2 } } \end{array} \right)
 \end{align*}
 \begin{itemize}
-\item $\mathbf{D}$ is diagonal because $\mathbb { E }[u_i u_j | X] = \mathbb { E }[u_i  | x_i]  \mathbb { E }[u_j  | x_j]=0$ (independence)
-\item The elements of $D_i$ are given by $\mathbb { E }[u_i^2 | X] = \mathbb { E }[u_i^2 | x_i] = \sigma_i^2$.
+\item $\mathbf{D}$ is diagonal because $\mathbb { E }[u_i u_j \mid  X] = \mathbb { E }[u_i  \mid x_i]  \mathbb { E }[u_j  \mid  x_j]=0$ (independence)
+\item The elements of $D_i$ are given by $\mathbb { E }[u_i^2 \mid  X] = \mathbb { E }[u_i^2 \mid x_i] = \sigma_i^2$.
 \item In the \alert{homoskedastic} case $\mathbf{D} = \sigma^2 \mathbf{I}_n$.
 \end{itemize}
 \end{frame}
@@ -262,8 +263,8 @@ We have that $ (X'  \mathbf{D} X)  = \sum_{i=1}^N x_i x_i'\sigma_i^2$. Under hom
 \begin{frame}{Variance of $\widehat{\beta}$}
 \begin{align*}
 \mathbf { D } = \operatorname { diag } \left( \sigma _ { 1 } ^ { 2 } , \ldots , \sigma _ { n } ^ { 2 } \right)
-= \mathbb { E } \left( u_i u_i'  | \mathbf { X } \right)
-= \mathbb { E } \left( \widetilde{\mathbf{D}}| \mathbf { X } \right)
+= \mathbb { E } \left( u_i u_i'  \mid \mathbf { X } \right)
+= \mathbb { E } \left( \widetilde{\mathbf{D}} \mid  \mathbf { X } \right)
 \end{align*}
 
 We can estimate $\widehat{\mathbf{V}}_{\widehat{\beta}}$ by plugging in $\mathbf{D} \rightarrow  \widetilde{\mathbf{D}} $:
@@ -273,9 +274,9 @@ We can estimate $\widehat{\mathbf{V}}_{\widehat{\beta}}$ by plugging in $\mathbf
 \end{align*}
 The expectation shows us this estimator is unbiased:
 \begin{align*}
-E[\mathbf{V}_{\widehat{\beta}} | X]
-&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' E[u_i^2 | X] \right) (X'X)^{-1} \\
-&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' \sigma_i^2 \right) (X'X)^{-1} = (X'X)^{-1} (X' D X) (X'X)^{-1} 
+\mathbb{E}[\mathbf{V}_{\widehat{\beta}} \mid X]
+&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i'\, \mathbb{E}[u_i^2 | X] \right) (X'X)^{-1} \\
+&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' \, \sigma_i^2 \right) (X'X)^{-1} = (X'X)^{-1} (X' D X) (X'X)^{-1} 
 \end{align*}
 \end{frame}
 
@@ -300,7 +301,7 @@ Could use leave one out variance estimate:
 \item $HC3$ are the most \alert{conservative} and also place the most weight on potential outliers.
 \item \texttt{Stata} uses $HC1$ as the default and it is what most people refer to when they say \alert{robust standard errors}.
 \item These are often called White (1980) SE's or Eicher-Huber-White SE's.
-\item In small sample some evidence that $HC2$ does better.
+\item In small sample some evidence that $HC2$ has better \alert{coverage}, (what is that?)
 \end{itemize}
 \end{frame}
 
@@ -308,12 +309,15 @@ Could use leave one out variance estimate:
 \footnotesize
 To read about SE's in \texttt{estimatr}:
 \url{ https://declaredesign.org/r/estimatr/articles/mathematical-notes.html}
+or \texttt{fixest}
+\url{https://lrberge.github.io/fixest/articles/fixest_walkthrough.html#the-vcov-argument-1}
 \begin{minted}{R}
 dat <- data.frame(X = matrix(rnorm(2000*5), 2000), y = rnorm(2000))
-hc0<-lm_robust(y ~ ., data = dat, se_type="HC0")$std.error
-hc1<-lm_robust(y ~ ., data = dat, se_type="HC1")$std.error
-hc2<-lm_robust(y ~ ., data = dat, se_type="HC2")$std.error
-hc3<-lm_robust(y ~ ., data = dat, se_type="HC3")$std.error
+res<-feols(y ~ X.1+X.2+X.3+X.4+X.5, data = dat)
+hc0<-summary(res, vcov = sandwich::vcovHC, type = "HC0")$se
+hc1<-summary(res, vcov = sandwich::vcovHC, type = "HC1")$se
+hc2<-summary(res, vcov = sandwich::vcovHC, type = "HC2")$se
+hc3<-summary(res, vcov = sandwich::vcovHC, type = "HC3")$se
 all(hc2 > hc0 )
 [1] TRUE
 all(hc3> hc2 )
@@ -359,19 +363,19 @@ All of these are equivalent:
 \begin{frame}{Clustering (Continued)}
 The error terms have covariance within each cluster $g$ as:
 \begin{align*}
- \boldsymbol{\Sigma}_ { g } = \mathbb { E } \left( \mathbf{u} _ { g }  \mathbf{ u } _ { g } ^ { \prime } | \boldsymbol { X } _ { g } \right)
+ \boldsymbol{\Sigma}_ { g } = \mathbb { E } \left( \mathbf{u} _ { g }  \mathbf{ u } _ { g } ^ { \prime } \mid \boldsymbol { X } _ { g } \right)
 \end{align*}
 
 In order to calculate $\widehat{V}_{\widehat{\beta}}$ we replace the covariance matrix $\mathbf{D}$ with $\Omega$ and consider an estimator $\widehat{\Omega}_n$. We exploit \alert{independence across clusters}:
 \begin{align*}
-\operatorname { var } \left( \left( \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \mathbf{u}_ { g } \right) | \boldsymbol { X } \right) = \sum _ { g = 1 } ^ { G } \operatorname { var } \left( \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol { u } _ { g } | \boldsymbol { X } _ { g } \right)
+\operatorname { var } \left( \left( \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \mathbf{u}_ { g } \right) \mid \boldsymbol { X } \right) = \sum _ { g = 1 } ^ { G } \operatorname { var } \left( \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol { u } _ { g } | \boldsymbol { X } _ { g } \right)
 = \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \mathbb { E } \left( \boldsymbol { u } _ { g } \boldsymbol { u } _ { g } ^ { \prime } | \boldsymbol { X } _ { g } \right) \boldsymbol { X } _ { g }
 = \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol { \Sigma } _ { g } \mathbf { X } _ { g } 
  \equiv \Omega_N
 \end{align*}
 And an estimate of the variance:
 \begin{align*}
-\boldsymbol { V } _ { \widehat { \boldsymbol { \beta } } } = \operatorname { var } ( \widehat { \boldsymbol { \beta } } | \boldsymbol { X } )
+\boldsymbol { V } _ { \widehat { \boldsymbol { \beta } } } = \operatorname { var } ( \widehat { \boldsymbol { \beta } } \mid  \boldsymbol { X } )
 = \left( \mathbf { X } ^ { \prime } \mathbf { X } \right) ^ { - 1 } \boldsymbol { \Omega } _ { n } \left( \mathbf { X } ^ { \prime } \mathbf { X } \right) ^ { - 1 }
 \end{align*}
 \end{frame}
@@ -465,7 +469,7 @@ A simple extension is Weighted Least Squares (WLS)
 Can weight each observation as $w_i$ so that $\sum_{i=1}^N w_i = 1$ instead of $w_i=\frac{1}{N}$.\\
 Can define a diagonal matrix $W$ with entries $w_i$.
 \begin{align*}
-\arg \min_{\beta} \sum_{i=1}^N w_i (y_i - X_i \beta)^2 = \arg \min_{\beta} \norm{W^{1/2}|Y - X \beta| } 
+\arg \min_{\beta} \sum_{i=1}^N w_i (y_i - X_i \beta)^2 = \arg \min_{\beta} \norm{W^{1/2} \left|Y - X \beta \right| } 
 \end{align*}
 Can also consider a transformation of the data 
 \begin{align*}
@@ -522,8 +526,8 @@ The idea is to use the \alert{inverse covariance matrix} of residuals. But this 
 \item Intialize weights to identity matrix: $\widehat{\Omega}= I$
 \item Regress $Y$ on $X$ with weighting matrix $\widehat{\Omega}$
 \item Obtain $\widehat{\varepsilon}_i$.
-\item Construct $E[ \varepsilon_i^2 | X, Z]$ via (nonlinear) regression: $\exp[ \gamma_0 + \gamma_1 x_{i} + \gamma_2 z_{i}]$.
-\item Update $\widehat{\Omega}$ with $E[ \varepsilon_i^2 | X, Z]$
+\item Construct $\E[ \varepsilon_i^2 \mid X, Z]$ via (nonlinear) regression: $\exp[ \gamma_0 + \gamma_1 x_{i} + \gamma_2 z_{i}]$.
+\item Update $\widehat{\Omega}$ with $\E[ \varepsilon_i^2 \mid X, Z]$
 \item Repeat until parameter estimates don't change
 \end{enumerate}
 \end{frame}

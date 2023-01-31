@@ -1,13 +1,13 @@
 ---
 title: 'Exercises: Week 1'
 author: "Prof. Conlon"
-date: 'Due: 2/8/22'
+date: 'Due: 2/7/23'
 output:
   pdf_document: default
   html_notebook: default
 ---
 
-1. Let's start by writing a function that generates fake data 
+1.  Let's start by writing a function that generates fake data
 
 $$
 y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + e_i
@@ -21,22 +21,19 @@ generate_sample<- function(n_obs, beta, x1_var,x2_var,e_var,e_type){
 
 The function should take the following arguments:
 
-  * n_obs: number of observations in the sample
-  * beta : a vector of coefficients
-  * x1_var: a variance/scale parameter for x1
-  * x2_var: a variance/scale parameter for x2
-  * e_var: a variance/scale parameter for e_i
-  * e_type: a distribution type for the residual (maybe uniform or normal?)
- 
-2. Now let's write a function that takes the same arguments and also takes as an argument the number of simulated datasets (say 1000?)
+-   n_obs: number of observations in the sample
+-   beta : a vector of coefficients
+-   x1_var: a variance/scale parameter for x1
+-   x2_var: a variance/scale parameter for x2
+-   e_var: a variance/scale parameter for e_i
+-   e_type: a distribution type for the residual (maybe uniform or normal?)
 
-3. Let's write a function that takes in a single dataset and runs a regression and calculates the output (let's keep the estimates of $\widehat{\beta}$ and it's standard error, $R^2$, $MSE$, and let's evaluate the a t-statistic for the hypothesis that $H_0: \beta=a$ for some choice of $a$). It will be helpful to return everything in a data frame.
+2.  Now let's write a function that takes the same arguments and also takes as an argument the number of simulated datasets (say 1000?)
 
-4. Plot the distribution of $\widehat{\beta}_1$ when the sample size is $n=100$ and see how it compares when $e_i$ is uniform vs. when it is normal across the 1000 samples.
+3.  Let's write a function that takes in a single dataset and runs a regression and calculates the output (let's keep the estimates of $\widehat{\beta}$ and it's standard error, $R^2$, $MSE$, and let's evaluate the a t-statistic for the hypothesis that $H_0: \beta=a$ for some choice of $a$). It will be helpful to return everything in a data frame.
 
-5. Make a table that shows how $\widehat{\beta}_1$ and computes the mean, the standard deviation, the 5th and 95th percentile, and compare that to the asymptotic standard error under different assumptions about the error distribution.
+4.  Plot the distribution of $\widehat{\beta}_1$ when the sample size is $n=100$ and see how it compares when $e_i$ is uniform vs. when it is normal across the 1000 samples.
 
-6. How does changing the variance of $x_1$ and $x_2$ and $e_i$ affect the results? Can you provide a relative precise quantification?
+5.  Make a table that shows how $\widehat{\beta}_1$ and computes the mean, the standard deviation, the 5th and 95th percentile, and compare that to the asymptotic standard error under different assumptions about the error distribution.
 
-
-
+6.  How does changing the variance of $x_1$ and $x_2$ and $e_i$ affect the results? Can you provide a relative precise quantification?
