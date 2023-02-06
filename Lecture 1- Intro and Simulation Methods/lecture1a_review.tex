@@ -17,7 +17,11 @@
 \usepackage{dcolumn}
 \usepackage{soul}
 \usepackage[cache=false]{minted}
-\renewcommand{\MintedPygmentize}{/opt/homebrew/Caskroom/miniforge/base/envs/np_veclib/bin/pygmentize}
+%\renewcommand{\MintedPygmentize}{/opt/homebrew/Caskroom/miniforge/base/envs/np_veclib/bin/pygmentize}
+\renewcommand{\MintedPygmentize}{/Users/christopherconlon/miniforge3/envs/np_veclib/bin/pygmentize}
+
+
+
 \usepackage{MnSymbol}
 \usepackage{stmaryrd}
 
@@ -490,7 +494,7 @@ Also used as a solution to heteroskedasticity
 \end{itemize}
 Why? We are minimizing weighted sum of squared residuals:
 \begin{align*}
-\sum_{i=1}^N w_i (y_i - \hat{y}_i)^2 = \sum_{i=1}^N w_i \varepsilon_i^2 
+\sum_{i=1}^N w_i (y_i - \hat{y}_i)^2 = \sum_{i=1}^N w_i u_i^2 
 \end{align*}
 Suppose we have heteroskedasticity so that $Var(\varepsilon_i) = \sigma_i^2$ and $w_i \propto \frac{1}{\sigma_i^2}$.\\
 In this setting WLS is \alert{BLUE}.
@@ -506,8 +510,8 @@ This procedure is known as Iteratively Re-weighted Least Squares \alert{IRLS}
 \begin{enumerate}
 \item Intialize weights to identity matrix: $W = I$
 \item Regress $Y$ on $X$ with weights $W$
-\item Obtain $\widehat{\varepsilon}_i$.
-\item Update $W$ with $w_{ii} = \frac{1}{\widehat{\varepsilon}_i^2}$
+\item Obtain $\widehat{u}_i$.
+\item Update $W$ with $w_{ii} = \frac{1}{\widehat{u}_i^2}$
 \item Repeat until parameter estimates don't change
 \end{enumerate}
 \end{frame}
@@ -525,9 +529,9 @@ The idea is to use the \alert{inverse covariance matrix} of residuals. But this 
 \begin{enumerate}
 \item Intialize weights to identity matrix: $\widehat{\Omega}= I$
 \item Regress $Y$ on $X$ with weighting matrix $\widehat{\Omega}$
-\item Obtain $\widehat{\varepsilon}_i$.
-\item Construct $\E[ \varepsilon_i^2 \mid X, Z]$ via (nonlinear) regression: $\exp[ \gamma_0 + \gamma_1 x_{i} + \gamma_2 z_{i}]$.
-\item Update $\widehat{\Omega}$ with $\E[ \varepsilon_i^2 \mid X, Z]$
+\item Obtain $\widehat{u}_i$.
+\item Construct $\E[ u_i^2 \mid X, Z]$ via (nonlinear) regression: $\exp[ \gamma_0 + \gamma_1 x_{i} + \gamma_2 z_{i}]$.
+\item Update $\widehat{\Omega}$ with $\E[ u_i^2 \mid X, Z]$
 \item Repeat until parameter estimates don't change
 \end{enumerate}
 \end{frame}
