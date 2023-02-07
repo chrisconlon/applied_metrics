@@ -1,70 +1,4 @@
-\documentclass[aspectratio=169]{beamer}
-\usetheme{metropolis}
-
-%\usepackage{beamerthemesplit}
-%\beamertemplatenavigationsymbolsempty
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{latexsym}
-\usepackage{graphicx}
-\usepackage{fancybox}
-\usepackage{dsfont}
-\usepackage{multirow} 
-\usepackage{multicol}
-\usepackage{booktabs} 
-\usepackage{dcolumn}
-\usepackage{soul}
-%\usepackage[cache=false]{minted}
-\usepackage{MnSymbol}
-\usepackage{stmaryrd}
-
-
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-
-\newcommand{\X}{\mathtt{X}}
-\newcommand{\Y}{\mathtt{Y}}
-
-%\newcommand{\R}{\mathbb{R}}
-%\newcommand{\E}{\mathbb{E}}
-%\newcommand{\V}{\mathbb{V}}
-\newcommand{\p}{\mathbb{P}}
-\newcommand*\df{\mathop{}\!\mathrm{d}}
-\newcommand{\del}{\partial}
-
-
-% imports
-\usepackage{xargs}
-\usepackage{xpatch}
-\usepackage{etoolbox}
-\usepackage{pdflscape}
-\usepackage{booktabs}
-\usepackage{threeparttable}
-\usepackage[skip=0.2\baselineskip]{caption}
-
-% command for inputting raw latex
-\makeatletter
-\newcommand\primitiveinput[1]{\@@input #1 }
-\makeatother
-
-% common table command
-\newcommandx{\tablecontent}[4]{
-    \begin{threeparttable}[!ht]
-        \centering
-        \caption{#3}
-        \vspace{-1em}
-        \footnotesize
-        \begin{tabular}{#1}
-            \primitiveinput{../tables/#2.tex}
-        \end{tabular}
-        \vspace{-0.2em}
-        \begin{tablenotes}[flushleft]
-            #4
-        \end{tablenotes}
-    \end{threeparttable}
-}
-
+\input{../preamble.tex}
 
 
 
@@ -74,18 +8,6 @@
 \institute{NYU Stern }
 
 
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\V}{\mathbb{V}}
-\newcommand{\ol}{\overline}
-%\newcommand{\ul}{\underline}
-\newcommand{\pp}{{\prime \prime}}
-\newcommand{\ppp}{{\prime \prime \prime}}
-\newcommand{\policy}{\gamma}
-
-
-\newcommand{\fp}{\frame[plain]}
 
 \date{\today}
 
@@ -106,7 +28,7 @@
 \item Choose $\widehat{\theta}_{gmm}$ to minimize $$Q_N(\theta)=g_N(\theta)' \cdot W_N \cdot  g_N(\theta)$$
 \item Have to choose a weighting matrix $W_n$.
 \item Jacobian: $D(\theta) \equiv \mathbb{E}[\frac{\partial g(w_i,\theta)}{\partial \theta}]$, which is a $q \times k$ matrix.
-\item  Evaluated at the optimum, $\frac{1}{\sqrt{N}} \sum_{i=1}^N g(w_i,\theta_0) \overset{d}{\to} N(0,S)$ where $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is a $q \times q$ matrix.
+\item  Evaluated at the optimum, $\frac{1}{\sqrt{N}} \sum_{i=1}^N g(w_i,\theta_0) \overset{d}{\to} N(0,S)$ where $S = \E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is a $q \times q$ matrix.
 \end{itemize}
 \end{frame}
 
@@ -186,7 +108,7 @@ This gives us some insight into what we are looking for from moment conditions.
 \item In practical terms, the problem is well identified when the objective function is steep around $\theta_0$.
 \item When the problem becomes flat, it becomes hard to distinguish one $\theta$ in favor of another.
 \end{itemize}
-\item The problem is that $S = E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is not something that we readily observe from our data. In fact, the asymptotic covariance evaluated at $\theta_0$ is \alert{infeasible}.
+\item The problem is that $S = \E[g(w_i,\theta_0) g(w_i,\theta_0)']$ is not something that we readily observe from our data. In fact, the asymptotic covariance evaluated at $\theta_0$ is \alert{infeasible}.
 \end{itemize}
 \end{frame}
 
@@ -216,7 +138,7 @@ For the linear IV estimator when $i$ is independent then $g(w_i,\theta) = z_i \e
 \hat{S}=\frac{1}{N} \sum_{i=1}^N z_i z_i' \epsilon_i^2
 \end{eqnarray*}
 \begin{itemize}
-\item When there is homoskedastic variance $E[\epsilon_i^2 | z_i] = \sigma^2$ and the covariance of the moments becomes $\frac{\sigma^2}{N} \sum_{i=1}^N z_i z_i'$.
+\item When there is homoskedastic variance $\E[\epsilon_i^2 \mid z_i] = \sigma^2$ and the covariance of the moments becomes $\frac{\sigma^2}{N} \sum_{i=1}^N z_i z_i'$.
 \item Because scaling weighting matrix by a constant has no effect on the maximum this is equivalent to the 2SLS weight matrix: $\sum_{i=1}^N z_i z_i'$ or $Z'Z$
 \begin{itemize}
 \item  2SLS is only the efficient estimator under \alert{homoskedasticity}.
@@ -254,7 +176,7 @@ Take Logs
 \begin{frame}{Example: Gravity Equation}
 If the moment condition holds then everything is good:
 \begin{align*}
-E[ln (\eta_{ij}) | Y_i, Y_j D_{ij} ]=0
+\E[ln (\eta_{ij}) | Y_i, Y_j D_{ij} ]=0
 \end{align*}
 Some problems
 \begin{itemize}
@@ -272,7 +194,7 @@ T_{i j}&=\exp \left(x_{i} \beta\right) \eta_{i j}
 \end{align*}
 This gives us our moment condition:
 \begin{align*}
-E[ T_{i j} - \exp \left(x_{i} \beta\right) | x_i]=0
+\E[ T_{i j} - \exp \left(x_{i} \beta\right) | x_i]=0
 \end{align*}
 This works as long as we are okay with \alert{proportional variance}
 

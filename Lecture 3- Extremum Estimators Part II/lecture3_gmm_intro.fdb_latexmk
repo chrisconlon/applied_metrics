@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1675791035 "lecture3_gmm_examples.xdv" "lecture3_gmm_examples.pdf" "lecture3_gmm_examples" 1675791036 0
-  "lecture3_gmm_examples.xdv" 1675791035 118728 8e1cedfea8c68e9b75b9261415927aac "xelatex"
+["xdvipdfmx"] 1675790870 "lecture3_gmm_intro.xdv" "lecture3_gmm_intro.pdf" "lecture3_gmm_intro" 1675790871 0
+  "lecture3_gmm_intro.xdv" 1675790870 103260 03cd249ca4525d2d742a478e40ada9ec "xelatex"
   (generated)
-  "lecture3_gmm_examples.pdf"
+  "lecture3_gmm_intro.pdf"
   (rewritten before read)
-["xelatex"] 1675791033 "lecture3_gmm_examples.tex" "lecture3_gmm_examples.xdv" "lecture3_gmm_examples" 1675791036 0
+["xelatex"] 1675790868 "lecture3_gmm_intro.tex" "lecture3_gmm_intro.xdv" "lecture3_gmm_intro" 1675790871 0
   "../preamble.tex" 1675790317 2920 dd48c8343b8e8882d7d3e71c2220ecfd ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -263,16 +263,16 @@
   "/usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf" 1646502317 40171 cdab547de63d26590bebb3baff566530 ""
   "/usr/local/texlive/2022/texmf-var/web2c/xetex/xelatex.fmt" 1674580787 10495935 e84413c0850800a84eaae558041c8c1b ""
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
-  "lecture3_gmm_examples.aux" 1675791035 3605 de237185744a865033048c8d3999dce8 "xelatex"
-  "lecture3_gmm_examples.nav" 1675791035 1817 66934389eeb88ce9359bcf9823ea43c0 "xelatex"
-  "lecture3_gmm_examples.out" 1675791035 78 11e533bd72f2c1403c493a359d3a2b20 "xelatex"
-  "lecture3_gmm_examples.tex" 1675791031 9575 1bec7e9b9aa43e99ac01417dc4d9be57 ""
+  "lecture3_gmm_intro.aux" 1675790870 3263 8831273f70ff7399659e87b7e08436fb "xelatex"
+  "lecture3_gmm_intro.nav" 1675790870 1631 7a4775659a9cec3c06a01e55af82d7a6 "xelatex"
+  "lecture3_gmm_intro.out" 1675790870 78 11e533bd72f2c1403c493a359d3a2b20 "xelatex"
+  "lecture3_gmm_intro.tex" 1675790867 8760 b9c06f13e80be532da303186de506ca4 ""
   (generated)
-  "lecture3_gmm_examples.aux"
-  "lecture3_gmm_examples.log"
-  "lecture3_gmm_examples.nav"
-  "lecture3_gmm_examples.out"
-  "lecture3_gmm_examples.snm"
-  "lecture3_gmm_examples.toc"
-  "lecture3_gmm_examples.xdv"
+  "lecture3_gmm_intro.aux"
+  "lecture3_gmm_intro.log"
+  "lecture3_gmm_intro.nav"
+  "lecture3_gmm_intro.out"
+  "lecture3_gmm_intro.snm"
+  "lecture3_gmm_intro.toc"
+  "lecture3_gmm_intro.xdv"
   (rewritten before read)

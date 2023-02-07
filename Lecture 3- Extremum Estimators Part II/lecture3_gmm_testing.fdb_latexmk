@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1675791035 "lecture3_gmm_examples.xdv" "lecture3_gmm_examples.pdf" "lecture3_gmm_examples" 1675791036 0
-  "lecture3_gmm_examples.xdv" 1675791035 118728 8e1cedfea8c68e9b75b9261415927aac "xelatex"
+["xdvipdfmx"] 1675791146 "lecture3_gmm_testing.xdv" "lecture3_gmm_testing.pdf" "lecture3_gmm_testing" 1675791147 0
+  "lecture3_gmm_testing.xdv" 1675791146 65560 2c4cd8d6789c6bf523acd58a563e4801 "xelatex"
   (generated)
-  "lecture3_gmm_examples.pdf"
+  "lecture3_gmm_testing.pdf"
   (rewritten before read)
-["xelatex"] 1675791033 "lecture3_gmm_examples.tex" "lecture3_gmm_examples.xdv" "lecture3_gmm_examples" 1675791036 0
+["xelatex"] 1675791144 "lecture3_gmm_testing.tex" "lecture3_gmm_testing.xdv" "lecture3_gmm_testing" 1675791147 0
   "../preamble.tex" 1675790317 2920 dd48c8343b8e8882d7d3e71c2220ecfd ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -263,16 +263,17 @@
   "/usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf" 1646502317 40171 cdab547de63d26590bebb3baff566530 ""
   "/usr/local/texlive/2022/texmf-var/web2c/xetex/xelatex.fmt" 1674580787 10495935 e84413c0850800a84eaae558041c8c1b ""
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
-  "lecture3_gmm_examples.aux" 1675791035 3605 de237185744a865033048c8d3999dce8 "xelatex"
-  "lecture3_gmm_examples.nav" 1675791035 1817 66934389eeb88ce9359bcf9823ea43c0 "xelatex"
-  "lecture3_gmm_examples.out" 1675791035 78 11e533bd72f2c1403c493a359d3a2b20 "xelatex"
-  "lecture3_gmm_examples.tex" 1675791031 9575 1bec7e9b9aa43e99ac01417dc4d9be57 ""
+  "lecture3_gmm_testing.aux" 1675791146 2973 212406558b2a1d63e6b5e52568665c80 "xelatex"
+  "lecture3_gmm_testing.nav" 1675791146 1496 9df07feb22bf13427005f991fe59e1d7 "xelatex"
+  "lecture3_gmm_testing.out" 1675791146 156 85e8948c1d19b781835e2ac3b323117e "xelatex"
+  "lecture3_gmm_testing.tex" 1675791143 4934 7de10deb1a38a12e9be3187bfef76396 ""
+  "resources/lmlrwald.png" 1600297573 40634 7978b94d08c3a5888175ca7d542cea55 ""
   (generated)
-  "lecture3_gmm_examples.aux"
-  "lecture3_gmm_examples.log"
-  "lecture3_gmm_examples.nav"
-  "lecture3_gmm_examples.out"
-  "lecture3_gmm_examples.snm"
-  "lecture3_gmm_examples.toc"
-  "lecture3_gmm_examples.xdv"
+  "lecture3_gmm_testing.aux"
+  "lecture3_gmm_testing.log"
+  "lecture3_gmm_testing.nav"
+  "lecture3_gmm_testing.out"
+  "lecture3_gmm_testing.snm"
+  "lecture3_gmm_testing.toc"
+  "lecture3_gmm_testing.xdv"
   (rewritten before read)

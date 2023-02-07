@@ -1,88 +1,9 @@
-\documentclass[aspectratio=169]{beamer}
-\usetheme{metropolis}
-
-%\usepackage{beamerthemesplit}
-%\beamertemplatenavigationsymbolsempty
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{latexsym}
-\usepackage{graphicx}
-\usepackage{fancybox}
-\usepackage{dsfont}
-\usepackage{multirow} 
-\usepackage{multicol}
-\usepackage{booktabs} 
-\usepackage{dcolumn}
-\usepackage{soul}
-%\usepackage[cache=false]{minted}
-\usepackage{MnSymbol}
-\usepackage{stmaryrd}
-
-
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-
-\newcommand{\X}{\mathtt{X}}
-\newcommand{\Y}{\mathtt{Y}}
-
-%\newcommand{\R}{\mathbb{R}}
-%\newcommand{\E}{\mathbb{E}}
-%\newcommand{\V}{\mathbb{V}}
-\newcommand{\p}{\mathbb{P}}
-\newcommand*\df{\mathop{}\!\mathrm{d}}
-\newcommand{\del}{\partial}
-
-
-% imports
-\usepackage{xargs}
-\usepackage{xpatch}
-\usepackage{etoolbox}
-\usepackage{pdflscape}
-\usepackage{booktabs}
-\usepackage{threeparttable}
-\usepackage[skip=0.2\baselineskip]{caption}
-
-% command for inputting raw latex
-\makeatletter
-\newcommand\primitiveinput[1]{\@@input #1 }
-\makeatother
-
-% common table command
-\newcommandx{\tablecontent}[4]{
-    \begin{threeparttable}[!ht]
-        \centering
-        \caption{#3}
-        \vspace{-1em}
-        \footnotesize
-        \begin{tabular}{#1}
-            \primitiveinput{../tables/#2.tex}
-        \end{tabular}
-        \vspace{-0.2em}
-        \begin{tablenotes}[flushleft]
-            #4
-        \end{tablenotes}
-    \end{threeparttable}
-}
-
-
-
+\input{../preamble.tex}
 
 % \usepackage{slashbox}
 \title{Lecture 3: Generalized Method of Moments}
 \author{Chris Conlon }
 \institute{NYU Stern }
-
-
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\V}{\mathbb{V}}
-\newcommand{\ol}{\overline}
-%\newcommand{\ul}{\underline}
-\newcommand{\pp}{{\prime \prime}}
-\newcommand{\ppp}{{\prime \prime \prime}}
-\newcommand{\policy}{\gamma}
 
 
 \newcommand{\fp}{\frame[plain]}
@@ -159,14 +80,13 @@ CUE has some additional advantages over GMM. We see this by examining the GMM FO
 \end{eqnarray*}
 If we take an Edgeworth expansion we can see how the  \alert{asymptotic bias} term looks:
 \begin{eqnarray*}
-\frac{1}{N^2}\sum_{i=1}^N E[g(w_i,\theta) W_n g(w_i,\theta)]
+\frac{1}{N^2}\sum_{i=1}^N \E[g(w_i,\theta) W_n g(w_i,\theta)]
 \end{eqnarray*}
 As long as the variance is finite we can see that this bias disappears as $N \rightarrow \infty$. However it also tends to grow linearly with $q$ the number of moment restrictions. This is often referred to as the \textit{too many moments} or \textit{many instruments} problem.
 
 The challenge is that in general when we estimate $\hat{g}(\hat{\theta})$ and $\hat{D}(\hat{\theta})$ we construct them so that they are mechanically correlated with one another. It turns out the CUE estimator fixes this in exactly the right way. How is beyond the scope of this note (and course). If you are really interested you should look at Newey and Smith (2004).
 
 \end{frame}
-\section*{\normalsize  Common Questions/Extensions}
 
 \section*{Thanks!}
 
