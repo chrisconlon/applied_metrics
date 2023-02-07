@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1675790394 "lecture2_mle_intro.xdv" "lecture2_mle_intro.pdf" "lecture2_mle_intro" 1675790395 0
-  "lecture2_mle_intro.xdv" 1675790394 118072 ae25615a07132c2005ba980e5252d5f2 "xelatex"
+["xdvipdfmx"] 1675790359 "lecture2_optimization.xdv" "lecture2_optimization.pdf" "lecture2_optimization" 1675790360 0
+  "lecture2_optimization.xdv" 1675790359 85976 eef5c3d795f9c80cb9ceff7fb9168d29 "xelatex"
   (generated)
-  "lecture2_mle_intro.pdf"
+  "lecture2_optimization.pdf"
   (rewritten before read)
-["xelatex"] 1675790392 "lecture2_mle_intro.tex" "lecture2_mle_intro.xdv" "lecture2_mle_intro" 1675790395 0
+["xelatex"] 1675790357 "lecture2_optimization.tex" "lecture2_optimization.xdv" "lecture2_optimization" 1675790360 0
   "../preamble.tex" 1675790317 2920 dd48c8343b8e8882d7d3e71c2220ecfd ""
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -262,17 +262,16 @@
   "/usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf" 1646502317 40171 cdab547de63d26590bebb3baff566530 ""
   "/usr/local/texlive/2022/texmf-var/web2c/xetex/xelatex.fmt" 1674580787 10495935 e84413c0850800a84eaae558041c8c1b ""
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
-  "lecture2_mle_intro.aux" 1675790394 4289 f13a9780d9785ca328509ef695ad3aee "xelatex"
-  "lecture2_mle_intro.nav" 1675790394 2189 d5e3a34f021996a4ddb3ee6bd5ef7e2b "xelatex"
-  "lecture2_mle_intro.out" 1675790394 78 11e533bd72f2c1403c493a359d3a2b20 "xelatex"
-  "lecture2_mle_intro.tex" 1675790390 11626 01d142b2c02931083fb26d303c067ec4 ""
-  "resources/jensen.png" 1675785653 94736 f06f547ddaf5a8dd29788e1824e20d65 ""
+  "lecture2_optimization.aux" 1675790359 3585 4727c7757560a17b6a6bc826a1911f37 "xelatex"
+  "lecture2_optimization.nav" 1675790359 1926 b321cba5ad7edbd11529cfe00ccd6a19 "xelatex"
+  "lecture2_optimization.out" 1675790359 502 cda45fb69142571171c0632ef6904aaa "xelatex"
+  "lecture2_optimization.tex" 1675790250 7273 6ac6570d91a192f91d73cfe7ad42b720 ""
   (generated)
-  "lecture2_mle_intro.aux"
-  "lecture2_mle_intro.log"
-  "lecture2_mle_intro.nav"
-  "lecture2_mle_intro.out"
-  "lecture2_mle_intro.snm"
-  "lecture2_mle_intro.toc"
-  "lecture2_mle_intro.xdv"
+  "lecture2_optimization.aux"
+  "lecture2_optimization.log"
+  "lecture2_optimization.nav"
+  "lecture2_optimization.out"
+  "lecture2_optimization.snm"
+  "lecture2_optimization.toc"
+  "lecture2_optimization.xdv"
   (rewritten before read)
