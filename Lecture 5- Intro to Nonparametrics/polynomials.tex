@@ -1,28 +1,4 @@
-\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
-\usetheme{metropolis}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
-
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{amsmath}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-
-%\usepackage[cache=false]{minted}
-%\renewcommand{\MintedPygmentize}{/Users/christopherconlon/anaconda3/bin/pygmentize}
-
-\usepackage[absolute,overlay]{textpos} 
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
-\DeclareMathSizes{10}{10}{6}{6} 
-
+\input{../preamble.tex}
 
 \title [Nonparametrics]{Nonparametrics and Local Methods: Polynomials}
 \author{C.Conlon}
@@ -226,15 +202,15 @@ p(x)=\frac{\hat{p}(x)}{ \hat{p}(1)}
 \item Weighting function: $w(x) > $ (positive everywhere)
 \item Inner product $\langle f,g \rangle = \int_D f(x) g(x) w(x) d x$
 \item Polynomials are orthogonal wrt to $w(x)$ IFF 
-\begin{eqnarray*}
+\begin{align*}
 \langle \phi_i, \phi_j \rangle = 0, \quad i \neq j
-\end{eqnarray*}
+\end{align*}
 \item Can compute orthogonal polynomials using recurrence formulas
-\begin{eqnarray*}
-\phi_0(x) &=& 1\\
-\phi_1(x) &=& x \\
-\phi_{k+1}(x) &=& (a_{k+1} x + b_k) \phi_k(x) + c_{k+1} \phi_{k-1}(x)
-\end{eqnarray*}
+\begin{align*}
+\phi_0(x)&= 1\\
+\phi_1(x) &= x \\
+\phi_{k+1}(x) &= (a_{k+1} x + b_k) \phi_k(x) + c_{k+1} \phi_{k-1}(x)
+\end{align*}
 \end{itemize}
 \end{block}
 \end{frame}
@@ -246,18 +222,19 @@ p(x)=\frac{\hat{p}(x)}{ \hat{p}(1)}
 \item $[a,b] = [-1,1]$ and $w(x) = (1-x^2)^{-1/2}$
 \item $T_n(x) = \cos(n \cos^{-1} x)$
 \item Recursive Definition 
-\begin{eqnarray*}
-T_0(x) &=& 1\\
-T_1(x) &=& x\\
-T_{n+1}(x) &=& 2x T_n(x) - T_{n-1}(x)
-\end{eqnarray*}
+\vspace{-1cm}
+\begin{align*}
+T_0(x) &= 1\\
+T_1(x) &= x\\
+T_{n+1}(x) &= 2x T_n(x) - T_{n-1}(x)
+\end{align*}
 \end{itemize}
 \begin{block}{General Intervals}
 \begin{itemize}
 \item Most problems aren't on the $[-1,1]$ interval so we need a COV
-\begin{eqnarray*}
+\begin{align*}
 y = -1 + 2 \frac{x-a}{b-a}
-\end{eqnarray*}
+\end{align*}
 \item Polynomials $\phi_i^{*}(x) \equiv \phi_i (-1 + 2 \frac{x-a}{b-a})$ are orthogonal over $x \in[a,b]$ with respect to the weight $w^{*}(x) \equiv (-1 + 2 \frac{x-a}{b-a})$ iff the $\phi_i(y)$ are orthogonal over $y\in[-1,1]$ wrt $w(y)$.
 \end{itemize} 
 \end{block}
