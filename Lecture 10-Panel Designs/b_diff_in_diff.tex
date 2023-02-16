@@ -1,34 +1,4 @@
-
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
-\usetheme{default}
-\usetheme{metropolis}
-\usepackage{mathtools}
-\setbeamersize{text margin left=.3in,text margin right=.3in} 
-
-\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
-\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
-
-
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
-
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace,centernot}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-\usepackage{pdfpages}
-\usepackage[absolute,overlay]{textpos} 
-
-
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
-\DeclareMathSizes{10}{10}{6}{6} 
+\input{../preamble.tex}
 
 \begin{document}
 \title{Part 8: Program Evaluation (d): \\
