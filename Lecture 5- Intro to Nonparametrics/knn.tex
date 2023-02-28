@@ -1,29 +1,6 @@
-\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
-\usetheme{metropolis}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
+\input{../preamble.tex}
 
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{amsmath}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-
-%\usepackage{pxfonts}
-
-\usepackage[absolute,overlay]{textpos} 
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
-\DeclareMathSizes{10}{10}{6}{6} 
-
-
-\title [Nonparametrics]{Nonparametrics and Local Methods: Nearest Neighbor}
+\title [Nonparametrics]{Nonparametrics and Local Methods: Nearest Neighbor Methods}
 \author{C.Conlon}
 \institute{Applied Econometrics}
 \date{\today}
@@ -34,12 +11,10 @@
 \titlepage
 \end{frame}
 
-
-
 \begin{frame}{Bias Variance Decomposition}
 We can decompose any estimator into two components
 \begin{align*}
-\underbrace{E[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( E[\hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{E \left[ \left(\hat{f}(x) - E[\hat{f}(x) \right] \right)^2}_{Variance} 
+\underbrace{\E[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( \E[\hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{\E \left[ \left(\hat{f}(x) -\E[\hat{f}(x) \right] \right)^2}_{Variance} 
 \end{align*}
 \begin{itemize}
 \item In general we face a tradeoff between bias and variance.
@@ -52,7 +27,7 @@ We can decompose any estimator into two components
 \begin{frame}{Bias Variance Decomposition}
 What minimizes MSE?
 \begin{align*}
-f(x_i) = E[Y_i | X_i] 
+f(x_i) = \E[Y_i | X_i] 
 \end{align*}
 \begin{itemize}
 \item Seems simple enough (but we are back where we started).
@@ -70,7 +45,7 @@ f(x_i) = E[Y_i | X_i]
 \begin{frame}{How about logit?}
 We write:
 \begin{align*}
-E[Y_i | X_i] &= Pr(Y_i =1 | X_i) = p(x_i)\\
+\E[Y_i | X_i] &= Pr(Y_i =1 | X_i) = p(x_i)\\
  Pr(Y_i =1 | X_i)  &= \frac{1}{1+\exp^{\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots}}
 \end{align*}
 Or with the log odds transformation:
@@ -80,7 +55,7 @@ Or with the log odds transformation:
 Logit is \alert{linear} again (in parameters). This is a \alert{generalized linear model}.
 \end{frame}
 
-\begin{frame}{How else might we estimate $E[Y_i | X_i]$?}
+\begin{frame}{How else might we estimate $\E[Y_i | X_i]$?}
 Obvious approach:
 \begin{itemize}
 \item With enough data: look at all values for $X_i = x$ and take the mean.

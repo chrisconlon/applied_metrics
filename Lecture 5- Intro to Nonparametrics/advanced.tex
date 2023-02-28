@@ -1,27 +1,4 @@
-\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
-\usetheme{metropolis}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
-
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{amsmath}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-
-%\usepackage{pxfonts}
-
-\usepackage[absolute,overlay]{textpos} 
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
-\DeclareMathSizes{10}{10}{6}{6} 
-
+\input{../preamble.tex}
 
 \title [Nonparametrics]{Nonparametrics and Local Methods: Advanced Topics}
 \author{C.Conlon}
@@ -33,7 +10,6 @@
 \begin{frame}
 \titlepage
 \end{frame}
-
 
 \frame{\frametitle{Local Bandwidths}
 

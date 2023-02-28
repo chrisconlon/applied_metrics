@@ -1,28 +1,4 @@
-\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
-\usetheme{metropolis}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
-
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{amsmath}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-
-%\usepackage[cache=false]{minted}
-%\renewcommand{\MintedPygmentize}{/Users/christopherconlon/anaconda3/bin/pygmentize}
-
-\usepackage[absolute,overlay]{textpos} 
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
-\DeclareMathSizes{10}{10}{6}{6} 
-
+\input{../preamble.tex}
 
 \title [Nonparametrics]{Nonparametrics and Local Methods: Splines}
 \author{C.Conlon}
@@ -34,13 +10,12 @@
 \begin{frame}
 \titlepage
 \end{frame}
-
 \begin{frame}{Polynomial Basis}
 Again consider the following relationship:
 \begin{align*}
 y_i = f(x_i) + \epsilon_i
 \end{align*}
-One approach is to approximate $f(x_i)$ or $E[y_i | x_i]$ with a \alert{polynomial series}.
+One approach is to approximate $f(x_i)$ or $\E[y_i | x_i]$ with a \alert{polynomial series}.
 \begin{align*}
 y_i = a_0^k  + a_1^k x_i + a_2^k x_i^2 + a_3^k x_i^3+ \varepsilon_i \text{ for } x \in [\underline{x}_k,\overline{x}_k]
 \end{align*}
