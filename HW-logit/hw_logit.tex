@@ -1,0 +1,121 @@
+\documentclass{article}
+\usepackage{verbatim}
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+\begin{document}
+
+\title{Problem Set 3} 
+\author{Chris Conlon}
+\date{Due: April 4, 2022}
+\maketitle
+This problem set is designed to make sure that your $\mathtt{numpy}$ or \texttt{R} skills are up to speed. For each question, the expectation is that you complete the task, provide the appropriate code, and fully read the documentation, and work the $\mathtt{numpy}$ provided examples on your own.  The tasks should be fairly easy.  The goal is to accomplish the tasks in the most straightforward manner with the least amount of code.  
+
+If you are new to $\mathtt{numpy}$ I suggest the following tutorials:
+\begin{itemize}
+\item \url{https://docs.scipy.org/doc/numpy/user/quickstart.html}
+\item  \url{https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html}
+\end{itemize}
+
+\section*{\normalsize Part I: Logit Inclusive Value}
+The logit inclusive value or $IV = \log \sum_{i=0}^N \exp[x_i]$.
+\begin{enumerate}
+\item Show that the this function is everywhere convex if $x_0=0$.
+\item A common problem in practice is that if one of the $x_i > 600$ that we have an ``overflow'' error on a computer. In this case $\exp[600] \approx 10^{260}$ which is too large to store with any real precision, especially if another $x$ has a different scale (say $x_2=10$). A common ``trick'' is to subtract off $m_i = \max_i x_i$ from all $x_i$.  Show how to implement the trick and get the correct value of $IV$. If you get stuck take a look at Wikipedia.
+\item Compare your function to $\mathtt{scipy.special.logsumexp}$ in Python or \texttt{matrixStats.LogSumExp} in \texttt{R}. Does it appear to suffer from underflow/overflow? Does it use the $\max$ trick?
+\end{enumerate}
+
+\section*{\normalsize Part II: Numerical Integration}
+In this part we will look to calculation the logit choice probability $p(X,\theta)$ by numerical integration:\\
+ $p(X,\theta) =\int_{-\infty}^{\infty} \frac{\exp(\beta_i X)}{1+ \exp(\beta_i X)} f(\beta_i | \theta) \partial \beta_i$. \\
+
+
+\noindent Assume $f \sim N(0.5,2)$ and that $X = 0.5$.\\
+
+
+\noindent A helpful relationship is the following:\\
+
+\noindent Let $Y\sim N(\mu,\sigma^2)$ and apply COV $x = (y-\mu)/\sqrt{2} \sigma$
+\begin{eqnarray*}
+E[f(Y)] = (2 \pi \sigma^2)^{-\frac{1}{2}} \int_{-\infty}^{\infty} f(y) \exp\left[-\frac{(y-\mu)^2}{2\sigma^2} \right] dy \\
+\int_{-\infty}^{\infty} f(y) \exp\left[-\frac{(y-\mu)^2}{2\sigma^2} \right] dy = \int_{-\infty}^{\infty} f(\sqrt{2} \sigma x + \mu) e^{-x^2} \sqrt{2} \sigma dx
+\end{eqnarray*}
+Gives the quadrature formula using Gauss Hermite $(x_s,w_s)$.
+\begin{eqnarray*}
+E[f(Y)] = \frac{1}{\sqrt{\pi}} \sum_{s=1}^S w_s f(\sqrt{2}\sigma x_s+ \mu)
+\end{eqnarray*}
+notice that we don't have the $e^{-x^2}$ anymore, so we can use the $(w_s, x_s)$ weights and nodes for Gauss-Hermite quadrature without a problem.\\
+
+
+ 
+\begin{enumerate}
+\item Create the function in an Python/R called $\mathtt{binomiallogit}$. (It should take $\beta$ the item you integrate over as its argument, it should take the PDF $\mathtt{scipy.stats.norm.pdf}$ in Python, or \texttt{pnorm} in \texttt{R} or  as an optional argument).
+
+\item Integrate the function using Python's $\mathtt{scipy.integrate.quad}$ or \texttt{gauss.quad} in \texttt{R} and setting the tolerance to $1\e{-14}$.  Treat this a the ``true'' value.
+\begin{comment}
+\begin{verbatim}
+[Ftrue,nevals]=quad(@binomiallogit,-10,10,1e-14);
+z=randn(100,1);
+Fmc=sum(binomiallogitnopdf(z))./length(z);
+Fgh=binomiallogitnopdf(x)'*(w./sum(w));
+\end{verbatim}
+\end{comment}
+
+\item Integrate the function by taking 20 and 400 Monte Carlo draws from $f$ and computing the sample mean.
+\item Integrate the function using Gauss-Hermite quadrature for $k=4, 12$ (Try some odd ones too). Obtain the quadrature points and nodes from the internet. Gauss-Hermite quadrature assumes a weighting function of $\exp[-x^2]$, you will need a change of variables to integrate over a normal density.[See my notes \url{https://github.com/chrisconlon/Grad-IO/blob/master/Extra%20Notes/Numerical%20Integration/integration.pdf}] You also need to pay attention to the constant of integration.
+\item Compare results to the Monte Carlo results. \textit{Make sure your quadrature weights sum to 1!}
+
+
+\begin{comment}
+\begin{table}[htdp]
+\caption{True value: 0.5515}
+\begin{center}
+\begin{tabular}{l r r r }
+Method & Points & Error\\
+quad & 2597 & 1e-14 \\
+monte carlo & 100 & 0.0166\\
+Gauss Hermite & 4 & 0.0044234\\
+Gauss Hermite & 12 & 0.0044469\\
+\end{tabular}
+\end{center}
+\end{table}
+\end{comment}
+
+\item Repeat the exercise in two dimensions where $\mu = (0.5,1), \sigma = (2,1)$, and $X=(0.5,1)$.
+\item Put everything into two tables (one for the 1-D integral, one for the 2-D integral). Showing the error from the ``true'' value and the number of points used in the evaluation.
+\begin{comment}
+\begin{table}[htdp]
+\caption{2-D Results True value: 0.7145}
+\begin{center}
+\begin{tabular}{l r r r }
+Method & Points & Error\\
+quad & n/a & 1e-14 \\
+monte carlo & 100 &  0.0174\\
+Gauss Hermite(PR) & 25 & 0.0250\\
+SGI-GQN & 13 & 0.0091\\
+SGI-KPN & 17 & -6.9355e-04\\
+\end{tabular}
+\end{center}
+\end{table}%
+\end{comment}
+\end{enumerate}
+
+\section*{\normalsize Part III: Maximum Likelihood}
+I have generated data from the following utility model where student $i$ is choosing among a set of apartments $j$ that all have the same price.
+
+\begin{align*}
+u_{ij} = \beta_0 +\beta_1 \cdot\log \text{square feet}_j + \beta_2 \cdot \text{bathrooms}_{j}
++ \beta_3 \cdot \text{bathrooms}_{j} \cdot \text{family size}_{i}+
+ \gamma_i \cdot \text{ourtdoor space}_j + \varepsilon_{ij}
+\end{align*}
+
+The true data-generating process allows $\gamma_i \sim N(\overline{\gamma},\sigma^2)$ so that students differ in their tastes for outdoor space.
+
+\begin{enumerate}
+\item Estimate a plain logit where $\gamma_i = \gamma$ for all individuals via maximum likelihood.
+\item Estimate a mixed logit using Gauss-Hermite integration via maximum simulated likelihood.
+\item Bonus: Compute the standard errors using the information matrix / Hessian relationship.
+\end{enumerate}
+\end{document}
+
