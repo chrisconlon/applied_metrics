@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1679404360 "b_nested_logit.xdv" "b_nested_logit.pdf" "b_nested_logit" 1679404360 0
-  "b_nested_logit.xdv" 1679404359 158292 1de7a5f4dbc15eee719522332fbbcfc3 "xelatex"
+["xdvipdfmx"] 1679427172 "b_nested_logit.xdv" "b_nested_logit.pdf" "b_nested_logit" 1679427172 0
+  "b_nested_logit.xdv" 1679427172 129752 114c46f8812a45e22149421e344d8bbe "xelatex"
   (generated)
   "b_nested_logit.pdf"
   (rewritten before read)
-["xelatex"] 1679404358 "b_nested_logit.tex" "b_nested_logit.xdv" "b_nested_logit" 1679404360 0
+["xelatex"] 1679427170 "b_nested_logit.tex" "b_nested_logit.xdv" "b_nested_logit" 1679427172 0
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/jknappen/ec/ectt1000.tfm" 1136768653 1536 06717a2b50de47d4087ac0e6cd759455 ""
@@ -243,10 +243,10 @@
   "/usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf" 1646502317 40171 cdab547de63d26590bebb3baff566530 ""
   "/usr/local/texlive/2022/texmf-var/web2c/xetex/xelatex.fmt" 1675882582 10497524 c091143260c00e1d0df754811360b3f7 ""
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
-  "b_nested_logit.aux" 1679404359 5207 24c031ce3ba823b82057ef420e2d4ab3 "xelatex"
-  "b_nested_logit.nav" 1679404359 2737 03209cc80050e296ec06b94da218fa53 "xelatex"
-  "b_nested_logit.out" 1679404359 411 3dfb11b1b82429875dd79a30d74ce5ec "xelatex"
-  "b_nested_logit.tex" 1679404355 14313 baf73b070871a94f98bf5e5e56b426e2 ""
+  "b_nested_logit.aux" 1679427172 4523 a940a4104442e6c9190bd2dabcf38332 "xelatex"
+  "b_nested_logit.nav" 1679427172 2365 17a511aae7ffc3fc8e188b3b16129ce4 "xelatex"
+  "b_nested_logit.out" 1679427172 411 92f7d643cd8f1c90fc0a94d9b88109f0 "xelatex"
+  "b_nested_logit.tex" 1679427167 14415 64c3882d8270254bfeefaa2f2f810ffc ""
   "preamble.tex" 1679345119 2915 e5adc9cc0b8fe3e84c7e9ef8ac623d76 ""
   "resources_2/nesting.png" 1600297493 44437 003faecb54e444d36f15ef7d60082941 ""
   (generated)

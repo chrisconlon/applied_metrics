@@ -22,7 +22,7 @@
 
 
 \begin{frame}{Reading}
-Today's reading is Chapters 5 from:\\
+Today's reading is Chapters 4 from:\\
 \href{https://eml.berkeley.edu/books/choice2.html}{Ken Train's Discrete Choice Methods with Simulation}
 \end{frame}
 
@@ -172,64 +172,64 @@ s_{ij} = s_{ij|g}(\theta) s_{ig}(\theta)
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Nested Logit}
-How does it actually look?
-\begin{eqnarray*}
- IV_{ig}(\theta) &=& \log \left(\sum_{k \in G} \exp [x_k \beta/(1-\lambda_g)] \right) = E_{\varepsilon}[\max_{j \in G} u_{ij}]\\
- s_{ij|g}(\theta) &=& \frac{\exp [x_j \beta/(1-\lambda_g)]}{\sum_{k \in G} \exp [x_k \beta/(1-\lambda_g)]} \\
- s_{ig}(\theta) &=& \frac{\exp [IV_{ig}]^{1-\lambda_g}}{\sum_{h} \exp [IV_{ih}]^{1-\lambda_h}} 
-\end{eqnarray*}
-%\begin{itemize}
-%\item When $\lambda_g \rightarrow 0$ we get the IIA logit model (no correlation within nests)
-%\item When $\lambda_g \rightarrow 1$ we get no across nest substitution.
-%\item When $\lambda_g > 1$ we get something not necessarily consistent with utility maximization!
-%\end{itemize}
-\end{frame}
+% \begin{frame}
+% \frametitle{Nested Logit}
+% How does it actually look?
+% \begin{eqnarray*}
+%  IV_{ig}(\theta) &=& \log \left(\sum_{k \in G} \exp [x_k \beta/(1-\lambda_g)] \right) = E_{\varepsilon}[\max_{j \in G} u_{ij}]\\
+%  s_{ij|g}(\theta) &=& \frac{\exp [x_j \beta/(1-\lambda_g)]}{\sum_{k \in G} \exp [x_k \beta/(1-\lambda_g)]} \\
+%  s_{ig}(\theta) &=& \frac{\exp [IV_{ig}]^{1-\lambda_g}}{\sum_{h} \exp [IV_{ih}]^{1-\lambda_h}} 
+% \end{eqnarray*}
+% %\begin{itemize}
+% %\item When $\lambda_g \rightarrow 0$ we get the IIA logit model (no correlation within nests)
+% %\item When $\lambda_g \rightarrow 1$ we get no across nest substitution.
+% %\item When $\lambda_g > 1$ we get something not necessarily consistent with utility maximization!
+% %\end{itemize}
+% \end{frame}
 
-\begin{frame}
-\frametitle{Nested Logit}
-How does it actually look?
-\begin{eqnarray*}
-\log \left(\frac{s_{ij|g}(\theta)}{s_{ik|g}(\theta)} \right) = (x_j -x_k)\cdot \frac{\beta}{1-\lambda_g}
- \end{eqnarray*}
- \begin{itemize}
-\item We are back to having the IIA property but now within the group $G$.
-\item We also have IIA across groups $g,h$
-\item $\lambda_g$ and $\alpha$ govern the elasticities, which also have a block structure. % expand this later
-\item Sometimes people refer to this as the \alert{product of two logits}
-\item In the old days people used to estimate by fitting sequential IIA logit models -- this is consistent but inefficient -- you shouldn't do this today!
-\item Estimation happens via MLE. This can be tricky because the model is non-convex. It helps to substitute $\tilde{\beta} = \beta/(1-\lambda_g)$
- \end{itemize}
-\end{frame}
+% \begin{frame}
+% \frametitle{Nested Logit}
+% How does it actually look?
+% \begin{eqnarray*}
+% \log \left(\frac{s_{ij|g}(\theta)}{s_{ik|g}(\theta)} \right) = (x_j -x_k)\cdot \frac{\beta}{1-\lambda_g}
+%  \end{eqnarray*}
+%  \begin{itemize}
+% \item We are back to having the IIA property but now within the group $G$.
+% \item We also have IIA across groups $g,h$
+% \item $\lambda_g$ and $\alpha$ govern the elasticities, which also have a block structure. % expand this later
+% \item Sometimes people refer to this as the \alert{product of two logits}
+% \item In the old days people used to estimate by fitting sequential IIA logit models -- this is consistent but inefficient -- you shouldn't do this today!
+% \item Estimation happens via MLE. This can be tricky because the model is non-convex. It helps to substitute $\tilde{\beta} = \beta/(1-\lambda_g)$
+%  \end{itemize}
+% \end{frame}
 
-\begin{frame}
-\frametitle{Parametric Identification}
+% \begin{frame}
+% \frametitle{Parametric Identification}
 
-Look at derivatives:
-\begin{eqnarray*}
-\frac{\partial\, s_{j|g}}{\partial X_j} &=& \beta_1 s_{j|g}(1-s_{j|g}) \\
- \frac{\partial\, s_{g}}{\partial X} &=& (1-\lambda) \beta_1 s_{g}(1-s_{g}) \\
-  \frac{\partial\, s_{g}}{\partial J} &=& \frac{1-\lambda}{J} s_{g}(1-s_{g})
-\end{eqnarray*}
-\begin{itemize}
-\item We get $\beta$ by changing $x_j$ within group
-\item We get nesting parameter $\lambda$ by varying $X$
-\item We don't have any parameters left to explain changing number of products $J$.
-\end{itemize}
+% Look at derivatives:
+% \begin{eqnarray*}
+% \frac{\partial\, s_{j|g}}{\partial X_j} &=& \beta_1 s_{j|g}(1-s_{j|g}) \\
+%  \frac{\partial\, s_{g}}{\partial X} &=& (1-\lambda) \beta_1 s_{g}(1-s_{g}) \\
+%   \frac{\partial\, s_{g}}{\partial J} &=& \frac{1-\lambda}{J} s_{g}(1-s_{g})
+% \end{eqnarray*}
+% \begin{itemize}
+% \item We get $\beta$ by changing $x_j$ within group
+% \item We get nesting parameter $\lambda$ by varying $X$
+% \item We don't have any parameters left to explain changing number of products $J$.
+% \end{itemize}
 
-\end{frame}
+% \end{frame}
 
 
 
-\begin{frame}
-\frametitle{Nested Logit}
-There are more potential generalizations though they are less frequently used:
- \begin{itemize}
-\item You can have multiple levels of nesting: first I select a size car (compact, mid-sized, full-sized) then I select a manufacturer, finally a car.
-\item You can have potentially overlapping nests: Yogurt brands are one nest, Yogurt flavors are a second nest. This way strawberry competes with strawberry and/or Dannon substitutes for Dannon.
- \end{itemize}
-\end{frame}
+% \begin{frame}
+% \frametitle{Nested Logit}
+% There are more potential generalizations though they are less frequently used:
+%  \begin{itemize}
+% \item You can have multiple levels of nesting: first I select a size car (compact, mid-sized, full-sized) then I select a manufacturer, finally a car.
+% \item You can have potentially overlapping nests: Yogurt brands are one nest, Yogurt flavors are a second nest. This way strawberry competes with strawberry and/or Dannon substitutes for Dannon.
+%  \end{itemize}
+% \end{frame}
 
 
 
