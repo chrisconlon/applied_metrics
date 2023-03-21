@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1679404343 "a_discrete_choice.xdv" "a_discrete_choice.pdf" "a_discrete_choice" 1679404343 0
-  "a_discrete_choice.xdv" 1679404343 142608 372c9503f31d20f5f54d5c81475f8e81 "xelatex"
+["xdvipdfmx"] 1679421200 "a_discrete_choice.xdv" "a_discrete_choice.pdf" "a_discrete_choice" 1679421201 0
+  "a_discrete_choice.xdv" 1679421200 142620 07a1f0bf1bd92667667888b8d026682d "xelatex"
   (generated)
   "a_discrete_choice.pdf"
   (rewritten before read)
-["xelatex"] 1679404341 "a_discrete_choice.tex" "a_discrete_choice.xdv" "a_discrete_choice" 1679404343 0
+["xelatex"] 1679421199 "a_discrete_choice.tex" "a_discrete_choice.xdv" "a_discrete_choice" 1679421201 0
   "/usr/local/texlive/2022/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
   "/usr/local/texlive/2022/texmf-dist/fonts/tfm/jknappen/ec/ectt1000.tfm" 1136768653 1536 06717a2b50de47d4087ac0e6cd759455 ""
@@ -252,10 +252,10 @@
   "/usr/local/texlive/2022/texmf-dist/web2c/texmf.cnf" 1646502317 40171 cdab547de63d26590bebb3baff566530 ""
   "/usr/local/texlive/2022/texmf-var/web2c/xetex/xelatex.fmt" 1675882582 10497524 c091143260c00e1d0df754811360b3f7 ""
   "/usr/local/texlive/2022/texmf.cnf" 1647878952 577 209b46be99c9075fd74d4c0369380e8c ""
-  "a_discrete_choice.aux" 1679404343 4949 ccb2eb88067742792b8afd2c16dc56c2 "xelatex"
-  "a_discrete_choice.nav" 1679404343 2539 21479e082e73806dbebc1e7a154332bf "xelatex"
-  "a_discrete_choice.out" 1679404343 222 283b88c621ab62a8eb3724f6d5e1ff37 "xelatex"
-  "a_discrete_choice.tex" 1679404339 11073 45c369258a62ee50afa80540501e37b9 ""
+  "a_discrete_choice.aux" 1679421200 4949 ccb2eb88067742792b8afd2c16dc56c2 "xelatex"
+  "a_discrete_choice.nav" 1679421200 2539 21479e082e73806dbebc1e7a154332bf "xelatex"
+  "a_discrete_choice.out" 1679421200 222 283b88c621ab62a8eb3724f6d5e1ff37 "xelatex"
+  "a_discrete_choice.tex" 1679421196 11086 26225d9ef7f0430dfce7fa262da951dd ""
   "preamble.tex" 1679345119 2915 e5adc9cc0b8fe3e84c7e9ef8ac623d76 ""
   "resources_1/hardmax.png" 1600297493 3970 4a9efbaede7b9e767bce2b6c41daae2b ""
   "resources_1/softmax.png" 1600297493 14462 76b72c50107317631c52fc1b28670c50 ""

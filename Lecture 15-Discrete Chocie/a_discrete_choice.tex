@@ -188,7 +188,7 @@ s_{ij} = \frac{e^{V_{ij}/\sigma}}{\sum_k e^{V_{ik}/\sigma}} \approx \frac{e^{\be
 \frametitle{Multinomial Logit: Elasticity}
 An important output from a demand system are elasticities w.r.t $x_{ij}$
 \begin{align*}
-\frac{\partial s_{ij}}{\partial x_{ij}} =\left(\mathbb{I}[j = k]\cdot s_{ij} - s_{ij}\cdot s_{ik} \right)
+\frac{\partial s_{ij}}{\partial x_{ij}} = \beta \cdot \left(\mathbb{I}[j = k]\cdot s_{ij} - s_{ij}\cdot s_{ik} \right)
 \end{align*}
 \begin{itemize}
 \item This implies that $ \eta_{jj}^x = \frac{\partial s_{ij}}{\partial x_{ij}} \frac{x_{ij}}{s_{ij}}  = \beta x_{ij} (1-s_{ij})$.
