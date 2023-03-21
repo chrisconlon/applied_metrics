@@ -1,0 +1,291 @@
+\input{preamble.tex}
+
+% title page
+\title{Mixed Logit}
+\author{Chris Conlon}
+\institute{NYU Stern: MSQE Applied Econometrics}
+
+\date{Spring 2023}
+
+
+
+
+\begin{document}
+
+
+
+%--------------
+% TITLE PAGE
+\begin{frame}[plain] %
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Reading}
+Today's reading is Chapters 6 from:\\
+\href{https://eml.berkeley.edu/books/choice2.html}{Ken Train's Discrete Choice Methods with Simulation}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Mixed Logit}
+We relax the IIA property by mixing over various logits with \alert{random effects}:
+\begin{eqnarray*}
+u_{ijt} &=& \beta \, x_j + \mu_{ij} + \varepsilon_{ij} \\
+s_{ij} &=& \int \frac{\beta \, exp[x_{j} + \mu_{ij} ]}{1+\sum_k \exp[ \beta  \, x_{k}+ \mu_{ik} ]} f(\boldsymbol{\mu_i} | \theta)
+\end{eqnarray*}
+ \begin{itemize}
+ \item Each individual draws a vector $\boldsymbol{\mu_i}$ of $\mu_{ij}$ (separately from $\boldsymbol{\varepsilon}$).
+ \item Conditional on $\boldsymbol{\mu_i}$ each person follows an IIA logit model.
+ \item However we integrate (or mix) over many such individuals giving us a \alert{mixed logit} or \alert{heirarchical model} (if you are a statistician)
+ \item In practice these are not that different from linear \alert{random effects models} you have learned about previously.
+ \item It helps to think about fixing $\boldsymbol{\mu_i}$ first and then integrate out over $\boldsymbol{\varepsilon_i}$
+ \end{itemize}
+\end{frame}
+
+\begin{frame}{Mixed/ Random Coefficients Logit}
+\small
+As an alternative, we could have specified an error components structure on $\varepsilon_i$.
+\begin{eqnarray*}
+U_{ij} = \beta x_{ij} + \underbrace{\nu_i z_{ij} + \varepsilon_{ij}}_{\tilde{\varepsilon}_{ij}}
+\end{eqnarray*}
+\begin{itemize}
+\item The key is that $\nu_i$ is unobserved and mean zero. But that $x_{ij},z_{ij}$ are observed per usual and $\varepsilon_{ij}$ is IID Type I EV.
+\item This allows for a heteroskedastic structure on $\varepsilon_{i}$, but only one which we can project down onto the space of $z$.
+\end{itemize}
+An alternative is to allow for individuals to have random variation in $\beta_i$:
+\begin{eqnarray*}
+U_{ij} = \beta_i x_{ij} +  \varepsilon_{ij}
+\end{eqnarray*}
+Which is the random coefficients formulation (these are the same model).
+\end{frame}
+
+%
+%\begin{frame}{Mixed/ Random Coefficients Logit}
+%For each individual $i$, the resulting choice probability follows a logit:
+%\begin{eqnarray*}
+%P_{ij} = \int \frac{ e^{V_{ij}(\beta_i)}}{\sum_k e^{V_{ik}(\beta_i)}} f(\beta_i | \theta) \partial \beta
+%\end{eqnarray*}
+%This structure is quite general:
+%\begin{itemize}
+%\item The choice probabilities are know a function of unknown parameters $\theta$.
+%\item We can allow for there to be two types of $\beta_i$ in the population (high-type, low-type). \alert{latent class model}.
+%\item We can allow $\beta_i$ to follow an independent normal distribution for each component of $x_{ij}$ such as $\beta_i = \overline{\beta} + \nu_i \sigma$.
+%\item We can allow for correlated normal draws using the Cholesky root of the covariance matrix.
+%\item Can allow for non-normal distributions too (lognormal, exponential). Why is normal so easy?
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}{Mixed/ Random Coefficients Logit}
+\begin{itemize}
+\item Kinds of heterogeneity
+\begin{itemize}
+\item We can allow for there to be two types of $\beta_i$ in the population (high-type, low-type). \alert{latent class model}.
+\item We can allow $\beta_i$ to follow an independent normal distribution for each component of $x_{ij}$ such as $\beta_i = \overline{\beta} + \nu_i \sigma$.
+\item We can allow for correlated normal draws using the Cholesky root of the covariance matrix.
+\item Can allow for non-normal distributions too (lognormal, exponential). Why is normal so easy?
+\end{itemize}
+\item The structure is extremely flexible but at a cost.
+\item We generally must perform the integration numerically.
+\item High-dimensional numerical integration is difficult. In fact, integration in dimension 8 or higher makes me very nervous.
+\item We need to be parsimonious in how many variables have unobservable heterogeneity.
+\item Again observed heterogeneity does not make life difficult so the more of that the better!
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Mixed Logit}
+How does it work?
+ \begin{itemize}
+\item Well we are mixing over individuals who conditional on $\beta_i$ or $\mu_i$ follow logit substitution patterns, however they may differ wildly in their $s_{ij}$ and hence their substitution patterns.
+\item For example if we are buying cameras: I may care a lot about price, you may care a lot about megapixels, and someone else may care mostly about zoom.
+\item The basic idea is that we need to explain the heteroskedasticity of $Cov(\varepsilon_i, \varepsilon_j)$ what random coefficients do is let us use a basis from our $X$'s.
+\item If our $X$'s are able to span the space effectively, then an RC logit model can approximate any arbitrary RUM (McFadden and Train 2002). 
+\item Of course if you have 1000 products and two random coefficients, you are asking for a lot.
+ \end{itemize}
+\end{frame}
+
+
+%\begin{frame}{Mixed/ Random Coefficients Logit}
+%How do we approximate:
+%\begin{eqnarray*}
+%P_{ij} = \int \frac{ e^{V_{ij}(\beta_i)}}{\sum_k e^{V_{ik}(\beta_i)}} f(\beta_i | \theta) \partial \beta
+%\end{eqnarray*}
+%
+%\begin{itemize}
+%\item Monte Carlo Integration
+%\begin{itemize}
+%\item Draw $\beta_i$ from the candidate distribution. $[\beta_i^{(1)}, \beta_i^{(2)}, \ldots\beta_i^{(s)}] | \theta$.
+%\item For each $\beta_i$ calculate $P_{ij}(\beta_i)$.
+%\item $\frac{1}{S} \sum_{s=1}^S P_{ij} = \widehat{P_{j}^{s}}$
+%\end{itemize}
+%\end{itemize}
+%The way we usually get correlated normal variables (or any normal variables) is to transform independent normals appropriately.
+%\end{frame}
+
+\begin{frame}{Mixed/ Random Coefficients Logit}
+Suppose there is only one random coefficient, and the others are fixed:
+\begin{itemize}
+\item $f(\beta_i \theta) \sim N(\overline{\beta},\sigma)$.
+\item We can re-write this as the integral over a transformed standard normal density
+\begin{align*}
+s_{ij}(\theta) = \int \frac{ e^{V_{ij}(\nu_{\iota},\theta)}}{\sum_k e^{V_{ik}(\nu_{\iota},\theta)}} f(\nu_{\iota}) \partial \nu
+\approx \sum_{\iota=1}^{I} w_{\iota} \cdot \frac{ e^{V_{ij}(\nu_{\iota},\theta)}}{\sum_k e^{V_{ik}(\nu_{\iota},\theta)}} 
+\end{align*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Numerical Integration: Monte Carlo}
+How do we choose $(w_{\iota}, \nu_{\iota})$
+\begin{align*}
+s_{ij}(\theta)
+\approx \sum_{\iota=1}^{I} w_{\iota} \cdot \frac{ e^{V_{ij}(\nu_{\iota},\theta)}}{\sum_k e^{V_{ik}(\nu_{\iota},\theta)}} 
+\end{align*}
+Monte Carlo Integration: Independent Normal Case
+\begin{itemize}
+\item Draw $\nu_i$ from the standard normal distribution.
+\item Set $w_{\iota} = \frac{1}{I}$ (the number of draws).
+\item Now we can rewrite $\beta_{\iota} = \overline{\beta} + \nu_{\iota} \sigma$
+\item For each $\beta_{\iota}$ calculate $s_{ij}(\beta_{\iota})$.
+\item $\frac{1}{I} \sum_{\iota=1}^I s_{ij}(\beta_{\iota}) = \widehat{s_{ij}}$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Numerical Integration: Multivariate Normal}
+Suppose instead we want to integrate out over a multivariate normal so that $\nu_i \sim \mathcal{N}(0,\Sigma)$.
+
+\begin{itemize}
+\item Work with the \alert{Cholesky Root} of $L L' = \Sigma$
+\item If $\nu_i$ is a $k$-dimensional \alert{standard normal} then $L\, \nu_i \sim \mathcal{N}(0,\Sigma)$.
+\item The vector $\beta_{\iota} = \overline{\beta} + L\, \nu_{\iota}$
+\item Otherwise the same as before, except now we are looking for \alert{lower triangle} $L$ instead of $\sigma$.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Numerical Integration: Gaussian Quadrature}
+\begin{itemize}
+\item Quadrature rules give us a set of $(w_{\iota},\nu_{\iota})$ to approximate
+\begin{align*}
+s_{ij}(\theta)
+\approx \sum_{\iota=1}^{I} w_{\iota} \cdot \frac{ e^{V_{ij}(\nu_{\iota},\theta)}}{\sum_k e^{V_{ik}(\nu_{\iota},\theta)}} 
+\end{align*}
+to a high degree of accuracy with a small number of \alert{nodes}.
+\item These points are chosen to approximate the function to a \alert{polynomial order} and then integrate the polynomial exactly.
+\item ie: approximate with 13th order polynomial.
+\item For smooth, bounded, and continuously differentiable functions, these work really well!
+\item We will use \alert{Gauss Hermite} rules on the homework.
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Quadrature in higher dimensions}
+\begin{itemize}
+\item Quadrature is great in low dimensions -- but scales badly in high dimensions.
+\item If we need $N_a$ points to accurately approximate the integral in $d=1$ then we need $N_a^d$ points in dimension $d$ (using the tensor product of quadrature rules).
+\item There is some research on quadrature rules that nest and also how to carefully eliminate points so that the number doesn't grow so quickly.
+\item Try \url{http://sparse-grids.de}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Estimation}
+How do we actually estimate these models?
+\begin{itemize}
+\item In practice we should be able to do MLE.
+\begin{eqnarray*}
+\max_{\theta} \sum_{i=1}^N y_{ij} \log s_{ij}(\theta)
+\end{eqnarray*}
+\item When we are doing IIA logit, this problem is globally convex and is easy to estimate using Newton's Method.
+\item When doing nested logit or random coefficients logit, it generally is non-convex which can make life difficult.
+\item The tough part is generally working out what $\frac{\partial \log s_{ij}}{\partial \theta}$ is, especially when we need to simulate to obtain $s_{ij}$.
+\item It turns out that MSLE actually has consistent problems for fixed $S$. Why?
+\item Alternative? MSM/MoM type estimators
+\end{itemize}
+\end{frame}
+
+
+
+
+%\begin{frame}
+%\frametitle{Mixed Logit}
+% \begin{itemize}
+%\item Now the choice of $\mu_{ij}$ is crucial.  
+%\item A popular choice is \alert{random coefficients logit}: $\beta_i = \overline{\beta} +  \Sigma \nu_i * \mathbf{x_j}$ where $\nu_i$ is a vector of standard normal draws and $\Sigma$ are covariance parameters so that $\beta_i \sim N(\overline{\beta},\Sigma)$.
+%\item We have to estimate $(\overline{\beta},\Sigma)$.
+%\item People are often lazy and let $\Sigma$ be a diagonal matrix to reduce the \# of parameters.
+% \end{itemize}
+%\end{frame}
+
+
+\begin{frame}
+\frametitle{Mixed Logit: Estimation}
+ \begin{itemize}
+\item Just like before, we do MLE
+\item One wrinkle--how do we compute the integral?
+ \end{itemize}
+\begin{eqnarray*}
+s_{ij} &=& \int \frac{\exp[x_{j} \beta_i  ]}{1+\sum_k \exp[x_{k} \beta_i  ]} f(\beta_i | \theta) \approx \sum_{s=1}^{ns} w_s \frac{\exp[x_{j} (\overline{\beta} + \Sigma \nu_{is})  ]}{1+\sum_k \exp[x_{k} (\overline{\beta} + \Sigma \nu_{is})  ]} 
+\end{eqnarray*}
+ \begin{itemize}
+\item Option 1: Monte Carlo integration.  Draw $NS=1000$ or so samples of $\nu_i$ from the standard normal and set $w_i = \frac{1}{NS}$.
+\item Option 2: Quadrature. Choose $\nu_i$ and $w_i$ according to a Gaussian quadrature rule. Like \texttt{quad} in MATLAB or \texttt{mvquad} in R or \texttt{scipy.integrate.quadrature} in \texttt{Python}.
+\item Personally I get nervous about integrals in dimension greater than 5. People routinely have 20 or more though.
+ \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Mixed Logit: Hints}
+ How bad is the simulation error?
+ \begin{itemize}
+\item Depends how small your shares are. 
+\item Since you care about $\log s_{jt}$ when shares are small, tiny errors can be enormous.
+\item Often it is pretty bad.
+\item I recommend sticking with quadrature at a high level of precision.
+\item \texttt{sparse-grids.de} provide efficient high dimensional quadrature rules.
+ \end{itemize}
+\end{frame}
+
+\section{A Semiparametric Estimator}
+
+\begin{frame}
+\frametitle{Even More Flexibility (Fox, Kim, Ryan, Bajari)}
+Suppose we wanted to nonparametrically estimate $f(\beta_i | \theta)$ instead of assuming that it is normal or log-normal.
+\begin{eqnarray*}
+s_{ij} &=& \int \frac{\exp[x_{j} \beta_i  ]}{1+\sum_k \exp[x_{k} \beta_i  ]} f(\beta_i | \theta)
+\end{eqnarray*}
+\begin{itemize}
+\item Choose a distribution $g(\beta_i)$ that is more spread out that $f(\beta_i | \theta)$
+\item Draw several $\beta_{s}$ from that distribution (maybe 500-1000).
+\item Compute $\hat{s}_{ij}(\beta_s)$ for each draw of $\beta_s$ and each $j$.
+\item Holding $\hat{s}_{ij}(\beta_s)$ fixed, look for $w_s$ that solve
+\begin{eqnarray*}
+\min_w \left(s_j -  \sum_{s=1}^{ns} w_s \hat{s}_{ij}(\beta_s) \right)^2 \quad \mbox{ s.t. } \sum_{s=1}^{ns} w_s = 1, \quad w_s \geq 0 \quad \forall s
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Even More Flexibility (Fox, Kim, Ryan, Bajari)}
+% Hey this is lasso
+\begin{itemize}
+\item Like other semi-/non- parametric estimators, when it works it is both general and very easy.
+\item We are solving a least squares problem with constraints: positive coefficients, coefficients sum to 1.
+\item It tends to produce \alert{sparse models} with only a small number of $\beta_s$ getting positive weights.
+\item This is way easier than solving a random coefficients logit model with all but the simplest distributions.
+\item There is a bias-variance tradeoff in choosing $g(\beta_i)$.
+\item Incorporating parameters that are not random coefficients loses some of the simplicity.
+\item I have no idea how to do this with large numbers of fixed effects.
+\end{itemize}
+\end{frame}
+
+
+
+
+\section*{Thanks}
+\end{document}
+
