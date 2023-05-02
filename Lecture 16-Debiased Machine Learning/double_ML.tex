@@ -1,0 +1,92 @@
+\input{preamble}
+
+
+% \usepackage{slashbox}
+\title{ Double/Debiased Machine Learning}
+\author{Chris Conlon }
+\institute{NYU Stern }
+
+
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Setup}
+
+\begin{frame}{The core problem}
+\begin{align*}
+Y_i &= \alert{\tau_i} \cdot D_i + g_0(X_i) + u_i &\text{ with }\E[u_i \mid x_i, D_i]=0\\
+D_i &= m_0(X_i) + v_i &\text{ with } \E[v_i \mid x_i ]=0
+\end{align*}
+\begin{itemize}
+    \item $D_i$ is \alert{treatment indicator} and $\tau_i$  is \alert{treatment effect}
+    \item $X_i$ are covariates (``controls'' or ``confounders'') $\rightarrow$
+    \item We call $m_0(\cdot)$ and $g_0(\cdot)$ \alert{nuisance parameters} or \alert{nuisance functions}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What if we try ``machine learning?`'}
+\begin{align*}
+Y_i &= \alert{\tau_i} \cdot D_i + g_0(X_i) + u_i &\text{ with }\E[u_i \mid x_i, D_i]=0\\
+D_i &= m_0(X_i) + v_i &\text{ with } \E[v_i \mid x_i ]=0
+\end{align*}
+Could alternate steps:
+\begin{enumerate}
+    \item Fit random forest of $Y_i - \widehat{\tau_i} \cdot D_i$ on $Z_i$ to get $\widehat{g_0}(Z_i)$.
+    \item Run OLS of $Y_i - \widehat{g_0}(Z_i)$ on $D_i$ to get $\widehat{\tau}$ or $\widehat{\tau_i}$
+\end{enumerate}
+This fits the data great but gives terrible estimates of $\widehat{\tau}$!\\
+Why? Frisch-Lovell-Waugh really needs things to be \alert{linear}!
+\end{frame}
+
+\begin{frame}{What goes wrong}
+\begin{itemize}
+\item We are trading off \alert{bias} for \alert{variance reduction}
+\item But, we can't trust \alert{plug-in} estimates when $m_0(\cdot),g_0(\cdot)$ are not linear.
+\item So bias can be very dangerous now...
+\end{itemize}
+What we need to do is \alert{orthogonalize} things properly (like a nonlinear Frisch-Lovell-Waugh)
+\begin{itemize}
+\item Bias from \alert{regularization} \textrightarrow Orthogonalization
+\item Bias from \alert{overfitting} \textrightarrow Sample Splitting
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Sample Splitting}
+
+\begin{itemize}
+\item Split the sample into two parts \alert{main sample} and \alert{auxiliary sample}.
+\item On the auxiliary Sample:
+\begin{itemize}
+\item Estimate $\widehat{g}(X_i)$ from $Y_i = \tau \cdot D_i + g(X_i) + u_i $
+\item Estimate $\widehat{m}(X_i)$ from $D_i =  m(X_i) + v_i $
+\end{itemize}
+\item Now on the main sample:
+\begin{itemize}
+\item Compute the residual:  $\widehat{v_i} = D_i - \widehat{m}(X_i)$.
+\item Estimate $\hat{\tau}=\left(\hat{v}^{\prime} D\right)^{-1} \hat{v}^{\prime}(Y-\hat{g}(X))$
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{More Info}
+To learn more watch Chernozhukov lecture here:
+\url{https://www.youtube.com/watch?v=eHOjmyoPCFU&t=37s}\\
+
+The \texttt{R} package
+\url{https://docs.doubleml.org/stable/index.html}
+\end{frame}
+
+
+
+\section*{Thanks!}
+
+
+
+
+\end{document}

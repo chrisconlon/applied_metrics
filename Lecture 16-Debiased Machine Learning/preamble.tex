@@ -1,0 +1,96 @@
+\documentclass[handout, serif, aspectratio=169, 10pt]{beamer}
+
+% packages
+%\usepackage{newpxmath} % math font is Palatino compatible
+%\usepackage[nomath]{fontspec}
+
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{soul} % for \st
+\usepackage{hyperref} % for links
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+
+
+% table stuff
+\usepackage{chronosys}
+\usepackage{verbatim}
+% \pagenumbering{arabic}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{mathtools}
+
+% R Code
+\usepackage{listings}
+\usepackage{courier}
+\lstset{basicstyle=\scriptsize\ttfamily,breaklines=true}
+\lstset{framextopmargin=50pt,frame=bottomline}
+
+% themes
+\usetheme[progressbar=frametitle, block=fill]{metropolis}
+\useoutertheme{metropolis}
+\useinnertheme{metropolis}
+
+% colors
+\definecolor{dimwhite}{rgb}{0.99, 0.99, 0.99}
+\definecolor{charcoal}{rgb}{0.21, 0.27, 0.31}
+\definecolor{slategray}{rgb}{0.44, 0.5, 0.56}
+\definecolor{dimgray}{rgb}{0.41, 0.41, 0.41}
+\definecolor{bleudefrance}{rgb}{0.19, 0.55, 0.91}
+
+% beamer options
+\setbeamercolor{author}{fg=charcoal}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{section in toc}{fg=charcoal}
+\setbeamercolor{subsection in toc}{fg=dimgray}
+\setbeamercolor{frametitle}{bg=dimwhite, fg=charcoal}
+\setbeamercolor{progress bar}{fg=slategray, bg=fg!50!black!30}
+\setbeamercovered{transparent}
+\setbeamertemplate{itemize items}[triangle]
+\setbeamertemplate{itemize subitem}[circle]
+\setbeamertemplate{itemize subsubitem}[square]
+\setbeamersize{text margin left=7mm,text margin right=7mm} 
+
+% new commands
+\newcommand{\q}[1]{``#1''}
+\newcommand{\hs}[1]{\textsc{\hfill\scriptsize\color{dimgray}#1}}
+\newcommand{\g}[1]{{\color{gray}#1}}
+\newcommand{\dg}[1]{{\color{dimgray}#1}}
+\newcommand{\sg}[1]{{\color{slategray}#1}}
+\newcommand{\bdf}[1]{{\color{bleudefrance}#1}}
+\newcommand{\itemcolor}[1]{\renewcommand{\makelabel}[1]{\color{#1}\hfil ##1}}
+\newcommand\Wider[2][2em]{
+\makebox[\linewidth][c]{
+  \begin{minipage}{\dimexpr\textwidth+#1\relax}
+  \raggedright#2
+  \end{minipage}
+  }
+}
+
+% misc
+\linespread{1.35}
+
+% Math stuff
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\probP}{\mathbb{P}}
+\newcommand{\ol}{\overline}
+%\newcommand{\ul}{\underline}
+\newcommand{\pp}{{\prime \prime}}
+\newcommand{\ppp}{{\prime \prime \prime}}
+\newcommand{\policy}{\gamma}
+\newcommand{\plim}{ \overset{p}{\to}}
+\newcommand{\hnot}{ \overset{H_0}{\to}}
+
+% Causal Graphs
+\usetikzlibrary{shapes,decorations,arrows,calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
