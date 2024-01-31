@@ -1,0 +1,144 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in,headheight=3ex,headsep=3ex]{geometry}
+
+\newcommand{\blankline}{\quad\pagebreak[2]}
+
+\title{Econometrics of Panel Data}\author{Chris Conlon}
+\date{Spring 2024}
+
+\usepackage[sc]{mathpazo}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+
+\usepackage[mmddyyyy]{datetime}% http://ctan.org/pkg/datetime
+\usepackage{advdate}% http://ctan.org/pkg/advdate
+\newdateformat{syldate}{\twodigit{\THEMONTH}/\twodigit{\THEDAY}}
+\newsavebox{\THURSDAY}\savebox{\THURSDAY}{Tue}% Mon
+
+\newcommand{\week}[1]{%
+%  \cleardate{mydate}% Clear date
+% \newdate{mydate}{\the\day}{\the\month}{\the\year}% Store date
+  \paragraph*{\kern-2ex\quad #1, \syldate{\today}:}% Set heading  \quad #1
+%  \setbox1=\hbox{\shortdayofweekname{\getdateday{mydate}}{\getdatemonth{mydate}}{\getdateyear{mydate}}}%
+  \ifdim\wd1=\wd\THURSDAY
+    \AdvanceDate[7]
+  \else
+    \AdvanceDate[7]
+  \fi%
+}
+
+
+
+\usepackage{setspace}
+\usepackage{multicol}
+%\usepackage{indentfirst}
+\usepackage{fancyhdr,lastpage}
+\usepackage{url}
+\pagestyle{fancy}
+\usepackage{hyperref}
+\usepackage{lastpage}
+\usepackage{amsmath}
+\usepackage{layout}   
+\lhead{}
+\chead{}
+\rhead{\footnotesize Applied Econometrics- Spring 2021}
+\lfoot{}
+\cfoot{\small \thepage/\pageref*{LastPage}}
+\rfoot{}
+
+\usepackage{array, xcolor}
+\usepackage{color,hyperref}
+\definecolor{clemsonorange}{HTML}{EA6A20}
+\hypersetup{colorlinks,breaklinks,
+            linkcolor=clemsonorange,urlcolor=clemsonorange,
+            anchorcolor=clemsonorange,citecolor=black}
+
+
+
+
+\begin{document}
+
+
+\maketitle
+
+\blankline
+
+\begin{tabular*}{.93\textwidth}{@{\extracolsep{\fill}}lr}
+
+
+  E-mail: \texttt{cconlon@stern.nyu.edu} & Web: \href{http://chrisconlon.org}{\tt\bf https://chrisconlon.github.io/metrics.html}  \\
+
+ Office Hours: Wed 10-11 (or by appointment) &  Class Hours: Tuesday 9:00-12:00 \\
+
+
+ Office: KMC 7-76  & Class Room: Zoom (email for link) \\
+&  \\
+\hline
+\end{tabular*}
+
+\vspace{10 mm}
+
+\section*{Course Description}
+This is a second term Ph.D. course in applied econometrics though advanced undergraduates are welcome. The main audience are PhD students not studying economics or finance at Stern (Accounting, Marketing, TOPS, Strategy) as well as other students at NYU (including Ph.D. students at Wagner).
+
+The focus is on microeconometrics and panel data. It is a continuation of Prof. Scott's course, though once the basics are covered we will have more opportunity to explore topics related to student intererst. 
+
+\begin{description}
+\item[Problem Sets:] I have designed the problem sets in R, though you are free to use whichever statistical software you would like. 
+\end{description}
+
+\section*{Books}
+I will follow two main textbooks.
+\begin{itemize}
+\item Greene (2017). \textit{Econometric Analysis}. ISBN: 0134461363
+\item Tibshirani, Hastie, Friedman (2016), \textit{The Elements of Statistical Learning}. ISBN: 0387848576. Available online at \url{https://web.stanford.edu/~hastie/Papers/ESLII.pdf}.
+\item Hansen. Econometrics (2020). \url{https://www.ssc.wisc.edu/~bhansen/econometrics/Econometrics.pdf}.
+\end{itemize} 
+
+\section*{Course Policy}
+You are expected to attend every lecture and it is expected that you have done the reading BEFORE the class. This is a Ph.D. course which means you will be expected to read a lot on your own.
+\subsection*{Grading Policy}
+\begin{itemize}
+\item 60\% of your grade will be performance on 6 problem sets (10\% each).
+\item 30\% of your grade will be performance on the final replication project.
+\item 10\% of your grade will be participation in class.
+\end{itemize}
+You get an automatic 48 hour extension for each homework assignment as long as you don't email to request an extension.\\
+
+\noindent Homeworks can be submitted here \url{https://www.dropbox.com/request/nSQRZOk2ETDpLkH2gAla}.\\
+
+\noindent Please submit both a knitted/easy to read PDF as well as the R source code.
+
+
+\subsection*{Academic Dishonesty Policy}
+Don't cheat. It is helpful to work with a partner on debugging code, but my expectation is that assignments are 100\% your own work (including computer code).
+
+\newpage
+
+\SetDate[24/01/2024]
+\week{Week 01} Review of Linear Estimators, Asymptotics, and Simulation\\
+\week{Week 02} Time Series\\
+\textit{PS 1 Due}
+\week{Week 03} Maximum Likelihood and Generalized Method of Moments\\
+\week{Week 04} Delta Method and Bootstrap (Reschedule)
+\week{Week 05} Intro to Nonparametrics\\
+\textit{PS 2 Due}
+\week{Week 06} Model Selection and Intro to Machine Learning
+\week{Week 07} Program Evaluation and Selection Models\\
+\textit{PS 3 Due}
+\week{Break} \textbf{SPRING BREAK }
+\week{Week 08} Matching and Local Average Treatment Effects\\
+\textit{PS 4 Due}
+\week{Week 09} Diff in Diff and Regression Discontinuity (Reschedule)
+\week{Week 10} Synthetic Control and Marginal Treatment Effects\\
+\textit{PS 5 Due}
+\week{Week 11} Discrete Choice
+\week{Week 12} Machine Learning: Model Selection and Regularization (LASSO, RIDGE, PCA)
+\week{Week 13} Topics based on interest: Duration Models, Dynamic Discrete Choice, Tree Models, Model Averaging Boosting/Bagging, etc
+\textit{PS 6 Due}
+
+
+
+
+\end{document}
