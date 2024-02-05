@@ -1,92 +1,10 @@
-\documentclass[aspectratio=169]{beamer}
-\usetheme{focus}
-
-%\usepackage{beamerthemesplit}
-%\beamertemplatenavigationsymbolsempty
-\usepackage{amsmath}
-\usepackage{amsthm}
-\usepackage{amssymb}
-\usepackage{latexsym}
-\usepackage{graphicx}
-\usepackage{fancybox}
-\usepackage{dsfont}
-\usepackage{multirow} 
-\usepackage{multicol}
-\usepackage{booktabs} 
-\usepackage{dcolumn}
-\usepackage{soul}
-\usepackage[cache=false]{minted}
-\usepackage{MnSymbol}
-\usepackage{stmaryrd}
-
-
-\DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\argmin}{arg\,min}
-
-\newcommand{\X}{\mathtt{X}}
-\newcommand{\Y}{\mathtt{Y}}
-
-%\newcommand{\R}{\mathbb{R}}
-%\newcommand{\E}{\mathbb{E}}
-%\newcommand{\V}{\mathbb{V}}
-\newcommand{\p}{\mathbb{P}}
-\newcommand*\df{\mathop{}\!\mathrm{d}}
-\newcommand{\del}{\partial}
-
-
-% imports
-\usepackage{xargs}
-\usepackage{xpatch}
-\usepackage{etoolbox}
-\usepackage{pdflscape}
-\usepackage{booktabs}
-\usepackage{threeparttable}
-\usepackage[skip=0.2\baselineskip]{caption}
-
-% command for inputting raw latex
-\makeatletter
-\newcommand\primitiveinput[1]{\@@input #1 }
-\makeatother
-
-% common table command
-\newcommandx{\tablecontent}[4]{
-    \begin{threeparttable}[!ht]
-        \centering
-        \caption{#3}
-        \vspace{-1em}
-        \footnotesize
-        \begin{tabular}{#1}
-            \primitiveinput{../tables/#2.tex}
-        \end{tabular}
-        \vspace{-0.2em}
-        \begin{tablenotes}[flushleft]
-            #4
-        \end{tablenotes}
-    \end{threeparttable}
-}
-
-
-
+% !TEX options=--shell-escape
+\input{../preamble.tex}
 
 % \usepackage{slashbox}
-\title{Lecture 1: Time Series}
+\title{Lecture 2: Time Series}
 \author{Chris Conlon }
 \institute{NYU Stern }
-
-
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\E}{\mathbb{E}}
-\newcommand{\V}{\mathbb{V}}
-\newcommand{\ol}{\overline}
-%\newcommand{\ul}{\underline}
-\newcommand{\pp}{{\prime \prime}}
-\newcommand{\ppp}{{\prime \prime \prime}}
-\newcommand{\policy}{\gamma}
-
-
-\newcommand{\fp}{\frame[plain]}
-
 \date{\today}
 
 \begin{document}
@@ -96,6 +14,7 @@
 Let's load some packages so that I can make some better looking plots:\\
 \begin{minted}{R}
 #always
+library(fixest)
 library(tidyverse)
 # for loading data
 library(tidyquant)
@@ -104,10 +23,7 @@ library(timetk)
 library(broom)
 library(sweep)
 library(forecast)
-# for AR regression
-library(dynlm)
-# for testing
-library(ts)
+
 \end{minted}
 \end{frame}
 
@@ -149,26 +65,22 @@ But suppose we observe a single object for may periods (subscript $t$):
 
 \begin{frame}[fragile]{Do it ourselves}
 \begin{minted}{R}
-gdp<-tq_get("A191RL1Q225SBEA", get  = "economic.data",
-         from='1950-01-1',to='2018-12-31')
-tail(gdp)
-           A191RL1Q225SBEA
-2017-04-01             3.0
-2017-07-01             2.8
-2017-10-01             2.3
-2018-01-01             2.2
-2018-04-01             4.2
-2018-07-01             3.4
+# Load and plot the PPI Data
+ppi<-tq_get("PPIACO", get  = "economic.data",
+         from='1980-01-1',to='2018-12-31')
+tail(ppi)
+
+
 \end{minted}
 \end{frame}
 
 \begin{frame}[fragile]{Do it ourselves}
 \begin{minted}{R}
-ggplot(gdp, aes(date, price)) + geom_line() +
-+     scale_x_date() + ylab("Annualized GDP Growth") + xlab("")
+ggplot(ppi, aes(date, price)) + geom_line() +
+    scale_x_date() + ylab("Producer Price Index") + xlab("")
 \end{minted}
 \begin{center}
-\includegraphics[width=4.5in]{./resources/gdp_plot.png}
+\includegraphics[width=4in]{./resources/ppi_plot.pdf}
 \end{center}
 \end{frame}
 
@@ -226,13 +138,17 @@ Which we can estimate via:
 
 \begin{frame}[fragile]{ACF plots}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/acf_plot.png}
+\includegraphics[width=3in]{./resources/acf_plot.png}
 \end{center}
+\small{
 \begin{minted}{R}
+gdp<-tq_get("A191RL1Q225SBEA", get  = "economic.data",
+           from='1950-01-1',to='2018-12-31')
 result<-tidy(acf(gdp$price))
 ggplot(result, aes(x=lag, y=acf)) +
          geom_bar(stat='identity', width=0.1) + theme_bw()
 \end{minted}
+}
 \end{frame}
 
 
@@ -280,7 +196,7 @@ We probably want something like an LLN or CLT:
 \begin{frame}{$AR(1)$ Regression}
 Consider the first-order autoregression for a \alert{forecast}:
 \begin{align*}
-y_t = \beta_0 + \beta_1 Y_{t-1} + \varepsilon_t
+y_t = \beta_0 + \beta_1 y_{t-1} + \varepsilon_t
 \end{align*}
 \begin{itemize}
     \item No causal interpretation of $(\beta_0,\beta_1)$.
@@ -292,7 +208,7 @@ y_t = \beta_0 + \beta_1 Y_{t-1} + \varepsilon_t
 \begin{frame}{$AR(1)$ Regression}
 Consider the first-order autoregression for a \alert{forecast}:
 \begin{align*}
-y_t = \beta_0 + \beta_1 Y_{t-1} + \varepsilon_t
+y_t = \beta_0 + \beta_1 y_{t-1} + \varepsilon_t
 \end{align*}
 \begin{itemize}
     \item No causal interpretation of $(\beta_0,\beta_1)$.
@@ -349,7 +265,7 @@ Consider the Wold Representation of the $AR(1)$
 \begin{align*}
 y_t &= \widetilde{\beta}_0 + \sum_{k=1}^{\infty} \beta_1^{k} \varepsilon_{t-k}
 \end{align*}
-Assume that $\varepsilon \sim N[0,\sigma^2)$ and IID
+Assume that $\varepsilon \sim N(0,\sigma^2)$ and IID
 \begin{align*}
 E[y_t] &= \widetilde{\beta}_0 \\
 V[y_t] &= \sum_{k=1}^{\infty} \beta_0^{k} Var(\varepsilon_{t-k})  \rightarrow \frac{1}{1-\beta_1} \sigma^2 
@@ -796,7 +712,7 @@ Given some time series data how should we start?
 \begin{minted}{R}
 alcohol_sales_tbl <- tq_get("S4248SM144NCEN", 
                             get  = "economic.data", 
-                            from = "2007-01-01",to   = "2016-12-31")
+                            from = "2007-01-01",to   = "2023-12-31")
                            # A tibble: 120 x 2
    date       price # note expenditure not prices!
    <date>     <int>
@@ -830,29 +746,34 @@ alcohol_sales_tbl %>%
 
 \begin{frame}{Alcohol Example}
 \begin{center}
-\includegraphics[width=5in]{./resources/alcohol.png}
+\includegraphics[width=4.8in]{./resources/alcohol.pdf}
 \end{center}
 \end{frame}
 
 
 \begin{frame}[fragile]{Rearranging Alcohol Data}
 Notice the strong seasonal pattern (December and June)
-\footnotesize
+\scriptsize
 \begin{minted}{R}
-> alcohol_sales_ts <- tk_ts(alcohol_sales_tbl, start = 2007, 
-				freq = 12, silent = TRUE)
-> alcohol_sales_ts
-       Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
+> alcohol_sales_ts <- tk_ts(alcohol_sales_tbl, start = 2007, freq = 12, silent = TRUE)
+     Jan   Feb   Mar   Apr   May   Jun   Jul   Aug   Sep   Oct   Nov   Dec
 2007  6627  6743  8195  7828  9570  9484  8608  9543  8123  9649  9390 10065
 2008  7093  7483  8365  8895  9794  9977  9553  9375  9225  9948  8758 10839
 2009  7266  7578  8688  9162  9369 10167  9507  8923  9272  9075  8949 10843
 2010  6558  7481  9475  9424  9351 10552  9077  9273  9420  9413  9866 11455
 2011  6901  8014  9832  9281  9967 11344  9106 10469 10085  9612 10328 11483
 2012  7486  8641  9709  9423 11342 11274  9845 11163  9532 10754 10953 11922
-2013  8395  8888 10110 10493 12218 11385 11186 11462 10494 11540 11138 12709
-2014  8557  9059 10055 10977 11792 11904 10965 10981 10828 11817 10470 13310
-2015  8400  9062 10722 11107 11508 12904 11869 11224 12022 11983 11506 14183
-2016  8650 10323 12110 11424 12243 13686 10956 12706 12279 11914 13025 14431
+2013  8383  8870 10085 10462 12177 11342 11139 11409 10442 11479 11077 12636
+2014  8506  9003  9991 10903 11709 11815 10875 10884 10725 11697 10353 13153
+2015  8279  8926 10557 10933 11330 12708 11700 11079 11882 11865 11420 14100
+2016  8556 10199 11949 11253 12046 13453 10755 12465 12038 11674 12761 14137
+2017  8870 10251 12241 11266 13275 14428 11165 13098 11619 12386 12904 13859
+2018  9248 10056 12221 11474 13650 14067 12178 13714 11954 13450 13706 15086
+2019 10391 10776 12238 12879 14358 14076 13290 13990 12849 14318 13584 16076
+2020 10524 11206 13308 12167 13925 16032 15598 15217 15449 16139 14911 16309
+2021 11360 12380 15354 15617 15527 17832 15751 16185 15944 15687 16909 18211
+2022 11862 13358 16216 15766 16755 17882 15168 16977 16430 15480 16718 18001
+2023 12201 13552 16041 14412 16225 17519 14091 16699 15503 15660 17065      
 \end{minted}
 \end{frame}
 

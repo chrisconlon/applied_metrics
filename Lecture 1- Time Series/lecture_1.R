@@ -15,22 +15,24 @@ library(ts)
 
 
 # Load and plot the GDP Data
-gdp<-tq_get("A191RL1Q225SBEA", get  = "economic.data",
-         from='1950-01-1',to='2018-12-31')
-tail(gdp)
-ggplot(gdp, aes(date, price)) + geom_line() +
-    scale_x_date() + ylab("Annualized GDP Growth") + xlab("")
+ppi<-tq_get("PPIACO", get  = "economic.data",
+         from='1980-01-1',to='2018-12-31')
+tail(ppi)
+ggplot(ppi, aes(date, price)) + geom_line() +
+    scale_x_date() + ylab("Producer Price Index") + xlab("")
 
 
 # Compute the autocorrelation function and plot it
+gdp<-tq_get("A191RL1Q225SBEA", get  = "economic.data",
+           from='1950-01-1',to='2018-12-31')
 result<-tidy(acf(gdp$price))
 ggplot(result, aes(x=lag, y=acf)) +
          geom_bar(stat='identity', width=0.1) + theme_bw()
 
 
 # Run various AR(p) models
-ar1<-ar(gdp$price,order=1)
-ar2<-ar(gdp$price,order=2)
+ar1<-ar(ppi$price,order=1)
+ar2<-ar(ppi$price,order=2)
 
 # automatic lag selection
 ar(gdp$price)
@@ -74,7 +76,7 @@ auto.arima(gdp2)
 ## Alcohol Data
 alcohol_sales_tbl <- tq_get("S4248SM144NCEN", 
                             get  = "economic.data", 
-                            from = "2007-01-01",to   = "2018-12-31")
+                            from = "2007-01-01",to   = "2023-12-31")
 
 
 # Plot with Exponential Moving Average
