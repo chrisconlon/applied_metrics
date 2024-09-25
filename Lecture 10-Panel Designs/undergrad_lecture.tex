@@ -1,5 +1,5 @@
+% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
 \input{../preamble.tex}
-
 \begin{document}
 \title{Quasi Experimental Methods}
 \author{Chris Conlon}
@@ -54,7 +54,7 @@ Are charter schools effective at improving educational outcomes?
 \begin{frame}{How does it work?}
 Naive comparison (this has a selection problem):
 \begin{align*}
-\beta = \E[Score_i \mid \text{Attend}] - \E[Score_i \mid Z_i = \text{Not Attend}] 
+\beta = \E[Score_i \mid \text{Attend}] - \E[Score_i \mid  \text{Not Attend}] 
 \end{align*}
 What we want instead is:
 \begin{align*}
