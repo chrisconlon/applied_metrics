@@ -1,0 +1,192 @@
+\documentclass[11pt]{article}
+%\usepackage[utf8x]{inputenc}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\newcommand{\lyxmathsym}[1]{\ifmmode\begingroup\def\b@ld{bold}
+  \text{\ifx\math@version\b@ld\bfseries\fi#1}\endgroup\else#1\fi}
+\newcommand{\R}{\mathbb{R}}
+
+
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\title{\Huge Problem Set 1}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2025}
+
+\makeatother
+
+\begin{document}
+
+\title{Problem Set 1}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+
+
+\subsection*{1 Prediction errors}
+
+Define $u \equiv y - E\left[ y | x\right]$. Show that for any function $g\left(x\right)$,  $E\left[ g\left(x\right) u \right]=0$.
+
+\subsection*{2 Multivariate normal distributions}
+
+The random variables $y,x$ have a multivariate normal distribution
+with mean vector $\mu^{\prime}=[1,2]$ and covariance matrix 
+\[
+\Sigma=\left[\begin{array}{ccc}
+2 & 3 \\
+3 & 6 \\
+\end{array}\right]
+\]
+
+\begin{enumerate}[label=\alph*)]
+\item Define \[
+\varepsilon = y - E[y\vert x]
+\]
+Show that $E[\varepsilon\vert x]=0$ and $E[\varepsilon]=0$
+
+\item It's true that $E[y\vert x]$ is linear in $x$, i.e., $E[y\vert x] = \alpha + \beta x$ (Optional: show this). \\
+Given the mean vector and covariance matrix above, what are the values for $\alpha$ and $\beta$? 
+
+\item Compute the conditional variance $Var[y\vert x]$. (Hint: you may appeal to the Law of Total Variance.)
+
+
+\item  Compute the squared correlation $R^{2}$ between $y$ and $x$.
+
+\item Compute the squared correlation $R^{2}$ between $y$ and $E[y\vert x]$. Comment, comparing
+your answer here to part (d). 
+\end{enumerate}
+
+
+\subsection*{3 Data warm-up}
+
+The data file (which you should download) 
+
+\href{http://ptscott.com/teaching/data/fuelbills.csv}{http://ptscott.com/teaching/data/fuelbills.csv }
+
+is a CSV file that contains data on fuel bills and number of rooms for 144 homes. 
+
+\begin{enumerate}[label=\alph*)]
+\item Produce a simple scatter (X-Y) plot with ROOMS on the horizontal axis
+and FUELBILL on the vertical axis. What conclusion do you draw about
+the relationship between number of rooms and fuelbill? 
+
+\item Note that ROOMS only takes a few values, 3,4,5,\dots ,11. Compute
+the mean value of FUELBILL for the different values of ROOMS. What
+do you conclude about the conditional mean? Plot the means against
+the number of rooms. What do you find?
+\end{enumerate}
+
+
+
+\subsection*{4 Partitioned regression}
+Suppose a data set consists of $\boldsymbol{y}$ ($n \times 1$), $\boldsymbol{X}_{1}$ ($n \times K_{1}$)
+and $\boldsymbol{X}_{2}$  ($n \times K_{2}$). Do the following four procedures
+produce the same value for the least squares coefficients on $\boldsymbol{X}_{2}$?
+\begin{enumerate}[label=\alph*)]
+\item Regress $\boldsymbol{y}$ on both $\boldsymbol{X}_{1}$ and $\boldsymbol{X}_{2}$. 
+\item Regress the residuals from a regression of $\boldsymbol{y}$ on $\boldsymbol{X}_{1}$ on the
+residuals (column by column) of regressions of $\boldsymbol{X}_{2}$ on $\boldsymbol{X}_{1}$. 
+\item Same as (b), but do not transform $\boldsymbol{y}$. 
+\item Same as (b), but do not transform $\boldsymbol{X}_{2}$.
+\end{enumerate}
+
+{\footnotesize
+\emph{Hint:} $\boldsymbol{P}=\boldsymbol{X}\left(\boldsymbol{X}\boldsymbol{'X}\right)^{-1}\boldsymbol{X}'$
+is known as the \emph{projection matrix }because 
+\[
+\boldsymbol{P}\boldsymbol{y}=\boldsymbol{X}\left(\boldsymbol{X}\boldsymbol{'X}\right)^{-1}\boldsymbol{X}'\boldsymbol{y}=\boldsymbol{X}\boldsymbol{b}_{OLS}=\hat{\boldsymbol{y}}.
+\]
+Define $\boldsymbol{M}=\boldsymbol{I}-\boldsymbol{P}=\boldsymbol{I}-\boldsymbol{X}\left(\boldsymbol{X}\boldsymbol{'X}\right)^{-1}\boldsymbol{X}'$.
+This matrix is known as the \emph{residual maker} because
+\[
+\boldsymbol{M}\boldsymbol{y}=\left(\boldsymbol{I}-\boldsymbol{P}\right)\boldsymbol{y}=\boldsymbol{y}-\boldsymbol{P}\boldsymbol{y}=\boldsymbol{y}-\hat{\boldsymbol{y}}=\boldsymbol{e}.
+\]
+
+You can make progress on this problem by using the residual maker.
+For example, the matrix of residuals from regressing $\boldsymbol{X}_{2}$
+on $\boldsymbol{X}_{1}$ is given by 
+\[
+\left(\boldsymbol{I}-\boldsymbol{X}_{1}\left(\boldsymbol{X}_{1}\boldsymbol{'X}_{1}\right)^{-1}\boldsymbol{X}'_{1}\right)\boldsymbol{X}_{2}.
+\]
+}
+
+
+
+\subsection*{5 Change in the sum of squares}
+ Suppose that $\boldsymbol{b}$ is the least
+squares coefficient vector in the regression of $\boldsymbol{y}$ on $\boldsymbol{X}$ and that
+$\boldsymbol{c}$ is any other $K\times1$ vector. Prove that the difference in
+the two sums of squared residuals is 
+\[
+(\boldsymbol{y}-\boldsymbol{X} \boldsymbol{c})^{\prime}(\boldsymbol{y}-\boldsymbol{X} \boldsymbol{c})-
+(\boldsymbol{y}-\boldsymbol{X} \boldsymbol{b})^{\prime}(\boldsymbol{y}-\boldsymbol{X} \boldsymbol{b})=
+(\boldsymbol{c}-\boldsymbol{b})^{\prime} \boldsymbol{X}{}^{\prime} \boldsymbol{X}(\boldsymbol{c}-\boldsymbol{b}).
+\]
+\\
+A property of the matrix $\boldsymbol{X}^{\prime} \boldsymbol{X}$ is that is \emph{positive
+definite}. This means that for any vector $\boldsymbol{u} \ne0$, $\boldsymbol{u}'\boldsymbol{X}^{\prime}\boldsymbol{X} \boldsymbol{u}>0$.
+How does this property and your result above connect to the definition
+of the least squares estimator? 
+
+
+\subsection*{6 The budget model.} 
+
+Consider a plan to fit least squares regressions
+using three dependent variables $y_{1},\ y_{2},\ y_{3}$, where $y_{j}$
+is the share of total expenditure on durables, nondurables, and services,
+respectively. Note that the three budget shares sum to 1. 
+
+All three regressions will use the same $\boldsymbol{X} $ matrix which has 5 columns
+(variables) $\boldsymbol{X} =[\text{a constant term},\text{ income},P_{D},P_{N},P_{S}]$
+where $P_{m}$ is a price index for the $m^{\text{th}}$ expenditure
+group. Denote the the $m^{\text{th}}$ least squares coefficient vector
+by $\boldsymbol{b}_{m}$, where  $m=D,N,S$. 
+
+Prove that the sum of the three least squares coefficient vectors
+is 
+\[
+\boldsymbol{b}_{D}+\boldsymbol{b}_{N}+\boldsymbol{b}_{S}=[1,0,0,0,0]^{\prime}.
+\]
+That is, the constant terms sum to 1 and the other coefficients sum
+to zero.
+
+Now, suppose instead of budget shares, we have expenditure data. Moreover,
+though we would like to use income as the second independent variable,
+we have only total expenditure, the sum of the three expenditures.
+Now, what do you get when you add the three least squares coefficient
+vectors? Prove your answer.
+
+
+
+
+\end{document}
