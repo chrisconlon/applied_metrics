@@ -1,0 +1,199 @@
+\input{../resources/preamble}
+
+% \documentclass[english,xcolor={dvipsnames},aspectratio=169]{beamer}
+
+% %\usepackage[T1]{fontenc}
+% %\usepackage{libertine}
+% \usepackage[italic]{mathastext}
+
+% \usepackage{float}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{graphicx}
+% \usepackage{setspace}
+% \usepackage[outdir=./]{epstopdf}
+
+% \usepackage{caption,subcaption}
+% \usepackage{booktabs}
+% \usepackage[flushleft]{threeparttable}
+
+% \usepackage{siunitx}
+% \sisetup{
+% input-symbols = {()},
+% group-digits  = false,
+% explicit-sign
+% }
+
+% %\usetheme{CambridgeUS}
+% \usetheme{Boadilla}
+% \usecolortheme{seahorse}
+
+% \setbeamertemplate{itemize subsubitem}{\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
+
+
+% \usepackage{tikz}
+% \usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
+% \usetikzlibrary{tikzmark}
+
+% \makeatletter
+
+
+% \usepackage{setspace}
+% \usepackage[normalem]{ulem}
+% \setbeamersize{text margin left=5pt,text margin right=5pt}
+
+% \makeatother
+
+% \usepackage{babel}
+\begin{document}
+
+\title[L0 - Introduction]{ Econometrics I}
+\subtitle{Lecture 0: Introduction}
+\author{Chris Conlon \\NYU Stern}
+\institute{Grad IO }
+\date{Fall 2025}
+\maketitle
+
+\section{Econometrics Overview}
+
+
+\begin{frame}{Course Description}
+
+\parbox{\linewidth}{
+The aim of the course is to teach you to {\bf use} popular
+applied econometric methods while developing your theoretical understanding
+of those methods. Topics include least squares, asymptotic theory,
+hypothesis testing, instrumental variables, difference-in-differences,
+regression discontinuity, treatment effects, panel data, maximum likelihood, and
+discrete choice models.
+}
+
+\end{frame}
+
+
+\begin{frame}{Prerequisites for Studying Econometrics}
+Ideally, you should have experience with
+\begin{itemize}
+	\item Calculus
+	\item Basic Probability and Statistics 
+	\item Linear Algebra 
+	\item Data analysis software such as R, Python/Numpy, Matlab, Julia, Stata, or similar
+		(Excel doesn't count) 
+\end{itemize}
+\end{frame}
+% 4 people missing LA, 4 missing programming training, 1 missing prob stats, only one person missing two things 
+% for those without linear algebra: study our brief review, check out the khan academy thing soon if you haven't already 
+% in particular the first two components: vectors and spaces, and matrix transformations
+% you won't need every detail for this course, so be ready, when you come across something in the book you don't understand,
+% go look it up and have some patience to make sure you fully understand what's going on. Same for lectures, if there was a 
+% point involving matrices you didn't understand, be sure to look it up after and figure out what's going on. And of course 
+% you can come to me if you have trouble figuring something out.
+% Don't come to me saying "teach me linear algebra", I'm expecting more independence from you than that, but you are very welcome
+% meet with me if you get stuck on something
+% 
+% For those with little or no programming experience, the best way to learn is to do it. If you're starting from scratch,
+% or from very little, I suggest using R. Check out an R tutorial, and write your first program this weekend if you can. 
+
+
+\begin{frame}{Assignments and Grading}
+\begin{itemize}
+	\item 4 Problem sets: 10\% each
+		\begin{itemize}
+		\item You may use any software you like. When giving examples, I will use R.
+		\item To compose, consider using software like LaTeX, R Markdown, and Jupyter.
+	\end{itemize}
+
+	\smallskip
+	\item Two in-class quizzes: 10\% each
+
+
+	\smallskip
+	\item Group project: 40\%
+	\begin{itemize}
+		\item A research project on any topic (subject to my approval) using econometric analysis.
+		\item I suggest choosing a published paper to replicate and finding a way to extend, test, or improve on it.  
+		Ideally, choose something on a topic that interests you. I will also share a list of suggestions. 
+		\item 1-3 students per group
+		\item Proposal due in middle of semester. 
+		\item Presentations in final class session
+		\item Paper due at end of semester
+	\end{itemize}
+
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+\begin{frame}{What is Econometrics?}
+\begin{itemize}
+	\item {\bf Experiments and Research Design:}
+	\begin{itemize}
+			\item In natural sciences, randomized controlled trials are considered the gold standard.
+			\medskip
+			\item In the social sciences, it's often hard to run experiments: macroeconomic policy, 
+			mergers and antitrust policy.
+			\medskip
+			\item This is perhaps the main reason we have econometrics: in the absence of controlled 
+			experiments, we need to figure out how to learn what we want to learn from naturally 
+			occurring data.
+	\end{itemize}
+\end{itemize}
+\end{frame}	
+	
+\begin{frame}{What is Econometrics?}
+\begin{itemize}
+	\item {\bf Econometric Questions:}
+	\begin{itemize}
+			\item Often about \emph{causality}
+			\begin{itemize}
+				\item About individuals: \emph{What is the effect of education on wages?}
+				\item About markets (micro):   \emph{How does the price of the iPad affect the number of units that will be sold?}
+				\item About markets (macro): \emph{How does raising the minimum wage affect employment?}
+			\end{itemize}
+			
+			\bigskip
+			\item Some studies are primarily descriptive 
+			\begin{itemize}
+				\item \emph{How many home runs will Aaron Judge hit in 2025?}
+				\item \emph{How has the distribution of real income in the US changed since 1990?}
+			\end{itemize}
+
+	\end{itemize}				
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What is Econometrics?}
+\begin{itemize}	
+
+	\item{\bf Challenges:}
+		\begin{itemize}
+				\item Endogeneity: general term for an observed variable's being correlated with things we can't observe.
+				Related: omitted variables. 
+				\medskip
+				\item Selection: economic agents (people, firms, etc.) are purposeful and know more than we do about their personal situations!
+				\medskip
+				\item Simultaneity: is the relationship between price and quantity increasing (supply) or decreasing (demand)? 
+				 What is driving the changes? 
+				The world is complicated, and it's often too simplistic to say \emph{`'this is the effect of X on Y''}. 
+				
+			\medskip
+			\item External validity:
+			\begin{itemize}
+				\item What will happen if we raise the minimum wage to levels not before seen? 
+				\item Is the price variation in the data short-run or long-run? Do consumers/firms respond differently to 
+				the two types of variation?
+				\item Related: structural econometrics, theory building. 
+			\end{itemize}
+		\end{itemize}	
+\end{itemize}
+\end{frame}
+
+
+
+
+\end{document}

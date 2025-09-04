@@ -1,0 +1,164 @@
+\documentclass[10pt,aspectratio=169]{beamer}
+% \documentclass[10pt,aspectratio=169,handout]{beamer}
+
+% silence some Metropolis warnings
+\usepackage{silence}
+\WarningFilter{beamerthememetropolis}{You need to compile with XeLaTeX or LuaLaTeX}
+\WarningFilter{latexfont}{Font shape}
+\WarningFilter{latexfont}{Some font}
+
+% define custom colors
+\definecolor{dark gray}{HTML}{444444}
+\definecolor{light gray}{HTML}{777777}
+\definecolor{dark red}{HTML}{BB0000}
+\definecolor{dark green}{HTML}{00BB00}
+
+% configure metropolis
+\usetheme[numbering=fraction]{metropolis}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=dark gray}
+\setbeamercolor{alerted text}{fg=dark red}
+\setbeamercolor{item projected}{bg=dark red}
+\setbeamercolor{local structure}{fg=dark red}
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+\setbeamercovered{transparent=10}
+
+% use thicker lines
+\makeatletter
+\setlength{\metropolis@titleseparator@linewidth}{1pt}
+\setlength{\metropolis@progressonsectionpage@linewidth}{1pt}
+\makeatother
+
+% custom bullet points
+\setbeamertemplate{itemize item}{\color{dark red}$\blacktriangleright$}
+\setbeamertemplate{itemize subitem}{\color{dark red}$\blacktriangleright$}
+\setbeamertemplate{itemize subsubitem}{\color{dark red}$\blacktriangleright$}
+\newcommand{\custombullet}{{\color{dark red}$\blacktriangleright$}\hspace{0.5em}}
+
+% use classic font for math
+\usefonttheme[onlymath]{serif}
+
+% imports
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{mathabx}
+\usepackage{stmaryrd}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xfrac}
+\usepackage{appendixnumberbeamer}
+\usepackage{tabularx}
+
+% check and x marks
+\usepackage{pifont}
+\newcommand{\cmark}{{\color{dark green}\ding{51}}\hspace{0.3em}}
+\newcommand{\xmark}{{\color{dark red}\ding{55}}\hspace{0.5em}}
+
+% diagrams
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+
+% references
+\usepackage[natbibapa]{apacite}
+\bibliographystyle{apacite}
+\renewcommand{\bibsection}{}
+
+% use ampersands instead of "and" for text citations
+\AtBeginDocument{\renewcommand{\BBAB}{\&}}
+
+% possessive cites
+\makeatletter
+\patchcmd{\NAT@test}{\else \NAT@nm}{\else \NAT@nmfmt{\NAT@nm}}{}{}
+\DeclareRobustCommand\citepos
+  {\begingroup
+   \let\NAT@nmfmt\NAT@posfmt
+   \NAT@swafalse\let\NAT@ctype\z@\NAT@partrue
+   \@ifstar{\NAT@fulltrue\NAT@citetp}{\NAT@fullfalse\NAT@citetp}}
+\let\NAT@orig@nmfmt\NAT@nmfmt
+\def\NAT@posfmt#1{\NAT@orig@nmfmt{#1's}}
+\makeatother
+
+% spaced-out lists
+\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{10pt}}{\enditemize}
+\newenvironment{wideenumerate}{\enumerate\addtolength{\itemsep}{10pt}}{\endenumerate}
+
+% replace footnotes with buttons
+\usepackage[absolute,overlay]{textpos}
+\newcounter{beamerpausessave}
+\newcommand{\always}[1]{
+    \setcounter{beamerpausessave}{\value{beamerpauses}}
+    \setcounter{beamerpauses}{0}
+    \pause
+    #1 
+    \setcounter{beamerpauses}{\value{beamerpausessave}}
+    \addtocounter{beamerpauses}{-1}
+    \pause
+}
+\newcommand{\buttons}[1]{\always{
+    \begin{textblock*}{\paperwidth}(0.015\textwidth, 1.022\textheight)
+        \scriptsize
+        #1
+    \end{textblock*}
+}}
+\newcommand{\appendixbuttons}[1]{\always{
+    \begin{textblock*}{\paperwidth}(0.015\textwidth, 1.043\textheight)
+        \scriptsize
+        #1
+    \end{textblock*}
+}}
+\newcommand{\goto}[2]{\hyperlink{#1}{{\color{dark red}$\smalltriangleright$} #2}\hspace{0.5em}}
+\newcommand{\goback}[2]{\hyperlink{#1}{{\color{dark red}$\smalltriangleleft$} #2}\hspace{0.5em}}
+
+% custom appendix
+\renewcommand{\appendixname}{\texorpdfstring{\translate{Appendix}}{Appendix}}
+
+% change color of cites and URLs
+\let\oldcite\cite
+\let\oldcitet\citet
+\let\oldcitep\citep
+\let\oldcitepos\citepos
+\let\oldcitetalias\citetalias
+\let\oldcitepalias\citepalias
+\let\oldurl\url
+\def\cite#1#{\citeaux{#1}}
+\def\citet#1#{\citetaux{#1}}
+\def\citep#1#{\citepaux{#1}}
+\def\citepos#1#{\citeposaux{#1}}
+\def\citetalias#1#{\citetaliasaux{#1}}
+\def\citepalias#1#{\citepaliasaux{#1}}
+\def\url#1#{\urlaux{#1}}
+\newcommand*\citeaux[2]{{\color{light gray}\oldcite#1{#2}}}
+\newcommand*\citetaux[2]{{\color{light gray}\oldcitet#1{#2}}}
+\newcommand*\citepaux[2]{{\color{light gray}\oldcitep#1{#2}}}
+\newcommand*\urlaux[2]{{\color{light gray}\oldurl#1{#2}}}
+\newcommand*\citeposaux[2]{{\color{light gray}\oldcitepos#1{#2}}}
+\newcommand*\citetaliasaux[2]{{\color{light gray}\oldcitetalias#1{#2}}}
+\newcommand*\citepaliasaux[2]{{\color{light gray}\oldcitepalias#1{#2}}}
+
+% custom math commands
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\renewcommand{\Pr}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathbb{V}}
+\newcommand{\Cov}{\mathbb{C}}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+% tables
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{makecell}
+\arrayrulecolor{dark red}
+
+% custom date
+\usepackage{datetime}
+\newdateformat{monthyeardate}{\monthname[\THEMONTH] \THEYEAR}
+
+% fix pauses with graphics
+\usepackage{fixpauseincludegraphics}

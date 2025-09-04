@@ -1,0 +1,487 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+One way to solve this is to appeal to facts about the multivariate normal
+ distribution that say that if 
+\begin_inset Formula 
+\[
+\left(\begin{array}{c}
+y\\
+\boldsymbol{x}
+\end{array}\right)\sim\mathcal{N}\left(\left(\begin{array}{c}
+\mu_{y}\\
+\boldsymbol{\mu}_{x}
+\end{array}\right),\left(\begin{array}{cc}
+\sigma_{y}^{2} & \Sigma_{y\boldsymbol{x}}\\
+\Sigma_{\boldsymbol{x}y} & \Sigma_{\boldsymbol{xx}}
+\end{array}\right)\right),
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ is potentially a vector of variables, e.g.
+ 
+\begin_inset Formula $\boldsymbol{x}=\left(\begin{array}{c}
+x\\
+z
+\end{array}\right)$
+\end_inset
+
+ in the context of this problem, then 
+\begin_inset Formula $y|\boldsymbol{x}$
+\end_inset
+
+ has a normal distribution with mean 
+\begin_inset Formula 
+\[
+E\left[y|x\right]=\text{\ensuremath{\mu_{y}}}+\ensuremath{\Sigma}_{y\boldsymbol{x}}\Sigma_{\boldsymbol{xx}}^{-1}\left(\boldsymbol{x}-\boldsymbol{\mu}_{\boldsymbol{x}}\right)
+\]
+
+\end_inset
+
+and variance 
+\begin_inset Formula 
+\[
+\sigma^{2}-\Sigma_{y\boldsymbol{x}}\Sigma_{\boldsymbol{xx}}^{-1}\Sigma_{\boldsymbol{x}y}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See for instance the Wikipedia page on the 
+\begin_inset CommandInset href
+LatexCommand href
+name "multivariate normal distribution"
+target "https://en.wikipedia.org/wiki/Multivariate_normal_distribution"
+literal "false"
+
+\end_inset
+
+.
+ From here, the problem is pretty mechanical.
+ 
+\end_layout
+
+\begin_layout Standard
+For the first part, we have
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+E\left(y|x\right)=1+\frac{3}{5}\left(x-2\right)=-\frac{1}{5}+\frac{3}{5}x.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For the second part, we have
+\begin_inset Formula 
+\[
+E\left(y|x,z\right)=1+\left(\begin{array}{cc}
+1 & 3\end{array}\right)\left(\begin{array}{cc}
+5 & 2\\
+2 & 6
+\end{array}\right)^{-1}\left(\begin{array}{c}
+x-2\\
+z-4
+\end{array}\right)=1+\left(\begin{array}{cc}
+\frac{8}{13} & -\frac{1}{26}\end{array}\right)\left(\begin{array}{c}
+x-2\\
+z-4
+\end{array}\right)=\frac{1}{13}+\frac{8}{13}x-\frac{1}{26}z.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+However, this solution is not very instructive – it starts out with a fact
+ about the normal distribution that mostly solves the problem for us.
+ Furthermore, to derive the fact ourself (i.e., deriving the expressions for
+ conditional distribution from the multivariate normal distribution) would
+ be a pain and not necessarily illuminating.
+\end_layout
+
+\begin_layout Standard
+Another way to proceed is to define
+\begin_inset Formula 
+\[
+\varepsilon_{i}\equiv y_{i}-E\left[y_{i}|x_{i}\right],
+\]
+
+\end_inset
+
+and write
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+y_{i}=E\left[y_{i}|x_{i}\right]+\varepsilon_{i}.\label{eq:regeq}
+\end{equation}
+
+\end_inset
+
+Now, start with two facts that are less strong that the expression for 
+\begin_inset Formula $y|x$
+\end_inset
+
+ above: 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $y|x$
+\end_inset
+
+ is normally distributed 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Formula $E\left[y|x\right]$
+\end_inset
+
+ linear in 
+\begin_inset Formula $x$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, the idea is to consider the properties of equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:regeq"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and argue that we can apply our linear regression results to understand
+ what its coefficients will be.
+ 
+\end_layout
+
+\begin_layout Standard
+Given the second fact, we can write 
+\begin_inset Formula 
+\begin{equation}
+y_{i}=\alpha+\beta x_{i}+\varepsilon_{i},\label{eq:regeq-linear}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula 
+\[
+E\left[y|x\right]=\alpha+\beta x.
+\]
+
+\end_inset
+
+Furthermore, by the definition of 
+\begin_inset Formula $\varepsilon_{i}$
+\end_inset
+
+ , we can use the law of iterated expectations to argue that
+\begin_inset Formula 
+\[
+E\left(\varepsilon_{i}|x_{i}\right)=E\left(y_{i}-E\left[y_{i}|x_{i}\right]|x_{i}\right)=E\left[y_{i}|x_{i}\right]-E\left[y_{i}|x_{i}\right]=0.
+\]
+
+\end_inset
+
+Furthermore, if we consider independently simulated data on 
+\begin_inset Formula $x$
+\end_inset
+
+, we would have 
+\begin_inset Formula $E\left(\boldsymbol{\varepsilon}|\boldsymbol{X}\right)=0$
+\end_inset
+
+, the strict exogeneity condition.
+ 
+\end_layout
+
+\begin_layout Standard
+Finally, notice that fact 1 implies that 
+\begin_inset Formula $\varepsilon_{i}$
+\end_inset
+
+ is normally distributed.
+ 
+\end_layout
+
+\begin_layout Standard
+Now, equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:regeq-linear"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) satisfies all the assumptions for the linear regression model with normally
+ distributed error terms.
+ 
+\end_layout
+
+\begin_layout Standard
+Following the slides, we know that regressing 
+\begin_inset Formula $y$
+\end_inset
+
+ on 
+\begin_inset Formula $x$
+\end_inset
+
+ (and a constant) with data simulated from the assumed distribution will
+ yield the following coefficient estimates:
+\begin_inset Formula 
+\[
+\widehat{\beta}=\frac{s_{xy}}{s_{x}^{2}}\qquad\qquad\widehat{\alpha}=\overline{y}-\widehat{\beta}\overline{x}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $s_{xy}$
+\end_inset
+
+ refers to the sample covariance, 
+\begin_inset Formula $s_{x}^{2}$
+\end_inset
+
+ refers to the sample variance, and 
+\begin_inset Formula $\overline{y}$
+\end_inset
+
+, 
+\begin_inset Formula $\overline{x}$
+\end_inset
+
+ refer to sample means.
+ 
+\end_layout
+
+\begin_layout Standard
+It's intuitive and easy to verify that the sample moments correspond to
+ the population moments: 
+\begin_inset Formula $E\left[s_{xy}\right]=\sigma_{xy}$
+\end_inset
+
+ and 
+\begin_inset Formula $E\left(s_{x}^{2}\right)=\sigma^{2}$
+\end_inset
+
+.
+ Note: for the sample moments to be unbiased, we have to divide by 
+\begin_inset Formula $n-1$
+\end_inset
+
+ instead of 
+\begin_inset Formula $n$
+\end_inset
+
+ (see 
+\begin_inset CommandInset href
+LatexCommand href
+name "Bessel's correction"
+target "https://en.wikipedia.org/wiki/Bessel%27s_correction"
+literal "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+Informally, this seems to suggest that 
+\begin_inset Formula 
+\[
+E\left[\widehat{\beta}\right]\approx\frac{\sigma_{xy}}{\sigma_{x}^{2}},
+\]
+
+\end_inset
+
+which would then imply 
+\begin_inset Formula 
+\[
+E\left[\widehat{\alpha}\right]\approx\mu_{y}-\frac{\sigma_{xy}}{\sigma_{x}^{2}}\mu_{x}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If these results hold with equality, we can plug in the parameters from
+ the population distribution, and we arrived at the same solution as above.
+ (A similar argument can be applied to 
+\begin_inset Formula $E\left[y|x,z\right]$
+\end_inset
+
+.) For large sample sizes, it's intuitive that the sample moments 
+\begin_inset Formula $s_{xy}$
+\end_inset
+
+ and 
+\begin_inset Formula $s_{x}^{2}$
+\end_inset
+
+ will be very close to their population analogs, so it makes sense that
+ 
+\begin_inset Formula $\widehat{\beta}$
+\end_inset
+
+ should be close to 
+\begin_inset Formula $\frac{\sigma_{xy}}{\sigma_{x}^{2}}$
+\end_inset
+
+ for a large sample.
+ 
+\end_layout
+
+\begin_layout Standard
+To make this proof strategy formally complete, we need to argue that equality
+ does hold
+\begin_inset Formula 
+\[
+E\left[\widehat{\beta}\right]=E\left[\frac{s_{xy}}{s_{x}^{2}}\right]=\frac{E\left[s_{xy}\right]}{E\left[s_{x}^{2}\right]}=\frac{\sigma_{xy}}{\sigma_{x}^{2}}.
+\]
+
+\end_inset
+
+The non-obvious part is 
+\begin_inset Formula 
+\[
+E\left[\frac{s_{xy}}{s_{x}^{2}}\right]=\frac{E\left[s_{xy}\right]}{E\left[s_{x}^{2}\right]},
+\]
+
+\end_inset
+
+which is true because 
+\begin_inset Formula $s_{xy}$
+\end_inset
+
+ and 
+\begin_inset Formula $s_{x}^{2}$
+\end_inset
+
+ are independent, but it's not immediately obvious that they are independent
+ because they both rely on the same data.
+ The independence argument can be established by starting with 
+\begin_inset Formula $n=2$
+\end_inset
+
+ and extending the argument by induction, or it can be done more elegantly
+ with a change in variables.
+ See 
+\begin_inset CommandInset href
+LatexCommand href
+name "this discussion"
+target "https://math.stackexchange.com/questions/47350/proof-of-the-independence-of-the-sample-mean-and-sample-variance"
+literal "false"
+
+\end_inset
+
+ for an example of the latter proof strategy.
+ 
+\end_layout
+
+\end_body
+\end_document

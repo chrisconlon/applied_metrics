@@ -1,0 +1,263 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+One way to solve this is to appeal to facts about the multivariate normal
+ distribution that say that if 
+\begin_inset Formula 
+\[
+\left(\begin{array}{c}
+y\\
+\boldsymbol{x}
+\end{array}\right)\sim\mathcal{N}\left(\left(\begin{array}{c}
+\mu_{y}\\
+\boldsymbol{\mu}_{x}
+\end{array}\right),\left(\begin{array}{cc}
+\sigma_{y}^{2} & \Sigma_{y\boldsymbol{x}}\\
+\Sigma_{\boldsymbol{x}y} & \Sigma_{\boldsymbol{xx}}
+\end{array}\right)\right),
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\boldsymbol{x}$
+\end_inset
+
+ is potentially a vector of variables, then 
+\begin_inset Formula $y|\boldsymbol{x}$
+\end_inset
+
+ has a normal distribution with mean 
+\begin_inset Formula 
+\[
+E\left[y|x\right]=\text{\ensuremath{\mu_{y}}}+\ensuremath{\Sigma}_{y\boldsymbol{x}}\Sigma_{\boldsymbol{xx}}^{-1}\left(\boldsymbol{x}-\boldsymbol{\mu}_{\boldsymbol{x}}\right)
+\]
+
+\end_inset
+
+and variance 
+\begin_inset Formula 
+\[
+\sigma^{2}-\Sigma_{y\boldsymbol{x}}\Sigma_{\boldsymbol{xx}}^{-1}\Sigma_{\boldsymbol{x}y}.
+\]
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+From here, the problem is pretty mechanical.
+ 
+\end_layout
+
+\begin_layout Standard
+For part (a), we have 
+\begin_inset Formula 
+\[
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\ensuremath{\Sigma}_{y\boldsymbol{x}}=\sigma_{yx}=3\qquad\qquad\Sigma_{\boldsymbol{xx}}=\sigma_{x}^{2}=5
+\]
+
+\end_inset
+
+In this context, 
+\begin_inset Formula 
+\[
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where ....
+ See for instance the Wikipedia page on the 
+\begin_inset CommandInset href
+LatexCommand href
+name "multivariate normal distribution"
+target "https://en.wikipedia.org/wiki/Multivariate_normal_distribution"
+literal "false"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+In this context: 
+\end_layout
+
+\begin_layout Standard
+(a) Following the slides, we have 
+\begin_inset Formula 
+\[
+\hat{b}_{1}=\frac{s_{xy}}{s_{x}^{2}}\qquad\qquad\hat{b}_{0}=\overline{y}-\hat{b}_{1}\overline{x}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $s_{xy}$
+\end_inset
+
+ refers to the sample covariance, 
+\begin_inset Formula $s_{x}^{2}$
+\end_inset
+
+ refers to the sample variance, and 
+\begin_inset Formula $\overline{y}$
+\end_inset
+
+, 
+\begin_inset Formula $\overline{x}$
+\end_inset
+
+ refer to sample means.
+ 
+\end_layout
+
+\begin_layout Standard
+It's intuitive and easy to verify that 
+\begin_inset Formula $E\left[s_{xy}\right]=\sigma_{xy}$
+\end_inset
+
+ and 
+\begin_inset Formula $E\left(s_{x}^{2}\right)=\sigma^{2}$
+\end_inset
+
+.
+ Note: for these estimates to be consistent we have to divide by 
+\begin_inset Formula $n-1$
+\end_inset
+
+ instead of 
+\begin_inset Formula $n$
+\end_inset
+
+ (see 
+\begin_inset CommandInset href
+LatexCommand href
+name "Bessel's correction"
+target "https://en.wikipedia.org/wiki/Bessel%27s_correction"
+literal "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+Informally, this seems to suggest that 
+\begin_inset Formula 
+\[
+E\left[\hat{b}_{1}\right]\approx\frac{\sigma_{xy}}{\sigma^{2}},
+\]
+
+\end_inset
+
+which would then imply 
+\begin_inset Formula 
+\[
+E\left[\hat{b}_{0}\right]\approx\mu_{y}-\frac{\sigma_{xy}}{\sigma^{2}}\mu_{x}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
