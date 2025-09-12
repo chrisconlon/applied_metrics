@@ -1,76 +1,77 @@
-\documentclass[english,xcolor={dvipsnames},aspectratio=169]{beamer}
-\usepackage[italic]{mathastext}
+\input{../resources/preamble.tex}
+% \documentclass[english,xcolor={dvipsnames},aspectratio=169]{beamer}
+% \usepackage[italic]{mathastext}
 
-\usepackage{float}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{graphicx}
-\usepackage{setspace}
-\usepackage[outdir=./]{epstopdf}
-\usepackage{listings}
+% \usepackage{float}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{graphicx}
+% \usepackage{setspace}
+% \usepackage[outdir=./]{epstopdf}
+% \usepackage{listings}
 
-\usepackage{caption,subcaption}
-\usepackage{booktabs}
-\usepackage[flushleft]{threeparttable}
+% \usepackage{caption,subcaption}
+% \usepackage{booktabs}
+% \usepackage[flushleft]{threeparttable}
 
-\usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=blue,
-}
-
-
-   \lstset{language=R,
-           basicstyle=\ttfamily\scriptsize,
-           keywordstyle=\color{blue}\ttfamily,
-           stringstyle=\color{red}\ttfamily,
-           commentstyle=\color{green}\ttfamily,
-          breaklines=true
-          }
+% \usepackage{hyperref}
+% \hypersetup{
+%     colorlinks=true,
+%     linkcolor=blue,
+%     filecolor=magenta,      
+%     urlcolor=blue,
+% }
 
 
-\usepackage{siunitx}
-\sisetup{
-input-symbols = {()},
-group-digits  = false,
-explicit-sign
-}
-
-%\usetheme{CambridgeUS}
-\usetheme{Boadilla}
-\usecolortheme{seahorse}
-
-\setbeamertemplate{itemize subsubitem}{\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
+%    \lstset{language=R,
+%            basicstyle=\ttfamily\scriptsize,
+%            keywordstyle=\color{blue}\ttfamily,
+%            stringstyle=\color{red}\ttfamily,
+%            commentstyle=\color{green}\ttfamily,
+%           breaklines=true
+%           }
 
 
-\DeclareFontShape{OT1}{cmss}{b}{n}{<->ssub * cmss/bx/n}{} 
+% \usepackage{siunitx}
+% \sisetup{
+% input-symbols = {()},
+% group-digits  = false,
+% explicit-sign
+% }
+
+% %\usetheme{CambridgeUS}
+% \usetheme{Boadilla}
+% \usecolortheme{seahorse}
+
+% \setbeamertemplate{itemize subsubitem}{\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
 
 
-\usepackage{tikz}
-\usepackage{pgfplots}
-\pgfplotsset{compat=1.7}
-\usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
-
-\makeatletter
+% \DeclareFontShape{OT1}{cmss}{b}{n}{<->ssub * cmss/bx/n}{} 
 
 
-\usepackage{setspace}
-\usepackage[normalem]{ulem}
-\setbeamersize{text margin left=10pt,text margin right=10pt}
+% \usepackage{tikz}
+% \usepackage{pgfplots}
+% \pgfplotsset{compat=1.7}
+% \usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
 
-\makeatother
+% \makeatletter
 
-\usepackage{babel}
+
+% \usepackage{setspace}
+% \usepackage[normalem]{ulem}
+% \setbeamersize{text margin left=10pt,text margin right=10pt}
+
+% \makeatother
+
+% \usepackage{babel}
 
 \begin{document}
 
 
 \title[L3 - Linear Regression]{ Econometrics I}
 \subtitle{Lecture 3: Linear Regression}
-\author{Paul T. Scott \\NYU Stern}
-\date{Fall 2024}
+\author{Chris Conlon \\NYU Stern}
+\date{Fall 2025}
 \maketitle
 
 
