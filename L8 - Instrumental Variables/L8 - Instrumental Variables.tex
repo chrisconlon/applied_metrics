@@ -41,9 +41,9 @@
 	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
 \end{align*}
 	\item IVs break $X$ into two pieces that are themselves uncorrelated:
-		\[
+		\begin{align*}
 			X_i =\gamma_0 + \gamma_1  Z_i + \eta_i
-		\]
+		\end{align*}
 
 		\begin{itemize}
 			\item A piece that is not correlated with $\varepsilon$ ($Cov(Z,\varepsilon)=0$)
@@ -204,10 +204,11 @@ Instrumental Variable:
 
 \begin{frame}{Formal Definition of an Instrumental Variable}
 Model:
-\[
+\begin{align*}
 	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
-\]
-		\begin{itemize}
+\end{align*}
+
+\begin{itemize}
 \item We call a variable $Z$ a a valid {\bf instrumental variable} if the following two conditions hold:
 \end{itemize}
 \begin{enumerate}
@@ -345,22 +346,23 @@ Let's begin with the simplest 0/1 model (this time for $Z$):
 
 What is the relationship between $Y$ and $Z$, taking expectations?
 \begin{align*}
-		E(Y|Z) =& E\left(\beta_0 + \beta_1 X + \varepsilon| Z\right)\\
-			   =& \beta_0 + \beta_1 E(X|Z) + \underbrace{E(\varepsilon|Z)}_{=0}\\
-			   =&\beta_0 + \beta_1 E(X|Z)
+		\E(Y|Z) =& E\left(\beta_0 + \beta_1 X + \varepsilon| Z\right)\\
+			   =& \beta_0 + \beta_1 \E(X|Z) + \underbrace{\E(\varepsilon|Z)}_{=0}\\
+			   =&\beta_0 + \beta_1 \E(X|Z)
 \end{align*}
 
 Since $Z$ is 0/1... 
 
 \begin{align*}
-	E(Y|Z=1) =& \beta_0 + \beta_1 E(X|Z=1)\\
-	E(Y|Z=0) =& \beta_0 + \beta_1 E(X|Z=0)
+	\E(Y|Z=1) =& \beta_0 + \beta_1 \E(X|Z=1)\\
+	\E(Y|Z=0) =& \beta_0 + \beta_1 \E(X|Z=0)
 \end{align*}
 
 Rearranging... 
-\[
-	E(Y|Z=1)-E(Y|Z=0) = \beta_1\times\left(E(X|Z=1)-E(X|Z=0)\right)
-\]
+\begin{align*}
+	\E(Y|Z=1)-\E(Y|Z=0) = \beta_1\times\left(\E(X|Z=1)-\E(X|Z=0)\right)
+\end{align*}
+
 
 
 \end{frame}
@@ -368,14 +370,15 @@ Rearranging...
 \begin{frame}{The IV Regression for a 0/1 $Z$}
 
 From the previous slide we have:
-\[
+\begin{align*}
 	\beta_1 = \frac{E(Y|Z=1)-E(Y|Z=0)}{E(X|Z=1)-E(X|Z=0)}
-\]
+\end{align*}
+
 
 From the LLN we can construct the following estimator:
-		\[
+		\begin{align*}
 			\hat\beta_1 = \frac{\bar Y_1 - \bar Y_0}{\bar X_1 - \bar X_0}
-		\]
+		\end{align*}
 		\begin{itemize}
 			\item The subscript refers to $Z=1$ or $Z=0$
 			\item We call this the IV estimator
@@ -387,16 +390,17 @@ From the LLN we can construct the following estimator:
 \begin{frame}{Interpreting the Estimator for 0/1 $Z$}
 
 Estimator:
-	\[
+	\begin{align*}
 			\hat\beta_1^{IV} = \frac{\bar Y_1 - \bar Y_0}{\bar X_1 - \bar X_0}
-	\]
+	\end{align*}
 
 \begin{itemize}
 
 	\item For a 0/1 $X$ we look at the change in $Y$ over the change in $X$:
-		\[
+		\begin{align*}
 			\hat\beta_1^{OLS} = \frac{\bar Y_{X=1} - \bar Y_{X=0}}{\bar X_{X=1} - \bar X_{X=0}} = \Delta \bar Y
-		\]
+		\end{align*}
+
 	\begin{itemize}
 		\item For a $0/1$ $X$, $\Delta \bar X = 1$
 		\item Basically looking at how much $Y$ changes for a change in $X$
@@ -409,17 +413,16 @@ Estimator:
 			\item Use the change in $X$ \emph{given $Z$} to get the right scaling
 		\end{itemize}
 \end{itemize}
-
-
 \end{frame}
 
 
 \begin{frame}{The IV  Regression with a Continuous $Z$}
 
 Same model as before:
-\[
+\begin{align*}
 	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
-\]
+\end{align*}
+
 
 
 \begin{itemize}
@@ -427,19 +430,19 @@ Same model as before:
 	\item How to capture the indirect effect of $Z$?
 		\begin{itemize}
 			\item Intuition from OLS: use the covariance between $Z$ and $Y$ as a measure of the relationship:
-			\begin{align*}
+	\begin{align*}
 	Cov(Y,Z) =& Cov(\beta_0 + \beta_1 X + \varepsilon,Z)\\
 			 =& \beta_1 Cov(X,Z)
-\end{align*}
+	\end{align*}
 			\item Rearranging:
-				\[
+				\begin{align*}
 					\beta_1= \frac{Cov(Y,Z)}{Cov(X,Z)}
-				\]
+				\end{align*}
 		\end{itemize}
 	\item {\bf Instrumental Variables Estimator:}
-		\[
+		\begin{align*}
 			\hat\beta^{IV}_1 = \frac{s_{YZ}}{s_{XZ}}
-		\]
+		\end{align*}
 \end{itemize}
 \end{frame}
 
@@ -452,7 +455,7 @@ Same model as before:
 \begin{frame}{Heterogeneous treatment effects I}
 \begin{itemize}
 \item Let's consider a simple case with binary treatment $X_i \in \left\{0,1\right\}$ where 
-the treatment effect $\beta_i=E\left(Y_{i1} - Y_{i0}\right)$ is heterogeneous.
+the treatment effect $\beta_i=\E\left(Y_{i1} - Y_{i0}\right)$ is heterogeneous.
 \begin{itemize}
 	\item $Y_{ix}$ denotes the potential outcome for $i$ given treatment status $X_i = x$.
 \end{itemize}
@@ -465,50 +468,54 @@ the treatment effect $\beta_i=E\left(Y_{i1} - Y_{i0}\right)$ is heterogeneous.
 	treatment status for $i$ when $Z_i = z$. 
 
 \medskip
-\item Model:\[
+\item Model:
+\begin{align*}
 	Y_i = \beta_0 + \beta_i X_i + \varepsilon_i
-\]
+\end{align*}
 
 
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Heterogeneous treatment effects II}
-\[
+\begin{align*}
 	Y_i = \beta_0 + \beta_i X_i + \varepsilon_i
-\]
+\end{align*}
+
 \begin{itemize}
-\item Assuming that $E\left[\varepsilon_i | Z_i = 1\right] - E\left[\varepsilon_i | Z_i = 0\right] =0$,
-\[
-E\left[ Y_i | Z_i = 1\right] - E\left[ Y_i | Z_i = 0\right] = E\left[ \beta_i X_i | Z_i = 1\right] - E\left[ \beta_i X_i | Z_i = 0\right] 
-\]
+\item Assuming that $\E\left[\varepsilon_i | Z_i = 1\right] - \E\left[\varepsilon_i | Z_i = 0\right] =0$,
+\begin{align*}
+\E\left[ Y_i | Z_i = 1\right] - \E\left[ Y_i | Z_i = 0\right] = \E\left[ \beta_i X_i | Z_i = 1\right] - \E\left[ \beta_i X_i | Z_i = 0\right] 
+\end{align*}
 
 \medskip
 Plugging in our potential outcomes for $X$,
-\[
-E\left[ Y_i | Z_i = 1\right] - E\left[ Y_i | Z_i = 0\right] = E\left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
-\]
+\begin{align*}
+\E\left[ Y_i | Z_i = 1\right] - \E\left[ Y_i | Z_i = 0\right] = \E\left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
+\end{align*}
+
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Heterogeneous treatment effects III}
-\[
-E\left[ Y_i | Z_i = 1\right] - E\left[ Y_i | Z_i = 0\right] = E\left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
-\]
+\begin{align*}
+\E\left[ Y_i | Z_i = 1\right] - \E\left[ Y_i | Z_i = 0\right] = \E\left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
+\end{align*}
+
 \begin{itemize}
 \item Given the binary treatment, there are three possible values for $X_{i1} -X_{i0}$:
-{\small
-\[
+\begin{align*}
+\footnotesize
 \begin{array}{llcl}
-E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\right] & =Pr\left(X_{i1}-X_{i0}=1\right)E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=1\right] & \qquad & \text{(compliers)}\\
- & +Pr\left(X_{i1}-X_{i0}=0\right)E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=0\right] &  & \text{(always/never takers)}\\
- & +Pr\left(X_{i1}-X_{i0}=-1\right)E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=-1\right] &  & \text{(defiers)}
+\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\right] & =\Pr\left(X_{i1}-X_{i0}=1\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=1\right] & \qquad & \text{(compliers)}\\
+ & +\Pr\left(X_{i1}-X_{i0}=0\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=0\right] &  & \text{(always/never takers)}\\
+ & +\Pr\left(X_{i1}-X_{i0}=-1\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=-1\right] &  & \text{(defiers)}
 \end{array}
-\]
-}
+\end{align*}
+
 
 \item The second term (always/never takers) is necessarily equal to zero. We might also make a {\bf monotonicity assumption} that
-	$Pr\left(X_{i1}-X_{i0}=-1\right)=0$. Ruling out defiers, this could be interpreted to mean that 
+	$\Pr\left(X_{i1}-X_{i0}=-1\right)=0$. Ruling out defiers, this could be interpreted to mean that 
 	being assigned to treatment can only make you more likely to receive treatment.
 	
 \end{itemize}
