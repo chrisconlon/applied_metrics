@@ -238,3 +238,4 @@ TSWLatexianTemp*
 *.orig
 *.tmp
 
+.DS_Store
