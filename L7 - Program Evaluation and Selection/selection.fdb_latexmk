@@ -1,12 +1,12 @@
 # Fdb version 4
-["xdvipdfmx"] 1760490477.9822 "selection.xdv" "selection.pdf" "selection" 1760490478.27313 0
-  "selection.xdv" 1760490477.86473 217472 1c1b36c39c13486625c5dc66a7053687 "xelatex"
+["xdvipdfmx"] 1760924558.35641 "selection.xdv" "selection.pdf" "selection" 1760924558.63957 0
+  "selection.xdv" 1760924558.23987 216384 2a6ed8b8cab0a0c10e5f82cfe53e4e42 "xelatex"
   (generated)
   "selection.pdf"
   (rewritten before read)
-["xelatex"] 1760490475.74393 "selection.tex" "selection.xdv" "selection" 1760490478.27111 0
+["xelatex"] 1760924556.13733 "selection.tex" "selection.xdv" "selection" 1760924558.63749 0
   "/Users/christopherconlon/Library/texmf/tex/latex/fixpauseincludegraphics/fixpauseincludegraphics.sty" 1726517785.07121 1931 6c7a30bfcbc0be1a8fb4c196dc92c9a6 ""
-  "/Users/christopherconlon/Library/texmf/tex/latex/teaching_slides/teaching_slides.sty" 1759600247.33924 10103 35580c32b555bbcf331e8e6ccc5745af ""
+  "/Users/christopherconlon/Library/texmf/tex/latex/teaching_slides/teaching_slides.sty" 1760924550.53306 10473 596f16c644dee7ba3e6dc6d56d483aca ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/adobe/symbol/psyr.tfm" 1136768653 1408 5937f58aa508ea2cea4901c07d10f5fe ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -126,7 +126,6 @@
   "/usr/local/texlive/2025/texmf-dist/tex/latex/base/fontenc.sty" 1748806692 5275 2f50a1b91fdc3c2c6ff41843a6854061 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/base/ifthen.sty" 1748806692 5525 1593ca62a2554dd7423fc8a4e5a82125 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/base/size11.clo" 1748806692 8464 f339f4d5391fbe0425b2d94c90e6819e ""
-  "/usr/local/texlive/2025/texmf-dist/tex/latex/base/textcomp.sty" 1738182759 2846 e26604d3d895e65d874c07f30c291f3f ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/base/ts1enc.def" 1738182759 8090 bcb38b4f148e75e16d2c33225dbca53b ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamer.cls" 1755201777 12512 724a31a12631f62f8e3b2527e35ae529 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/beamer/beamerbaseauxtemplates.sty" 1750100799 24830 2a9b5288e861d4287ff2800898819436 ""
@@ -202,7 +201,6 @@
   "/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/nameref.sty" 1750533789 11027 0fe7ce2c6b5291fd809c2de7bbdca37e ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/pd1enc.def" 1752350709 14249 e14b403fb70abdf1f6742598a63b0e2a ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/puenc.def" 1752350709 117118 e2f5f7983a43f89e2ffcd709fc59d37c ""
-  "/usr/local/texlive/2025/texmf-dist/tex/latex/inconsolata/inconsolata.sty" 1558214095 4327 344b968526dbd149d23066f8b2160aa4 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/koma-script/scrlfile-hook.sty" 1757447679 11185 14750cd198d99e759e6b1c8beccdcfab ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/koma-script/scrlfile.sty" 1757447679 3328 1e3627ccc04197e70a93339b37793f13 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/koma-script/scrlogo.sty" 1757447679 2162 ac090bf9383313ef37b4ce1f7b1f60cf ""
@@ -226,7 +224,6 @@
   "/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/microtype-xetex.def" 1752091573 28582 5e86e2ee569786bf3228c6ac61441975 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/microtype.cfg" 1752091573 27628 65e257a6863987c0e5097054c917d02d ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/microtype.sty" 1752091573 102775 cc4629d7100508b1ba679322aef9b545 ""
-  "/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-LatinModernRoman.cfg" 1739394495 10002 87b90d9edb7468cf5bbd96e0ba2b3367 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg" 1739394495 5929 11976688d7d8ed4d0d05efd1b3d5a7e9 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg" 1739394495 5594 d52d5015abe666fae752ed7674c2dd73 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty" 1731446765 6696 886c9f3087d0b973ed2c19aa79cb3023 ""
@@ -267,7 +264,6 @@
   "/usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math-table.tex" 1691956686 241443 1a7594ad34b6e3e9ee4c5855f2c3ee83 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math-xetex.sty" 1691956686 131459 a23c98c9e5ecfc17568c7bc94fda1317 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math.sty" 1691956686 1474 b42cfbe849cb22ed1c0632800327884f ""
-  "/usr/local/texlive/2025/texmf-dist/tex/latex/upquote/upquote.sty" 1334873510 1048 517e01cde97c1c0baf72e69d43aa5a2e ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/url/url.sty" 1388531844 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/xcolor/xcolor.sty" 1727642399 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "/usr/local/texlive/2025/texmf-dist/tex/latex/xfrac/xfrac.sty" 1717530934 14945 a207ee7fd6b8cf6d82afb367c583ddd3 ""
@@ -275,11 +271,11 @@
   "/usr/local/texlive/2025/texmf-dist/web2c/texmf.cnf" 1749313668 42213 4e2ca030e8e2640502016e9e45868dcb ""
   "/usr/local/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1759534522 5937126 e6bf9052934f3e0620bb529a5731e68b ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "selection.aux" 1760490477.86325 4219 90e226694709caa1a4805e5c837032c3 "xelatex"
-  "selection.nav" 1760490477.86462 2225 c1c5afbecb67aec0ba53ac1043f451e4 "xelatex"
-  "selection.out" 1760490476.79402 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
-  "selection.tex" 1760490474.20144 15579 4d8c2cd8b722ffa261c07cf7fe1ee69d ""
-  "selection.vrb" 1760490477.47083 534 6716b7877d9ebd202c2b6c4db048d7a4 "xelatex"
+  "selection.aux" 1760924558.23833 4219 90e226694709caa1a4805e5c837032c3 "xelatex"
+  "selection.nav" 1760924558.23977 2225 c1c5afbecb67aec0ba53ac1043f451e4 "xelatex"
+  "selection.out" 1760924557.18934 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "selection.tex" 1760924554.86282 15169 5b8bcb2d701e0703f84acb3a2bc3aab8 ""
+  "selection.vrb" 1760924557.84511 534 6716b7877d9ebd202c2b6c4db048d7a4 "xelatex"
   (generated)
   "selection.aux"
   "selection.log"
