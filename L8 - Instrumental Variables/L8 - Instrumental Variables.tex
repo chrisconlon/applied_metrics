@@ -16,10 +16,10 @@
 %\usepackage[flushleft]{threeparttable}
 
 
-% \usepackage{tikz}
-% \usepackage{pgfplots}
-% \pgfplotsset{compat=1.7}
-% \usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.7}
+\usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
 
 
 
@@ -60,38 +60,38 @@
 
 A ``Good" Regression:
 
-% \begin{figure}[H]
-% \begin{center}
-% \resizebox{.4\textwidth}{!}{
-% \begin{tikzpicture}
+\begin{figure}[H]
+\begin{center}
+\resizebox{.4\textwidth}{!}{
+\begin{tikzpicture}
 
-% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
-% \tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
-% \tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
-% % vertices
-% \node[vertex] (a) at  (0,0) {\makebox[7.5mm][c]{\small X}};;
-% \node[vertex] (b) at  (5,0) {\makebox[7.5mm][c]{\small  $\varepsilon$}};;
-% \node[vertex] (c) at  (2.5,-2) {\makebox[7.5mm][c]{\small Y}};
-% %\node (d) at (2.5,0) {??};
-% \node at (2.5,.66) {Exogenous};
-% \node at (2.5,-2.75) {Endogenous};
+\tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
+\tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
+\tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
+% vertices
+\node[vertex] (a) at  (0,0) {\makebox[7.5mm][c]{\small X}};;
+\node[vertex] (b) at  (5,0) {\makebox[7.5mm][c]{\small  $\varepsilon$}};;
+\node[vertex] (c) at  (2.5,-2) {\makebox[7.5mm][c]{\small Y}};
+%\node (d) at (2.5,0) {??};
+\node at (2.5,.66) {Exogenous};
+\node at (2.5,-2.75) {Endogenous};
 
-% %edges
-% \draw[edge1] (a) to (c);
-% \draw[edge1] (b) to (c);
-% %\draw[edge2] (a) to (d);
-% %\draw[edge2] (b) to (d);                                            v
+%edges
+\draw[edge1] (a) to (c);
+\draw[edge1] (b) to (c);
+%\draw[edge2] (a) to (d);
+%\draw[edge2] (b) to (d);                                            v
 
-% % rectangle
-% \draw[rounded corners=15pt]
-%   (-1,-.75) rectangle ++(7,1.65);
+% rectangle
+\draw[rounded corners=15pt]
+  (-1,-.75) rectangle ++(7,1.65);
 
-% \draw[rounded corners=15pt]
-%   (-1,-3.25) rectangle ++(7,2);
+\draw[rounded corners=15pt]
+  (-1,-3.25) rectangle ++(7,2);
 
-% \end{tikzpicture}}
-% \end{center}
-% \end{figure}
+\end{tikzpicture}}
+\end{center}
+\end{figure}
 
 \begin{itemize}{\small
 	\item {\bf Exogenous Variables:} Variables in the data that do not cause each other
@@ -110,38 +110,38 @@ A ``Good" Regression:
 
 Selection/OVB:
 
-% \begin{figure}[H]
-% \begin{center}
-% \resizebox{.4\textwidth}{!}{
-% \begin{tikzpicture}
+\begin{figure}[H]
+\begin{center}
+\resizebox{.4\textwidth}{!}{
+\begin{tikzpicture}
 
-% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
-% \tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
-% \tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
-% % vertices
-% \node[vertex] (a) at  (0,-2) {\makebox[6mm][c]{\small X}};;
-% \node[vertex] (b) at  (2.5,-.1) {\makebox[6mm][c]{\small  $\varepsilon$}};;
-% \node[vertex] (c) at  (5,-2) {\makebox[6mm][c]{\small Y}};
-% %\node (d) at (2.5,0) {??};
-% \node at (2.5,.66) {Exogenous};
-% \node at (2.5,-2.75) {Endogenous};
+\tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
+\tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
+\tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
+% vertices
+\node[vertex] (a) at  (0,-2) {\makebox[6mm][c]{\small X}};;
+\node[vertex] (b) at  (2.5,-.1) {\makebox[6mm][c]{\small  $\varepsilon$}};;
+\node[vertex] (c) at  (5,-2) {\makebox[6mm][c]{\small Y}};
+%\node (d) at (2.5,0) {??};
+\node at (2.5,.66) {Exogenous};
+\node at (2.5,-2.75) {Endogenous};
 
-% %edges
-% \draw[edge1] (a) to (c);
-% \draw[edge1] (b) to (c);
-% \draw[edge2] (a) to (b);
-% %\draw[edge2] (b) to (d);                                            v
+%edges
+\draw[edge1] (a) to (c);
+\draw[edge1] (b) to (c);
+\draw[edge2] (a) to (b);
+%\draw[edge2] (b) to (d);                                            v
 
-% % rectangle
-% \draw[rounded corners=15pt]
-%   (-1,-.75) rectangle ++(7,1.65);
+% rectangle
+\draw[rounded corners=15pt]
+  (-1,-.75) rectangle ++(7,1.65);
 
-% \draw[rounded corners=15pt]
-%   (-1,-3.25) rectangle ++(7,2);
+\draw[rounded corners=15pt]
+  (-1,-3.25) rectangle ++(7,2);
 
-% \end{tikzpicture}}
-% \end{center}
-% \end{figure}
+\end{tikzpicture}}
+\end{center}
+\end{figure}
 
 \begin{itemize}{\small
 	\item In this picture $X$ is {\bf endogenous} because $\varepsilon$ now causes $X$ as well
@@ -157,39 +157,39 @@ Selection/OVB:
 
 Instrumental Variable:
 
-% \begin{figure}[H]
-% \begin{center}
-% \resizebox{.4\textwidth}{!}{
-% \begin{tikzpicture}
+\begin{figure}[H]
+\begin{center}
+\resizebox{.4\textwidth}{!}{
+\begin{tikzpicture}
 
-% \tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
-% \tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
-% \tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
-% % vertices
-% \node[vertex] (a) at  (0,-2) {\makebox[6mm][c]{\small X}};;
-% \node[vertex] (b) at  (4,-.1) {\makebox[6mm][c]{\small  $\varepsilon$}};;
-% \node[vertex] (c) at  (5,-2) {\makebox[6mm][c]{\small Y}};
-% \node[vertex] (d) at  (1,-.1) {\makebox[6mm][c]{\small  Z}};;
-% %\node (d) at (2.5,0) {??};
-% \node at (2.5,.66) {Exogenous};
-% \node at (2.5,-2.75) {Endogenous};
+\tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
+\tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
+\tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
+% vertices
+\node[vertex] (a) at  (0,-2) {\makebox[6mm][c]{\small X}};;
+\node[vertex] (b) at  (4,-.1) {\makebox[6mm][c]{\small  $\varepsilon$}};;
+\node[vertex] (c) at  (5,-2) {\makebox[6mm][c]{\small Y}};
+\node[vertex] (d) at  (1,-.1) {\makebox[6mm][c]{\small  Z}};;
+%\node (d) at (2.5,0) {??};
+\node at (2.5,.66) {Exogenous};
+\node at (2.5,-2.75) {Endogenous};
 
-% %edges
-% \draw[edge1] (a) to (c);
-% \draw[edge1] (b) to (c);
-% \draw[edge2] (a) to (b);
-% \draw[edge1] (d) to (a);                                            v
+%edges
+\draw[edge1] (a) to (c);
+\draw[edge1] (b) to (c);
+\draw[edge2] (a) to (b);
+\draw[edge1] (d) to (a);                                            v
 
-% % rectangle
-% \draw[rounded corners=15pt]
-%   (-1,-.75) rectangle ++(7,1.65);
+% rectangle
+\draw[rounded corners=15pt]
+  (-1,-.75) rectangle ++(7,1.65);
 
-% \draw[rounded corners=15pt]
-%   (-1,-3.25) rectangle ++(7,2);
+\draw[rounded corners=15pt]
+  (-1,-3.25) rectangle ++(7,2);
 
-% \end{tikzpicture}}
-% \end{center}
-% \end{figure}
+\end{tikzpicture}}
+\end{center}
+\end{figure}
 
 \begin{itemize}{\small
 	\item $Z$ causes $Y$ \emph{only indirectly} through $X$
@@ -231,9 +231,9 @@ Model:
 \item This assumption just means that $X$ and $Z$ are correlated
 \medskip
 \item We observe both $X$ and $Z$, so can easily test this assumption by regressing:
-\begin{align*}
-X_i = \beta_0 + \beta_1 Z_i + \varepsilon_i
-\end{align*}
+	\begin{align*}
+	X_i = \beta_0 + \beta_1 Z_i + \varepsilon_i
+	\end{align*}
 \item If $\beta_1 \neq 0$ in regression, we say instrument is relevant
 \end{itemize}
 \end{frame}
@@ -315,7 +315,7 @@ This is a good story! It's the ``magic'' of randomization.
 \end{frame}
 
 
-\begin{frame}{IV Estimation: Example with a 0/1 $Z$}
+\begin{frame}{IV Estimation: Example with a binary $Z \in\{0,1\}$}
 
 Let's begin with the simplest 0/1 model (this time for $Z$):
 \begin{align*}
@@ -340,8 +340,6 @@ Let's begin with the simplest 0/1 model (this time for $Z$):
 
 
 
-
-
 \begin{frame}{The Relationship Between $Y$ on $Z$}
 
 What is the relationship between $Y$ and $Z$, taking expectations?
@@ -352,7 +350,6 @@ What is the relationship between $Y$ and $Z$, taking expectations?
 \end{align*}
 
 Since $Z$ is 0/1... 
-
 \begin{align*}
 	\E(Y|Z=1) =& \beta_0 + \beta_1 \E(X|Z=1)\\
 	\E(Y|Z=0) =& \beta_0 + \beta_1 \E(X|Z=0)
@@ -362,32 +359,26 @@ Rearranging...
 \begin{align*}
 	\E(Y|Z=1)-\E(Y|Z=0) = \beta_1\times\left(\E(X|Z=1)-\E(X|Z=0)\right)
 \end{align*}
-
-
-
 \end{frame}
 
-\begin{frame}{The IV Regression for a 0/1 $Z$}
-
+\begin{frame}{The IV Regression for a binary $Z \in\{0,1\}$}
 From the previous slide we have:
 \begin{align*}
-	\beta_1 = \frac{E(Y|Z=1)-E(Y|Z=0)}{E(X|Z=1)-E(X|Z=0)}
+	\beta_1 = \frac{\E(Y|Z=1)-\E(Y|Z=0)}{\E(X|Z=1)-\E(X|Z=0)}
 \end{align*}
 
 
 From the LLN we can construct the following estimator:
-		\begin{align*}
-			\hat\beta_1 = \frac{\bar Y_1 - \bar Y_0}{\bar X_1 - \bar X_0}
-		\end{align*}
-		\begin{itemize}
-			\item The subscript refers to $Z=1$ or $Z=0$
-			\item We call this the IV estimator
-		\end{itemize}
-
-
+\begin{align*}
+	\hat\beta_1 = \frac{\bar Y_1 - \bar Y_0}{\bar X_1 - \bar X_0}
+\end{align*}
+\begin{itemize}
+	\item The subscript refers to $Z=1$ or $Z=0$
+	\item We call this the IV estimator
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Interpreting the Estimator for 0/1 $Z$}
+\begin{frame}{Interpreting the Estimator for binary $Z \in \{0,1\}$}
 
 Estimator:
 	\begin{align*}
@@ -396,7 +387,7 @@ Estimator:
 
 \begin{itemize}
 
-	\item For a 0/1 $X$ we look at the change in $Y$ over the change in $X$:
+	\item For a binary $X$ we look at the change in $Y$ over the change in $X$:
 		\begin{align*}
 			\hat\beta_1^{OLS} = \frac{\bar Y_{X=1} - \bar Y_{X=0}}{\bar X_{X=1} - \bar X_{X=0}} = \Delta \bar Y
 		\end{align*}
@@ -439,17 +430,10 @@ Same model as before:
 					\beta_1= \frac{Cov(Y,Z)}{Cov(X,Z)}
 				\end{align*}
 		\end{itemize}
-	\item {\bf Instrumental Variables Estimator:}
-		\begin{align*}
-			\hat\beta^{IV}_1 = \frac{s_{YZ}}{s_{XZ}}
-		\end{align*}
+	\item {\bf Instrumental Variables Estimator:} $\hat\beta^{IV}_1 = s_{YZ}/ s_{XZ}$
+
 \end{itemize}
 \end{frame}
-
-
-
-
-
 
 
 \begin{frame}{Heterogeneous treatment effects I}
@@ -472,10 +456,10 @@ the treatment effect $\beta_i=\E\left(Y_{i1} - Y_{i0}\right)$ is heterogeneous.
 \begin{align*}
 	Y_i = \beta_0 + \beta_i X_i + \varepsilon_i
 \end{align*}
-
-
 \end{itemize}
 \end{frame}
+
+
 
 \begin{frame}{Heterogeneous treatment effects II}
 \begin{align*}
@@ -493,7 +477,6 @@ Plugging in our potential outcomes for $X$,
 \begin{align*}
 \E\left[ Y_i | Z_i = 1\right] - \E\left[ Y_i | Z_i = 0\right] = \E\left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
 \end{align*}
-
 \end{itemize}
 \end{frame}
 
@@ -505,17 +488,19 @@ Plugging in our potential outcomes for $X$,
 \begin{itemize}
 \item Given the binary treatment, there are three possible values for $X_{i1} -X_{i0}$:
 \begin{align*}
-\footnotesize
+\footnotesize{
 \begin{array}{llcl}
-\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\right] & =\Pr\left(X_{i1}-X_{i0}=1\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=1\right] & \qquad & \text{(compliers)}\\
- & +\Pr\left(X_{i1}-X_{i0}=0\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=0\right] &  & \text{(always/never takers)}\\
- & +\Pr\left(X_{i1}-X_{i0}=-1\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=-1\right] &  & \text{(defiers)}
+\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\right] & =\Pr\left(X_{i1}-X_{i0}=1\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=1\right]  & \text{(compliers)}\\
+ & +\Pr\left(X_{i1}-X_{i0}=0\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=0\right] & \text{(always/never takers)}\\
+ & +\Pr\left(X_{i1}-X_{i0}=-1\right)\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=-1\right] & \text{(defiers)}
 \end{array}
+}
 \end{align*}
 
 
 \item The second term (always/never takers) is necessarily equal to zero. We might also make a {\bf monotonicity assumption} that
-	$\Pr\left(X_{i1}-X_{i0}=-1\right)=0$. Ruling out defiers, this could be interpreted to mean that 
+	$\Pr\left(X_{i1}-X_{i0}=-1\right)=0$. 
+\item Ruling out defiers, this could be interpreted to mean that 
 	being assigned to treatment can only make you more likely to receive treatment.
 	
 \end{itemize}
@@ -524,23 +509,27 @@ Plugging in our potential outcomes for $X$,
 
 
 \begin{frame}{Heterogeneous treatment effects IV}
-\[
-E\left[ Y_i | Z_i = 1\right] - E\left[ Y_i | Z_i = 0\right] = E\left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
-\]
 \begin{itemize}
-\item With monotonicity, we have \[
-E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\right]  = Pr\left(X_{i1}-X_{i0}=1\right)E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=1\right]
-\]
+\item Start with 
+	\begin{align*}
+	\E \left[ Y_i \mid Z_i = 1\right] - \E \left[ Y_i \mid Z_i = 0\right] = \E \left[ \beta_i \left(X_{i1} -X_{i0}\right) \right] 
+	\end{align*}
+	\item \alert{Monotonicity} means:
+	\begin{align*}
+		\E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\right]  = \Pr\left(X_{i1}-X_{i0}=1\right) \E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)\mid X_{i1}-X_{i0}=1\right]
+	\end{align*}
 
-\item Also note that $Pr\left(X_{i1}-X_{i0}=1\right) = E\left[ X_{i} | Z_i=1\right] - E\left[ X_{i} | Z_i=0\right]$
+	\item Also note that $Pr\left(X_{i1}-X_{i0}=1\right) = E\left[ X_{i} \mid Z_i=1\right] - E\left[ X_{i} \mid Z_i=0\right]$
 
-\item Combining the above,\[
-\frac{E\left[ Y_i | Z_i = 1\right] - E\left[ Y_i | Z_i = 0\right] }{E\left[ X_{i} | Z_i=1\right] - E\left[ X_{i} | Z_i=0\right]} = E\left[\beta_{i}\left(X_{i1}-X_{i0}\right)|X_{i1}-X_{i0}=1\right]
-= E\left[\beta_{i}|X_{i1}-X_{i0}=1\right]
-\]
+	\item Combining the above,
+	\begin{align*}
+	\frac{\E\left[ Y_i \mid Z_i = 1\right] - \E\left[ Y_i \mid Z_i = 0\right] }{\E\left[ X_{i} \mid Z_i=1\right] - \E\left[ X_{i} \mid Z_i=0\right]} 
+	&= \E\left[\beta_{i}\left(X_{i1}-X_{i0}\right) \mid X_{i1}-X_{i0}=1\right]\\
+	&= \E\left[\beta_{i} \mid X_{i1}-X_{i0}=1\right]
+	\end{align*}
 
-\item We now have that our IV estimator equals the {\bf local average treatment effect}, which means the average effect on the individuals whose treatment
-status is changed by the instrument. 
+	\item We now have that our IV estimator equals the {\bf local average treatment effect}, which means the average effect on the individuals whose treatment
+	status is changed by the instrument. 
 
 \end{itemize}
 \end{frame}
@@ -601,6 +590,7 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \end{enumerate}
 \end{frame}
 
+
 \begin{frame}{Thinking About Exogeneity}
 \begin{itemize}
 \item Exogeneity: $Cov(Z,\varepsilon)= 0$
@@ -638,9 +628,6 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \begin{itemize}
 \item so $Z$ affects Y through \emph{another} $X$
 \end{itemize}
-
-
-
 \end{itemize}
 \end{enumerate}
 \begin{itemize}
@@ -675,9 +662,8 @@ Of course we could question the instrument's validity.
 \end{frame}
 
 \begin{frame}{Two Stage Least Squares}
+A popular IV estimator is Two Stage Least Squares (2SLS)
 \begin{itemize}
-\item A popular IV estimator is Two Stage Least Squares (2SLS)
-\medskip
 \item This effectively runs regression $Y_i=\beta_0 + \beta_1 Z_i + \varepsilon_i$, but \emph{scales} $\beta_1$ by how much $Z$ affects $X$
 \begin{itemize}
 \item If $Z$ affects $X$ at one-to-one rate, $\beta_1$ in above regression will capture effect of $X$
@@ -709,23 +695,23 @@ Y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i
 \end{frame}
 
 
-%\begin{frame}{2SLS Estimator}
-%\begin{itemize}
-%\item Why is $\hat{\beta}_1^{2SLS}=\frac{Cov(Y,Z)}{Cov(X,Z)}$?
-%\medskip
-%\item True model:
-%\begin{align*}
-%Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
-%\end{align*}
-%\item Take covariance of both sides with respect to $Z$:
-%\begin{align*}
-%Cov(Y_i, Z_i)&=Cov(\beta_0 + \beta_1 X_i + \varepsilon_i, Z_i) \\
-%Cov(Y_i, Z_i)& = Cov(\beta_0, Z_i) + Cov(\beta_1 X_i, Z_i) + Cov(\varepsilon_i, Z_i)\\
-%Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilon_i, Z_i)$ by assumption} \\
-%\implies & \beta_1 =\frac{Cov(Y,Z)}{Cov(X,Z)}
-%\end{align*}
-%\end{itemize}
-%\end{frame}
+\begin{frame}{2SLS Estimator}
+\begin{itemize}
+\item Why is $\hat{\beta}_1^{2SLS}=\frac{Cov(Y,Z)}{Cov(X,Z)}$?
+\medskip
+\item True model:
+\begin{align*}
+Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
+\end{align*}
+\item Take covariance of both sides with respect to $Z$:
+\begin{align*}
+Cov(Y_i, Z_i)&=Cov(\beta_0 + \beta_1 X_i + \varepsilon_i, Z_i) \\
+Cov(Y_i, Z_i)& = Cov(\beta_0, Z_i) + Cov(\beta_1 X_i, Z_i) + Cov(\varepsilon_i, Z_i)\\
+Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilon_i, Z_i)$ by assumption} \\
+\implies & \beta_1 =\frac{Cov(Y,Z)}{Cov(X,Z)}
+\end{align*}
+\end{itemize}
+\end{frame}
 
 
 \begin{frame}[fragile]\frametitle{Single Variable IV in \texttt{R}: Manually}
@@ -741,41 +727,33 @@ Y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i
 \medskip
 \item Step 1: Regress $X_i=\pi_0 + \pi_1 Z_i + v_i$ and get predicted study time, $\hat{X}_i$
 \begin{itemize}
-\item Data\$xHat = predict(lm(X$\sim$Z, data=Data))
+\item \texttt{Data\$xHat = predict(feols(X$\sim$Z, data=Data))}
 \end{itemize}
 \item Step 2: Regress $y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i$
 \begin{itemize}
-\item m3 = lm(Y$\sim$xHat, data=Data)
-\item coeftest(m3, vcov = vcovHC(m3, type = ``HC1"))
+\item \texttt{m3 = feols(Y$\sim$xHat, data=Data)}
+\item \texttt{summary(m3, vcov = vcovHC(m3, type = ``HC1"))}
 \begin{itemize}
 \item Note: Standard errors will be wrong!
 \end{itemize}
 \end{itemize}
 	\begin{itemize}{\small
 		\item \texttt{predict} gives the fitted values of $X$ from the first stage
-		\item Then \texttt{lm} can be used to get the second stage
+		\item Then \texttt{feols} can be used (again) to get the second stage
 		\item Problem: the standard errors (even robust) will be wrong}
 	\end{itemize}
 	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]\frametitle{Doing Single Variable IV in \texttt{R}: All at once}
+\texttt{R} can run 2SLS all at once:
 \begin{itemize}
-\item Need a package called \texttt{AER} for this
-\begin{itemize}
-\item install.packages(``AER")
-\item library(AER)
+\item \texttt{m4 = feols(Y $\sim$ W $\mid$ X $\sim$  Z, data=Data)}
+\item First formula: Regress $Y$ on \alert{exogenous controls} $W$ (and endogenous $X$)
+\item Second formula: Write \alert{first-stage} regression for \alert{endogenous} $X$ (included in second stage automatically)
+\item \texttt{feols} will also adjust standard errors
 \end{itemize}
-\medskip
-\item \texttt{R} can run 2SLS all at once:
-\medskip
-\item m4 = ivreg(Y $\sim$ X $|$ Z, data=Data)
-\medskip
-\item Use new standard error command to get ``right" standard errors:
-\begin{itemize}
-\item coeftest(m4, vcov=sandwich)
-\end{itemize}
-	\end{itemize}
+This is basically why we use \texttt{feols} whenever we can.
 \end{frame}
 
 
@@ -807,7 +785,7 @@ endogenous regressor.
 \item The 2SLS formula is now
 \begin{align*}
 \boldsymbol{b}_{2SLS}=\left(\hat{\boldsymbol{X}}'\hat{\boldsymbol{X}}\right)^{-1}\hat{\boldsymbol{X}}'\boldsymbol{y}\\
-	ext{with }\hat{\boldsymbol{X}}=\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}
+	\text{with }\hat{\boldsymbol{X}}=\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}
 \end{align*}
 \smallskip
 \item With homoscedasticity, the asymptotic variance of the estimator is
@@ -824,17 +802,16 @@ Var\left(\boldsymbol{b}_{2SLS}\right)=\frac{s^{2}}{n}\left[\boldsymbol{Z}'\bolds
 
 
 \begin{frame}[fragile]\frametitle{Doing General IV Case in \texttt{R}}
+IV w/ controls
 \begin{itemize}
-\item  IV w/ controls
-\item m5 = ivreg(workedm $\sim$ morekids + boy1st + boy2nd + black + hispan + othrace + agem1 + agefstm $|$
-			samesex + black + hispan + othrace + agem1 + agefstm+ boy1st + boy2nd, data=babyData)
-\item Standard errors: \\
-coeftest(m5, vcov=sandwich)
+\item \texttt{m5 = feols(workedm $\sim$ morekids + boy1st + boy2nd + black + hispan + othrace + agem1 + agefstm $|$
+			samesex $\sim$ boy1st + boy2nd, data=babyData)}
 	\item Still use the pipe to define the first stage
-	\item Need to include all exogenous variables on BOTH sides of the pipe!
+	\item Need to include \alert{only excluded instruments} in the second equation!
+	\item Syntax differs for different packages $\rightarrow$ Be careful!
 \end{itemize}
-
 \end{frame}
+
 
 
 \begin{frame}{Comparing 2SLS Variance to OLS Variance}{under Homoscedasticity}
@@ -854,9 +831,7 @@ For the single-variable case, we can show that
 \end{frame}
 
 
-
 \begin{frame}{Unbiasedness ``Proof''}
-
 \begin{align*}
 \E[\hat{\beta}_1^{2SLS}]&=\E\left[\frac{\sum\limits_{i=1}^N(z_i-\bar{z})(y_i-\bar{y})}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] \\
 &=\beta_1 + \E\left[ \frac{\sum\limits_{i=1}^N(z_i-\bar{z})\varepsilon_i}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] =\beta_1 + 0
@@ -866,7 +841,6 @@ For the single-variable case, we can show that
 
 
 \begin{frame}{Checking The IV Assumptions I}
-
 \begin{itemize}
 \item The two major assumptions:
 \begin{enumerate}
@@ -888,9 +862,10 @@ For the single-variable case, we can show that
 
 \begin{frame}{Weak Instruments I}
 \begin{itemize}
-	\item In finite samples there's a possibility that the sample covariance\[
+	\item In finite samples there's a possibility that the sample covariance
+	\begin{align*}
 	\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})
-		\]
+	\end{align*}
 	is close to zero, especially if the true covariance is relatively small.
 	\medskip
 	\item Dividing by zero is \emph{bad}.
@@ -903,7 +878,6 @@ For the single-variable case, we can show that
 
 
 \begin{frame}{Weak Instruments II}
-
 \begin{itemize}
 \item There is \textbf{big} problem with IV estimation: 2SLS performs \textbf{terribly} in small samples
 \medskip
@@ -931,13 +905,14 @@ Suppose that $Z$ is \emph{a bad instrument} in that $Cov(Z,\varepsilon)$ are cor
 
 \begin{itemize}
 	\item Similar to OVB
-		\[
+		\begin{align*}
 			\hat\beta_1^{IV}  \to \beta_1 + \frac{Cov(Z,\varepsilon)}{Cov(Z,X)}\times\frac{\sigma_\varepsilon}{\sigma_X}
-		\]
+		\end{align*}
 	\item Compare to OLS case (biased because of OVB):
-		\[
+		\begin{align*}
 			\hat\beta_1^{OLS} \to \beta_1 + Cov(X,\varepsilon)\times\frac{\sigma_\varepsilon}{\sigma_X}
-		\]
+		\end{align*}
+
 	\item Which estimator is better here?
 		\begin{itemize}
 			\item IV's advantage is $Corr(Z,\varepsilon)$ should be smaller than $Corr(X,\varepsilon)$
@@ -950,17 +925,14 @@ Suppose that $Z$ is \emph{a bad instrument} in that $Cov(Z,\varepsilon)$ are cor
 			\item Amplified bias may have different sign than OLS
 		\end{itemize}
 \end{itemize}
-
-
-
 \end{frame}
 
 \begin{frame}{Weak Instruments and Inference}
 
 To do inference we rely on the CLT:
-\[
+\begin{align*}
 	\hat\beta^{IV} \sim \mathcal{N}\left(\beta, Var\left(\hat\beta^{IV}\right)\right)
-\]
+\end{align*}
 
 \begin{itemize}
 	\item First issue: the Normal Approximation fails unless $N$ is huge! (the CLT does not work well)
@@ -1018,7 +990,7 @@ Some clarification:
 		be wary if \emph{any} of them suggests a weak instrument problem.
 		\medskip
 		\item Many have argued that the $F>10$ cutoff is not stringent enough. See, for example, 
-		\href{https://arxiv.org/abs/2010.05058}{Lee, McCrary, Moreira, and Porter} 
+		\url{https://arxiv.org/abs/2010.05058}{Lee, McCrary, Moreira, and Porter} 
 
 \end{itemize}
 \end{frame}
@@ -1039,9 +1011,9 @@ The model:
 \end{frame}
 
 \begin{frame}{The Sampling Distribution of $\hat\beta$}
-\[
+\begin{align*}
 	Y = 1 + 2 X + \varepsilon
-\]
+\end{align*}
 
 \begin{figure}
 \centering \caption{\small Distribution of $\hat\beta$ for OLS, strong IV, weak IV with $N=100$}
@@ -1051,20 +1023,18 @@ The model:
 \begin{itemize}{\footnotesize
 \item OLS is biased with $\mu=2.27$ and $\sigma^2=.008$
 \item Strong IV is unbiased (asymptotically) with $\mu=1.99$ and $\sigma^2 = .024$
-\item Weak IV is unbiased (asymptotically) with $\mu=2.05$ but $\mathbf{\sigma^2 = 1653.11}$
-
+\item Weak IV is unbiased (asymptotically) with $\mu=2.05$ but $\symbf{\sigma^2 = 1653.11}$
 }
 \end{itemize}
-
 
 \end{frame}
 
 
 
 \begin{frame}{The Sampling Distribution of $\hat\beta$}
-\[
+\begin{align*}
 	Y = 1 + 2 X + \varepsilon
-\]
+\end{align*}
 
 \begin{figure}
 \centering \caption{\small Distribution of $\hat\beta$ for OLS, weak IV, strong IV with $N=10000$}
@@ -1077,14 +1047,10 @@ The model:
 \item Weak IV is consistent with $\mu=2.05$ and even with $N=10k$, $\sigma^2 = .05$
 	\begin{itemize}{\scriptsize
 		\item Still over 100x larger variance than strong instruments!
-
 	}
 	\end{itemize}
-
 }
 \end{itemize}
-
-
 \end{frame}
 
 
@@ -1120,7 +1086,7 @@ The model:
 \begin{itemize}
 \item The two major assumptions:
 \begin{enumerate}
-	\item Relevance: $Cov(X,Z)\ne 0$, or that $E\left[{\bf z}_i {\bf x}_i' \right]$ has full rank
+	\item Relevance: $Cov(X,Z)\ne 0$, or that $\E\left[{\bf z}_i {\bf x}_i' \right]$ has full rank
 
 	\item Exogeneity: All instruments must be uncorrelated with $\varepsilon$
 \end{enumerate}
@@ -1278,24 +1244,21 @@ Exogeneity Assumption:
 
 \begin{frame}{Operationalizing the Intuition}{Defining the $J$ Statistic}
 
-	\begin{itemize}
-		\item Procedure to Test Overidentifying Restrictions
+		Procedure to Test Overidentifying Restrictions
 			\begin{enumerate}
 				\item Estimate the model using 2SLS
 				\item Compute $e_i$ with $X_i$ (not $\hat X_i$):
-					\[
+					\begin{align*}
 						e_i = Y_i - \hat\beta_0 - \hat\beta_1 X_i^{(1)} - ... \hat\beta_m X_i^{(k)}
-					\]
+					\end{align*}
 				\item Regress $e_i$ on all $Z$'s and exogenous variables:
-				\[
+				\begin{align*}
 					e_i = \alpha_0 + \alpha_1 Z_i^{(1)} + ... +\alpha_m Z_i^{(m)} +  Exogenous + \varepsilon_i
-				\]
+				\end{align*}
 				\item Compute the $F$ statistic for $\alpha_1=...=\alpha_m=0$ but do \emph{not} do the standard $F$ test
 (degrees of freedom would be wrong)
 				\item Compute $J = mF$, where $m$ is the number of instruments
 			\end{enumerate}
-
-	\end{itemize}
 \end{frame}
 
 
@@ -1339,7 +1302,6 @@ Exogeneity Assumption:
 
 			\end{itemize}
 \end{itemize}
-
 \end{frame}
 
 \iffalse
@@ -1433,475 +1395,475 @@ Which implies...
 
 \end{frame}
 
-\begin{frame}{Understanding Simultaneity Bias}
+% \begin{frame}{Understanding Simultaneity Bias}
 
-OLS with Simultaneity:
-\[
-	\hat\beta_1^{OLS} \to \beta_1 + (1-\alpha_1\beta_1)\times\frac{\alpha_1\sigma^2_\varepsilon + \sigma_{\varepsilon\nu}}{\alpha_1^2\sigma^2_\varepsilon + \sigma^2_\nu + 2\alpha_1 \sigma_{\varepsilon\nu}}
-\]
+% OLS with Simultaneity:
+% \[
+% 	\hat\beta_1^{OLS} \to \beta_1 + (1-\alpha_1\beta_1)\times\frac{\alpha_1\sigma^2_\varepsilon + \sigma_{\varepsilon\nu}}{\alpha_1^2\sigma^2_\varepsilon + \sigma^2_\nu + 2\alpha_1 \sigma_{\varepsilon\nu}}
+% \]
 
-Consider the special case that $\varepsilon$ and $\nu$ are independent:
-\[
-	\hat\beta_1^{OLS} = \beta_1 \frac{\sigma^2_\nu}{\sigma^2_\nu + \alpha_1^2\sigma^2_\varepsilon} + \frac{1}{\alpha_1} \frac{\alpha_1^2\sigma^2_\varepsilon}{\sigma^2_\nu + \alpha_1^2 \sigma^2_\varepsilon}
-\]
+% Consider the special case that $\varepsilon$ and $\nu$ are independent:
+% \[
+% 	\hat\beta_1^{OLS} = \beta_1 \frac{\sigma^2_\nu}{\sigma^2_\nu + \alpha_1^2\sigma^2_\varepsilon} + \frac{1}{\alpha_1} \frac{\alpha_1^2\sigma^2_\varepsilon}{\sigma^2_\nu + \alpha_1^2 \sigma^2_\varepsilon}
+% \]
 
-\begin{itemize}
-	\item OLS becomes a weighted average of two pieces:
-		\begin{enumerate}
-			\item $\beta_1$: the effect of $X$ on $Y$
-			\item $1/\alpha_1$: the feedback loop from $Y$ to $X$ back to $Y$
-		\end{enumerate}
- 	\item This is {\bf simultaneity bias}
+% \begin{itemize}
+% 	\item OLS becomes a weighted average of two pieces:
+% 		\begin{enumerate}
+% 			\item $\beta_1$: the effect of $X$ on $Y$
+% 			\item $1/\alpha_1$: the feedback loop from $Y$ to $X$ back to $Y$
+% 		\end{enumerate}
+%  	\item This is {\bf simultaneity bias}
 
-\end{itemize}
-
-
-\end{frame}
-
-\begin{frame}{IV Can Solve Simultaneity Bias}
-
-Why cover simultaneity bias \emph{now}?
-
-\vspace{3mm}
-
-New Model:
-\begin{align*}
-	Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
-	X_i =& \alpha_0 + \alpha_1 Z_i + \alpha_2 Y_i + \nu_i
-\end{align*}
-
-\begin{itemize}
-	\item If we have data on $Z$, we can potentially use $Z$ as an instrument!
-	\item What conditions would $Z$ have to fulfill?
-		\begin{enumerate}
-			\item Instrument Relevance: $\alpha_1>0$
-			\item Instrument Exogeneity: $Cov(Z_i,\varepsilon_i)=0$
-		\end{enumerate}
-
-\end{itemize}
-
-\end{frame}
+% \end{itemize}
 
 
+% \end{frame}
 
-\begin{frame}{Example: Angrist \& Evans}
+% \begin{frame}{IV Can Solve Simultaneity Bias}
 
-Model:
-\begin{align*}
-Hours_i =& \beta_0 + \beta_1 Children_i + \varepsilon_i\\
-Children_i =& \alpha_0 + \alpha_1 Hours_i + \alpha_2 SameSex_i + \nu_i
-\end{align*}
+% Why cover simultaneity bias \emph{now}?
 
-\begin{itemize}
-	\item $SameSex$: indicator for whether first two children have same sex
-	\item Hours and children are determined jointly
-	\item Also $Cov(\varepsilon,\nu)$ is unlikely to be 0
-		\begin{itemize}{\footnotesize
-			\item Education can matter for both number of children and hours worked (so education is part of $\varepsilon$ and $\nu$)
-			\item Being married may matter for both
-			\item Quality of non-financial benefits (e.g., maternity leave)
+% \vspace{3mm}
 
-			}
-		\end{itemize}
-	\item So formally, the instrument $SameSex$ is supposed to help solve simultaneity
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Example: Angrist \& Evans}
-\begin{center}
-\includegraphics[scale=.45]{AE_tab8}
-\end{center}
-\end{frame}
-
-
-\begin{frame}{Example: Porter (1983)}
-\begin{itemize}
-	\item The Joint Executive Committee's (19th Century railroad cartel)
-	main business was transporting grain from Midwest to ports on East Coast.
-
-	\item Porter (1983) estimates the following simultaneous system:\[
-\begin{array}{cccc}
-\text{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
-\\
-\text{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
-\end{array}
-\]
-where
-\begin{itemize}
-\item $Q_{t}$ is the quantity (tonnage of grain) transported by the JEC
-\item $P_{t}$ is the price per ton of grain transported
-\item $L_{t}$ is a dummy for whether the Great Lakes were open to navigation
-\item $S_{t}$ is a vector of time dummies
-\item $I_{t}$ is an indicator for whether the JEC was colluding
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Example: Porter (1983)}
-\begin{align*}
-	ext{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
-\\
-	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
-\end{align*}
-\begin{align*}
-	ext{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
-\\
-	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
-\end{align*}
-\end{frame}
+% New Model:
 % \begin{align*}
-% 	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
-% \\
-% 	ext{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
+% 	Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
+% 	X_i =& \alpha_0 + \alpha_1 Z_i + \alpha_2 Y_i + \nu_i
 % \end{align*}
 
+% \begin{itemize}
+% 	\item If we have data on $Z$, we can potentially use $Z$ as an instrument!
+% 	\item What conditions would $Z$ have to fulfill?
+% 		\begin{enumerate}
+% 			\item Instrument Relevance: $\alpha_1>0$
+% 			\item Instrument Exogeneity: $Cov(Z_i,\varepsilon_i)=0$
+% 		\end{enumerate}
 
-\begin{frame}{Example: Roberts and Schlenker (2013)}
-\begin{itemize}
-	\item How much does the biofuels mandate increase the price of grains?
-	It depends on supply and demand.
+% \end{itemize}
 
-	\item Roberts and Schlenker (2013) estimate the following supply and demand equations:\[
-\begin{array}{cccl}
-\text{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
-\begin{align*}
-\E\left[\boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}_0\right) \right]=0,
-\end{align*}
-where
-\begin{itemize}
-\item $Q_{st}$ is global grain supply (calories)
-\item $Q_{dt}$ is global grain consumption ($Q_{st}\ne Q_{dt}$ because
-of storage)
-\item The prices are measured at different times (planting vs harvest time)
-\item $\omega_{t}$ is a yield shock (due to weather), used as an instrument
-for demand
-\item $\omega_{t-1}$ is used as an instrument for supply (through storage,
-past production matters for current prices)
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Example: Roberts and Schlenker (2013)}
-\begin{center}
-\includegraphics[scale=.5]{RS_t1}
-\end{center}
-\end{frame}
+% \end{frame}
 
 
 
-%\begin{frame}{More weather-based IVs}
-%From \href{https://www.iaee.org/en/publications/ejarticle.aspx?id=2243}{Hughes, Knittel, Sperling (2008)}
-%\begin{center}
-%\includegraphics[width=.9\textwidth]{Katrina_iv}
-%\end{center}
-%\end{frame}
+% \begin{frame}{Example: Angrist \& Evans}
+
+% Model:
+% \begin{align*}
+% Hours_i =& \beta_0 + \beta_1 Children_i + \varepsilon_i\\
+% Children_i =& \alpha_0 + \alpha_1 Hours_i + \alpha_2 SameSex_i + \nu_i
+% \end{align*}
+
+% \begin{itemize}
+% 	\item $SameSex$: indicator for whether first two children have same sex
+% 	\item Hours and children are determined jointly
+% 	\item Also $Cov(\varepsilon,\nu)$ is unlikely to be 0
+% 		\begin{itemize}{\footnotesize
+% 			\item Education can matter for both number of children and hours worked (so education is part of $\varepsilon$ and $\nu$)
+% 			\item Being married may matter for both
+% 			\item Quality of non-financial benefits (e.g., maternity leave)
+
+% 			}
+% 		\end{itemize}
+% 	\item So formally, the instrument $SameSex$ is supposed to help solve simultaneity
+% \end{itemize}
+% \end{frame}
+
+
+% \begin{frame}{Example: Angrist \& Evans}
+% \begin{center}
+% \includegraphics[scale=.45]{AE_tab8}
+% \end{center}
+% \end{frame}
+
+
+% \begin{frame}{Example: Porter (1983)}
+% \begin{itemize}
+% 	\item The Joint Executive Committee's (19th Century railroad cartel)
+% 	main business was transporting grain from Midwest to ports on East Coast.
+
+% 	\item Porter (1983) estimates the following simultaneous system:\[
+% \begin{array}{cccc}
+% \text{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+% \\
+% \text{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+% \end{array}
+% \]
+% where
+% \begin{itemize}
+% \item $Q_{t}$ is the quantity (tonnage of grain) transported by the JEC
+% \item $P_{t}$ is the price per ton of grain transported
+% \item $L_{t}$ is a dummy for whether the Great Lakes were open to navigation
+% \item $S_{t}$ is a vector of time dummies
+% \item $I_{t}$ is an indicator for whether the JEC was colluding
+% \end{itemize}
+% \end{itemize}
+% \end{frame}
+
+% \begin{frame}{Example: Porter (1983)}
+% \begin{align*}
+% 	ext{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+% \\
+% 	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+% \end{align*}
+% \begin{align*}
+% 	ext{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+% \\
+% 	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+% \end{align*}
+% \end{frame}
+% % \begin{align*}
+% % 	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
+% % \\
+% % 	ext{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
+% % \end{align*}
+
+
+% \begin{frame}{Example: Roberts and Schlenker (2013)}
+% \begin{itemize}
+% 	\item How much does the biofuels mandate increase the price of grains?
+% 	It depends on supply and demand.
+
+% 	\item Roberts and Schlenker (2013) estimate the following supply and demand equations:\[
+% \begin{array}{cccl}
+% \text{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
+% \begin{align*}
+% \E\left[\boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}_0\right) \right]=0,
+% \end{align*}
+% where
+% \begin{itemize}
+% \item $Q_{st}$ is global grain supply (calories)
+% \item $Q_{dt}$ is global grain consumption ($Q_{st}\ne Q_{dt}$ because
+% of storage)
+% \item The prices are measured at different times (planting vs harvest time)
+% \item $\omega_{t}$ is a yield shock (due to weather), used as an instrument
+% for demand
+% \item $\omega_{t-1}$ is used as an instrument for supply (through storage,
+% past production matters for current prices)
+% \end{itemize}
+% \end{itemize}
+% \end{frame}
+
+% \begin{frame}{Example: Roberts and Schlenker (2013)}
+% \begin{center}
+% \includegraphics[scale=.5]{RS_t1}
+% \end{center}
+% \end{frame}
 
 
 
-\begin{frame}{Simultaneity more examples}
-\begin{itemize}
-	\item \href{https://www.ptscott.com/papers/telecom_infrastructure.pdf}{Download speeds and mobile data consumption}:
-		Consumers use their smart phones more when download speeds are fast, but high usage leads to congestion, which slows
-		down speeds.
-
-	\bigskip
-	\item Road investment and travel demand: better roads are more appealing to travelers, and highly-used routes are likely
-		to receive more funding .
-
-	\bigskip
-	\item Public opinion influences policy, and policy influences public opinion (cigarettes, parental leave, same-sex marriage). 
-
-	\bigskip
-	\item Intensity of policing and crime rates. 
-\end{itemize}
-\end{frame}
+% %\begin{frame}{More weather-based IVs}
+% %From \href{https://www.iaee.org/en/publications/ejarticle.aspx?id=2243}{Hughes, Knittel, Sperling (2008)}
+% %\begin{center}
+% %\includegraphics[width=.9\textwidth]{Katrina_iv}
+% %\end{center}
+% %\end{frame}
 
 
 
-\begin{frame}{Measurement Error}
+% \begin{frame}{Simultaneity more examples}
+% \begin{itemize}
+% 	\item \href{https://www.ptscott.com/papers/telecom_infrastructure.pdf}{Download speeds and mobile data consumption}:
+% 		Consumers use their smart phones more when download speeds are fast, but high usage leads to congestion, which slows
+% 		down speeds.
 
-The problem: the $X$ variable is measured with noise
+% 	\bigskip
+% 	\item Road investment and travel demand: better roads are more appealing to travelers, and highly-used routes are likely
+% 		to receive more funding .
 
-\begin{itemize}
-	\item The idea mathematically:
-		\begin{align*}
-			\text{\bf{TRUTH}:} Y &= \beta_0 + \beta_1 X + \varepsilon \\
-			\text{\bf{DATA}:}  Y &= \beta_0 + \beta_1 X^* + \varepsilon^*
-		\end{align*}
-		where $X^*$ is a noisy measure of $X$
-	\item Examples: 
-	\begin{itemize}
-		\item Recording errors in data entry
-		\item Recollection errors in survey data (these are frequent)
-		\item Rounding errors
-		\item Hard to measure variables (e.g., a firm's capital stock)
-	\end{itemize}
-	\item Note: we can also have measurement error in $Y$. Turns out these behave differently
-\end{itemize}
+% 	\bigskip
+% 	\item Public opinion influences policy, and policy influences public opinion (cigarettes, parental leave, same-sex marriage). 
+
+% 	\bigskip
+% 	\item Intensity of policing and crime rates. 
+% \end{itemize}
+% \end{frame}
+
+
+
+% \begin{frame}{Measurement Error}
+
+% The problem: the $X$ variable is measured with noise
+
+% \begin{itemize}
+% 	\item The idea mathematically:
+% 		\begin{align*}
+% 			\text{\bf{TRUTH}:} Y &= \beta_0 + \beta_1 X + \varepsilon \\
+% 			\text{\bf{DATA}:}  Y &= \beta_0 + \beta_1 X^* + \varepsilon^*
+% 		\end{align*}
+% 		where $X^*$ is a noisy measure of $X$
+% 	\item Examples: 
+% 	\begin{itemize}
+% 		\item Recording errors in data entry
+% 		\item Recollection errors in survey data (these are frequent)
+% 		\item Rounding errors
+% 		\item Hard to measure variables (e.g., a firm's capital stock)
+% 	\end{itemize}
+% 	\item Note: we can also have measurement error in $Y$. Turns out these behave differently
+% \end{itemize}
 
 	
-\end{frame}
+% \end{frame}
 
-\begin{frame}{Visualizing Measurement Error: Self-Reported Australian Incomes}
+% \begin{frame}{Visualizing Measurement Error: Self-Reported Australian Incomes}
 	
-Survey question: What is your income in thousands? 
+% Survey question: What is your income in thousands? 
 
-\begin{figure}[H]
-	\includegraphics[width=.575\textwidth]{measurementErrorPlot.pdf}	
-\end{figure}
+% \begin{figure}[H]
+% 	\includegraphics[width=.575\textwidth]{measurementErrorPlot.pdf}	
+% \end{figure}
 	
-	\begin{itemize}{\scriptsize
-		\item The lumps occur at 5s and 0s
-		\item E.g., people making 41k might say ``40" or ``45" instead of 41
+% 	\begin{itemize}{\scriptsize
+% 		\item The lumps occur at 5s and 0s
+% 		\item E.g., people making 41k might say ``40" or ``45" instead of 41
 			
-		}
-	\end{itemize}
+% 		}
+% 	\end{itemize}
 
 	
-\end{frame}
+% \end{frame}
 
-\begin{frame}{Measurement Error in $X$}{The Math of Measurement Error}
+% \begin{frame}{Measurement Error in $X$}{The Math of Measurement Error}
 
 	
-\begin{itemize}
-	\item Consider adding and subtracting noise to the truth:
-		\begin{align*}
-			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
-				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
-				=& \beta_0 + \beta_1 X_i^* + V_i
-		\end{align*}
-	\item $X_i^*$ and $V_i$ likely to be correlated because $X^*$ is part of $V$
-	\item Extra assumptions:
-		\begin{itemize}
-			\item {\bf Classical Errors-in-Variables:}
-				\[
-					X_i = X_i^* + u_i
-				\begin{align*}
-				n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
-				\end{align*}
-		\end{itemize}
+% \begin{itemize}
+% 	\item Consider adding and subtracting noise to the truth:
+% 		\begin{align*}
+% 			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
+% 				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
+% 				=& \beta_0 + \beta_1 X_i^* + V_i
+% 		\end{align*}
+% 	\item $X_i^*$ and $V_i$ likely to be correlated because $X^*$ is part of $V$
+% 	\item Extra assumptions:
+% 		\begin{itemize}
+% 			\item {\bf Classical Errors-in-Variables:}
+% 				\[
+% 					X_i = X_i^* + u_i
+% 				\begin{align*}
+% 				n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
+% 				\end{align*}
+% 		\end{itemize}
 
-\end{itemize}
+% \end{itemize}
 	
 	
-\end{frame}
+% \end{frame}
 
 
-\begin{frame}{Measurement Error in $X$}{Classical Measurement Error}
+% \begin{frame}{Measurement Error in $X$}{Classical Measurement Error}
 
-Under classical measurement error:
-	\[
-		Y_i = \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1u_i + \varepsilon_i}_{V_i}
-	\]
-\begin{itemize}
-	\item Using the population definition of $\hat\beta^{OLS}$:{\small
-		\begin{align*}
-			\hat\beta^{OLS}\to & \frac{Cov(X^*,Y)}{Var(X^*)}\\
-							=&\frac{Cov(X+u,\beta_0 + \beta_1 X + \varepsilon)}{Var(X+u)}\\
-							=&\frac{Cov(X,\beta_0 + \beta_1 X + \varepsilon) + Cov(u,\beta_0 + \beta_1 X + \varepsilon)}{Var(X+u)}\\
-							=& \frac{\beta_1 Cov(X,X) + 0}{Var(X+u)}
-		\end{align*}}
+% Under classical measurement error:
+% 	\[
+% 		Y_i = \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1u_i + \varepsilon_i}_{V_i}
+% 	\]
+% \begin{itemize}
+% 	\item Using the population definition of $\hat\beta^{OLS}$:{\small
+% 		\begin{align*}
+% 			\hat\beta^{OLS}\to & \frac{Cov(X^*,Y)}{Var(X^*)}\\
+% 							=&\frac{Cov(X+u,\beta_0 + \beta_1 X + \varepsilon)}{Var(X+u)}\\
+% 							=&\frac{Cov(X,\beta_0 + \beta_1 X + \varepsilon) + Cov(u,\beta_0 + \beta_1 X + \varepsilon)}{Var(X+u)}\\
+% 							=& \frac{\beta_1 Cov(X,X) + 0}{Var(X+u)}
+% 		\end{align*}}
 		
 		
-\end{itemize}
+% \end{itemize}
 	
 	
-\end{frame}
+% \end{frame}
 
-\begin{frame}{Measurement Error in $X$}{Classical Measurement Error, Cont'd}
+% \begin{frame}{Measurement Error in $X$}{Classical Measurement Error, Cont'd}
 
-\begin{itemize}
-	\item Continuing from above:{\small
-		\begin{align*}
-			\hat\beta^{OLS}\to & \frac{\beta_1 Cov(X,X) + 0}{Var(X+u)}\\
-							=& \beta_1\times\frac{Var(X)}{Var(X+u)}\\
-							=& \beta_1\times\underbrace{\frac{\sigma^2_X}{\sigma^2_X + \sigma^2_u}}_{\text{Attenuation}}
-		\end{align*}}
-	\item Estimated coefficient converges to the truth times an attenuation term
-		\begin{itemize}
-			\item Attenuation term is less than 1 $\Rightarrow$ pushes coefficient towards zero
-			\begin{itemize}
-			\item {\bf NB:} It does \emph{not} make the term more negative---it dampens the coefficient and preserves the sign
-			\end{itemize}
-			\item This ``attenuates" the effect of $X$ on $Y$. Hence the name: {\bf attenuation bias}
-		\end{itemize}
+% \begin{itemize}
+% 	\item Continuing from above:{\small
+% 		\begin{align*}
+% 			\hat\beta^{OLS}\to & \frac{\beta_1 Cov(X,X) + 0}{Var(X+u)}\\
+% 							=& \beta_1\times\frac{Var(X)}{Var(X+u)}\\
+% 							=& \beta_1\times\underbrace{\frac{\sigma^2_X}{\sigma^2_X + \sigma^2_u}}_{\text{Attenuation}}
+% 		\end{align*}}
+% 	\item Estimated coefficient converges to the truth times an attenuation term
+% 		\begin{itemize}
+% 			\item Attenuation term is less than 1 $\Rightarrow$ pushes coefficient towards zero
+% 			\begin{itemize}
+% 			\item {\bf NB:} It does \emph{not} make the term more negative---it dampens the coefficient and preserves the sign
+% 			\end{itemize}
+% 			\item This ``attenuates" the effect of $X$ on $Y$. Hence the name: {\bf attenuation bias}
+% 		\end{itemize}
 		
-\end{itemize}
+% \end{itemize}
 	
 	
-\end{frame}
+% \end{frame}
 
-\begin{frame}{Measurement Error in $X$}{Classical Measurement Error Intuition}	
-	\begin{itemize}
-		\item Why does measurement error attenuate the estimated effect of $X$ on $Y$?
-		\begin{itemize}
-			\item Noise in measured $X$ makes it more likely to see high $X$ and low $X$ with some $Y$ because of randomness
-			\item Extreme example: fix $X$ and keep adding noise---eventually $X^*$ will look like noise itself
-		\end{itemize}	
-		\item Notice the following rearranging of the attenuation term:
-			\[
-				\frac{\sigma^2_X}{\sigma^2_X + \sigma^2_u} = \frac{1}{1+(\sigma^2_u/\sigma^2_X)}
-			\]
-			\begin{itemize}
-				\item $\sigma^2_X/\sigma^2_u$ is called the {\bf signal-to-noise ratio}
-				\item Larger signal to noise ratio $\Rightarrow$ smaller bias
-				\item What matter is the \emph{relative} variance of $X$ to $u$
-				\item If $\sigma^2_u$ is small \emph{relative} to $\sigma^2_X$ then attenuation bias isn't too large
-			\end{itemize}
-	\end{itemize}
-\end{frame}
+% \begin{frame}{Measurement Error in $X$}{Classical Measurement Error Intuition}	
+% 	\begin{itemize}
+% 		\item Why does measurement error attenuate the estimated effect of $X$ on $Y$?
+% 		\begin{itemize}
+% 			\item Noise in measured $X$ makes it more likely to see high $X$ and low $X$ with some $Y$ because of randomness
+% 			\item Extreme example: fix $X$ and keep adding noise---eventually $X^*$ will look like noise itself
+% 		\end{itemize}	
+% 		\item Notice the following rearranging of the attenuation term:
+% 			\[
+% 				\frac{\sigma^2_X}{\sigma^2_X + \sigma^2_u} = \frac{1}{1+(\sigma^2_u/\sigma^2_X)}
+% 			\]
+% 			\begin{itemize}
+% 				\item $\sigma^2_X/\sigma^2_u$ is called the {\bf signal-to-noise ratio}
+% 				\item Larger signal to noise ratio $\Rightarrow$ smaller bias
+% 				\item What matter is the \emph{relative} variance of $X$ to $u$
+% 				\item If $\sigma^2_u$ is small \emph{relative} to $\sigma^2_X$ then attenuation bias isn't too large
+% 			\end{itemize}
+% 	\end{itemize}
+% \end{frame}
 
-\begin{frame}{Visualizing Measurement Error}
-	\begin{figure}[h]
-	\only<1>{
-		\includegraphics[width=.7\textwidth]{measurementErrorExample_1.pdf}
-	}
-	\only<2>{
-		\includegraphics[width=.7\textwidth]{measurementErrorExample_2.pdf}
-	}
-	\only<3>{
-		\includegraphics[width=.7\textwidth]{measurementErrorExample_3.pdf}
-	}
-	\end{figure}
+% \begin{frame}{Visualizing Measurement Error}
+% 	\begin{figure}[h]
+% 	\only<1>{
+% 		\includegraphics[width=.7\textwidth]{measurementErrorExample_1.pdf}
+% 	}
+% 	\only<2>{
+% 		\includegraphics[width=.7\textwidth]{measurementErrorExample_2.pdf}
+% 	}
+% 	\only<3>{
+% 		\includegraphics[width=.7\textwidth]{measurementErrorExample_3.pdf}
+% 	}
+% 	\end{figure}
 
-	\begin{itemize}
-		\only<1>{\item Suppose this is the true data. But...}
-		\only<2>{\item ... you only observe the noisy data...}
-		\only<3>{\item ... then what happens to the estimated slope?}
-	\end{itemize}
-
-
-\end{frame}
+% 	\begin{itemize}
+% 		\only<1>{\item Suppose this is the true data. But...}
+% 		\only<2>{\item ... you only observe the noisy data...}
+% 		\only<3>{\item ... then what happens to the estimated slope?}
+% 	\end{itemize}
 
 
+% \end{frame}
 
 
 
-\begin{frame}{Measurement Error and IVs}
-		\begin{align*}
-			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
-				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
-				=& \beta_0 + \beta_1 X_i^* + V_i
-		\end{align*}
-\begin{itemize}
-	\item How do we address attenuation bias using instrumental variables? 
-% note we need something correlated with the measurement but not the measurement error; an independent
-% measurement will do 		
-\end{itemize}
-\end{frame}
+
+
+% \begin{frame}{Measurement Error and IVs}
+% 		\begin{align*}
+% 			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
+% 				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
+% 				=& \beta_0 + \beta_1 X_i^* + V_i
+% 		\end{align*}
+% \begin{itemize}
+% 	\item How do we address attenuation bias using instrumental variables? 
+% % note we need something correlated with the measurement but not the measurement error; an independent
+% % measurement will do 		
+% \end{itemize}
+% \end{frame}
 
 
 
-\begin{frame}{Measurement Error in $Y$}{No problemo}	
-	\begin{itemize}
-		\item Suppose the econometrician observes $Y^{*} = Y + u$, where $Y$ is the true value. \[
-\begin{array}{ccl}
-Y_{i} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}\\
-Y_{i}+Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+Y_{i}^{*}\\
-Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right)
-\end{array}
-\]
-	\item Again, we can see this as changing the error term:
-\[
-Y_{i}^{*}=\beta_{0}+\beta_{1}X_{i}+V_{i}
-\]
-where $V_{i}=\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right).$	
+% \begin{frame}{Measurement Error in $Y$}{No problemo}	
+% 	\begin{itemize}
+% 		\item Suppose the econometrician observes $Y^{*} = Y + u$, where $Y$ is the true value. \[
+% \begin{array}{ccl}
+% Y_{i} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}\\
+% Y_{i}+Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+Y_{i}^{*}\\
+% Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right)
+% \end{array}
+% \]
+% 	\item Again, we can see this as changing the error term:
+% \[
+% Y_{i}^{*}=\beta_{0}+\beta_{1}X_{i}+V_{i}
+% \]
+% where $V_{i}=\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right).$	
 		
-		\item As long as this is classical measurement error, i.e. $E\left[u|X\right]= 0$,
-		then as long as exogeneity is satisfied with the original error term $E\left[\varepsilon|X\right]=0$,
-		it will still be satisfied for the modified error term $E\left[V|X\right]=0$.
+% 		\item As long as this is classical measurement error, i.e. $E\left[u|X\right]= 0$,
+% 		then as long as exogeneity is satisfied with the original error term $E\left[\varepsilon|X\right]=0$,
+% 		it will still be satisfied for the modified error term $E\left[V|X\right]=0$.
 		
-\end{itemize}
-\end{frame}		
+% \end{itemize}
+% \end{frame}		
 
 
 
-\begin{frame}{IV as a method-of-moments estimator}
-\begin{itemize}
-	\item The Generalized Method of Moments includes everything we've
-	done so far, and more.
+% \begin{frame}{IV as a method-of-moments estimator}
+% \begin{itemize}
+% 	\item The Generalized Method of Moments includes everything we've
+% 	done so far, and more.
 	
-	\item Recall how IV regression (just identified) results in residuals that satisfy\[
-		{\bf Z}' 		{\bf e} = {\bf 0} .
-	\]
-	This is the sample analog of the population moment $E\left[ {\bf z}_i e_i \right]=0$.
+% 	\item Recall how IV regression (just identified) results in residuals that satisfy\[
+% 		{\bf Z}' 		{\bf e} = {\bf 0} .
+% 	\]
+% 	This is the sample analog of the population moment $E\left[ {\bf z}_i e_i \right]=0$.
 	
-	\medskip
-	\item With a just identified model, the IV estimator is the unique estimator that sets 
-	${\bf Z}' 		{\bf e} = {\bf 0} $, just like how OLS is the unique extimator that gives 	${\bf X}' 		{\bf e} = {\bf 0} $.
+% 	\medskip
+% 	\item With a just identified model, the IV estimator is the unique estimator that sets 
+% 	${\bf Z}' 		{\bf e} = {\bf 0} $, just like how OLS is the unique extimator that gives 	${\bf X}' 		{\bf e} = {\bf 0} $.
 	
-	\medskip
-	\item Thus, we can derive the IV estimator from the starting point that we want to find
-	parameters that give us residuals that are uncorrelated with our instruments. 
+% 	\medskip
+% 	\item Thus, we can derive the IV estimator from the starting point that we want to find
+% 	parameters that give us residuals that are uncorrelated with our instruments. 
 
-\end{itemize}
-\end{frame}	
+% \end{itemize}
+% \end{frame}	
 	
-\begin{frame}{Generalized Method of Moments I}
-\begin{itemize}
-	\item {\bf Moments} are expectations of functions of the data:\[
-		E\left[ \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}_0\right) \right]=0,
-	\]
-	where $\boldsymbol{\theta}_0$ is the true value of a vector of parameters of interest.
-	Typically, we consider moments that are equal to zero -- if they were set equal to something else,
-	we could just subtract that from both sides.
-\end{itemize}
-\end{frame}
+% \begin{frame}{Generalized Method of Moments I}
+% \begin{itemize}
+% 	\item {\bf Moments} are expectations of functions of the data:\[
+% 		E\left[ \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}_0\right) \right]=0,
+% 	\]
+% 	where $\boldsymbol{\theta}_0$ is the true value of a vector of parameters of interest.
+% 	Typically, we consider moments that are equal to zero -- if they were set equal to something else,
+% 	we could just subtract that from both sides.
+% \end{itemize}
+% \end{frame}
 
-\begin{frame}{Generalized Method of Moments II}
-\begin{itemize}
-	\item A crucial ingredient for the {\bf method of moments} is that the sample analog of a moment,\[
-	n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
-	\]
-	will converge to the true analog, as long as $\boldsymbol{\theta} = \boldsymbol{\theta}_0$ (law of large numbers)
+% \begin{frame}{Generalized Method of Moments II}
+% \begin{itemize}
+% 	\item A crucial ingredient for the {\bf method of moments} is that the sample analog of a moment,\[
+% 	n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
+% 	\]
+% 	will converge to the true analog, as long as $\boldsymbol{\theta} = \boldsymbol{\theta}_0$ (law of large numbers)
 
-	\medskip
-	\item Furthermore, if the problem is set up well (i.e., if the model is {\bf identified}),
-	then\[
-n^{-1} \sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}\right)\nrightarrow0
-\]
-for any value of $\boldsymbol{\theta}\ne\boldsymbol{\theta}_{0}$.
-	\end{itemize}
-\end{frame}
+% 	\medskip
+% 	\item Furthermore, if the problem is set up well (i.e., if the model is {\bf identified}),
+% 	then\[
+% n^{-1} \sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}\right)\nrightarrow0
+% \]
+% for any value of $\boldsymbol{\theta}\ne\boldsymbol{\theta}_{0}$.
+% 	\end{itemize}
+% \end{frame}
 
-\begin{frame}{Generalized Method of Moments II}
-\begin{align*}
-n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}_{0}\right)\rightarrow0
-\end{align*}
-\begin{align*}
-\forall\boldsymbol{\theta}\ne\boldsymbol{\theta}_{0}:\quad n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}\right)\nrightarrow0
-\end{align*}
-\begin{itemize}
-\item Thus, let's try to find a parameter vector $\hat{\boldsymbol{\theta}}$ such that \[
-	n^{-1}\sum_{i}^{n}m\left(y_{i},\boldsymbol{x}_{i};\hat{\boldsymbol{\theta}}\right) = 0
-	\begin{align*}
-	n^{-1}\sum_{i}^{n}m\left(y_{i},\boldsymbol{x}_{i};\hat{\boldsymbol{\theta}}\right) = 0
-	\end{align*}
-\end{itemize}
-\end{frame}
+% \begin{frame}{Generalized Method of Moments II}
+% \begin{align*}
+% n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}_{0}\right)\rightarrow0
+% \end{align*}
+% \begin{align*}
+% \forall\boldsymbol{\theta}\ne\boldsymbol{\theta}_{0}:\quad n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}\right)\nrightarrow0
+% \end{align*}
+% \begin{itemize}
+% \item Thus, let's try to find a parameter vector $\hat{\boldsymbol{\theta}}$ such that \[
+% 	n^{-1}\sum_{i}^{n}m\left(y_{i},\boldsymbol{x}_{i};\hat{\boldsymbol{\theta}}\right) = 0
+% 	\begin{align*}
+% 	n^{-1}\sum_{i}^{n}m\left(y_{i},\boldsymbol{x}_{i};\hat{\boldsymbol{\theta}}\right) = 0
+% 	\end{align*}
+% \end{itemize}
+% \end{frame}
 
 
 
-\begin{frame}{OLS and IV as Method-of-Moments}
-\begin{itemize}
-\item OLS can be derived as a method of moments estimator based on the moments
-\begin{align*}
-\E\left[\boldsymbol{x}_{i}\varepsilon_{i}\right]=0\\
-	ext{or}\\
-\E\left[\boldsymbol{x}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
-\end{align*}
-\medskip
-\item Similarly, IV estimation comes from the moments
-\begin{align*}
-\E\left[\boldsymbol{z}_{i}\varepsilon_{i}\right]=0\\
-	ext{or}\\
-\E\left[\boldsymbol{z}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
-\end{align*}
+% \begin{frame}{OLS and IV as Method-of-Moments}
+% \begin{itemize}
+% \item OLS can be derived as a method of moments estimator based on the moments
+% \begin{align*}
+% \E\left[\boldsymbol{x}_{i}\varepsilon_{i}\right]=0\\
+% 	ext{or}\\
+% \E\left[\boldsymbol{x}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
+% \end{align*}
+% \medskip
+% \item Similarly, IV estimation comes from the moments
+% \begin{align*}
+% \E\left[\boldsymbol{z}_{i}\varepsilon_{i}\right]=0\\
+% 	ext{or}\\
+% \E\left[\boldsymbol{z}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
+% \end{align*}
 
-\item Econometrics II will cover GMM in more detail.
-\end{itemize}
-\end{frame}
+% \item Econometrics II will cover GMM in more detail.
+% \end{itemize}
+% \end{frame}
 
 
 
