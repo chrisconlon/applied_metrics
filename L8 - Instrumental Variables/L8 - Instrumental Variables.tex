@@ -776,9 +776,9 @@ Y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i
 \begin{frame}{IV Setup with Matrix Notation}
 \begin{itemize}
 \item Consider a multiple regression equation
-\[
+\begin{align*}
 \boldsymbol{y}=\boldsymbol{\beta}\boldsymbol{X}+\boldsymbol{\varepsilon}
-\]
+\end{align*}
 The IV assumptions are now that
 \begin{itemize}
 \item $Cov\left(\boldsymbol{z}_{i},\varepsilon_{i}\right)=\boldsymbol{0}$
@@ -798,17 +798,15 @@ endogenous regressor.
 \begin{frame}{2SLS with Matrix Notation}
 \begin{itemize}
 \item The 2SLS formula is now
-\[
-\begin{array}{c}
+\begin{align*}
 \boldsymbol{b}_{2SLS}=\left(\hat{\boldsymbol{X}}'\hat{\boldsymbol{X}}\right)^{-1}\hat{\boldsymbol{X}}'\boldsymbol{y}\\
-\text{with }\hat{\boldsymbol{X}}=\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}
-\end{array}
-\]
+	ext{with }\hat{\boldsymbol{X}}=\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}
+\end{align*}
 \smallskip
 \item With homoscedasticity, the asymptotic variance of the estimator is
-\[
+\begin{align*}
 Var\left(\boldsymbol{b}_{2SLS}\right)=\frac{s^{2}}{n}\left[\boldsymbol{Z}'\boldsymbol{X}\left(\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\boldsymbol{X}'\boldsymbol{Z}\right]^{-1}
-\]
+\end{align*}
 \smallskip
 	\item Note: this  (asymptotically correct) estimate of the variance is not equal to the (incorrect) formula we would get
 	from na{\"i}vely applying OLS formulas to the second-stage regression.
@@ -835,11 +833,10 @@ coeftest(m5, vcov=sandwich)
 \begin{frame}{Comparing 2SLS Variance to OLS Variance}{under Homoscedasticity}
 
 For the single-variable case, we can show that
-\[
+\begin{align*}
 	Var(\hat\beta_{2SLS}) = \frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X R^2_{XZ}}
-\]
-\begin{itemize}
-	\item $R^2_{XZ}$ is the $R^2$ from the first stage regression of $X$ on $Z$
+\mathbf{X}'\mathbf{e}_{OLS}=\mathbf{0}
+\end{align*}
 	\smallskip
 	\item OLS variance under homoscedasticity: $Var(\hat\beta^{OLS})=\frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X}$
 		\begin{itemize}
@@ -1160,17 +1157,17 @@ The model:
 \mathbf{X}'\mathbf{e}_{OLS}=\mathbf{0}
 \]
 where
-\[
+\begin{align*}
 \mathbf{e}_{OLS}=\left(\mathbf{y}-\mathbf{X}\mathbf{b}_{OLS}\right)
-	\]
+\end{align*}
 	\item Similarly, for the IV estimator,
-\[
+\begin{align*}
 \mathbf{Z}'\mathbf{e}_{IV}= \mathbf{0}
-\]
+\end{align*}
 where
-\[
+\begin{align*}
 \mathbf{e}_{IV}=\left(\mathbf{y}-\mathbf{X}\mathbf{b}_{IV}\right)
-\]
+\end{align*}
 	\item (Derivation on board)
 
 \end{itemize}
@@ -1217,9 +1214,9 @@ where
 	\item The Wu-Hausman test implements this idea formally. It can be derived
 as a Wald test using the IV and OLS regression results, and it can
 also be implemented using the following regression:
-\[
+\begin{align*}
 \boldsymbol{y=}\boldsymbol{X}\boldsymbol{\beta}+\hat{\boldsymbol{X}}\boldsymbol{\gamma}+\boldsymbol{\varepsilon}^{*}
-\]
+\end{align*}
  where $\hat{\boldsymbol{X}}$ are the fitted values of $\boldsymbol{X}$
 from the first-stage regression of $\boldsymbol{X}$ on $\boldsymbol{Z}.$
 
@@ -1537,29 +1534,23 @@ where
 \end{frame}
 
 \begin{frame}{Example: Porter (1983)}
-\[
-\begin{array}{cccc}
-\text{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+\begin{align*}
+	ext{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
 \\
-\text{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
-\end{array}
-\]
-
-\begin{itemize}
-\item Note that $L_t$, a demand shifter, can be used as an instrument for supply.
-\item Also note that $I_t$, a supply shifter, can be used as an instrument for demand.
-\item We can apply 2SLS to each equation, but it is somewhat more asymptotically
-	efficient (i.e., smaller standard errors)
-	to estimate the two jointly (see {\bf multi-equation GMM}).
+	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+\end{align*}
+\begin{align*}
+	ext{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+\\
+	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+\end{align*}
 \end{itemize}
 \end{frame}
-
-\begin{frame}{Example: Porter (1983)}
-\begin{center}
-\includegraphics[scale=.4]{Porter_t3}
-\end{center}
-\end{frame}
-
+\begin{align*}
+	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
+\\
+	ext{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
+\end{align*}
 
 
 \begin{frame}{Example: Roberts and Schlenker (2013)}
@@ -1570,10 +1561,9 @@ where
 	\item Roberts and Schlenker (2013) estimate the following supply and demand equations:\[
 \begin{array}{cccl}
 \text{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
-\\
-\text{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
-\end{array}
-\]
+\begin{align*}
+\E\left[\boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}_0\right) \right]=0,
+\end{align*}
 where
 \begin{itemize}
 \item $Q_{st}$ is global grain supply (calories)
@@ -1683,9 +1673,9 @@ Survey question: What is your income in thousands?
 			\item {\bf Classical Errors-in-Variables:}
 				\[
 					X_i = X_i^* + u_i
-				\]
-				with $u$ being independent of $X$ and $\varepsilon$ (just noise)
-			\item If $u$ and $X$ are correlated this is very complicated
+				\begin{align*}
+				n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
+				\end{align*}
 		\end{itemize}
 
 \end{itemize}
@@ -1872,18 +1862,18 @@ for any value of $\boldsymbol{\theta}\ne\boldsymbol{\theta}_{0}$.
 \end{frame}
 
 \begin{frame}{Generalized Method of Moments II}
-\[
+\begin{align*}
 n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}_{0}\right)\rightarrow0
-\]
-\[
+\end{align*}
+\begin{align*}
 \forall\boldsymbol{\theta}\ne\boldsymbol{\theta}_{0}:\quad n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\theta}\right)\nrightarrow0
-\]
+\end{align*}
 \begin{itemize}
 \item Thus, let's try to find a parameter vector $\hat{\boldsymbol{\theta}}$ such that \[
 	n^{-1}\sum_{i}^{n}m\left(y_{i},\boldsymbol{x}_{i};\hat{\boldsymbol{\theta}}\right) = 0
-	\]
-
-\item Intuitively, in a large sample, this $\hat{\boldsymbol{\theta}}$ should be close to the true parameter.
+	\begin{align*}
+	n^{-1}\sum_{i}^{n}m\left(y_{i},\boldsymbol{x}_{i};\hat{\boldsymbol{\theta}}\right) = 0
+	\end{align*}
 \end{itemize}
 \end{frame}
 
@@ -1892,22 +1882,18 @@ n^{-1}\sum_{i}^{n}\boldsymbol{m}\left(y_{i},\boldsymbol{x}_{i};\boldsymbol{\thet
 \begin{frame}{OLS and IV as Method-of-Moments}
 \begin{itemize}
 \item OLS can be derived as a method of moments estimator based on the moments
-\[
-\begin{array}{c}
-E\left[\boldsymbol{x}_{i}\varepsilon_{i}\right]=0\\
-\text{or}\\
-E\left[\boldsymbol{x}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
-\end{array}
-\]
+\begin{align*}
+\E\left[\boldsymbol{x}_{i}\varepsilon_{i}\right]=0\\
+	ext{or}\\
+\E\left[\boldsymbol{x}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
+\end{align*}
 \medskip
 \item Similarly, IV estimation comes from the moments
-\[
-\begin{array}{c}
-E\left[\boldsymbol{z}_{i}\varepsilon_{i}\right]=0\\
-\text{or}\\
-E\left[\boldsymbol{z}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
-\end{array}
-\]
+\begin{align*}
+\E\left[\boldsymbol{z}_{i}\varepsilon_{i}\right]=0\\
+	ext{or}\\
+\E\left[\boldsymbol{z}_{i}\left(y_{i}-\boldsymbol{x}_{i}'\boldsymbol{\beta}\right)\right]=0
+\end{align*}
 
 \item Econometrics II will cover GMM in more detail.
 \end{itemize}
