@@ -5,7 +5,7 @@
 \title{Instrumental Variables}
 \author{Chris Conlon}
 \institute{Applied Econometrics}
-\date{}
+\date{\today}
 
 %\usepackage[italic]{mathastext}
 
@@ -845,14 +845,12 @@ For the single-variable case, we can show that
 \mathbf{X}'\mathbf{e}_{OLS}=\mathbf{0}
 \end{align*}
 	\smallskip
-	\item OLS variance under homoscedasticity: $Var(\hat\beta^{OLS})=\frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X}$
+	OLS variance under homoscedasticity: $Var(\hat\beta^{OLS})=\frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X}$
 		\begin{itemize}
 			\item Since $R^2_{XZ}\leq 1$, IV variance is larger
 			\item The higher first stage $R^2_{XZ}$, the lower the variance. If $X$ and $Z$ are collinear, variance is equivalent to OLS.
 			\item If $R^2_{XZ}\approx 0$ then variance blows up!
 		\end{itemize}
-
-\end{itemize}
 \end{frame}
 
 
@@ -1551,13 +1549,12 @@ where
 \\
 	ext{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
 \end{align*}
-\end{itemize}
 \end{frame}
-\begin{align*}
-	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
-\\
-	ext{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
-\end{align*}
+% \begin{align*}
+% 	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
+% \\
+% 	ext{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
+% \end{align*}
 
 
 \begin{frame}{Example: Roberts and Schlenker (2013)}
