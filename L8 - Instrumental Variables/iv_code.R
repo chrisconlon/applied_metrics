@@ -17,5 +17,5 @@ flm2 = feols(morekids ~ BoyBoy + GirlGirl + black + hisp + othrace, data=babydat
 lh2 = linearHypothesis(flm2,c("BoyBoy","GirlGirl"), test="F")
 
 # look at test statistics
-m6= feols(worked ~ black + hisp +othrace + age + agefst |
+m6= feols(hoursw ~ black + hisp +othrace + age + educ |
             morekids ~ BoyBoy + GirlGirl, data=babydata)
