@@ -1,0 +1,257 @@
+---
+title: "Hausman–Wu and Sargan (Hansen J) tests with fixest — R Notebook"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(dplyr)
+library(fixest)
+library(AER)       # for ivreg
+library(sandwich)  # for robust variance calculations
+library(Matrix)    # for matrix operations
+set.seed(2025)
+```
+
+# Overview
+
+This notebook simulates two scenarios and implements:
+  
+  * The matrix/formal Hausman test comparing OLS and IV estimates;
+* The regression-based Wu/Hausman test (include first-stage residuals in the outcome);
+* The Sargan test (homoskedastic version) and the heteroskedasticity-robust Hansen J statistic implemented from GMM moments.
+
+We show both a **homogeneous** treatment-effect setting (where the tests behave as standard) and a **heterogeneous** treatment-effect setting (where Sargan/Hansen and Hausman can reject even with valid instruments).
+
+---
+  
+  ## 1. Simulate data — two instruments, possible heterogeneity
+  
+  We simulate a setting where there are two instruments `z1` and `z2`. Each instrument affects `x` only for a different subgroup (defined by `w`), and treatment effects differ across those subgroups in the heterogeneous scenario.
+
+```{r sim-data}
+n <- 2000
+# covariate that determines subgroup
+w <- rbinom(n, 1, 0.5)
+
+# two instruments (binary), independent
+z1 <- rbinom(n, 1, 0.5)
+z2 <- rbinom(n, 1, 0.5)
+
+# reduced-form noise
+v <- rnorm(n)
+u <- rnorm(n)
+
+# instrument relevance differs by subgroup: z1 matters when w==0, z2 when w==1
+gamma1 <- 1.0
+gamma2 <- 1.0
+x <- gamma1 * z1 * (1 - w) + gamma2 * z2 * w + 0.5 * v
+
+# Errors correlated with x (endogeneity): let u correlate with v
+u <- 0.5 * v + rnorm(n, sd = 1)
+
+# Homogeneous effect
+beta_hom <- 2
+y_hom <- beta_hom * x + rnorm(n)
+
+# Heterogeneous effect: different beta by subgroup
+beta0 <- 1.0
+beta1 <- 3.0
+# Here beta differs by w
+y_het <- x * (beta0 * (1 - w) + beta1 * w) + rnorm(n)
+
+# Put into data.frame
+df <- data.frame(y_hom, y_het, x, w, z1, z2)
+head(df)
+```
+
+---
+  
+  ## 2. OLS and IV estimates
+  
+  We estimate OLS with `fixest::feols` and IV with `AER::ivreg`. For IV we use both instruments `z1` and `z2` together.
+
+```{r ols-iv}
+# OLS (fixest)
+ols_hom <- feols(y_hom ~ x, data = df)
+ols_het <- feols(y_het ~ x, data = df)
+
+# IV (AER::ivreg) — instrument x by z1 + z2
+iv_hom <- feols(y_hom ~ 1 | x~ z1 + z2, data = df)
+iv_het <- feols(y_het ~ 1 | x~z1 + z2, data = df)
+
+summary(ols_hom)
+summary(iv_hom)
+summary(ols_het)
+summary(iv_het)
+etable(ols_hom,ols_het,iv_hom,iv_het)
+```
+
+Take note: in the homogeneous case OLS and IV should be closer (depending on endogeneity), while in the heterogeneous case the IV identifies a complier-weighted average that can differ from OLS.
+
+---
+  
+  ## 3. Hausman–Wu (matrix) test — difference in estimators
+  
+  We implement the matrix-form Hausman statistic
+
+( H = (\hat{\beta}*{IV} - \hat{\beta}*{OLS})' [Var(\hat{\beta}*{IV}) - Var(\hat{\beta}*{OLS})]^{-1} (\hat{\beta}*{IV} - \hat{\beta}*{OLS}) )
+
+(Here models are just- or over-identified but the test is valid for K parameters.)
+
+```{r hausman-matrix}
+# Extract estimates and covariance matrices
+beta_ols_hom <- coef(ols_hom)["x"]
+beta_iv_hom  <- coef(iv_hom)["fit_x"]
+
+# Variances: use sandwich robust cov for IV and OLS
+vcov_ols_hom <- vcov(ols_hom, vcov = sandwich)
+vcov_iv_hom  <- sandwich::vcovHC(iv_hom, type = "HC0")
+
+# For single-parameter x case, forms simplify to scalar
+delta_hom <- beta_iv_hom - beta_ols_hom
+var_diff_hom <- as.numeric(vcov_iv_hom["fit_x","fit_x"] - vcov_ols_hom["x","x"])
+H_hom <- (delta_hom^2) / var_diff_hom
+pval_hom <- 1 - pchisq(H_hom, df = 1)
+
+# Repeat for heterogeneous outcome
+beta_ols_het <- coef(ols_het)["x"]
+beta_iv_het  <- coef(iv_het)["fit_x"]
+vcov_ols_het <- vcov(ols_het, vcov = sandwich)
+vcov_iv_het  <- sandwich::vcovHC(iv_het, type = "HC0")
+delta_het <- beta_iv_het - beta_ols_het
+var_diff_het <- as.numeric(vcov_iv_het["fit_x","fit_x"] - vcov_ols_het["x","x"])
+H_het <- (delta_het^2) / var_diff_het
+pval_het <- 1 - pchisq(H_het, df = 1)
+
+data.frame(
+  scenario = c("homogeneous","heterogeneous"),
+  beta_ols = c(beta_ols_hom, beta_ols_het),
+  beta_iv  = c(beta_iv_hom, beta_iv_het),
+  H_stat   = c(H_hom, H_het),
+  p_value  = c(pval_hom, pval_het)
+)
+```
+
+> Note: we used heteroskedasticity-robust variances for both estimators when forming the difference.
+
+---
+
+## 4. Wu/Hausman regression-based test (first-stage residuals)
+
+The Wu test regresses `y` on `x` and the first-stage residuals `v_hat` from the regression of `x` on instruments. Under exogeneity the coefficient on `v_hat` should be zero.
+
+```{r wu-test}
+# First-stage: regress x on instruments (separately for hom/het design; same X used)
+first_stage <- feols(x ~ z1 + z2, data = df)
+df$vhat <- resid(first_stage)
+
+# Augmented outcome regression
+aug_hom <- feols(y_hom ~ x + vhat, data = df)
+aug_het <- feols(y_het ~ x + vhat, data = df)
+
+summary(aug_hom)
+summary(aug_het)
+
+# Test whether coefficient on vhat is zero (t-test / F-test)
+coeftable(aug_hom)
+coeftable(aug_het)
+```
+
+If the coefficient on `vhat` is significant, that's evidence of endogeneity (reject exogeneity).
+
+---
+  
+  ## 5. Sargan test (homoskedastic) and Hansen J (robust)
+  
+  We compute the homoskedastic Sargan statistic as:
+  
+  ( J = n \cdot R^2 )
+
+from regressing IV residuals on all instruments. For the heteroskedasticity-robust Hansen J, we implement the GMM-style statistic
+
+( J = n , \hat{g}(\hat{\beta})' \hat{\Omega}^{-1} \hat{g}(\hat{\beta}) )
+
+where ( \hat{g} = \frac{1}{n} Z'\hat{u} ) and ( \hat{\Omega} = \frac{1}{n} Z' \hat{u} \hat{u}' Z ).
+
+```{r sargan-hansen}
+# IV residuals
+u_iv_hom <- resid(iv_hom)
+u_iv_het <- resid(iv_het)
+
+# Instrument matrix
+Z <- as.matrix(cbind(1, df$z1, df$z2)) # include intercept (we'll account for dims)
+n <- nrow(df)
+K <- 1  # number of endogenous regressors (x only)
+L <- ncol(Z) - 1 # instruments count excluding intercept
+
+# -- Homoskedastic Sargan (classical) --
+# regress residuals on instruments (exclude intercept for regressing)
+sargan_lm_hom <- lm(u_iv_hom ~ z1 + z2, data = df)
+J_hom_classic <- n * summary(sargan_lm_hom)$r.squared
+p_sargan_hom <- 1 - pchisq(J_hom_classic, df = L - K)
+
+sargan_lm_het <- lm(u_iv_het ~ z1 + z2, data = df)
+J_het_classic <- n * summary(sargan_lm_het)$r.squared
+p_sargan_het <- 1 - pchisq(J_het_classic, df = L - K)
+
+# -- Hansen J (robust) via GMM moment approach --
+# helper to compute robust J
+hansen_J <- function(u, Z) {
+  n <- length(u)
+  Zmat <- as.matrix(Z)
+  g_hat <- drop(t(Zmat) %*% u) / n          # vector of length dim(Z)
+  # Omega_hat = (1/n) Z' (u u') Z = (1/n) * t(Z * u) %*% (Z * u)
+  Zu <- Zmat * as.numeric(u)
+  Omega_hat <- crossprod(Zu) / n
+  # Remove intercept row/col if present — use full Z including intercept here but
+  # we will compute J over instrument rows excluding intercept if desired.
+  # We'll use all instruments (z1,z2) rows only (exclude intercept component)
+  # Identify indices corresponding to z1,z2 in Zmat: here 2 and 3
+  idx <- 2:ncol(Zmat)
+  g_sub <- g_hat[idx]
+  Omega_sub <- Omega_hat[idx, idx]
+  J <- n * as.numeric(t(g_sub) %*% solve(Omega_sub) %*% g_sub)
+  df_j <- length(idx) - K
+  list(J = J, df = df_j, pval = 1 - pchisq(J, df_j))
+}
+
+# Build Z without intercept for moments
+Z_noint <- cbind(df$z1, df$z2)
+
+h_hom <- hansen_J(u_iv_hom, cbind(1, Z_noint))
+h_het <- hansen_J(u_iv_het, cbind(1, Z_noint))
+
+# Show results
+res_sargan <- data.frame(
+  scenario = c("homogeneous","heterogeneous"),
+  J_classic = c(J_hom_classic, J_het_classic),
+  p_classic = c(p_sargan_hom, p_sargan_het),
+  J_hansen = c(h_hom$J, h_het$J),
+  p_hansen = c(h_hom$pval, h_het$pval)
+)
+res_sargan
+```
+
+Interpretation:
+  
+  * If `p` is small (e.g. < 0.05) we reject the null that all instruments are valid.
+* In the heterogeneous case, we may observe rejection even when instruments are 'valid' in the sense that each instrument affects `x` exogenously for its subgroup — because different instruments identify distinct local effects.
+
+---
+  
+  ## 6. Wrap-up / notes
+  
+  * The notebook used `fixest` for OLS and first-stage regressions; IV was computed with `AER::ivreg` for convenience.
+* We computed both the matrix Hausman statistic and the regression-based Wu test — both are valid ways to probe endogeneity under homogeneous-effect assumptions.
+* We computed both the classical Sargan (homoskedastic) statistic and a heteroskedasticity-robust Hansen J using a GMM moment approach.
+
+---
+  
+```{r session-info}
+sessioninfo::session_info()
+```

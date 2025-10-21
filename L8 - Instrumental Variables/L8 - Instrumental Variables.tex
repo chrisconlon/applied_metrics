@@ -19,8 +19,14 @@
 \usepackage{tikz}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.7}
-\usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
-
+\usetikzlibrary{shapes,decorations,arrows,snakes, patterns, angles, quotes, calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
 
 
 
@@ -254,6 +260,40 @@ do is ask the question "given this exogeneity assumption, does this other exogen
 true?" But we can never test an exogeneity assumption in a self-contained way. 
 \end{itemize}
 \end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{IV: Causal Diagram}
+\begin{itemize}
+\item Recall the absence of direct path between $Z \rightarrow Y$. This is the \alert{exclusion restriction}.
+\item $Z \rightarrow X$ is the \alert{relevance} condition.
+\end{itemize}
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    % x node set with absolute coordinates
+    \node[state] (x) at (0,0) {$X$};
+
+    \node[state] (y) [right =of x] {$Y$};
+    \node[state] (e) [above =of x] {$\varepsilon$};
+    \node[state] (z) [left =of x] {$Z$};
+
+    % Directed edge
+    \path (x) edge (y);
+    \path (e) edge (y);
+    \path (e) edge (x);
+    \path (z) edge (x);
+    
+    % Bidirected edge
+    \path[bidirected] (z) edge[bend right=60] node[below] {excluded} (y);
+\end{tikzpicture}
+\end{center}
+Idea: There is a path from $Z \rightarrow Y$ but only \alert{through} $X$ (this is the key).
+\end{frame}
+
+
 
 \begin{frame}{Best Defense of Exogeneity IV Assumption: Randomized Experiment}
 \begin{itemize}
@@ -732,7 +772,7 @@ Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilo
 \item Step 2: Regress $y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i$
 \begin{itemize}
 \item \texttt{m3 = feols(Y$\sim$xHat, data=Data)}
-\item \texttt{summary(m3, vcov = vcovHC(m3, type = ``HC1"))}
+\item \texttt{summary(m3, vcov= "HC1"))}
 \begin{itemize}
 \item Note: Standard errors will be wrong!
 \end{itemize}
@@ -844,7 +884,7 @@ For the single-variable case, we can show that
 \begin{itemize}
 \item The two major assumptions:
 \begin{enumerate}
-	\item Relevance: $Cov(X,Z)\ne 0$, or that $E\left[{\bf z}_i {\bf x}_i' \right]$ has full rank
+	\item Relevance: $Cov(X,Z)\ne 0$, or that $\E\left[{\bf z}_i {\bf x}_i' \right]$ has full rank
 
 	\item Exogeneity: All instruments must be uncorrelated with $\varepsilon$
 \end{enumerate}
@@ -1095,12 +1135,10 @@ The model:
 	\item With one IV, it's impossible to test exogeneity, hence
 	the need to evaluate exogeneity by thinking about whether
 	some unobserved variables might be correlated with the instrument.
-	\item With extra instruments, we can test the IVs against each other.
-	Similarly, one IV allows us to test the validity of OLS.
-	\item In all cases, the most we can do is test one exogeneity assumption
-	against another, we can never test the validity of an exogeneity assumption on its own.
-
-
+	% \item With extra instruments, we can test the IVs against each other.
+	% Similarly, one IV allows us to test the validity of OLS.
+	% \item In all cases, the most we can do is test one exogeneity assumption
+	% against another, we can never test the validity of an exogeneity assumption on its own.
 \end{itemize}
 \end{frame}
 
@@ -1160,55 +1198,43 @@ where
 	us to test whether the error terms are correlated with the
 	regressors.
 
-	\smallskip
-	\item However, the residuals from IV can be used to test
-	the OLS exogeneity assumption. Similarly, if we have
-	more instruments than we need (overidentification),
-	we can test the instruments against each other.
+	% \smallskip
+	% \item However, the residuals from IV can be used to test
+	% the OLS exogeneity assumption. Similarly, if we have
+	% more instruments than we need (overidentification),
+	% we can test the instruments against each other.
 
 
 \end{itemize}
 \end{frame}
 
 
-
-\begin{frame}{Wu-Hausman Test}
-\begin{itemize}
-	\item Is OLS biased? Does the use of instrumental variables really make a difference in results?
-
-	\smallskip
-	\item Intuition: we can compare the OLS and IV coefficient estimates, see if they're different.
-	If they differ and we believe in the validity of the IV, that's evidence that OLS is biased
-	because of an endogenous regressor.
-
-	\smallskip
-	\item The Wu-Hausman test implements this idea formally. It can be derived
-as a Wald test using the IV and OLS regression results, and it can
-also be implemented using the following regression:
+\begin{frame}{Tests of Exogeneity?}
+One possibility is the \alert{Durbin-Wu-Hausman Test} which compares $\Delta = \beta_{OLS} - \beta_{2SLS}$ under the null that $X$ is \alert{exogenous} ($Z$ is assumed exogenous).
 \begin{align*}
-\boldsymbol{y=}\boldsymbol{X}\boldsymbol{\beta}+\hat{\boldsymbol{X}}\boldsymbol{\gamma}+\boldsymbol{\varepsilon}^{*}
+H_0: & \beta_{OLS}, \beta_{2SLS} \text{ are consistent, }\quad \beta_{OLS} \text{ is efficient }\\
+H_1: & \beta_{2SLS} \text{ is consistent, } \beta_{OLS} \text{ is not }.
 \end{align*}
- where $\hat{\boldsymbol{X}}$ are the fitted values of $\boldsymbol{X}$
-from the first-stage regression of $\boldsymbol{X}$ on $\boldsymbol{Z}.$
-
-\smallskip
-\item Testing $\boldsymbol{\gamma}=0$ is
-\href{http://eclr.humanities.manchester.ac.uk/index.php/IV_in_R\#Testing_for_exogeneity}{one way}
-of implementing the Hausman test. It can also be implemented using the
-\href{https://stats.stackexchange.com/questions/134789/interpretation-of-ivreg-diagnostics-in-r}{AER package}.
-\end{itemize}
+This gives a chi-squared test statistic:
+\begin{align*}
+T = (\widehat{\beta}_{2SLS} - \widehat{\beta}_{OLS})^T\, (V(\widehat{\beta}_{2SLS}) - V(\widehat{\beta}_{OLS}))^{\dagger}\, (\widehat{\beta}_{2SLS} - \widehat{\beta}_{OLS}) \sim \chi^2_{K}
+\end{align*}
+This uses the \alert{pseudo inverse} of the variance matrix where $K$ is the rank of that matrix.\\
+\medskip
+Idea: Reject $H_0$ if $\norm{\Delta} \gg 0$ (2SLS and OLS disagree).
 \end{frame}
 
 
 
 
-\iffalse
+
+
 \begin{frame}[fragile]\frametitle{Example in \texttt{R}: Checking Angrist \& Evans Validity}
 {\small
 		\begin{lstlisting}[frame=single]  % Start your code-block
 		gross
  # First Stage Test in Angrist & Evans
-flm1 = lm(morekids ~ samesex + black + hispan, data=babyData)
+flm1 = fixest(morekids ~ samesex + black + hispan, data=babyData)
 lh1 = linearHypothesis(flm1,c("samesex"),vcov=vcovHC(flm1, type = "HC1"))
 
 # First Stage Test in AE w/ Multiple Instruments
@@ -1222,7 +1248,7 @@ lh2 = linearHypothesis(flm2,c("boyBoy","girlGirl"),vcov=vcovHC(flm2, type = "HC1
 	\item With ``BoyBoy" and ``GirlGirl": $F = 714.86$
 \end{itemize}}
 \end{frame}
-\fi
+
 
 \begin{frame}{Checking Instrument Validity II}
 Exogeneity Assumption:
