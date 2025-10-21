@@ -479,16 +479,16 @@ Same model as before:
 \begin{frame}{Heterogeneous treatment effects I}
 \begin{itemize}
 \item Let's consider a simple case with binary treatment $X_i \in \left\{0,1\right\}$ where 
-the treatment effect $\beta_i=\E\left(Y_{i1} - Y_{i0}\right)$ is heterogeneous.
+the treatment effect $\beta_i=\E\left(Y_{i}(1) - Y_{i}(0)\right)$ is heterogeneous.
 \begin{itemize}
-	\item $Y_{ix}$ denotes the potential outcome for $i$ given treatment status $X_i = x$.
+	\item $Y_{i}(x)$ denotes the potential outcome for $i$ given treatment status $X_i = x$.
 \end{itemize}
 
 \medskip
 \item We have a binary instrument $Z_i \in \left\{0,1\right\}$
 
 \medskip
-\item Let's also have potential outcomes for treatment status: $X_{iz}$ is the potential
+\item Let's also have potential outcomes for treatment status: $X_{i}(z)$ is the potential
 	treatment status for $i$ when $Z_i = z$. 
 
 \medskip
@@ -677,7 +677,7 @@ Be careful: even when an IV is clearly random, it might not be excludable.
 \end{frame}
 
 \section{IV Math}
-\begin{frame}{IV Directly into Model}
+\begin{frame}{IV Directly into Model (aka ``the reduced form'')}
 \begin{itemize}
 \item Suppose that our IV assumptions hold
 \medskip
