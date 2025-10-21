@@ -846,8 +846,9 @@ IV w/ controls
 \begin{itemize}
 \item \texttt{m5 = feols(workedm $\sim$ morekids + boy1st + boy2nd + black + hispan + othrace + agem1 + agefstm $|$
 			samesex $\sim$ boy1st + boy2nd, data=babyData)}
-	\item Still use the pipe to define the first stage
-	\item Need to include \alert{only excluded instruments} in the second equation!
+	\item Second stage $\mid$ First stage
+	\item Don't include endogenous $X$ before the pipe (only exogenous controls)
+	\item Need to include \alert{excluded instruments} in the second equation!
 	\item Syntax differs for different packages $\rightarrow$ Be careful!
 \end{itemize}
 \end{frame}
@@ -1234,18 +1235,19 @@ Idea: Reject $H_0$ if $\norm{\Delta} \gg 0$ (2SLS and OLS disagree).
 		\begin{lstlisting}[frame=single]  % Start your code-block
 		gross
  # First Stage Test in Angrist & Evans
-flm1 = fixest(morekids ~ samesex + black + hispan, data=babyData)
-lh1 = linearHypothesis(flm1,c("samesex"),vcov=vcovHC(flm1, type = "HC1"))
+flm1 = feols(morekids ~ samesex + black + hispan, data=babyData)
+lh1 = linearHypothesis(flm1,"samesex = 0", test="F")
 
 # First Stage Test in AE w/ Multiple Instruments
 flm2 = lm(morekids ~ boyBoy + girlGirl + black + hispan, data=babyData)
-lh2 = linearHypothesis(flm2,c("boyBoy","girlGirl"),vcov=vcovHC(flm2, type = "HC1"))
-	\end{lstlisting}
+lh2 = linearHypothesis(flm2,c("BoyBoy","GirlGirl"), test="F")
+\end{lstlisting}
+
 \vspace{3mm}
 	Results:
 \begin{itemize}
-	\item With ``Same Sex": $F = 1414.252$
-	\item With ``BoyBoy" and ``GirlGirl": $F = 714.86$
+	\item With ``Same Sex": $F = 25.874$
+	\item With ``BoyBoy" and ``GirlGirl": $F = 12.94$
 \end{itemize}}
 \end{frame}
 
@@ -1278,7 +1280,7 @@ Exogeneity Assumption:
 						e_i = Y_i - \hat\beta_0 - \hat\beta_1 X_i^{(1)} - ... \hat\beta_m X_i^{(k)}
 					\end{align*}
 				\item Regress $e_i$ on all $Z$'s and exogenous variables:
-				\begin{align*}
+				\begin{align*}	
 					e_i = \alpha_0 + \alpha_1 Z_i^{(1)} + ... +\alpha_m Z_i^{(m)} +  Exogenous + \varepsilon_i
 				\end{align*}
 				\item Compute the $F$ statistic for $\alpha_1=...=\alpha_m=0$ but do \emph{not} do the standard $F$ test
@@ -1340,16 +1342,16 @@ Exogeneity Assumption:
 \begin{lstlisting}[frame=single]  % Start your code-block
 		gross
 # Run the Regression
-m6 = ivreg(workedm ~ morekids | boyBoy + girlGirl, data=babyData)
+m6 = feols(workedm ~ 1 | morekids ~ boyBoy + girlGirl, data=babyData)
 
 # Back out the residuals
 babyData$uHat = babyData$workedm - fitted(m6)
 
 # Regress instruments on residual
-jReg = lm(uHat ~  boyBoy + girlGirl, data=babyData)
+jReg = feols(uHat ~  boyBoy + girlGirl, data=babyData)
 
 # Back out the F-statistic on the instruments
-jlh = linearHypothesis(jReg,c("boyBoy","girlGirl"),vcov=vcovHC(jReg, type = "HC1"))
+jlh = linearHypothesis(jReg,c("boyBoy","girlGirl"))
 
 # Don't forget to multiply by number of instruments!
 Jstat = 2*jlh$F[2]
