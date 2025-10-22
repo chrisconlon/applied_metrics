@@ -1,0 +1,198 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\newcommand{\lyxmathsym}[1]{\ifmmode\begingroup\def\b@ld{bold}
+  \text{\ifx\math@version\b@ld\bfseries\fi#1}\endgroup\else#1\fi}
+\newcommand{\R}{\mathbb{R}}
+
+
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\title{\Huge Problem Set 3}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2025}
+
+\makeatother
+
+\begin{document}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}} l l l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+
+\section*{\normalsize Problem 1: Maximum likelihood}
+Suppose $y_i$ for $i=1,2, \ldots, n$ are independently and identically distributed with a uniform distribution on $[0, M]$.
+\begin{enumerate}[label=\alph*.]
+\item Derive the maximum likelihood estimator of $M$. \vspace{1cm}\\
+ Let $\widehat{M}_n \equiv \max \left\{y_1, \ldots, y_n\right\}$ be the maximum value of the first $n$ observations.
+\item What is $\widehat{M}_n$ 's cumulative distribution function?
+\item Is $\widehat{M}_n$ an unbiased estimator of $M$ ?
+\item Is $\widehat{M}_n$ a consistent estimator of $M$ ?
+\item Is $\widehat{M}_n$ asymptotically efficient?
+\end{enumerate}
+
+\section*{\normalsize Problem 2: Hogwarts}
+
+You are hired by Hogwarts to assess whether there is evidence of discrimination in the
+grading patterns of its faculty. The concern is that teachers favor the students who are
+affiliated with the same house.
+
+\begin{enumerate}[label=\alph*.]
+\item Generate a ”same house” variable that is equal to one when the student and teacher
+are affiliated with the same house and zero otherwise ($student house=teacher house$) 
+where an observation $i$ here corresponds to a particular course and particular student.
+\item 
+Run the following regression:
+\begin{align*}
+Grade_i = \beta_0+\beta_1 \cdot same\_house_i+\varepsilon_i
+\end{align*}
+
+\item What do your results suggest about grade discrimination in Hogwarts?
+
+\item Can you think of an approach that would improve on the above analysis? If so,
+implement it.
+\end{enumerate}
+
+
+\section*{\normalsize Problem 3: Supply and Demand}
+In this problem we will understand why economists began to think about instrumental variables in the first place. We will explore simultaneity bias. Suppose that you are an economist trying to predict the effect that raising tariffs will have on the price and output of coffee. To do this, you need to understand the supply and demand functions of coffee. For now, suppose we just want to understand demand. Suppose that demand has the following simple form:
+
+$$
+Q^D=\beta_0+\beta_1 P+\epsilon
+$$
+
+
+This says that demand is linear in price but there are occasionally "demand shocks that make everyone prefer more of a good or less of a good regardless of price. We suspect that $\beta_1<0$, as people demand less of a good when price is high.
+
+Suppose that the market supply function for coffee has the following form:
+
+$$
+Q^S=\alpha_0+\alpha_1 P+\eta
+$$
+
+
+We suspect now that $\alpha_1>0$ since as price is higher, the market is more willing to supply coffee since more producers will enter.
+
+Finally, we know that in equilibrium, supply must equal demand. Now, you have collected data on many markets indexed by $m=1, \ldots, M$. Each market has the same supply and demand functions but differ in their random shocks. We will work through the problem of estimating supply and demand. For simplicity, we will assume that $\operatorname{Var}(\eta)=\sigma_\eta^2$, $\operatorname{Var}(\epsilon)=\sigma_\epsilon^2$ and $\operatorname{Cov}(\epsilon, \eta)=0$.
+
+\begin{enumerate}[label=\alph*.]
+	\item First, think of at least one component of $\epsilon$ - something that will differ across markets that might affect demand for coffee that isn't the price of coffee. Do you think this would also affect supply?
+	\item Second, think of at least one component of $\eta$ - something that will differ across coffee producers that might affect supply at any given price. Do you think this will also affect demand?
+	\item Now, use the fact that $Q^S=Q^D \equiv Q$ in equilibrium to solve for price and quantity in a market $m$ as a function of $\eta, \epsilon$ and the model parameters.
+
+	\item Solve for $\operatorname{Cov}\left(P_m, Q_m\right)$ in terms of $\sigma_\epsilon^2$ and $\sigma_\eta^2$.
+
+	\item A data scientist who has never heard of simultaneity runs a regression of $Q$ on $P$ across markets and tells you that he has estimated demand. In other words, they have run the regression
+
+	$$
+	Q=\beta_0+\beta_1 P+\epsilon
+	$$
+
+	From parts (4) and (5), solve for the asymptotic mean of the OLS estimator (i.e. $\operatorname{Cov}(Q, P) / \operatorname{Var}(P)$ ). Under what conditions, if any, will this be a consistent estimator of $\beta_1$ ?
+
+	\item Now suppose that we have data on whatever you suggested in part (2). Call this $Z$ and assume that it is uncorrelated with $\epsilon$, regardless of what you said: i.e. $\operatorname{Cov}(Z, \epsilon)=0$ and $\operatorname{Cov}(Z, \eta) \neq 0$. Prove that if one uses $Z$ as an instrument for price then, $\hat{\beta}_{1, I V}= \operatorname{Cov}(Z, Q) / \operatorname{Cov}(Z, P)$ is a consistent estimator of $\beta_1$.
+
+	\item The same logic as above allows us to use shocks to demand to estimate the supply function. Your friend the data scientist, wowed by your insights, suggests using the price of tea as a shock to demand for coffee. After all, if tea is expensive people will demand more coffee no matter the price. Do you think your friend has chosen a good instrument?
+\end{enumerate}
+
+\section*{\normalsize Problem 4: IV and 2SLS}
+Consider the linear IV model
+
+$$
+y_i=x_i^{\prime} \beta+e_i, \quad E\left[z_i e_i\right]=0
+$$
+
+with m regressors, $x_i \in R^m$, and k instrumental variables, $z_i \in R^k$. For the first part of the exercise, consider the case $m=k=2$ with a constant, $x_{i 1}=z_{i 1}=1$.
+
+\begin{enumerate}[label=\alph*.]
+\item Show that for this case, the rank condition is equivalent to $\operatorname{Cov}\left(x_{i 2}, z_{i 2}\right) \neq 0$.
+\item Show that the 2SLS estimator of the slope coefficient is given by
+
+$$
+\hat{\beta}_{2,2 S L S}=\frac{\operatorname{Cov}\left(z_{i 2}, y_{i 2}\right)}{\operatorname{Cov}\left(z_{i 2}, x_{i 2}\right)}
+$$
+
+which we refer to as the instrumental variables estimator.
+Now return to the case of general m and $k \geq m$. Then for an $k \times m$ matrix A , the instrumental variables estimator for $\beta$ is defined as the solution of the estimating equations
+
+$$
+A^{\prime} Z^{\prime}\left(y-X \hat{\beta}_{I V}\right)=0
+$$
+
+\item Solve for $\hat{\beta}_{I V}$ in terms of $\mathrm{y}, \mathrm{X}, \mathrm{Z}$ and A , assuming that a solution exists.
+\item Now choose $A=\hat{\Pi}$, the least squares estimator for $\Pi$ in the linear first stage
+
+$$
+\hat{x}_i^{\prime}=z_i^{\prime} \Pi+v_i^{\prime}, \quad E\left[z_i v_i^{\prime}\right]=0
+$$
+
+
+Show that the resulting IV estimator is numerically equivalent to 2SLS.
+\end{enumerate}
+
+\section*{\normalsize Problem 5: Measurement Error/ Attenuation Bias}
+
+Suppose the true population regression is,
+\begin{align*}
+y=\beta x+\epsilon
+\end{align*}
+
+But you observe only:
+\begin{align*}
+\begin{aligned}
+& \tilde{y}=y+u \\
+& \tilde{x}=x+v
+\end{aligned}
+\end{align*}
+
+
+Note that $\epsilon$ satisfies strict exogeneity and the other error terms can be white noise, meaning that they are i.i.d. and uncorrelated with any other variables.
+
+\begin{enumerate}[label=\alph*.]
+\item Which OLS assumption is violated when you regress $\tilde{y}$ on $\tilde{x}$ ? What is the size of the bias?
+\item Suppose now you regress $\tilde{y}$ on x? How does your answer to the above part change?
+\item  Finally regress $y$ on $\tilde{x}$ ? How does your answer to the above part change?
+\item Generate data (100 observations) that satisfies the the above relationship where $\beta=2$ (draw random x values, build your y variable based on the population regression and then construct your two noisy variables $\tilde{y}, \tilde{x}$.) For each of the three regressions above report your regression results in a table.
+\item What do you notice about your coefficient of interest and your standard errors? What might you expect to change if you increased the number of observations in your sample?
+\end{enumerate}
+
+\section*{\normalsize Problem 6: Angrist Krueger (1991)}
+This is data from Angrist and Krueger (1991), they are interested in estimating the effect of an additional year of education on wages.
+\begin{enumerate}[label=\alph*.]
+\item Regress log wage on education, controlling for black, urban, and married. Report these results. What omitted variable might you be worried about and how (what direction) would it bias results.
+\item They propose using quarter of birth as an instrument. What assumptions does this instrument need to fulfill? Do you think it meets these assumptions?
+\item Now use quarter of birth as an instrument, do your results move in the direction you'd expect?
+\item Now the compulsory education laws vary by states, so increase the set of instruments to include interactions with state of birth and quarter of birth. Report all your estimates in one table. What might you be worried about in this specification and how might you attempt to address your concern?
+\end{enumerate}
+\end{document}
