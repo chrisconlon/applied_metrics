@@ -338,15 +338,12 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-engli
 INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
 INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
 INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/babel/locale/en/babel-en.ini
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/inputenc.sty
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/inputenc.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/mathtools/mathtools.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/mathtools/mathtools.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/mathtools/mhsetup.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/mathtools/mhsetup.sty
-INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/mathabx/mathabx.sty
-INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/mathabx/mathabx.sty
-INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/mathabx/mathabx.dcl
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/eucal.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/eucal.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/stmaryrd/stmaryrd.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/stmaryrd/stmaryrd.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/xfrac/xfrac.sty
@@ -397,9 +394,6 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/fix-cm.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/base/ts1enc.def
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math-table.tex
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math-table.tex
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/concmath/concmath.sty
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/concmath/concmath.sty
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/concmath/concmath.sty
 INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecorations.pathreplacing.code.tex
 INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecorations.pathreplacing.code.tex
 INPUT /usr/local/texlive/2025/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecorations.code.tex
@@ -443,6 +437,26 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/datetime/datetime-defaults.st
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/datetime/datetime-defaults.sty
 INPUT /Users/christopherconlon/Library/texmf/tex/latex/fixpauseincludegraphics/fixpauseincludegraphics.sty
 INPUT /Users/christopherconlon/Library/texmf/tex/latex/fixpauseincludegraphics/fixpauseincludegraphics.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/listings.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/listings.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstpatch.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstpatch.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstpatch.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstmisc.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstmisc.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstmisc.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/listings.cfg
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/listings.cfg
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/listings.cfg
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang2.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang2.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang2.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang3.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang3.sty
+INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang3.sty
 INPUT ./L1 - Probability.aux
 INPUT ./L1 - Probability.aux
 INPUT L1 - Probability.aux
@@ -477,12 +491,8 @@ INPUT ./L1 - Probability.nav
 INPUT ./L1 - Probability.nav
 INPUT L1 - Probability.nav
 OUTPUT L1 - Probability.xdv
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/concmath/omlccm.fd
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/concmath/omlccm.fd
-INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/concmath/omlccm.fd
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi8.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi5.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -501,81 +511,58 @@ INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha8.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha5.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb8.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb5.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/stmaryrd/Ustmry.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/stmaryrd/Ustmry.fd
 INPUT /usr/local/texlive/2025/texmf-dist/tex/latex/stmaryrd/Ustmry.fd
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary8.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary6.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary5.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi7.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha7.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb7.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary7.tfm
-OUTPUT L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT L1 - Probability.vrb
-INPUT ./normal-cdf.pdf
-INPUT ./normal-cdf.pdf
-OUTPUT L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT L1 - Probability.vrb
-INPUT ./exp-cdf.pdf
-INPUT ./exp-cdf.pdf
-OUTPUT L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT L1 - Probability.vrb
-INPUT ./bernoulli-cdf.pdf
-INPUT ./bernoulli-cdf.pdf
-OUTPUT L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT L1 - Probability.vrb
-INPUT ./normal-pdf.pdf
-INPUT ./normal-pdf.pdf
-OUTPUT L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT ./L1 - Probability.vrb
-INPUT L1 - Probability.vrb
-INPUT ./exp-pdf.pdf
-INPUT ./exp-pdf.pdf
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi9.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/concmath-fonts/xccmi6.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi7.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/cm/cmmi5.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam5.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha9.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/matha6.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb9.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathb6.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/mathabx/mathx10.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary9.tfm
-INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary6.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
+INPUT /usr/local/texlive/2025/texmf-dist/fonts/tfm/public/stmaryrd/stmary10.tfm
+OUTPUT L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT L1 - Probability.vrb
+INPUT ./normal-cdf.pdf
+INPUT ./normal-cdf.pdf
+OUTPUT L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT L1 - Probability.vrb
+INPUT ./exp-cdf.pdf
+INPUT ./exp-cdf.pdf
+OUTPUT L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT L1 - Probability.vrb
+INPUT ./bernoulli-cdf.pdf
+INPUT ./bernoulli-cdf.pdf
+OUTPUT L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT L1 - Probability.vrb
+INPUT ./normal-pdf.pdf
+INPUT ./normal-pdf.pdf
+OUTPUT L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT ./L1 - Probability.vrb
+INPUT L1 - Probability.vrb
+INPUT ./exp-pdf.pdf
+INPUT ./exp-pdf.pdf
 OUTPUT L1 - Probability.nav
 OUTPUT L1 - Probability.toc
 OUTPUT L1 - Probability.snm

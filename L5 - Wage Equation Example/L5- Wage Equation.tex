@@ -1,15 +1,14 @@
-\input{../preamble.tex}
-
-\setbeamersize{text margin left=10pt,text margin right=10pt}
-
-
-\begin{document}
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{teaching_slides}
 
 
 \title[L5-Wage Equation Example]{ Econometrics I}
 \subtitle{Lecture 5: Extended Example: The Wage Equation}
 \author{Chris Conlon}
 \date{Fall 2025}
+
+
+\begin{document}
 \maketitle
 
 
@@ -19,9 +18,10 @@
 
 \begin{frame}{Mincerian Regression}
 \begin{itemize}
-	\item Recall the Mincerian regression (wage equation):\[
+	\item Recall the Mincerian regression (wage equation):
+	\begin{align*}
 	\ln wage_i = \beta_0 + \beta_{ed} Education_i + \beta_{exp} Experience_i + \beta_{Fem} Female_i + \dots + \varepsilon_i
-	\]
+	\end{align*}
 
 	\smallskip
 	\item Let's revisit estimating this with the Cornwell and Rupert (NLSY) data. 
@@ -143,23 +143,23 @@ We can compute the marginal effect of an additional year of experience as:
 	\small
 \begin{itemize}
 \item Suppose we have an asymptotic distribution for an estimator: 
-\[
+\begin{align*}
 \sqrt{n}\left(\boldsymbol{b}-\boldsymbol{\beta}\right)\Rightarrow_{d}\mathcal{N}\left(\boldsymbol{0},\boldsymbol{\Sigma}\right).
-\]
+\end{align*}
 \item Then the asymptotic distribution of a function of the estimator is
-\[
+\begin{align*}
 \sqrt{n}\left(g\left(\boldsymbol{b}\right)-g\left(\boldsymbol{\beta}\right)\right)\Rightarrow_{d}\mathcal{N}\left(\boldsymbol{0},\left(\nabla g\left(\boldsymbol{\beta}\right)\right)'\boldsymbol{\Sigma}\nabla g\left(\boldsymbol{\beta}\right)\right),
-\]
+\end{align*}
 where $\nabla g\left(\boldsymbol{\beta}\right)$ is the gradient of
 $g\left(\boldsymbol{\beta}\right)$: 
-\[
+\begin{align*}
 \nabla g\left(\boldsymbol{\beta}\right)=\left(\begin{array}{c}
 \frac{\partial g\left(\boldsymbol{\beta}\right)}{\partial\beta_{1}},
 \frac{\partial g\left(\boldsymbol{\beta}\right)}{\partial\beta_{2}},
 \cdots,
 \frac{\partial g\left(\boldsymbol{\beta}\right)}{\partial\beta_{K}}
 \end{array}\right)^T.
-\]
+\end{align*}
 \item Note that we can estimate $\nabla g\left(\boldsymbol{\beta}\right)$
 with $\nabla g\left(\boldsymbol{b}\right)$.
 \item Notice how the covariance between the coefficients $\boldsymbol{\Sigma}$ matters!
@@ -192,9 +192,9 @@ What is the exercise we perform in each case?
 \begin{frame}{Bootstrap/ Simulated Asymptotic Distribution}
 \begin{itemize}
 \item Given the the asymptotic distribution of a parameter estimate
-\[
+\begin{align*}
 \boldsymbol{b}\sim_{d}\mathcal{N}\left(\boldsymbol{\beta},\boldsymbol{\Sigma}\right),
-\]
+\end{align*}
 we have an estimated density function $\hat{f}$. Let $\hat{f}$ be
 the multivariate normal density with mean $\boldsymbol{\beta}$ and
 variance $\boldsymbol{\Sigma}$.
@@ -375,9 +375,11 @@ Y_{i}=\beta_{0}+\beta_{0F}D_{Fi}+\beta_{1}X_{1i}+\beta_{2}X_{1i}D_{Fi}+\varepsil
 
 \begin{frame}{Omitted Variables Bias II}
 \begin{itemize}
-	\item Using the Frisch-Waugh theorem, we can show that \[
-E\left[b_{OLS,k}|\boldsymbol{X},\boldsymbol{z}\right]=\beta_{k}+\gamma\left(\frac{Cov\left(z,x_{k}|\boldsymbol{X}_{-k}\right)}{Var\left(x_{k}|\boldsymbol{X}_{-k}\right)}\right)
-\]
+	\item Using the Frisch-Waugh theorem, we can show that 
+
+	\begin{align*}
+	\E\left[b_{OLS,k} \mid \symbf{X},\symbf{z}\right]=\beta_{k}+\gamma\left(\frac{Cov\left(z,x_{k} \mid \symbf{X}_{-k}\right)}{Var\left(x_{k} \mid \symbf{X}_{-k}\right)}\right)
+\end{align*}
 where $\boldsymbol{X}_{-k}$ refers to all the regressors besides $x_k$.
 
 	\item Suppose positive correlation between regressor $x_k$ and omitted variable $z$.

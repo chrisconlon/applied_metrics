@@ -1,16 +1,13 @@
-\input{../resources/preamble.tex}
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{teaching_slides}
 
-\begin{document}
-
-\pgfmathdeclarefunction{gauss}{2}{%
-  \pgfmathparse{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))}%
-}
 
 \title{Econometrics I}
 \subtitle{Lecture 2: Asymptotic Statistics}
-
 \author{Chris Conlon \\NYU Stern}
 \date{Fall 2025}
+
+\begin{document}
 \maketitle
 
 
@@ -45,7 +42,7 @@ Let's define $S_n = g( \{X_i\}_{i=1}^n)$ as some \alert{statistic} of the sequen
 \begin{itemize}
 	\item Summation: $S_n = \sum_{i=1}^n X_i$; Sample Average: $S_n = \frac{1}{n}\sum_{i=1}^n X_i$;
 	\item Largest Element: $S_n = \max  X_i$
-	\item Variance: $Var(X_1,X_2,\ldots,X_n)$.
+	\item Variance: $\Var(X_1,X_2,\ldots,X_n)$.
 	\item Something complicated: $X_1 - 2 X_2 + 3 X_3 - 4 X_4 \ldots$.
 \end{itemize}
 But our statistic could just be the identity function $S_n = \{X_i\}_{i=1}^n$ or transform $S_n = \{a X_i +b\}_{i=1}^n$ 
@@ -133,16 +130,16 @@ Y&=\left\{\begin{array}{ll}a & X \geq a \\ 0 & X<a\end{array}\right.\\
 \end{frame}
 
 \begin{frame}{Chebyshev Inequality}
-Let $X$ be a \alert{non-negative} random variable with finite expectation $\E[X]$ \alert{and variance} $E[(X-\mu)^2]=\sigma^2$.
+Let $X$ be a \alert{non-negative} random variable with finite expectation $\E[X]$ \alert{and variance} $\E[(X-\mu)^2]=\sigma^2$.
 \begin{align*}
-P\{|X-\mu| \geq k\} \leq \frac{\sigma^2}{k^2}
+\Pr\{|X-\mu| \geq k\} \leq \frac{\sigma^2}{k^2}
 \end{align*}
 This basically says ``if $Var(X)$ is small, the it is unlikely that $X$ is too far from the mean''.\\ \vspace{0.25cm}
 \pause
 
 Proof: Define $Z=(X-\mu)^2$ as our non-negative random variable.
 \begin{align*}
-P\{|X-\mu| \geq k\}=P\left\{(X-\mu)^2 \geq k^2\right\}\\ 
+\Pr\{|X-\mu| \geq k\}=\Pr\left\{(X-\mu)^2 \geq k^2\right\}\\ 
 \end{align*}
 Now apply Markov inequality to $Z$ where $a=k^2$.
 \end{frame}
@@ -154,9 +151,10 @@ Now apply Markov inequality to $Z$ where $a=k^2$.
 \begin{center}
 \begin{minipage}{.8\textwidth}
 	\begin{block}{Weak Law Of Large Numbers}
+\vspace{0.3cm}
 		If $X_i$ for $i=1,\dots,N$ are \alert{independent and identically distributed} with finite mean $\mu$ and variance $\sigma^2$,
 		then as $N\rightarrow \infty$,\[
-			\bar{X}_N \overset{p}{\rightarrow} E\left[X\right]
+			\bar{X}_N \overset{p}{\rightarrow} \E\left[X\right]
 		\]
 	\end{block}
 \end{minipage}
@@ -173,19 +171,18 @@ The Law of Large Numbers says the sample average converges in probability to its
 
 \begin{frame}{Proof: Law of Large Numbers}
 \begin{align*}
-S_n = \frac{1}{n} (X_1 + X_2 + X_3 + \cdots + X_n).\\
+S_n = \frac{1}{n} (X_1 + X_2 + X_3 + \cdots + X_n)
 \end{align*}
 Easy to see that $\E[S_n] = \mu$, and that
 \begin{align*}
-Var (S_n) &= Var\left(\frac{1}{N}(X_1 + X_2 + \cdots X_n) \right) \\
-&= \frac{1}{n^2} Var \left(X_1 + X_2 + \cdots X_n \right) = \frac{1}{n}\sum_{i=1}^n Var(X_i) = \frac{n \sigma^2}{n^2} = \frac{\sigma^2}{n} 
+\Var (S_n) &= \Var\left(\frac{1}{N}(X_1 + X_2 + \cdots X_n) \right)= \frac{1}{n^2} \Var \left(X_1 + X_2 + \cdots X_n \right) \\
+&= \frac{1}{n}\sum_{i=1}^n \Var(X_i)= \frac{n \sigma^2}{n^2} = \frac{\sigma^2}{n} 
 \end{align*}
 Now we apply Chebyshev with $k=\epsilon$:
 \begin{align*}
 \Pr\left(|S_n - \mu| \geq \varepsilon\right) &\leq \frac{\sigma^2}{n \cdot \varepsilon^2}\\
 \end{align*}
 Which goes to zero as $n \rightarrow \infty$.
-
 \end{frame}
 
 
@@ -419,7 +416,7 @@ Which goes to zero as $n \rightarrow \infty$.
 \begin{frame}{Unbiasedness and Consistency}
 \begin{itemize}
 	\item As mentioned above,
-	 $\hat{\theta}$ is an {\bf unbiased} estimator of $\theta$ if $E\left[\hat{\theta}\right] = \theta$.
+	 $\hat{\theta}$ is an {\bf unbiased} estimator of $\theta$ if $\E\left[\hat{\theta}\right] = \theta$.
 	 
 	 \medskip
 	 \item  $\hat{\theta}$ is a {\bf consistent} estimator of $\theta$ if $\hat{\theta}\overset{p}{\rightarrow}\theta$
@@ -484,10 +481,10 @@ Which goes to zero as $n \rightarrow \infty$.
 \begin{frame}{Central Limit Theorem}
 \begin{itemize}
 	\item If $X_i$ are i.i.d. draws with finite mean and variance, then as $N\rightarrow \infty$,
-	\[
+	\begin{align*}
 		\sqrt{N} \left( \bar{X}_N  - \mu\right) \overset{d}{\rightarrow} \mathcal{N}\left(0,\sigma^2\right) 
-	\]
-	where $\mu=E\left(X_i\right)$ and $\sigma^2 = Var\left(X_i\right)$.
+	\end{align*}
+	where $\mu=\E\left(X_i\right)$ and $\sigma^2 = \Var\left(X_i\right)$.
 
 	\medskip
 	\item Note that the CLT tells us something very specific about the behavior of
@@ -526,7 +523,7 @@ I am not going to prove the CLT (sorry!).
 	\item Compute $\bar{X}_N = N^{-1}\sum_{i=1}^N X_i$. Note that 
 	\begin{itemize}
 		\item $\bar{X}_N$ is $N^{-1}$ times a random variable that is $\sim \text{Binomial}\left(N,p\right)$. 
-		\item $E\left[\bar{X}_N \right]=p$.
+		\item $\E\left[\bar{X}_N \right]=p$.
 	\end{itemize}
 	\item Repeat above $S=1000$ times. Let $\bar{X}_{N,s}$ denote the sample mean from the $s$th simulation
 	
@@ -725,13 +722,13 @@ clt_function_scaled(1000,.4)
 
 
 	\item The extension of the LLN to {\bf multivariate} random variables is trivial. We can write\[
-			{\bf \bar{X}}_N \overset{p}{\rightarrow} E\left( {\bf X}_i \right)
+			{\bf \bar{X}}_N \overset{p}{\rightarrow} \E\left( {\bf X}_i \right)
 		\]
 		
 	\item The multivariate CLT holds that\[
-		\sqrt{N} \left({\bf \bar{X}}_N - E\left( {\bf X}_i \right) \right) \overset{d}{\rightarrow} \mathcal{N} \left(0,\Sigma\right),
+		\sqrt{N} \left({\bf \bar{X}}_N - \E\left( {\bf X}_i \right) \right) \overset{d}{\rightarrow} \mathcal{N} \left(0,\Sigma\right),
 	\]
-	where $\Sigma = E\left[\left({\bf X}_i - E\left( {\bf X}_i \right)\right)\left({\bf X}_i - E\left( {\bf X}_i \right)\right)'\right]$
+	where $\Sigma = \E\left[\left({\bf X}_i - \E\left( {\bf X}_i \right)\right)\left({\bf X}_i - \E\left( {\bf X}_i \right)\right)'\right]$
 
 \end{itemize}
 \end{frame}
@@ -762,15 +759,16 @@ clt_function_scaled(1000,.4)
 	\item Consider the usual setup with $X_i$ i.i.d. for $i=1,2,\dots,\infty$.
 
 	\medskip
-	\item Let's show that \[
-			E\left[\left(X_i - \bar{X}_N \right)^2\right] = \sigma^2 \left(\frac{N-1}{N}\right)
-		\]
+	\item Let's show that 
+	\begin{align*}
+			\E\left[\left(X_i - \bar{X}_N \right)^2\right] = \sigma^2 \left(\frac{N-1}{N}\right)
+	\end{align*}
 
 	\medskip
-	\item It follows that $E\left[s_N^2 \right] = \sigma^2$, where\[
-s_N^2 \equiv \frac{1}{N-1}\sum_{i=1}^{N} \left(X_i - \bar{X}_N \right)^2
-\]
-
+	\item It follows that $E\left[s_N^2 \right] = \sigma^2$, where
+	\begin{align*}
+			s_N^2 \equiv \frac{1}{N-1}\sum_{i=1}^{N} \left(X_i - \bar{X}_N \right)^2
+	\end{align*}
 	\medskip
 	\item But also notice that for large $N$, there is little difference between this estimator and one that divides by $N$.
 
@@ -784,12 +782,13 @@ s_N^2 \equiv \frac{1}{N-1}\sum_{i=1}^{N} \left(X_i - \bar{X}_N \right)^2
 s_N^2 \equiv \frac{1}{N-1}\sum_{i=1}^{N} \left(X_i - \bar{X}_N \right)^2
 \]
 \begin{itemize}
-	\item We can estimate $Var\left(\bar{X}_N\right)=\frac{\sigma^2}{N}$ with $\frac{s^2}{N}$
+	\item We can estimate $\Var\left(\bar{X}_N\right)=\frac{\sigma^2}{N}$ with $\frac{s^2}{N}$
 
 
-	\item A {\bf standard error} refers to our estimate of $\sqrt{Var\left( \bar{X}_N \right)}$:\[
-		\sqrt{\frac{s^2}{N}}
-\]
+	\item A {\bf standard error} refers to our estimate of :
+	\begin{align*}
+	\sqrt{\Var\left( \bar{X}_N \right)} = \sqrt{\frac{s^2}{N}}
+\end{align*}
 
 	\item Given the {\bf asymptotic normality} of $\bar{X}_N$, these standard errors allow us to
 			make statements about the (approximate) CDF of $\bar{X}_N$.
@@ -801,6 +800,7 @@ s_N^2 \equiv \frac{1}{N-1}\sum_{i=1}^{N} \left(X_i - \bar{X}_N \right)^2
 \end{frame}
 
 
+\section{Thanks!}
 
 
 

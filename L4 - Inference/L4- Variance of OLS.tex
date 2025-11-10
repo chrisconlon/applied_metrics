@@ -1,16 +1,17 @@
-\input{../preamble.tex}
-
-\setbeamersize{text margin left=10pt,text margin right=10pt}
-
-
-\begin{document}
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{teaching_slides}
 
 
 \title[L4 - Inference and Standard Errors]{ Econometrics I}
 \subtitle{Lecture 4: Inference and Standard Errors}
 \author{Chris Conlon}
 \date{Fall 2025}
+
+
+\begin{document}
 \maketitle
+
+
 
 
 \begin{frame}
@@ -174,21 +175,21 @@ f(x_i) = \mathbb{E}[Y_i \mid X_i]
 \begin{itemize}
 	\item A useful identity for linear algebra:
 \begin{align*}
-\operatorname { Var } (a \mathbf{Z} ) = a^2 \operatorname { Var }(\mathbf{Z})\\
-\operatorname { Var } (A \mathbf{Z} ) = A \operatorname { Var }(\mathbf{Z}) A'
+\operatorname { Var } (a \cdot \symbf{Z} ) &= a^2 \cdot \Var(\symbf{Z})\\
+\operatorname { Var } (A \cdot \symbf{Z} ) &= A \cdot  \Var(\symbf{Z}) \cdot A'
 \end{align*}
 
 \smallskip
-\item Since ${\bf b}_{OLS} = ({\bf X} '{\bf X} )^{-1} {\bf X} '{\bf y}$,
-\[
-\operatorname { Var } ({\bf b}_{OLS} | {\bf X}) = ({\bf X} '{\bf X} )^{-1} {\bf X}' \operatorname { Var } ({\bf y} | {\bf X})  {\bf X}  ({\bf X} '{\bf X} )^{-1}
-\]
+\item Since $\symbf{b_{OLS}} = (\symbf{X'} \symbf{X} )^{-1} \symbf{X'} \symbf{y}$,
+\begin{align*}
+\Var (\symbf{b_{OLS}} \mid  \symbf{X}) = (\symbf{X'} \symbf{X} )^{-1} \, \symbf{X'} \, \Var (\symbf{y} \mid \symbf{X}) \,  \symbf{X} \, (\symbf{X'X} )^{-1}
+\end{align*}
 
 \smallskip
-\item Recalling that $\operatorname { Var } ( \mathbf{y} |\mathbf{X} )  = \operatorname { Var } ( \mathbf{\varepsilon} | \mathbf { X } ) $ (because $\operatorname { Var } ( \mathbf{X} |\mathbf{X})=0$)
-\[
-\operatorname { Var } ({\bf b}_{OLS} | {\bf X}) = ({\bf X} '{\bf X} )^{-1} {\bf X}' \operatorname { Var } ( \mathbf{\varepsilon} | \mathbf { X } )  {\bf X}  ({\bf X} '{\bf X} )^{-1}
-\]
+\item Recalling that $\Var ( \symbf{y} \mid \symbf{X} )  = \Var ( \symbf{\varepsilon}  \mid \symbf{X}  ) $,  (because $\Var( \symbf{X} \mid \symbf{X})=0$)
+\begin{align*}
+\Var( \symbf{b_{OLS}} \mid \symbf{X}) = (\symbf{X'X})^{-1}\, \symbf{X'}\, \Var ( \symbf{\varepsilon} \mid \symbf { X } ) \, \symbf{X} \, (\symbf{X'X})^{-1}
+\end{align*}
 \end{itemize}
 \end{frame}
 
@@ -388,18 +389,20 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 
 \begin{frame}{Clustering II}
 \begin{itemize}
-	\item Recall the sandwich formula for standard errors:\[
-		n^{-1} \E\left[{\bf x}_i {\bf x}'_i\right]^{-1} \V\left[{\bf x}_i \varepsilon_i \right] \E\left[{\bf x}_i {\bf x}'_i\right]^{-1}.
-	\]
+	\item Recall the sandwich formula for standard errors:
+	\begin{align*}
+		n^{-1} \E\left[\symbf {x_i} \symbf {x_i'} \right]^{-1} \Var \left[\symbf {x_i} \varepsilon_i \right] \E\left[\symbf {x_i} \symbf {x_i'} \right]^{-1}.
+	\end{align*}
 
-	\item The estimator for the middle part without clustering was\[
-	{\bf \V}\left[{\bf x}_i \varepsilon_i \right] = n^{-1} \sum_{i} {\bf x}_i {\bf x}'_i  e_i^2
-	\]
+	% \item The estimator for the middle part without clustering was
+	\begin{align*}
+	\symbf{\Var}\left[\symbf {x_i} \varepsilon_i \right] = n^{-1} \sum_{i} \symbf{x_i} \symbf{x_i'}  e_i^2
+	\end{align*}
 
-	\item With clustering, it will be \[
-	{\bf V}_{clu} = n^{-1} \sum_{i=1}^{n}\sum_{j=1}^{n} {\bf x}_i\,  {\bf x}'_j \, e_i\, e_j \cdot {\mathbb{I}}\left[(i,j) \in \text{Group}_g \right]
-	\]
-	where the ${\bf I}$ function is 1 when $i,j$ come from the same group and zero otherwise.
+	% \item With clustering, it will be \[
+	% {\symbf V}_{clu} = n^{-1} \sum_{i=1}^{n}\sum_{j=1}^{n} {\symbf x}_i\,  {\symbf x}'_j \, e_i\, e_j \cdot {\mathbb{I}}\left[(i,j) \in \text{Group}_g \right]
+	% \]
+	% where the ${\symbf I}$ function is 1 when $i,j$ come from the same group and zero otherwise.
 
 \end{itemize}
 \end{frame}
@@ -548,7 +551,7 @@ feols(y~ x1 + x2, data=df, vcov=~group_id+time_id)
 	\medskip
 	\item Also, it can potentially deliver good estimates of standard errors even with 
 	correlated errors, but this depends on the version of the bootstrap (see {\bf block bootstrap}).
-	 Exploring formally the  conditions under which the bootstrap works well is beyond our scope. 
+	 Exploring formally the  conditions under which the bootstrap works well is for next semester!
 \end{itemize}
 \end{frame}
 

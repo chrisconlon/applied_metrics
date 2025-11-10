@@ -1,77 +1,13 @@
-\input{../resources/preamble.tex}
-% \documentclass[english,xcolor={dvipsnames},aspectratio=169]{beamer}
-% \usepackage[italic]{mathastext}
-
-% \usepackage{float}
-% \usepackage{amsmath}
-% \usepackage{amssymb}
-% \usepackage{graphicx}
-% \usepackage{setspace}
-% \usepackage[outdir=./]{epstopdf}
-% \usepackage{listings}
-
-% \usepackage{caption,subcaption}
-% \usepackage{booktabs}
-% \usepackage[flushleft]{threeparttable}
-
-% \usepackage{hyperref}
-% \hypersetup{
-%     colorlinks=true,
-%     linkcolor=blue,
-%     filecolor=magenta,      
-%     urlcolor=blue,
-% }
-
-
-%    \lstset{language=R,
-%            basicstyle=\ttfamily\scriptsize,
-%            keywordstyle=\color{blue}\ttfamily,
-%            stringstyle=\color{red}\ttfamily,
-%            commentstyle=\color{green}\ttfamily,
-%           breaklines=true
-%           }
-
-
-% \usepackage{siunitx}
-% \sisetup{
-% input-symbols = {()},
-% group-digits  = false,
-% explicit-sign
-% }
-
-% %\usetheme{CambridgeUS}
-% \usetheme{Boadilla}
-% \usecolortheme{seahorse}
-
-% \setbeamertemplate{itemize subsubitem}{\tiny\raise1.5pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
-
-
-% \DeclareFontShape{OT1}{cmss}{b}{n}{<->ssub * cmss/bx/n}{} 
-
-
-% \usepackage{tikz}
-% \usepackage{pgfplots}
-% \pgfplotsset{compat=1.7}
-% \usetikzlibrary{arrows, shapes, snakes, patterns, angles, quotes}
-
-% \makeatletter
-
-
-% \usepackage{setspace}
-% \usepackage[normalem]{ulem}
-% \setbeamersize{text margin left=10pt,text margin right=10pt}
-
-% \makeatother
-
-% \usepackage{babel}
-
-\begin{document}
-
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{teaching_slides}
 
 \title[L3 - Linear Regression]{ Econometrics I}
 \subtitle{Lecture 3: Linear Regression}
 \author{Chris Conlon \\NYU Stern}
 \date{Fall 2025}
+
+
+\begin{document}
 \maketitle
 
 
@@ -211,7 +147,7 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 	\item Now, we have a meaningful model. 
 	\item Note that
 \begin{align*}
-E\left[\boldsymbol{y}|\boldsymbol{X}\right] & =  E\left[\boldsymbol{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}|\boldsymbol{X}\right]\\
+\E\left[\boldsymbol{y}|\boldsymbol{X}\right] & =  \E\left[\boldsymbol{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}|\boldsymbol{X}\right]\\
  & =  \boldsymbol{X}\boldsymbol{\beta}+E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right]\\
  &  = \boldsymbol{X}\boldsymbol{\beta},
 \end{align*}
