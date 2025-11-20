@@ -53,13 +53,13 @@ y_{it} &= \alpha + \gamma_i \cdot D_i + \lambda_t \cdot \text{Post}_t +  \alert{
 \end{align*}
 \begin{itemize}
 \item Nobody treated at $t-1$ and some people treated at $t$.
-\item Parallel trends $\mathbb{E}[Y_{it}(0) - Y_{i,t-1}(0) | D_{it}=1] =\mathbb{E}[Y_{it}(0) - Y_{i,t-1}(0) | D_{it}=0]$
-\item If parallel trends holds: $\tau = ATT = \mathbb{E}[Y_{it} - Y_{i,t-1} | D_{it}=1]-\mathbb{E}[Y_{it} - Y_{i,t-1} | D_{it}=0]  $
+\item Parallel trends $\mathbb{E}[Y_{it}(0) - Y_{i,t-1}(0) \mid D_{it}=1] =\mathbb{E}[Y_{it}(0) - Y_{i,t-1}(0) \mid D_{it}=0]$
+\item If parallel trends holds: $\tau = ATT = \mathbb{E}[Y_{it} - Y_{i,t-1} \mid D_{it}=1]-\mathbb{E}[Y_{it} - Y_{i,t-1} \mid D_{it}=0]  $
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Simple Question?}
-When does TWFE deliver the $ATT=\mathbb{E}[\tau_{it} | D_{it}=1]$?
+When does TWFE deliver the $ATT=\mathbb{E}[\tau_{it} \mid D_{it}=1]$?
 \begin{align*}
 y_{it} = x_{it} \beta + \tau_{it} \cdot  D_{it} + \eta_i + \lambda_t + \varepsilon_{it}
 \end{align*}
@@ -74,7 +74,7 @@ y_{it} = x_{it} \beta + \tau_{it} \cdot  D_{it} + \eta_i + \lambda_t + \varepsil
 \begin{align*}
 y_{it} = x_{it} \beta + \tau_{it} \cdot  D_{it} + \eta_i + \lambda_t + \varepsilon_{it}
 \end{align*}
-Three different control groups when we compare $Y_{it} | D_{it}=1$:
+Three different control groups when we compare $Y_{it} \mid D_{it}=1$:
 \begin{enumerate}
 \item Units that \alert{never get treated}
 \item Units that \alert{will be treated later}: $t' > t$
@@ -183,8 +183,8 @@ Assumptions
 \item Irreversibility: $D_{it} \geq D_{i,t-1}$.
 \item Modified Parallel trends for $t \geq g \text { and } s \geq t$:
 \begin{align*}
-\mathbb{E}\left[Y_{t}(0)-Y_{t-1}(0) \mid G=g\right]&=\mathbb{E}\left[Y_{t}(0)-Y_{t-1}(0) \mid C=1\right] \\
-\mathbb{E}\left[Y_{t}(0)-Y_{t-1}(0) \mid G=g\right]&=\mathbb{E}\left[Y_{t}(0)-Y_{t-1}(0) \mid D_{s}=0, G \neq g\right]
+\E \left[Y_{t}(0)-Y_{t-1}(0) \mid G=g\right]&=\E\left[Y_{t}(0)-Y_{t-1}(0) \mid C=1\right] \\
+\E \left[Y_{t}(0)-Y_{t-1}(0) \mid G=g\right]&=\E \left[Y_{t}(0)-Y_{t-1}(0) \mid D_{s}=0, G \neq g\right]
 \end{align*}
 Can also do parallel trends \alert{conditional on covariates}.
 \end{itemize}
@@ -194,12 +194,12 @@ Can also do parallel trends \alert{conditional on covariates}.
 \small
 All observations treated at time $g$ are grouped into a \alert{cohort}
 \begin{align*}
-ATT(t,g) = \mathbb{E}\left[Y_{t}(g)-Y_{t}(0) \mid G=g\right]
+ATT(t,g) = \E \left[Y_{t}(g)-Y_{t}(0) \mid G=g\right]
 \end{align*}
 We can estimate a \alert{time-varying} and \alert{cohort-specific} ATT using \alert{never-treated} or \alert{not-yet-treated}.
 \begin{align*}
-\operatorname{ATT}(g, t)&=E\left[Y_{t}-Y_{g-1} \mid G=g\right]-E\left[Y_{t}-Y_{g-1} \mid C=1\right] \\
-\operatorname{ATT}(g, t)&=E\left[Y_{t}-Y_{g-1} \mid G=g\right]-E\left[Y_{t}-Y_{g-1} \mid D_{t}=0, G \neq g\right]
+\operatorname{ATT}(g, t)&=\E\left[Y_{t}-Y_{g-1} \mid G=g\right]-\E\left[Y_{t}-Y_{g-1} \mid C=1\right] \\
+\operatorname{ATT}(g, t)&=\E\left[Y_{t}-Y_{g-1} \mid G=g\right]-\E\left[Y_{t}-Y_{g-1} \mid D_{t}=0, G \neq g\right]
 \end{align*}
 In may be better to simply estimate and report these objects.\\
  (Assuming modified parallel trends hold).\\
