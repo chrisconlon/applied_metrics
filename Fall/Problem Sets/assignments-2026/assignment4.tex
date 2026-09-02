@@ -66,9 +66,20 @@ The loan helps every firm, but helps firms with better scores less (they have ot
 The \textbf{average treatment effect} is $\E[\tau_{i}] = 1$.
 
 \begin{enumerate}[label=(\alph*)]
-\item Before simulating: $D_{i}$ depends on $u_{i}$, and so does $y_{i}$. Use the operator
-rules to sign the bias of OLS of $y$ on $D$. Give the economic story in one sentence.
-\item Simulate the data. Regress $y$ on $D$. Compare to $1$.
+\item Before simulating. OLS of $y$ on a binary $D$ is a difference of two group means
+(Lecture 1's indicator trick): $\E[y \mid D=1] - \E[y \mid D=0]$. Substitute the outcome
+equation and show this equals
+\[
+\underbrace{\E[\tau_{i} \mid D_{i}=1]}_{\text{effect on the treated}}
+\;+\;
+\underbrace{\E[u_{i} \mid D_{i}=1] - \E[u_{i} \mid D_{i}=0]}_{\text{selection}},
+\]
+the decomposition from Session 5. Then use the approval rule to sign each piece: which firms
+get approved, what does that say about their $u_{i}$, and what does it say about their
+$\tau_{i}$ relative to the average of $1$? Which piece do you expect to dominate? Give the
+economic story in one sentence.
+\item Simulate the data. Regress $y$ on $D$. Then compute the two pieces from (a) directly
+(you know $\tau_{i}$ and $u_{i}$) and confirm they add up. Compare each to $1$.
 \item Build the instrument: for each application, the assigned officer's approval rate
 computed \emph{leaving out application $i$}. Call it $z_{i}$ (``leniency''). Why leave $i$
 out? (One sentence; think about what $D_{i}$ itself contributes to the officer's rate.)
