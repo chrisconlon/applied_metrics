@@ -1,0 +1,12 @@
+\begin{tabular}{lcccc}\toprule
+ & Poisson & Poisson, robust SE & Negative binomial & Zero-inflated NB \\ \midrule
+Promo (truth $= 0.6$ among buyers) & 0.631 & 0.631 & 0.620 & 0.615 \\
+ & (0.029) & (0.051) & (0.051) & (0.049) \\
+Tenure (truth $= 0.2$) & 0.213 & 0.213 & 0.204 & 0.203 \\
+ & (0.014) & (0.026) & (0.026) & (0.024) \\
+Overdispersion $\alpha$ (truth $= 0.8$) & 0 (imposed) & --- & 1.64 & 0.85 \\
+Never-buyer share $\pi$ (truth $= 0.25$) & --- & --- & --- & 0.24 \\
+Log-likelihood & -7200.5 & (same) & -5827.1 & -5812.9 \\
+AIC / BIC & 14407 / 14426 & & 11662 / 11687 & 11636 / 11667 \\
+Vuong, ZINB vs.\ NB & & & \multicolumn{2}{c}{$z = 2.73$ (favors ZINB)}  \\
+\bottomrule\end{tabular}

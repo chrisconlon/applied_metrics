@@ -1,0 +1,9 @@
+\begin{tabular}{lccccc}\toprule
+ & Cox PH & Weibull PH & Exponential PH & OLS $\ln T$, uncensored only & OLS $\ln T$, censored as exits \\ \midrule
+Price increase (truth $\beta = 0.5$; HR $= 1.65$) & 0.483 & 0.485 & 0.570 & -0.409 & -0.569 \\
+ & (0.042) & (0.042) & (0.042) & (0.072) & (0.061) \\
+Usage (truth $\beta = -0.4$) & -0.384 & -0.385 & -0.457 & 0.213 & 0.389 \\
+ & (0.023) & (0.023) & (0.023) & (0.038) & (0.032) \\
+Shape $p$ (truth $= 0.7$) & --- & 0.70 & 1 (imposed) & --- & --- \\
+Baseline hazard & unrestricted & Weibull & constant & (AFT, wrong sign) & (AFT, wrong sign) \\
+\bottomrule\end{tabular}
