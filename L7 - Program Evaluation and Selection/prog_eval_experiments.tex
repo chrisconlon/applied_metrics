@@ -697,6 +697,9 @@ power.t.test(delta = delta, sd = sigma, power = power,
     \item Pick practically meaningful \alert{relative} lift.
     \item Choose $\alpha$ (often 0.05) and desired power (often 0.8 or 0.9).
     \item Account for clustering, multiple comparisons, and unequal exposure.
+    \item Commit to the sample size \alert{in advance} --- checking daily and stopping
+    at $p<.05$ is the sequential version of multiple testing (Session 3), and it
+    inflates false positives several-fold.
     \item If sample sizes are enormous, consider: targeting a segment, increasing effect size via stronger treatment, or switching to a continuous metric with lower variance.
   \end{enumerate}
 \end{frame}

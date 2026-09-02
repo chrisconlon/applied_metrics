@@ -100,52 +100,22 @@ using a {\bf z test}.
 \begin{frame}{Rejection Region and Power}
 \begin{columns}
 \begin{column}{0.5\textwidth}
-\begin{figure}	
-	\includegraphics[width=\textwidth]{hypothesis_test.pdf}	
+\begin{figure}
+	\includegraphics[width=\textwidth]{hypothesis_test.pdf}
 \end{figure}
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
-	\item Suppose $\bar{X}$ is normally distributed with $Var\left(\bar{X}\right)=1$ 
+	\item $\bar{X}$ is normal with $Var\left(\bar{X}\right)=1$; test $H_{0}: \mu_x = 1$
+	against $H_{1}: \mu_x = 4$. Blue and red are the PDFs of $\bar{X}$ under the null
+	and alternative.
 
-	\item We want to test \[
-\begin{array}{c}
-H_{0}:\qquad\mu_{x}=1\\
-H_{1}:\qquad\mu_{x}= 4
-\end{array}
-\]
-	\item The blue and red lines are the PDF of $\bar{x}$ under the null and alternative hypotheses, respectively 
+	\item The shaded region ($\bar{X}\ge 2.65$) is the level-$.05$ rejection region
+	that \alert{maximizes power}: it rejects for the 5\% of the null PDF where the
+	alternative is most likely relative to the null.
 
-	\item The shaded region is the rejection region with level $\alpha = .05$ that maximizes power. 
-	Note that this is for $\bar{X}\ge 2.65$.
-	
-\end{itemize}
-
-\end{column}
-
-\end{columns}
-\end{frame}
-
-
-
-\begin{frame}{Rejection Region and Power}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\begin{figure}	
-	\includegraphics[width=\textwidth]{hypothesis_test.pdf}	
-\end{figure}
-\end{column}
-\begin{column}{0.5\textwidth}
-\begin{itemize}
-	\item Note that the rejection region is the region where the PDF of
-	the alternative hypothesis is high relative to the null hypothesis.
-	
-	\item The maximum power test with  level $.05$ is the test that rejects for the 5\%
-	of the null-hypothesis PDF in which $H_1$'s likelihood (probability density) is highest
-	relative to $H_0$'s.
-
-	\item We often take for granted that rejection regions
-	are in the tails of the null-hypothesis PDF; this is why.
+	\item This is why rejection regions live in the tails --- something we usually
+	take for granted.
 \end{itemize}
 
 \end{column}
@@ -316,6 +286,28 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 
 	\end{enumerate}
 }
+\end{frame}
+
+
+\begin{frame}{What a p-value is (and is not)}
+The \alert{p-value} is the probability, \alert{computed assuming $H_0$ is true}, of a
+test statistic at least as extreme as the one you observed.
+\bigskip
+
+It is \alert{not}:
+\begin{itemize}
+	\item the probability that $H_0$ is true given the data (that would require a prior --- Bayes, Lecture 1);
+	\item the probability that your result ``is a fluke'';
+	\item the probability the result would replicate;
+	\item a measure of the \alert{size} or \alert{importance} of the effect.
+\end{itemize}
+\bigskip
+\begin{itemize}
+	\item $p = 0.049$ and $p = 0.051$ are the same evidence. The 5\% threshold is a
+	convention, not a law of nature.
+	\item Reference for the interested: the ASA statement on p-values (2016) ---
+	written because misuse got bad enough to require an official statement.
+\end{itemize}
 \end{frame}
 
 
@@ -540,6 +532,54 @@ F=\frac{\left(\boldsymbol{R}\boldsymbol{b}_{OLS}-\boldsymbol{q}\right)'\left\{ \
 
 
 
+\begin{frame}{Testing many things}
+Run $m$ independent tests of hypotheses that are \alert{all truly null}, each at the
+5\% level. The chance of at least one ``significant'' result is $1 - 0.95^{m}$:
+\begin{center}
+\begin{tabular}{ccccc}
+$m$ & 1 & 5 & 20 & 100 \\
+\hline
+$\Pr(\text{at least one rejection})$ & 5\% & 23\% & \alert{64\%} & 99.4\% \\
+\end{tabular}
+\end{center}
+\bigskip
+\begin{itemize}
+	\item The business version: slice a campaign's results by 20 customer segments
+	and one segment will ``respond significantly'' \alert{by construction}, effect or no effect.
+
+	\item Subtler version (the ``garden of forking paths''): the count includes tests
+	you \emph{would have} run had the data looked different --- trying specifications
+	until one works is multiple testing even if only one regression appears in the
+	paper.
+
+	\item Peeking at an A/B test daily and stopping the moment $p < .05$ is the
+	sequential version of the same disease --- it can push the false positive rate
+	several-fold above 5\%. (More when we design experiments in Session 5.)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Testing many things: what to do}
+\begin{itemize}
+	\item \alert{Bonferroni}: to keep the overall (familywise) error rate at
+	$\alpha$ across $m$ tests, use $\alpha/m$ for each. Crude and conservative, but
+	honest --- and a useful instinct even without the formula.
+
+	\item \alert{Pre-specify}: decide the primary outcome, the subgroups, and the
+	sample size before looking. (This is why clinical trials and, increasingly, field
+	experiments are pre-registered.)
+
+	\item \alert{Holdout samples}: anything discovered by exploration is a
+	\emph{hypothesis}; confirm it on data that had no vote in finding it. (The same
+	logic as train/test splits --- Session 13.)
+
+	\item The critical-consumer question to ask of any surprising subgroup result,
+	in a paper or a dashboard: \alert{``how many chances did they have to find
+	this?''}
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Non-Nested Models}
 \begin{itemize}
 	\item We have considered only nested models thus far. When testing \[
@@ -621,10 +661,40 @@ F=\frac{\left(\boldsymbol{R}\boldsymbol{b}_{OLS}-\boldsymbol{q}\right)'\left\{ \
 
 	\smallskip
 	\item Defining the confidence interval in this way, the probability that the confidence interval contains
-	the true parameter (\alert{coverage}) is $1-\alpha$ (if the asymptotic distribution of the estimator is taken as the true distribution). 
+	the true parameter (\alert{coverage}) is $1-\alpha$ (if the asymptotic distribution of the estimator is taken as the true distribution).
 	That is, if $\alpha=.05$, this is called a 95\% confidence interval, and there
-	is a 95\% chance it will contain the true parameter (assuming that the asymptotic approximation holds). 
+	is a 95\% chance it will contain the true parameter (assuming that the asymptotic approximation holds).
 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Statistical vs.\ economic significance}
+Stars measure \alert{precision}. Decisions run on \alert{magnitudes}.
+\begin{itemize}
+	\item With $n$ large enough, \emph{everything} is statistically significant ---
+	scanner data and platform logs make $p < .001$ cheap. The question is whether a
+	0.2\% conversion lift pays for the engineering.
+
+	\medskip
+	\item Two estimates to keep straight:
+	\begin{itemize}
+		\item \alert{Precisely estimated, tiny}: significant and irrelevant.
+		A well-estimated zero can be a valuable finding; a well-estimated 0.2\% is a
+		decision input, not a triumph.
+		\item \alert{Noisy, potentially large}: a wide CI that covers both zero and
+		effects you'd care a lot about means \alert{underpowered}, not ``no effect.''
+		Absence of evidence is not evidence of absence.
+	\end{itemize}
+
+	\medskip
+	\item Discipline: report the CI \alert{in units a decision-maker uses}
+	(recall the transformations checklist), and lead with the magnitude, not the
+	stars.
+
+	\medskip
+	\item The classic complaint about ``sizeless science'': McCloskey and Ziliak.
+	Referees will make it about your work; make it about others' first.
 \end{itemize}
 \end{frame}
 
