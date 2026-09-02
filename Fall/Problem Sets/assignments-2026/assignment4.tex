@@ -1,0 +1,132 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\providecommand{\tabularnewline}{\\}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+
+\title{\Huge Assignment 4}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026 --- due at the start of Session 8}
+
+\makeatother
+
+\begin{document}
+
+\title{Assignment 4}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+\textbf{Instructions.} This is the first of the short biweekly assignments: two problems,
+covering the instrumental-variables designs from Session 7 (examiner or ``judge'' instruments,
+and shift-share exposure designs). \texttt{R} with \texttt{fixest} or Python with
+\texttt{pyfixest}; \texttt{feols(y \~{} 1 | d \~{} z)} estimates 2SLS. Turn in a PDF with your
+results and reasoning, and your code. Derive first, then simulate to check yourself.
+
+\subsection*{1 Loan officers as instruments}
+
+A bank receives $4{,}000$ small-business loan applications, each assigned \emph{at random}
+to one of $40$ loan officers. Officer $j$ approves an application if the firm's
+creditworthiness score clears the officer's personal cutoff $c_{j}$:
+\begin{align*}
+s_{i} &= u_{i} + v_{i}, \qquad D_{i} = \mathbb{1}\{s_{i} > c_{j(i)}\},
+\qquad c_{j} \sim \mathcal{N}(0.8,\ 0.5^{2}) \text{ (one draw per officer)},
+\end{align*}
+where $u_{i} \sim \mathcal{N}(0,1)$ is firm quality (seen by the officer, not by you) and
+$v_{i} \sim \mathcal{N}(0,1)$ is paperwork noise. Cutoffs are drawn once per officer.
+The outcome is the firm's log revenue two years later:
+\begin{align*}
+y_{i} = 1 + \tau_{i} D_{i} + u_{i} + \varepsilon_{i}, \qquad
+\tau_{i} = 1 - 0.4\, s_{i}, \qquad \varepsilon_{i} \sim \mathcal{N}(0, 0.5^{2}).
+\end{align*}
+The loan helps every firm, but helps firms with better scores less (they have other options).
+The \textbf{average treatment effect} is $\E[\tau_{i}] = 1$.
+
+\begin{enumerate}[label=(\alph*)]
+\item Before simulating: $D_{i}$ depends on $u_{i}$, and so does $y_{i}$. Use the operator
+rules to sign the bias of OLS of $y$ on $D$. Give the economic story in one sentence.
+\item Simulate the data. Regress $y$ on $D$. Compare to $1$.
+\item Build the instrument: for each application, the assigned officer's approval rate
+computed \emph{leaving out application $i$}. Call it $z_{i}$ (``leniency''). Why leave $i$
+out? (One sentence; think about what $D_{i}$ itself contributes to the officer's rate.)
+\item Estimate the first stage (regress $D$ on $z$) and the 2SLS estimate of the effect of a
+loan. Report both. Interpret the first-stage coefficient in words.
+\item State the three conditions this design needs --- relevance, exclusion, and
+\emph{monotonicity} --- in the language of loan officers. Which one does random assignment
+buy you, which one is about how officers behave, and which one is about whether an officer's
+strictness affects revenue \emph{other than} through the loan?
+\item Your 2SLS estimate should be noticeably below the ATE of $1$. Explain who the
+\emph{compliers} are in this design (which firms' approval actually depends on the officer they
+drew), use the model to say what their $s_{i}$ looks like, and hence why the LATE is below the
+ATE here. Confirm by computing the average of $\tau_{i}$ among simulated firms whose $s_{i}$
+lies between the strictest and most lenient officer cutoffs.
+\item Managerial summary, two sentences: the bank is considering making every officer
+as strict as its strictest one. Which of your numbers speaks to that policy, and which
+number would a consultant quoting ``the average effect of a loan'' be describing?
+\end{enumerate}
+
+\subsection*{2 A shift-share instrument for local demand}
+
+A retailer wants to know how much local employment growth raises its stores' sales. It has
+$300$ cities and $8$ industries. Cities specialize: each city has one \emph{dominant} industry,
+chosen at random, with pre-period employment share $s_{ck} = 0.5$; the other seven industries
+split the rest equally ($0.5/7$ each). Over the study period each industry gets a
+\emph{national} growth shock $g_{k} \sim \mathcal{N}(0, 1)$, drawn once per industry. City
+employment growth and store sales growth are:
+\begin{align*}
+x_{c} &= \underbrace{\textstyle\sum_{k} s_{ck}\, g_{k}}_{B_{c}} + 0.5\, \eta_{c} + \nu_{c},
+\qquad\qquad
+y_{c} = 0.5\, x_{c} + \eta_{c} + \varepsilon_{c},
+\end{align*}
+where $\eta_{c} \sim \mathcal{N}(0,1)$ is a local shock (a new highway, a plant closing) that
+moves both employment and sales, and $\nu_{c}, \varepsilon_{c} \sim \mathcal{N}(0, 0.5^{2})$.
+The retailer also has last period's sales growth, $y^{0}_{c} = \eta_{c} + \xi_{c}$ with
+$\xi_{c} \sim \mathcal{N}(0,1)$: a noisy look at the local shock. The true effect is $0.5$.
+
+\begin{enumerate}[label=(\alph*)]
+\item Simulate. Regress $y$ on $x$ by OLS. Which direction is the bias, and why?
+\item Construct the \emph{shift-share} (Bartik) instrument $B_{c} = \sum_{k} s_{ck} g_{k}$:
+each city's exposure to the national shocks, weighted by what it was already doing. Estimate
+2SLS with $B_{c}$ as the instrument for $x_{c}$. Compare to $0.5$.
+\item Two different assumptions make $B_{c}$ a valid instrument: (i) the \emph{shares} are
+as good as randomly assigned with respect to $\eta_{c}$ (Goldsmith-Pinkham, Sorkin and Swift
+2020), or (ii) the \emph{shocks} $g_{k}$ are as good as randomly assigned, whatever the
+shares look like (Borusyak, Hull and Jaravel 2022). Which one holds in this simulation, and
+what in the setup tells you?
+\item A colleague proposes a check: regress the pre-period outcome $y^{0}_{c}$ on $B_{c}$. What
+should you find if the instrument is valid, and what do you find?
+\item Now break it. Suppose industry $1$ is booming ($g_{1} = 2$ instead of a random draw), and
+that cities with a good local shock are more likely to be industry-$1$ cities: make industry $1$
+the dominant industry with probability $\Phi(\eta_{c})$ (the standard normal CDF), otherwise
+draw the dominant industry at random from the other seven. Redo (b) and (d). What happened to
+the 2SLS estimate, which of the two assumptions in (c) failed, and did the check in (d) catch it?
+\item Inference, one paragraph: there are $300$ cities but only $8$ industry shocks.
+Explain why the usual city-clustered standard errors overstate how much independent variation
+the instrument has, and what the ``number of observations'' effectively is in this design.
+(You do not need to implement a correction; Ad\~ao, Koles\'ar and Morales 2019 do.)
+\end{enumerate}
+
+\end{document}
