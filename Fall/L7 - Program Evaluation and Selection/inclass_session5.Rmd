@@ -10,7 +10,7 @@ set.seed(93)
 ```
 
 This notebook reproduces the power calculations and the collider simulation from
-Lecture 5, and leaves you two short problems.
+Lecture 5, and leaves you three short problems.
 
 # Reproduce: power and sample size for an A/B test
 
@@ -52,6 +52,28 @@ plot(talent[funded][1:2000], luck[funded][1:2000], pch = ".",
 
 Nobody made talent and luck trade off --- *conditioning on the collider did*.
 
+# Reproduce: interference in a marketplace
+
+Buyers share a limited inventory. A coupon raises purchase propensity from 0.20 to 0.30. When
+supply binds, treated buyers take units control buyers would have bought, and the buyer-level
+A/B test overstates the effect of giving everyone the coupon.
+
+```{r}
+run_market <- function(treat, supply, p0 = 0.2, delta = 0.1) {
+  want <- rbinom(length(treat), 1, p0 + delta * treat); sold <- integer(length(treat)); left <- supply
+  for (i in sample(seq_along(treat))) if (want[i] == 1 && left > 0) { sold[i] <- 1L; left <- left - 1 }
+  sold
+}
+B <- 200
+for (ratio in c(0.75, 1, 2)) {
+  supply <- round(ratio * 0.2 * B)
+  est <- replicate(200, { tr <- rbinom(B, 1, 0.5); s <- run_market(tr, supply)
+    c(naive = mean(s[tr == 1]) - mean(s[tr == 0]),
+      global = mean(run_market(rep(1, B), supply)) - mean(run_market(rep(0, B), supply))) })
+  cat(sprintf("supply/demand = %.2f:  buyer-level A/B %.3f   global effect %.3f\n", ratio, mean(est["naive", ]), mean(est["global", ])))
+}
+```
+
 # In-class problem 1: the bad control, live
 
 Simulate an advertising funnel: exposure to an ad is randomized,
@@ -70,7 +92,23 @@ the collider?)
 # your code here
 ```
 
-# In-class problem 2: design your own experiment
+# In-class problem 2: fix the marketplace experiment
+
+Using `run_market` above with `ratio = 0.75`:
+
+**(a)** Randomize the coupon at the *market* level instead (all buyers in a market treated or
+none), with 200 markets. Confirm the estimate is close to the global effect. Compare its
+standard error to the buyer-level test's.
+**(b)** Vary the treated share within markets (10%, 50%, 90% of buyers) and record the mean
+sales of *control* buyers in each case. What pattern do you see, and what does it diagnose?
+**(c)** One sentence: what feature of a business would make you confident the buyer-level test
+is fine?
+
+```{r problem2}
+# your code here
+```
+
+# In-class problem 3: design your own experiment
 
 Your product team wants to test a new checkout flow. The current completion rate is
 60%, and a change would only be worth engineering effort if it moves completion by
@@ -83,6 +121,6 @@ weeks." What minimum detectable effect does that traffic actually buy you (solve
 **(c)** Two sentences for the product manager: what do you recommend, and what is the
 risk of just running the underpowered test anyway?
 
-```{r problem2}
+```{r problem3}
 # your code here
 ```

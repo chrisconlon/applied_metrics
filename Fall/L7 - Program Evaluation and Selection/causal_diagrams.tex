@@ -349,29 +349,124 @@ authors need to be absent.
 \end{frame}
 
 
-\begin{frame}{Coming attraction: when units interfere}
+\section{When units interfere}
+
+\begin{frame}{The assumption every A/B test makes without saying so}
 \begin{itemize}
-	\item Everything today assumed my treatment doesn't affect \emph{your} outcome
-	(part of \alert{SUTVA}). Drawn as a DAG: no arrows \emph{between units}.
-
+	\item Everything so far assumed my treatment does not affect \emph{your} outcome. That is the
+	\alert{no-interference} half of SUTVA. As a DAG: no arrows between units.
 	\medskip
-	\item In marketplaces and platforms this fails constantly:
+	\item It fails whenever units share something:
 	\begin{itemize}
-		\item Discounting rides for treated riders lengthens wait times for control riders.
-		\item Promoting treated sellers steals demand from control sellers
-		$\Rightarrow$ the A/B test \alert{overstates} the effect of the promotion.
+		\item a \alert{market}: a coupon for treated buyers lets them grab inventory control buyers wanted;
+		promoting treated sellers diverts demand from control sellers;
+		\item a \alert{network}: a feature shown to treated users changes what their control friends see;
+		\item a \alert{resource}: discounted rides for treated riders lengthen waits for control riders;
+		drivers reallocate toward treated neighborhoods;
+		\item \alert{geography or time}: a store-level promotion pulls shoppers from the control store across the street.
 	\end{itemize}
-
 	\medskip
-	\item Fixes people use: cluster-randomize markets, switchback designs,
-	exposure modeling. See Wager Chs.~11--12 --- and Econometrics~II if you want the
-	full treatment.
-
-	\medskip
-	\item For now: when someone shows you an experiment on a \alert{connected} system,
-	ask what the control group's counterfactual really was.
+	\item When it fails, ``treated minus control'' is not the effect of treating everyone. It is the effect of
+	treating \emph{half} the units \emph{while the other half is untreated}, which is an experiment nobody
+	plans to run at scale.
 \end{itemize}
 \end{frame}
+
+
+\begin{frame}{A marketplace, simulated}
+\begin{itemize}
+	\item $200$ markets, $200$ buyers each, a shared inventory per market. A buyer wants to purchase with
+	probability $0.20$; a \alert{coupon} raises that to $0.30$. Purchases happen in random order until
+	inventory runs out.
+	\medskip
+	\item Three numbers, each with a known truth:
+	\begin{itemize}
+		\item \alert{Buyer-level A/B}: randomize the coupon across buyers within each market; compare treated
+		and control buyers. The experiment every platform runs by default.
+		\item \alert{Global treatment effect}: sales per buyer with the coupon for everyone minus sales per buyer
+		with it for no one. The number the business decision needs.
+		\item \alert{Market-level randomization}: give the coupon to everyone in a random half of the markets.
+	\end{itemize}
+	\medskip
+	\item The one knob: how much inventory there is relative to demand without the coupon.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{When supply binds, the A/B test measures the wrong thing}
+\begin{center}
+\includegraphics[width=.58\textwidth]{fig_interference.pdf}
+\end{center}
+\vspace{-.3cm}
+{\small With inventory at $75\%$ of demand, the coupon cannot raise total sales at all: the truth is zero.
+The buyer-level test reports $+0.06$, because treated buyers took units that control buyers would have bought.
+Only when supply is slack do the three numbers agree. Blake and Coey (2014) found exactly this at eBay.}
+\end{frame}
+
+
+\begin{frame}{The same picture as a table}
+\begin{center}
+\small
+\input{tab_interference.tex}
+\end{center}
+\medskip
+\begin{itemize}
+	\item The buyer-level test is precise and wrong: a tight standard error around a number that answers no
+	business question. A partially binding constraint biases it partway.
+	\item Market-level randomization is unbiased for the global effect; its price is precision, since the
+	effective sample size is the number of markets. Johari, Li, Liskovich and Weintraub (2022) derive the bias
+	in a queueing model and show that randomizing over buyers \emph{and} listings reduces it.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Designs that survive interference}
+\begin{itemize}
+	\item \alert{Cluster randomization.} Randomize at the unit where spillovers stop: markets, cities, stores,
+	ego-networks (Saveski et al.\ 2017 at LinkedIn). Estimand: the global effect, if clusters are closed.
+	\item \alert{Switchbacks.} One market, treatment on and off in alternating time blocks (DoorDash, Lyft;
+	Bojinov, Simchi-Levi and Zhao 2023). For markets you cannot split; needs carryover to die out between blocks.
+	\item \alert{Two-sided designs.} Randomize buyers and listings jointly so treated-buyer, treated-listing
+	cells exist (Johari et al.\ 2022; Bajari et al.\ 2023 at Amazon).
+	\item \alert{Budget-split.} Separate inventories or budgets for treatment and control so they cannot
+	compete (ad auctions: Liu et al.\ 2021 at LinkedIn). Removes the interference instead of averaging over it.
+	\item \alert{Exposure mapping.} Each unit's treatment is a function of what its neighbors got; estimate
+	effects by exposure level (Aronow and Samii 2017). The general framework the others are cases of.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{What cluster randomization costs: back to power}
+\begin{center}
+\includegraphics[width=.52\textwidth]{fig_design_effect.pdf}
+\end{center}
+\vspace{-.3cm}
+{\small The design effect $1 + (m - 1)\rho$, with $m$ buyers per cluster and within-cluster correlation $\rho$.
+Fixing $40{,}000$ buyers, the minimum detectable effect rises as clusters get fewer and bigger: $50$ metros at
+$\rho = 0.05$ detect roughly four times less than buyer-level randomization would. Plan power at the cluster level.}
+\end{frame}
+
+
+\begin{frame}{How to tell whether interference is biting}
+\begin{itemize}
+	\item \alert{Ask where the outcome comes from.} If treated and control units draw on the same inventory,
+	budget, drivers, or attention, assume interference until shown otherwise.
+	\medskip
+	\item \alert{Run both designs on a small scale.} A buyer-level and a market-level test of the same
+	change should agree if there is no interference (Saveski et al.\ 2017 formalize this as a test).
+	\medskip
+	\item \alert{Vary the treated share.} In a buyer-level test, randomize the \emph{fraction} treated across
+	markets ($10\%$, $50\%$, $90\%$). If control buyers' outcomes move with the treated share, they are being
+	affected (Hudgens and Halloran 2008).
+	\medskip
+	\item \alert{Look at the control group's trend.} If control outcomes fall when treatment starts, the
+	``effect'' is partly displacement.
+	\medskip
+	\item \alert{Report which estimand you have.} ``Treated minus control in a $50\%$ buyer-level test'' is a
+	fine sentence. ``The effect of the coupon'' is not, unless the design justifies it.
+\end{itemize}
+\end{frame}
+
 
 
 \begin{frame}{Recap}

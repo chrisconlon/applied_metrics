@@ -21,10 +21,10 @@
 \usepackage{inconsolata} % nice monospace font
 
 
-\title{Synthetic Control}
-\author{Chris Conlon}
-\institute{Applied Econometrics}
-\date{\today}
+\title[L11b - Synthetic Control]{ Econometrics I}
+\subtitle{Lecture 11b: Synthetic Control}
+\author{Chris Conlon \\NYU Stern}
+\date{Fall 2026}
 
 \begin{document}
 \frame{\titlepage}
@@ -382,6 +382,81 @@ Why? Remember, \alert{everything is a kernel} our prediction of $\E[Y \mid X]$ i
 \begin{center}
 \includegraphics[width=2.8in]{./resources/germany_5.png}
 \end{center}
+\end{frame}
+
+\section{Synthetic difference-in-differences}
+
+\begin{frame}{Three estimators, one formula}
+Arkhangelsky, Athey, Hirshberg, Imbens and Wager (2021) write all three as weighted two-way fixed-effects regressions:
+\begin{align*}
+	(\hat\tau, \hat\mu, \hat\alpha, \hat\beta) = \arg\min \sum_{j}\sum_{t} \big(Y_{jt} - \mu - \alpha_j - \beta_t - \tau W_{jt}\big)^2\, \omega_j\, \lambda_t
+\end{align*}
+\begin{center}
+\begin{tabular}{lccc}
+\hline
+ & unit weights $\omega_j$ & time weights $\lambda_t$ & unit fixed effects $\alpha_j$? \\
+\hline
+DiD & equal & equal & yes \\
+Synthetic control & fit pre-period, no intercept & equal & no \\
+Synthetic DiD & fit pre-period \emph{trends}, intercept allowed & fit pre-to-post, intercept allowed & yes \\
+\hline
+\end{tabular}
+\end{center}
+\small DiD trusts levels (fixed effects) but not the control group's composition; SC trusts composition
+(weights) but insists on matching levels. SDID reweights donors to track the treated unit's \emph{trend},
+absorbs the level gap with $\alpha_j$, reweights pre-periods to resemble the post-period, then differences.
+\end{frame}
+
+
+\begin{frame}{How the weights are chosen}
+\begin{itemize}
+	\item \alert{Unit weights} $\hat\omega$: nonnegative, sum to one, with a free intercept $\omega_0$,
+	\[
+		\min_{\omega_0, \omega}\ \sum_{t \le T_0}\Big(\omega_0 + \sum_{j} \omega_j Y_{jt} - Y_{1t}\Big)^2 + \zeta^2 T_0 \|\omega\|^2 .
+	\]
+	The intercept means the synthetic unit only has to \emph{move} like the treated unit; the ridge penalty
+	$\zeta$ spreads weight across donors.
+	\item \alert{Time weights} $\hat\lambda$: nonnegative, sum to one, with an intercept, chosen so the weighted
+	pre-period average of each donor predicts its post-period average. Pre-periods that look like the
+	post-period count more; the distant past counts less.
+	\medskip
+	\item Then run the weighted two-way FE regression. $\hat\tau$ is a DiD in which the control group and the
+	pre-period have both been reweighted to resemble the treated unit and the post-period.
+	\item Inference: placebo, jackknife over units, or bootstrap; the placebo variance works well with few
+	treated units. \texttt{synthdid} in R implements all of it.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The soda tax again: DiD, SC, and SDID on simulated cities}
+\begin{center}
+\small
+\input{tab_sdid.tex}
+\end{center}
+\medskip
+\small When the trend can be matched and the level is ordinary, SC and SDID both beat DiD. When the treated
+city sits \emph{above every donor} in level, SC cannot reproduce it (no intercept) and is off by a third; DiD
+handles the level but not the trend; SDID handles both, with a fifth of SC's bias over repeated draws. When
+the \emph{trend} is outside the hull, nothing works, and the pre-period fit says so.
+\end{frame}
+
+
+\begin{frame}{Which one, and when}
+\begin{itemize}
+	\item \alert{Many treated units, parallel-ish trends, levels differ}: DiD, with the Week 9 cautions about
+	staggered timing.
+	\medskip
+	\item \alert{One or a few treated units, a donor that can be built by convex combination}: SC. Report the
+	pre-period fit and the placebo distribution; it is the design's only credibility.
+	\medskip
+	\item \alert{One or a few treated units whose level is unusual but whose trend is not}: SDID. The intercept
+	is doing the work; it is the same idea as running DiD after picking a better control group.
+	\medskip
+	\item \alert{Treated unit is extreme in trend}: none of them. Say so.
+	\medskip
+	\item All three are weighted DiDs. The question is always the same: which units and which periods make an
+	honest counterfactual, and what did you have to assume to believe it.
+\end{itemize}
 \end{frame}
 
 \section{Thanks}

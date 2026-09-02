@@ -38,9 +38,9 @@ NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}
 \end{tabular*}
 \par\end{center}
 
-\textbf{Instructions.} This assignment covers Lectures 1--2 only. You may use
+\textbf{Instructions.} This assignment covers Sessions 1--2 only. You may use
 \texttt{R} or Python. Turn in (1) a PDF presenting your results and showing your work,
-and (2) your code. Derivations should use only the operator rules from Lecture 1
+and (2) your code. Derivations should use only the operator rules from Session 1
 (linearity of $\E[\cdot]$, the variance/covariance rules, the law of iterated
 expectations, and the law of total variance) --- if you find yourself writing an
 integral, you are working too hard.
@@ -95,7 +95,7 @@ fitted line.
 Let $X_{i} \sim \text{Exponential}(1)$ (so $\mu = 1$ and $\sigma^{2} = 1$, and the
 distribution is highly skewed).
 \begin{enumerate}[label=(\alph*)]
-\item In Lecture 1 we derived $Var\left(\bar{X}_{n}\right) = \sigma^{2}/n$ from the
+\item In Session 1 we derived $Var\left(\bar{X}_{n}\right) = \sigma^{2}/n$ from the
 operator rules alone. For each $n \in \{10, 100, 1000\}$, simulate $S = 1{,}000$ sample
 means $\bar{X}_{n}^{(s)}$ and compare the variance of the simulated sample means to
 $\sigma^{2}/n$. Present the comparison in a small table.
@@ -109,7 +109,7 @@ does the normal approximation start looking trustworthy for this (skewed) distri
 
 \subsection*{4 Omitted variables, with the answer key in hand}
 
-Recall the ``silly example'' from Lecture 2: rectangular paintings with
+Recall the ``silly example'' from Session 2: rectangular paintings with
 $\ln A_{i} = \ln W_{i} + \ln H_{i} + \varepsilon_{i}$, so the true coefficients are
 $\left(1, 1\right)$ by geometry.
 \begin{enumerate}[label=(\alph*)]
@@ -122,7 +122,7 @@ $\left(1, 1\right)$ by geometry.
 \]
 for $\sigma_{wh} = 0.6$. Run the \emph{long} regression of $\ln A$ on $\ln W$ and
 $\ln H$, and the \emph{short} regression of $\ln A$ on $\ln W$ only. Report both.
-\item Using the omitted variables bias formula from Lecture 2, compute what the short
+\item Using the omitted variables bias formula from Session 2, compute what the short
 regression coefficient \emph{should} be, and compare to (a).
 \item Repeat (a) for $\sigma_{wh} \in \{-0.6, 0, 0.3, 0.9\}$ and plot the short-regression
 coefficient against $\sigma_{wh}$, with the OVB-formula prediction overlaid as a line.
