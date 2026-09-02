@@ -23,7 +23,7 @@
 	\item \alert{The algebra of expectations}: $\E[\cdot]$, $Var[\cdot]$, and $Cov[\cdot,\cdot]$ as operators
 	\item Multivariate distributions and independence
 	\item Conditional probability and Bayes's Theorem
-	\item Conditional expectations, iterated expectations, total variance
+	\item Conditional expectations, iterated expectations, total variance, and the best (linear) predictor
 	\item Matrix notation (details in the self-study handout)
 \end{enumerate}
 \bigskip
@@ -199,7 +199,29 @@ Plotted is Bernoulli distribution with probability of success $\Pr(X=1)=p=.7$
 
 
 
-\begin{frame}{CDF: draw your own!}
+\begin{frame}{The quantile function, and how a computer draws a random variable}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+	\item Read the CDF backwards: the \alert{quantile function} $F^{-1}(u)$ is the $x$ with
+	$F(x) = u$. The median is $F^{-1}(0.5)$; for the standard normal, $F^{-1}(0.975) = 1.96$.
+	\medskip
+	\item \alert{Inverse-CDF sampling.} If $U \sim \text{Uniform}(0,1)$ then $X = F^{-1}(U)$ has CDF $F$:
+	$\Pr(X \le x) = \Pr(U \le F(x)) = F(x)$. Every \texttt{rnorm} or \texttt{rbinom} is a uniform
+	draw pushed through a quantile function.
+	\medskip
+	\item The uniforms are a deterministic sequence started at a \alert{seed}:
+	\texttt{set.seed(93)} is why your simulation and mine agree.
+\end{itemize}
+\end{column}
+\begin{column}{0.45\textwidth}
+\begin{center}
+\includegraphics[width=.8\textwidth]{inverse-cdf}
+\end{center}
+\vspace{-.2cm}
+{\small Pick $u$, walk across to the CDF, drop down.}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -331,6 +353,25 @@ Treat $\E[\cdot]$ like you treat the derivative: an \alert{operator} with a shor
 \end{itemize}
 \medskip
 Nearly every derivation this semester is: apply linearity, track the pieces that don't split.
+\end{frame}
+
+
+\begin{frame}{The indicator trick}
+Let $\mathbb{1}\{A\}$ equal $1$ if event $A$ happens and $0$ otherwise (a Bernoulli variable).
+\begin{itemize}
+	\item \alert{Probabilities are expectations:}\[
+		\E\big[\mathbb{1}\{A\}\big] = 1 \cdot \Pr(A) + 0 \cdot \Pr(A^c) = \Pr(A).
+	\]
+	So every rule for $\E[\cdot]$ is a rule for probabilities, and a sample mean of $0/1$s is a proportion.
+	\medskip
+	\item \alert{Conditional means are ratios of expectations:} for a group indicator $D \in \{0, 1\}$,\[
+		\E\left[Y \mid D = 1\right] = \frac{\E\left[Y \cdot \mathbb{1}\{D = 1\}\right]}{\Pr(D = 1)} .
+	\]
+	\medskip
+	\item Why you care: a regression coefficient on a dummy variable is a difference of two such
+	group means (Lecture 2); the effect of a treatment is $\E[Y \mid D = 1] - \E[Y \mid D = 0]$ under the
+	right conditions (Lecture 5). Both are this identity.
+\end{itemize}
 \end{frame}
 
 
@@ -473,6 +514,11 @@ where ${\bf x} = \left(x_1,\dots,x_T\right)\in \mathbb{R}^T$.
 	which is a $T\times T$ matrix. 
 
 	\item Note that $Cov\left(X,X\right) = Var\left(X\right)$.
+	\item Covariance has units (dollars $\times$ years). The \alert{correlation}\[
+		\rho_{XY} = \frac{Cov(X,Y)}{\sqrt{Var(X)\,Var(Y)}} \in [-1, 1]
+	\]
+	is unit-free, and $|\rho| = 1$ iff $Y$ is an exact linear function of $X$. It measures
+	\emph{linear} association only --- next slides.
 \end{itemize}
 \end{frame}
 
@@ -564,6 +610,30 @@ $\overline{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$. Using \alert{only the operator r
 	\medskip
 	\item What does this imply about the relationship between $\E\left[X Y\right]$ and $\E\left[X\right] \E\left[Y\right]$? 
 			
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Three ways to be ``unrelated'' --- and they are not the same}
+\begin{align*}
+	\underbrace{X \perp Y}_{\text{independent}}
+	\ \Longrightarrow\
+	\underbrace{\E[Y \mid X] = \E[Y]}_{\text{mean independent}}
+	\ \Longrightarrow\
+	\underbrace{Cov(X, Y) = 0}_{\text{uncorrelated}}
+\end{align*}
+\begin{itemize}
+	\item Each arrow is one line of operator algebra; \alert{neither arrow reverses.}
+	\medskip
+	\item The counterexample to memorize: $X$ symmetric around zero, $Y = X^2$. Then $Cov(X, Y) = \E[X^3] = 0$,
+	but $\E[Y \mid X] = X^2$. Uncorrelated, wildly dependent (workbook).
+	\medskip
+	\item Mean independence is the one we will assume most: ``$\E[\varepsilon \mid X] = 0$'' (Lecture 2)
+	says the error is unpredictable from $X$, linearly \emph{or otherwise}. Zero correlation only
+	rules out the linear part.
+	\medskip
+	\item Independence is what randomization delivers (Lecture 5): a coin flip is independent of
+	\emph{everything} about you.
 \end{itemize}
 \end{frame}
 
@@ -742,6 +812,26 @@ Imagine a scientist develops a test for a disease.
 	\medskip
 	\item This decomposition is $R^2$, ANOVA, and ``how much can $X$ explain?'' all at once
 		--- we will meet it again in Lecture 2.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Why $\E[Y \mid X]$, and what regression actually estimates}
+\begin{itemize}
+	\item Among \emph{all} functions $g(X)$, the conditional expectation is the best predictor of $Y$
+	in mean squared error:\[
+		\E[Y \mid X] = \arg\min_{g}\ \E\big[(Y - g(X))^2\big].
+	\]
+	(Add and subtract $\E[Y|X]$, square; iterated expectations kills the cross term.)
+	\medskip
+	\item Restrict to \emph{linear} functions $a + bX$. The best one, the \alert{linear projection},
+	needs only two operators:\[
+		b = \frac{Cov(X, Y)}{Var(X)}, \qquad a = \E[Y] - b\,\E[X].
+	\]
+	(Vector version: $\beta = Var(X)^{-1} Cov(X, Y)$ --- the population $(X'X)^{-1}X'y$.)
+	\medskip
+	\item This is what OLS estimates, \alert{whether or not} $\E[Y \mid X]$ is linear. If it is, the
+	projection \emph{is} the CEF; if not, OLS gives the best linear approximation to it. Lecture 2 starts here.
 \end{itemize}
 \end{frame}
 

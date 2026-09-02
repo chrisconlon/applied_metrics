@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 set.seed(93)
 ```
 
-This notebook reproduces the code from Lecture 1 and leaves you two short problems.
+This notebook reproduces the code from Lecture 1 and leaves you three short problems.
 Run every chunk yourself. Nothing here requires more than base R and `MASS`.
 
 # Reproduce: distributions from the slides
@@ -45,6 +45,47 @@ variance rules. Let's watch the derivation be true:
 n <- 25; sigma2 <- 4
 means <- replicate(2000, mean(rnorm(n, mean = 0, sd = sqrt(sigma2))))
 c(simulated = var(means), predicted = sigma2 / n)
+```
+
+# Reproduce: a computer draws a random variable through the quantile function
+
+Uniform draws pushed through the normal quantile function are normal draws. Same seed,
+same numbers:
+
+```{r}
+u <- runif(5)
+cbind(qnorm(u), {set.seed(1); qnorm(runif(5))}, {set.seed(1); rnorm(5)})[, 2:3]
+x <- qnorm(runif(10000))
+c(mean = mean(x), sd = sd(x), q975 = quantile(x, 0.975))
+```
+
+# Reproduce: probabilities are expectations of indicators
+
+```{r}
+x <- rnorm(10000)
+c(mean_of_indicator = mean(x > 1.96), true_prob = 1 - pnorm(1.96))
+d <- rbinom(10000, 1, 0.3); y <- 5 + 2 * d + rnorm(10000)
+c(direct = mean(y[d == 1]), via_indicator = mean(y * (d == 1)) / mean(d == 1))
+```
+
+# Reproduce: uncorrelated is not independent
+
+$X$ is symmetric, $Y = X^2$. The correlation is zero and $Y$ is a deterministic function of $X$.
+
+```{r}
+x <- rnorm(10000); y <- x^2
+cor(x, y)
+plot(x[1:500], y[1:500], pch = 16, cex = 0.5, xlab = "x", ylab = "y = x^2")
+abline(lm(y ~ x), col = "red", lwd = 2)          # the best *linear* predictor is flat
+```
+
+# Reproduce: the linear projection is what OLS estimates
+
+Even when the conditional expectation is not linear, OLS recovers $Cov(X,Y)/Var(X)$:
+
+```{r}
+x <- runif(10000, 0, 2); y <- exp(x) + rnorm(10000, sd = 0.3)   # nonlinear CEF
+c(projection = cov(x, y) / var(x), ols = unname(coef(lm(y ~ x))[2]))
 ```
 
 # Reproduce: LLN and CLT histograms
@@ -89,7 +130,21 @@ library(MASS)
 # your code here
 ```
 
-# In-class problem 2: total variance in a customer base
+# In-class problem 2: mean independent, or just uncorrelated?
+
+Let $X \sim \mathcal{N}(0,1)$ and $\varepsilon = X^2 - 1$ (so $\E[\varepsilon] = 0$).
+
+**(a)** Verify by simulation that $Cov(X, \varepsilon) = 0$.
+**(b)** Compute $\E[\varepsilon \mid X > 1]$ and $\E[\varepsilon \mid |X| < 0.5]$ from the simulated
+data. Is $\varepsilon$ mean independent of $X$?
+**(c)** One sentence: if $\varepsilon$ were the error in a regression of $Y$ on $X$, which of the
+two assumptions from lecture would hold, and why does it matter which?
+
+```{r problem2}
+# your code here
+```
+
+# In-class problem 3: total variance in a customer base
 
 A subscription business has two customer segments. Segment A (30% of customers)
 spends $\sim \mathcal{N}(80, 10^2)$ per month; segment B (70%) spends
@@ -102,6 +157,6 @@ they sum to (a).
 **(c)** One sentence: if you could only report one of the two pieces to describe
 "how different are our customers," which would you pick and why?
 
-```{r problem2}
+```{r problem3}
 # your code here
 ```
