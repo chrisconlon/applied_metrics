@@ -1,0 +1,10 @@
+\begin{tabular}{lcl}\toprule
+Quantity & Estimate & What it is \\ \midrule
+OLS, $y$ on $D$ & 2.72 (0.03) & effect on the treated $+$ selection (always-takers spend more anyway) \\
+Reduced form, $y$ on $Z$ & 0.32 (0.04) & intent-to-treat: effect of the \emph{email} \\
+First stage, $D$ on $Z$ & 0.39 (0.01) & share of compliers (truth $0.40$) \\
+2SLS $=$ Wald ratio & 0.80 (0.09) & LATE: effect for compliers (truth $0.80$) \\
+ATE (truth) & 0.91 & average over everyone, including never-takers \\
+ATT (truth) & 1.40 & average over app users: always-takers and encouraged compliers \\
+Complier mean tenure & 1.99 & Abadie's $\kappa$ estimate (truth 2.01; always-takers 4.00, never-takers 1.00) \\
+\bottomrule\end{tabular}

@@ -492,6 +492,55 @@ Substitute:
 \end{frame}
 
 
+\begin{frame}{Partial pooling: no pooling, complete pooling, and the thing in between}
+$60$ stores, $4$ to $64$ weeks each, true store effects $\alpha_s \sim N(0, 0.4^2)$, weekly noise SD $1$.
+Three estimates of each store's effect:
+\begin{itemize}
+	\item \alert{No pooling}: the store's own mean (fixed effects). Unbiased; noisy when $n_s$ is small.
+	\medskip
+	\item \alert{Complete pooling}: the grand mean for everyone (pooled OLS). Precise; ignores that stores differ.
+	\medskip
+	\item \alert{Partial pooling}: $\hat\alpha_s^{PP} = \bar y + w_s(\bar y_s - \bar y)$ with
+	\[
+		w_s = \frac{\sigma^2_\alpha}{\sigma^2_\alpha + \sigma^2_\varepsilon / n_s} .
+	\]
+	The random-effects prediction, empirical Bayes, or a hierarchical model with a normal prior:
+	three names, one formula. The weight is the store's signal-to-noise ratio.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Partial pooling, pictured}
+\begin{center}
+\includegraphics[width=.74\textwidth]{fig_partial_pooling.pdf}
+\end{center}
+\vspace{-.3cm}
+{\small Left: four-week stores (red) are pulled most of the way to the grand mean; sixteen-plus-week stores keep
+their own mean. Right: the weight by weeks observed. MSE against the true $\alpha_s$: no pooling $0.082$,
+complete pooling $0.124$, partial pooling $0.053$.}
+\end{frame}
+
+
+\begin{frame}{Why marketing uses this all the time}
+\begin{itemize}
+	\item Partial pooling beats both extremes on mean squared error: it is the bias--variance tradeoff from
+	Lecture 1b, applied sixty times with a data-driven weight.
+	\medskip
+	\item The \alert{ranking problem}: sort stores by sample mean and the top five include small-$n$ stores
+	that got lucky; sort by the shrunken estimate and the top five are stores with enough data to be
+	believed. Same logic for sellers, products, sales reps, ad creatives, teachers.
+	\medskip
+	\item Hierarchical Bayes in marketing (Rossi, Allenby and McCulloch 2005) is this with the prior estimated
+	from the data and full posteriors instead of point estimates: customer-level coefficients in a conjoint or
+	choice model are pooled toward the population with weights set by how much each customer's data can
+	support. \texttt{lme4::lmer}, \texttt{brms} in R; \texttt{statsmodels.MixedLM}, \texttt{PyMC} in Python.
+	\medskip
+	\item When $\beta$ is the object and $\alpha_i$ a nuisance: FE. When the $\alpha_i$ themselves are the
+	product: partially pool.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Pitfall: when $\alpha_i$ is the object of interest}
 \begin{itemize}
 	\item Sometimes the fixed effect \emph{is} the estimand: which physicians have better outcomes,
@@ -501,10 +550,7 @@ Substitute:
 	$\approx \sigma^2_\varepsilon / T_i$. The units at the top of the ranking are disproportionately
 	the ones with small $T_i$ and lucky draws.
 	\medskip
-	\item Shrink toward the mean in proportion to noise (empirical Bayes; the RE model again):
-	\begin{align*}
-		\hat\alpha_i^{EB} = \frac{\sigma^2_\alpha}{\sigma^2_\alpha + \sigma^2_\varepsilon/T_i}\,\hat\alpha_i .
-	\end{align*}
+	\item Shrink toward the mean in proportion to noise: the partial-pooling weight from the previous slides.
 	\item Believing $\hat\alpha_i$ causally also needs strict exogeneity of the \emph{assignment}
 	of units to $i$: patients are not randomly assigned to physicians (Chetty--Hendren's movers design
 	is the fix).

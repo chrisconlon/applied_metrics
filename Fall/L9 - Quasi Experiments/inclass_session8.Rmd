@@ -84,6 +84,20 @@ fit_mund <- feols(y ~ x + xbar | year, d, cluster = ~firm)
 etable(fit_fe, fit_mund, headers = c("within", "Mundlak"))
 ```
 
+## Reproduce: partial pooling of store effects
+
+Sixty stores with very different amounts of data. The partial-pooling estimate shrinks each
+store's mean toward the grand mean by a weight equal to its signal-to-noise ratio.
+
+```{r}
+S <- 60; alpha <- rnorm(S, 0, 0.4); n_s <- sample(c(4, 8, 16, 32, 64), S, replace = TRUE)
+ybar <- alpha + rnorm(S, 0, 1 / sqrt(n_s)); grand <- mean(ybar)
+s2_alpha <- max(0, var(ybar) - mean(1 / n_s))                     # method of moments, sigma_eps^2 = 1 known
+w <- s2_alpha / (s2_alpha + 1 / n_s); eb <- grand + w * (ybar - grand)
+c(no_pooling = mean((ybar - alpha)^2), complete = mean((grand - alpha)^2), partial = mean((eb - alpha)^2))
+rbind(top5_by_mean_n = n_s[order(-ybar)][1:5], top5_by_partial_n = n_s[order(-eb)][1:5])
+```
+
 # In-class problem 1: turn the correlation off and on
 
 Re-simulate with `rho = 0` (no correlation between quality and practices) and with

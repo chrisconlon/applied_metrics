@@ -1,0 +1,138 @@
+---
+title: "In-Class Session 7: LATE, Judges, Shift-Share, and Weak Instruments"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 4)
+library(fixest)
+set.seed(7)
+```
+
+This notebook reproduces the simulations behind Lecture 7 (the slides use `iv2_sims.R`) and
+leaves you three problems. Only `fixest` is needed.
+
+# Part 1: LATE in an encouragement design
+
+A retailer emails a random half of its customers to nudge them onto its app. Twenty percent
+would install it anyway (always-takers), forty percent install it only if emailed (compliers),
+forty percent never do. The app's effect on spending differs by type.
+
+```{r}
+sim_late <- function(N = 10000, tau = c(always = 2.0, complier = 0.8, never = 0.5)) {
+  type <- sample(names(tau), N, replace = TRUE, prob = c(0.2, 0.4, 0.4))
+  Z <- rbinom(N, 1, 0.5)
+  D <- as.integer(type == "always" | (type == "complier" & Z == 1))
+  base <- c(always = 3, complier = 1, never = 0.5)[type]
+  tenure <- c(always = 4, complier = 2, never = 1)[type] + rnorm(N)
+  data.frame(y = base + tau[type] * D + rnorm(N), D, Z, tenure, type, tau = tau[type])
+}
+d <- sim_late()
+etable(feols(y ~ D, d), feols(y ~ Z, d), feols(D ~ Z, d), feols(y ~ 1 | D ~ Z, d),
+       headers = c("OLS", "reduced form", "first stage", "2SLS"))
+c(LATE = mean(d$tau[d$type == "complier"]), ATE = mean(d$tau), ATT = mean(d$tau[d$D == 1]))
+```
+
+Who are the compliers? Abadie's trick: apply the Wald ratio to $X \cdot D$ instead of $y$.
+
+```{r}
+with(d, (mean(tenure[Z == 1] * D[Z == 1]) - mean(tenure[Z == 0] * D[Z == 0])) / (mean(D[Z == 1]) - mean(D[Z == 0])))
+tapply(d$tenure, d$type, mean)    # the truth, which you never see in real data
+```
+
+# In-class problem 1: which rows move?
+
+Re-simulate with the complier effect doubled (`tau = c(always = 2, complier = 1.6, never = 0.5)`),
+then with the always-taker effect doubled instead. For each, say which of the four regression
+rows change and which of the three truths (LATE, ATE, ATT) change, and why 2SLS never notices the
+always-takers.
+
+```{r problem1}
+# your code here
+```
+
+# Part 2: A judge design with refund agents
+
+Requests are routed at random to 50 agents who differ in generosity. The claim's merit $q$ is
+seen by the agent, not by us; refunds build the most goodwill for weak claims.
+
+```{r}
+sim_refund <- function(N = 20000, J = 50, typed = FALSE) {
+  q <- rnorm(N); agent <- sample(1:J, N, replace = TRUE)
+  ctype <- sample(c("shipping", "damage"), N, replace = TRUE)
+  gen <- rnorm(J, -0.5, 0.5)
+  if (typed) { gen2 <- -0.5 - (gen + 0.5)                # agents lenient on shipping are strict on damage
+    cutoff <- ifelse(ctype == "shipping", gen[agent], gen2[agent]) } else cutoff <- gen[agent]
+  R <- as.integer(q + cutoff + rnorm(N, 0, 0.5) > 0)
+  tau <- 20 - 15 * q
+  d <- data.frame(spend = 100 + tau * R + 30 * q + rnorm(N, 0, 20), R, agent, q, tau, ctype)
+  tot <- tapply(R, agent, sum); n_j <- tapply(R, agent, length)
+  d$len <- (tot[agent] - R) / (n_j[agent] - 1)           # leave-one-out leniency
+  d
+}
+dr <- sim_refund()
+etable(feols(spend ~ R, dr, cluster = ~agent), feols(R ~ len, dr, cluster = ~agent),
+       feols(spend ~ 1 | R ~ len, dr, cluster = ~agent), headers = c("OLS", "first stage", "2SLS"))
+c(ATE = mean(dr$tau), effect_on_refunded = mean(dr$tau[dr$R == 1]))
+```
+
+The first-stage picture, and the monotonicity check by claim type:
+
+```{r}
+bins <- cut(dr$len, quantile(dr$len, seq(0, 1, .05)), include.lowest = TRUE)
+plot(tapply(dr$len, bins, mean), tapply(dr$R, bins, mean), pch = 16, xlab = "agent leniency (leave-one-out)", ylab = "P(refund)")
+sapply(split(dr, dr$ctype), function(s) coef(feols(R ~ len, s))[2])
+```
+
+# In-class problem 2: agents with tastes
+
+Re-simulate with `typed = TRUE`: agents who are lenient on shipping claims are strict on damage
+claims, and vice versa.
+
+1. Re-run the overall first stage and the first stage by claim type. What do you see?
+2. Re-run 2SLS with the pooled leniency measure. Is it still a LATE for anyone?
+3. Fix it: compute leniency *within* claim type (each agent's leave-one-out rate on shipping
+   claims, separately from damage claims) and re-estimate. Explain in two sentences what
+   assumption the fix restores.
+
+```{r problem2}
+# your code here
+```
+
+# Part 3: Shift-share with Rotemberg weights
+
+Markets differ in which sector their banks lend to; national sector credit shocks move local
+credit growth; the question is the effect of local credit on firm entry (truth 0.4).
+
+```{r}
+sim_ss <- function(M = 1000, K = 6) {
+  dom <- sample(1:K, M, replace = TRUE); sh <- matrix(0.4 / (K - 1), M, K); sh[cbind(1:M, dom)] <- 0.6
+  g <- rnorm(K); eta <- rnorm(M); B <- as.vector(sh %*% g)
+  x <- B + 0.5 * eta + rnorm(M, 0, 0.3); y <- 0.4 * x + eta + rnorm(M, 0, 0.3)
+  list(d = data.frame(y, x, B), sh = sh, g = g)
+}
+s <- sim_ss(); d <- s$d
+etable(feols(y ~ x, d), feols(y ~ 1 | x ~ B, d, vcov = "hetero"), headers = c("OLS", "2SLS"))
+# Rotemberg weights: alpha_k proportional to g_k * sum_m s_mk * (x_m - mean x)
+xt <- d$x - mean(d$x)
+alpha <- sapply(1:6, function(k) s$g[k] * sum(s$sh[, k] * xt)); alpha <- alpha / sum(alpha)
+beta_k <- sapply(1:6, function(k) coef(feols(y ~ 1 | x ~ z, data.frame(d, z = s$sh[, k] * s$g[k])))[2])
+round(cbind(shock = s$g, weight = alpha, beta_k = beta_k), 2); sum(alpha * beta_k)
+```
+
+# In-class problem 3: drop the sector that carries the estimate
+
+Remove the sector with the largest Rotemberg weight (set its shock to zero, or drop it from the
+instrument) and re-estimate.
+
+1. What happens to the 2SLS estimate and to the first-stage $F$?
+2. If that sector's share-exogeneity claim were the doubtful one, what would you conclude from
+   the comparison?
+3. Bonus: Anderson-Rubin. For a grid of $\beta_0$ from 0 to 1, regress $y - \beta_0 x$ on $B$ and
+   record whether the coefficient is significant at 5%. Report the set of $\beta_0$ not rejected and
+   compare it to the 2SLS confidence interval.
+
+```{r problem3}
+# your code here
+```
