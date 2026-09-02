@@ -1,0 +1,127 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\providecommand{\tabularnewline}{\\}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+
+\title{\Huge Assignment 3}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026 --- due at the start of Session 6}
+
+\makeatother
+
+\begin{document}
+
+\title{Assignment 3}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+\textbf{Instructions.} This assignment covers endogeneity, simultaneity, and
+instrumental variables (Sessions 5--6). You may use \texttt{R} (with \texttt{fixest};
+\texttt{feols(y \~{} x | p \~{} z)} estimates 2SLS) or Python (with \texttt{pyfixest}).
+Turn in (1) a PDF presenting your results and showing your work, and (2) your code.
+As always: derive with the operator rules, then simulate to check yourself.
+
+\subsection*{1 Why you cannot regress quantity on price}
+
+A grocery chain sets weekly prices for a snack product in 500 store-weeks. Demand and
+pricing are:
+\begin{align*}
+q_{i} &= 8 - 2 \ln p_{i}^{*} + \xi_{i} && \text{(demand, in logs: elasticity } -2\text{)}\\
+\ln p_{i}^{*} &= 1 + 0.5\, c_{i} + 0.3\, \xi_{i} && \text{(pricing: costs, and a response to demand)}
+\end{align*}
+where $\xi_{i} \sim \mathcal{N}(0, 0.5^2)$ is a demand shock the chain observes but
+you do not, and $c_{i} \sim \mathcal{N}(0, 0.5^2)$ is a wholesale cost shifter.
+\begin{enumerate}[label=(\alph*)]
+\item Before simulating: use the operator rules to derive $\Cov(\ln p^{*}, \xi)$ and
+the sign of the bias in the OLS regression of $q$ on $\ln p^{*}$. Will OLS make demand
+look too elastic or too inelastic? Give the economic story in one sentence.
+\item Simulate 500 observations. Estimate the elasticity by OLS and compare to your
+answer in (a).
+\item Now use the cost shifter $c$ as an instrument for $\ln p^{*}$
+(\texttt{feols(q \~{} 1 | lnp \~{} c)}). Compare the estimate to $-2$.
+\item State the two IV conditions (relevance, exclusion) in the language of this
+problem, and say how you would defend each to a skeptical seminar audience.
+One of them is checkable in data --- which one, and how?
+\item A colleague proposes instrumenting price with \emph{the same product's price at
+other stores in the chain}. Under what assumption is that valid, and what plausible
+feature of grocery chains breaks it?
+\end{enumerate}
+
+\subsection*{2 The randomized experiment that wasn't enough}
+
+\emph{Based on Jeziorski, Leng \& Seiler (2025), ``Causal Inference with Endogenous
+Price Response'' (working paper; CEPR DP 20252) --- see the DAG from Session 5.}
+
+An online marketplace randomly assigns a product-page upgrade ($T_{i} \in \{0,1\}$,
+probability $0.5$) to 5{,}000 sellers. The upgrade shifts demand directly, but sellers
+also \emph{reprice} in response to the upgrade and to demand conditions:
+\begin{align*}
+p_{i} &= 1 + 0.3\, T_{i} + 0.4\, \xi_{i} + 0.5\, c_{i}\\
+q_{i} &= 2 - 2\, p_{i} + 1 \cdot T_{i} + \xi_{i}
+\end{align*}
+with $\xi_{i}, c_{i} \sim \mathcal{N}(0,1)$ independent; $c_{i}$ is a seller-level
+cost shifter. The \textbf{direct effect} of the upgrade --- the demand shift holding
+price constant --- is $1$.
+\begin{enumerate}[label=(\alph*)]
+\item Simulate the data. Regress $q$ on $T$ alone. What number do you get, and
+\emph{of what is it an unbiased estimate}? (Hint: substitute the price equation into
+the demand equation.) When would a manager want exactly this number?
+\item Now ``control for price'': regress $q$ on $T$ and $p$. You should find an
+estimate strictly between (a) and the direct effect of $1$. Explain, using the DAG
+from lecture, why this regression is biased for the direct effect \emph{even though
+$T$ is randomized}. Which arrow does the damage?
+\item Run the diagnostic from lecture: regress $p$ on $T$. What do you find, and what
+does it tell you?
+\item Recover the direct effect by instrumenting price with the cost shifter:
+\texttt{feols(q \~{} T | p \~{} c)}. Compare to $1$.
+\item Managerial summary, three sentences max: your product team says ``the upgrade
+only moved sales by [your answer to (a)], so it's not worth the engineering cost.''
+What do you tell them, and which of your four numbers belongs in which business
+decision?
+\item Re-run (a)--(d) with the repricing channel shut off ($p_{i} = 1 + 0.4\xi_{i} +
+0.5c_{i}$). Which estimators now agree, and why does the diagnostic in (c) predict
+this?
+\end{enumerate}
+
+\subsection*{3 The Wald estimator, by hand}
+
+Consider the just-identified model $y_{i} = \beta_{0} + \beta_{1} x_{i} +
+\varepsilon_{i}$ with a binary instrument $z_{i}$ satisfying $\Cov(z, \varepsilon) = 0$
+and $\Cov(z, x) \neq 0$.
+\begin{enumerate}[label=(\alph*)]
+\item Starting from the model, take the covariance of both sides with $z$ (operator
+rules!) and solve for $\beta_{1}$. You have just derived
+$\beta_{1} = \Cov(z, y)/\Cov(z, x)$.
+\item Show that this equals the \emph{Wald estimator}
+$\left(\E[y|z=1] - \E[y|z=0]\right) / \left(\E[x|z=1] - \E[x|z=0]\right)$.
+\item In one sentence: why does dividing the ``reduced form'' by the ``first stage''
+undo the attenuation that a weak first stage would otherwise cause --- and what is the
+price you pay when the first stage is very weak?
+\end{enumerate}
+
+\end{document}

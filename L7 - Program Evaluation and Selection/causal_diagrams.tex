@@ -222,6 +222,71 @@ In the graph on the last slide there are two paths from $D$ to $Y$:
 \end{frame}
 
 
+\begin{frame}{Case study: when prices respond to your experiment}
+\begin{columns}
+\begin{column}{0.45\textwidth}
+\begin{center}
+\begin{tikzpicture}[every node/.style={draw, circle, minimum size=9mm, inner sep=1pt}, node distance=16mm]
+	\node (T) {$T$};
+	\node[right=of T] (P) {$p$};
+	\node[right=of P] (Q) {$q$};
+	\node[above=10mm of $(P)!0.5!(Q)$] (Xi) {$\xi$};
+	\draw[->, thick] (T) -- (P);
+	\draw[->, thick] (P) -- (Q);
+	\draw[->, thick] (T) to[bend right=28] (Q);
+	\draw[->, thick] (Xi) -- (Q);
+	\draw[->, thick] (Xi) -- (P);
+\end{tikzpicture}
+\end{center}
+\smallskip
+{\small $T$ = randomized ad/feature, $p$ = price, $q$ = quantity, $\xi$ = demand shock (unobserved)}
+\end{column}
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+	\item A marketplace A/B test improves product pages. Demand rises --- and
+	\alert{treated sellers raise prices}, offsetting part of the sales gain.
+
+	\item Often the estimand is the \alert{direct effect}: the demand-curve shift,
+	\emph{holding price constant}.
+
+	\item So this time we \emph{want} to hold the mediator fixed --- but $p$ is a
+	\alert{doubly bad control}: post-treatment ($T \rightarrow p$) \emph{and}
+	correlated with the demand shock ($\xi \rightarrow p$: sellers reprice when
+	demand is hot).
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Three regressions, one instrument}
+With randomized $T$, positive direct effect, and prices that respond
+(Jeziorski, Leng \& Seiler 2025, working paper):
+\begin{enumerate}
+	\item $q$ on $T$: the \alert{total} effect --- demand shift \emph{minus} the price
+	offset. A fine estimand, but it is not the demand shift.
+
+	\item $q$ on $T$ and $p$: \alert{biased for the direct effect even though $T$ is
+	randomized} --- $p$ drags $\xi$ into the regression. Typically the bias shrinks
+	but does not vanish, and it has the same sign as omitting $p$. The middle answer
+	is still a wrong answer.
+
+	\item The fix: a \alert{price instrument} (a cost shifter that moves $p$ but not
+	demand) recovers the direct effect. Instruments are next week's topic --- note
+	that here the instrument is for the \alert{control}, not the treatment.
+\end{enumerate}
+\medskip
+\begin{itemize}
+	\item Built-in diagnostic: regress $p$ on $T$. If price responds to your
+	randomized treatment, regressions (1) and (2) answer different questions than
+	you think.
+	\item Stakes: in supermarket scanner data, not instrumenting price overstates
+	feature-advertising effects by a factor of 3--4 in some categories.
+	\item You will do all four steps yourself in Assignment 3.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{The research designs of this course, as DAGs}
 \begin{columns}
 \begin{column}{0.5\textwidth}
