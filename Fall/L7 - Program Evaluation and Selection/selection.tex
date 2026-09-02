@@ -1,0 +1,396 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{teaching_slides}
+
+
+\title[L12c - Selection]{ Econometrics I}
+\subtitle{Lecture 12c: Selection Models}
+\author{Chris Conlon \\NYU Stern}
+\date{Fall 2026}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+\begin{frame}{Motivation: Sample Selection Bias}
+\begin{itemize}
+    \item Ordinary Least Squares (OLS) assumes the sample is randomly drawn from the population.
+    \item In many cases, we only observe the outcome variable $y_i$ for a selected subset of individuals.
+    \item Example: Wages are only observed for those who work.
+    \begin{align*}
+    y_i = w_i \text{ observed only if } s_i = 1
+    \end{align*}
+    \item If the decision to work is correlated with unobservables affecting wages, OLS is biased.
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+
+\begin{frame}{Model Setup}
+\begin{block}{Outcome Equation (latent)}
+\begin{align*}
+y_i^* &= x_i'\beta + \varepsilon_i, \\
+\varepsilon_i &\sim N(0, \sigma^2)
+\end{align*}
+\end{block}
+
+\begin{block}{Selection Equation}
+\begin{align*}
+s_i^* &= z_i'\gamma + u_i, \\
+s_i &= 1[s_i^* > 0]\\
+\begin{pmatrix} \varepsilon_i \\ u_i \end{pmatrix}
+&\sim N \left(
+\begin{pmatrix} 0 \\ 0 \end{pmatrix},
+\begin{pmatrix}
+\sigma^2 & \rho\sigma \\
+\rho\sigma & 1
+\end{pmatrix}
+\right)
+\end{align*}
+\end{block}
+\end{frame}
+%------------------------------------------------
+
+\begin{frame}{Conditional Expectation and Bias}
+We only observe $y_i$ when $s_i = 1$. Then:
+\begin{align*}
+\E[y_i \mid x_i, s_i=1]
+    &= x_i'\beta + \E[\varepsilon_i \mid u_i > -z_i'\gamma] \\
+    &= x_i'\beta + \rho \sigma \lambda(z_i'\gamma)
+\end{align*}
+where
+\begin{align*}
+\lambda(z_i'\gamma)
+    &= \frac{\phi(z_i'\gamma)}{\Phi(z_i'\gamma)}.
+\end{align*}
+
+Thus:
+\begin{align*}
+\E[y_i \mid x_i, s_i=1]
+    &= x_i'\beta + \rho\sigma \lambda(z_i'\gamma)
+\end{align*}
+\end{frame}
+%------------------------------------------------
+
+\begin{frame}{Heckman Two-Step Estimator}
+\begin{enumerate}
+    \item \textbf{Step 1: Selection Equation (Probit)}
+    \begin{align*}
+    s_i &= 1[z_i'\gamma + u_i > 0].
+    \end{align*}
+    Estimate $\hat{\gamma}$ via probit, compute
+    \begin{align*}
+    \hat{\lambda}_i &= \frac{\phi(z_i'\hat{\gamma})}{\Phi(z_i'\hat{\gamma})}.
+    \end{align*}
+    \item \textbf{Step 2: Outcome Equation (Corrected OLS)}
+    \begin{align*}
+    y_i &= x_i'\beta + \rho\sigma \hat{\lambda}_i + \nu_i.
+    \end{align*}
+\end{enumerate}
+
+If $\rho \neq 0$, selection bias exists.\\
+\vspace{0.2cm}
+Note: standard errors must be corrected for the generated regressor $\hat{\lambda}_i$.
+\end{frame}
+
+
+\begin{frame}{Interpretation and Identification}
+\begin{itemize}
+    \item $\rho$ measures the correlation between the unobservables in the selection and outcome equations.
+    \begin{itemize}
+        \item If $\rho \neq 0$, selection bias exists.
+        \item If $\rho = 0$, OLS on observed $y_i$ is consistent.
+    \end{itemize}
+    \item Identification relies on nonlinearity of $\lambda(z_i'\gamma)$, but it’s better to have an \textbf{exclusion restriction}:
+    \[
+    \text{Some variables in } z_i \text{ not in } x_i.
+    \]
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+
+\begin{frame}{Full Information Maximum Likelihood (FIML)}
+Joint likelihood for observed data:
+\[
+\mathcal{L} = \prod_{i : s_i=1} f(y_i, s_i=1 \mid x_i, z_i)
+    \prod_{i: s_i=0} \Pr(s_i=0 \mid z_i)
+\]
+Assuming joint normality:
+\[
+\log \mathcal{L} = \sum_{s_i=1} \log \left[ 
+\frac{1}{\sigma} \phi\left( \frac{y_i - x_i'\beta}{\sigma} \right)
+\Phi\left( \frac{z_i'\gamma + \rho (y_i - x_i'\beta)/\sigma}{\sqrt{1-\rho^2}} \right)
+\right]
++ \sum_{s_i=0} \log \left[ 1 - \Phi(z_i'\gamma) \right]
+\]
+Estimated via MLE; asymptotically efficient.
+\end{frame}
+%------------------------------------------------
+
+%------------------------------------------------
+
+\begin{frame}[fragile]{Empirical Example in \texttt{R}}
+\begin{lstlisting}
+n <- 2000
+
+# regressors
+educ  <- rnorm(n, 12, 2)
+exper <- rnorm(n, 10, 5)
+
+# create correlated errors (epsilon for wage, u for selection) with rho != 0
+rho <- 0.6                   # correlation between wage error and selection error
+sigma_eps <- 1
+Sigma <- matrix(c(sigma_eps^2, rho*sigma_eps,
+                  rho*sigma_eps, 1), nrow = 2)
+errors <- mvrnorm(n, mu = c(0,0), Sigma = Sigma)
+eps <- errors[,1]   # wage disturbances
+u   <- errors[,2]   # selection disturbances
+
+# ---------------------------
+# Variant A: NO exclusion restriction
+# selection and outcome share same regressors
+# ---------------------------
+s_star_A <- 0.5 + 0.3*educ - 0.2*exper + u
+select_A <- as.integer(s_star_A > 0)
+
+wage_star <- 2 + 0.10*educ + 0.05*exper + eps
+wage_A <- ifelse(select_A==1, wage_star, NA)
+
+ols_A  <- lm(wage_A ~ educ + exper)
+heck_A <- selection(select_A ~ educ + exper, wage_A ~ educ + exper, method = "ml")
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Empirical Example in \texttt{R}: Heckman Results}
+\begin{lstlisting}
+Tobit 2 model (sample selection model)
+Maximum Likelihood estimation
+Newton-Raphson maximisation, 3 iterations
+Return code 8: successive function values within relative tolerance limit (reltol)
+Log-Likelihood: -2940.355 
+2000 observations (173 censored and 1827 observed)
+8 free parameters (df = 1992)
+Probit selection equation:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.19856    0.30870   0.643     0.52    
+educ         0.35155    0.03057  11.501   <2e-16 ***
+exper       -0.21976    0.01460 -15.055   <2e-16 ***
+Outcome equation:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 1.956873   0.153297  12.765  < 2e-16 ***
+educ        0.095521   0.012536   7.619 3.91e-14 ***
+exper       0.057020   0.005744   9.927  < 2e-16 ***
+   Error terms:
+      Estimate Std. Error t value Pr(>|t|)    
+sigma  1.01697    0.01851  54.935  < 2e-16 ***
+rho    0.54797    0.09150   5.989  2.5e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Empirical Example in \texttt{R}: Add Exclusion Restriction}
+Add excluded variable \alert{kids} to \alert{selection equation}:
+\begin{lstlisting}
+kids <- rbinom(n, 1, 0.3)   # 0/1 indicator: has young children
+
+s_star_B <- 0.5 + 0.3*educ - 0.2*exper - 0.8*kids + u   # kids reduces labor supply
+select_B <- as.integer(s_star_B > 0)
+
+wage_B <- ifelse(select_B==1, wage_star, NA)
+
+ols_B  <- lm(wage_B ~ educ + exper)
+heck_B <- selection(select_B ~ educ + exper + kids, wage_B ~ educ + exper, method = "ml")
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}{OLS vs. Heckman Selection Model (with exclusion restriction)}
+\begin{center}
+\begin{tabular}{@{\extracolsep{5pt}}lccc} 
+\toprule
+ & OLS (observed) & Heckman (MLE) & Heckman (Exclusion) \\ 
+\midrule
+ educ & 0.071$^{***}$ (0.012) & 0.096$^{***}$ (0.013) & 0.100$^{***}$ (0.013) \\ 
+  exper & 0.078$^{***}$ (0.005) & 0.057$^{***}$ (0.006) & 0.057$^{***}$ (0.006) \\ 
+  Constant & 2.154$^{***}$ (0.150) & 1.957$^{***}$ (0.153) & 1.898$^{***}$ (0.156) \\ 
+\midrule
+Observations & 1,754 & 2,000 & 2,000 \\ 
+R$^{2}$ & 0.138 &  &  \\ 
+Adjusted R$^{2}$ & 0.137 &  &  \\ 
+Log Likelihood &  & $-$2,940.355 & $-$2,903.073 \\ 
+$\rho$ &  & 0.548$^{***}$  (0.091) & 0.647$^{***}$  (0.068) \\ 
+\bottomrule 
+\textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\end{tabular} 
+\end{center}
+\end{frame}
+
+
+
+\begin{frame}{Extensions and Applications}
+\begin{itemize}
+    \item \textbf{Extensions:}
+    \begin{itemize}
+        \item Multinomial or dynamic selection.
+        \item Semiparametric or nonparametric corrections.
+        \item Panel data with selection.
+    \end{itemize}
+    \item \textbf{Applications:}
+    \begin{itemize}
+        \item Wage equations (Heckman 1979)
+        \item Labor force participation
+        \item Credit approval models
+        \item Censored health outcomes
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example: Borjas (1987)}
+\begin{itemize}
+\item Consider two countries $(0/1)$ (source and host).
+\begin{align*}
+\ln w_0 &= \alpha_0 + u_0 \quad \mbox{ with } u_0 \sim N(0,\sigma_0^2) \mbox{ source country}\\
+\ln w_1 &= \alpha_1 + u_1 \quad \mbox{ with } u_1 \sim N(0,\sigma_1^2) \mbox{ host country}
+\end{align*}
+\item Now we allow for migration cost of $C$ which he writes in hours: $\pi = \frac{C}{w_0}$.
+\item Assume workers know everything; you only see $u_0$ \alert{OR} $u_1$ depending on country.
+\item Correlation in earnings is $\rho=\frac{\sigma_{01}}{\sigma_{0} \sigma_{1}}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example: Borjas (1987)}
+\begin{itemize}
+\item Workers will migrate if:
+\begin{align*}
+\left( \alpha_{1}-\alpha_{0}-\pi\right)+\left(u_{1}-u_{0}\right)>0
+\end{align*}
+\item Who migrates? Probability of migration. Define $\nu = u_1-u_0$.
+\begin{align*}
+P &=\operatorname{Pr}\left[\nu>\left(\alpha_{0}-\alpha_{1}+\pi\right)\right] =\operatorname{Pr}\left[\frac{\nu}{\sigma_{\nu}}>\frac{\left(\alpha_{0}-\alpha_{1}+\pi\right)}{\sigma_{\nu}}\right] \\
+&=1-\Phi\left(\frac{\left(\alpha_{0}-\alpha_{1}+\pi\right)}{\sigma_{\nu}}\right) \equiv 1-\Phi(z)
+\end{align*}
+\item Higher $z$ $\rightarrow$ less migration.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Borjas (1987): How does selection work?}
+Construct \alert{counterfactual wages} for workers in \alert{source} country for those who immigrate:
+\begin{itemize}
+\item For now ignore mean differences $\alpha_0 = \alpha_1 = \alpha$.
+\begin{align*}
+\mathbb{E} \left(w_{0} | \text { Immigrate }\right) &=\alpha+\mathbb{E}\left(u_{0} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+&=\alpha+\sigma_{0} \cdot \mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right)
+\end{align*}
+\item Wages depend on:
+\begin{enumerate}
+\item Mean earnings in the source country
+\item Both error terms $\left(u_{0}, u_{1}\right)$ through $\nu$
+\item Implicitly, it also depends on the correlation between the error terms.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Borjas (1987): How does selection work?}
+\begin{itemize}
+\item If everything is normal, we just run univariate regression $\mathbb{E}\left(u_{0} | \nu\right)=\frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \nu$:
+\begin{align*}
+\mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}\right) &= \frac{1}{\sigma_{0}}\cdot \frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \cdot \frac{\sigma_{\nu}^{2}}{\sigma_{\nu}^{2}} \cdot \nu  
+=\frac{\sigma_{0 \nu}}{\sigma_{0} \sigma_{\nu}} \frac{\nu}{\sigma_{\nu}}  =\rho_{0 \nu} \frac{\nu}{\sigma_{\nu}} 
+\end{align*}
+\begin{align*}
+\mathbb{E}\left(w_{0} | \text { Immigrate }\right) 
+&=\alpha_{0}+\sigma_{0} \cdot \mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+ &=\alpha_{0}+\rho_{0 \nu} \cdot \sigma_{0} \cdot \mathbb{E}\left(\frac{\nu}{\sigma_{\nu}} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+  &=\alpha_{0}+\rho_{0 \nu} \cdot \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) 
+\end{align*}
+\item This hazard rate of the standard normal has a special name \alert{Inverse Mills Ratio} $\mathbb{E}[x | x > z]$.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Borjas (1987): How does selection work?}
+\begin{itemize}
+\item A similar expression for those who do immigrate:
+\begin{align*}
+\mathbb{E}\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\mathbb{E}\left(u_{1} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
+&=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{\Phi(-z)}\right)
+\end{align*}
+\item We can re-write both expressions in terms of the \alert{Inverse Mills Ratio}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Inverse Mills Ratio}
+\begin{align*}
+\mathbb{E}\left(w_{0} | \text { Immigrate }\right) &=\alpha_{0}+\rho_{0 \nu} \sigma_{0}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+&=\alpha_{0}+\frac{\sigma_{0} \sigma_{1}}{\sigma_{\nu}}\left(\rho-\frac{\sigma_{0}}{\sigma_{1}}\right)\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+\mathbb{E}\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{1-\Phi(z)}\right) \\
+&=\alpha_{1}+\frac{\sigma_{0} \sigma_{1}}{\sigma_{\nu}}\left(\frac{\sigma_{1}}{\sigma_{0}}-\rho\right)\left(\frac{\phi(z)}{1-\Phi(z)}\right)
+\end{align*}
+Where $\rho=\sigma_{01} / \sigma_{0} \sigma_{1}$.
+\end{frame}
+
+
+
+\begin{frame}{Positive Hierarchical Sorting}
+Let $Q_{0}=\E\left(u_{0} | I=1\right), Q_{1}=\E\left(u_{1} | I=1\right)$ (expected \alert{skill} of immigrants).
+\begin{itemize}
+\item Immigrants are positively selected and above average $(Q_0,Q_1) > 0$ and $\frac{\sigma_{1}}{\sigma_{0}}>1 \text { and } \rho>\frac{\sigma_{0}}{\sigma_{1}}$
+\begin{itemize}
+\item $\frac{\sigma_{1}}{\sigma_{0}}>1$ returns to ``skill'' are higher in host country.
+\item $\rho>\frac{\sigma_{0}}{\sigma_{1}}$ correlation between valued skills in both counties is high (similar skills valued in both countries).
+\end{itemize}
+\item Best and brightest leave because returns to skill are too low in home country.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Negative Hierarchical Sorting}
+We swap the standard deviations:
+\begin{itemize}
+\item Immigrants are negatively selected and below average $(Q_0,Q_1) < 0$ and $\frac{\sigma_{1}}{\sigma_{0}}>1 \text { and } \rho>\frac{\sigma_{0}}{\sigma_{1}}$
+\begin{itemize}
+\item $\frac{\sigma_{0}}{\sigma_{1}}>1$ returns to ``skill'' are lower in host country.
+\item $\rho>\frac{\sigma_{1}}{\sigma_{0}}$ correlation between valued skills in both counties is high (similar skills valued in both countries).
+\end{itemize}
+\item Compressed wage structure attracts the low skill types because it provides ``insurance'' or ``subsidizes'' low wage workers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Refugee/Superman Sorting?}
+\begin{itemize}
+\item Immigrants are below average at home and above average in host $(Q_0<0 ,Q_1>1)$ and $\frac{\sigma_{1}}{\sigma_{0}}>1$:
+\begin{itemize}
+\item $\rho<\min \left(\frac{\sigma_{1}}{\sigma_{0}}, \frac{\sigma_{0}}{\sigma_{1}}\right)$ being below average in source country makes you above average in host country.
+\end{itemize}
+\item You are a nerdy intellectual in a country that values physical labor, or are otherwise discriminated against in the labor market.
+\end{itemize}
+The missing (fourth) case:
+\begin{itemize}
+\item Mathematically impossible $\rho>\max \left(\frac{\sigma_{1}}{\sigma_{0}}, \frac{\sigma_{0}}{\sigma_{1}}\right)$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Takeaway}
+What can we learn here?
+\begin{itemize}
+\item Heckman won a Nobel Prize for his work on selection...
+\item You need to know what an \alert{inverse Mills ratio is}
+\item But today it is hard to get away with strong parametric assumptions (bivariate normal) on error terms.
+\item Doing MLE with a fully normal model is not a terrible place to start sometimes
+\begin{itemize}
+\item Sometimes helpful to know how bad the selection problem might be.
+\item But you probably need \alert{exclusion restrictions}!
+\end{itemize}
+\item R package is \texttt{sampleSelection} and see \url{https://rpubs.com/hacamvan/316839} and \url{https://cran.r-project.org/web/packages/sampleSelection/vignettes/selection.pdf}.
+\end{itemize}
+\end{frame}
+
+\end{document}

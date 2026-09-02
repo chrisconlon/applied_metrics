@@ -1,0 +1,152 @@
+---
+title: "In-Class Session 5: Causality, DAGs, and Experiment Design"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+set.seed(93)
+```
+
+This notebook reproduces the power calculations and the collider simulation from
+Lecture 5, and leaves you three short problems.
+
+# Reproduce: power and sample size for an A/B test
+
+From the lecture: baseline conversion 2%, and we want to detect a lift to 2.5%
+(a 25% relative lift) at $\alpha = 0.05$ with 80% power.
+
+```{r}
+power.prop.test(p1 = 0.02, p2 = 0.025, sig.level = 0.05, power = 0.80)
+```
+
+The required $n$ *per arm*. Now the sample-size/lift curve:
+
+```{r}
+lifts <- seq(0.0005, 0.005, by = 0.0005)
+n_req <- sapply(lifts, function(d)
+  power.prop.test(p1 = 0.02, p2 = 0.02 + d, sig.level = 0.05, power = 0.80)$n)
+plot(100 * lifts / 0.02, n_req / 1000, type = "b", log = "y",
+     xlab = "Detectable relative lift (%)", ylab = "n per arm (thousands, log scale)")
+```
+
+Small lifts are *brutally* expensive to detect --- this is the Lewis--Rao point about
+advertising experiments.
+
+# Reproduce: randomization inference in ten lines
+
+A small experiment with a skewed outcome --- exactly where the t-approximation is
+shakiest. 40 sellers, half treated, revenue is lognormal, true effect is a 30% lift:
+
+```{r}
+n <- 40
+d <- sample(rep(0:1, n / 2))
+y <- exp(rnorm(n, mean = 3, sd = 1)) * (1 + 0.3 * d)
+
+observed <- mean(y[d == 1]) - mean(y[d == 0])
+perm <- replicate(10000, {
+  d_star <- sample(d)               # reshuffle labels, same # treated
+  mean(y[d_star == 1]) - mean(y[d_star == 0])
+})
+c(observed = observed, p_value = mean(abs(perm) >= abs(observed)),
+  t_test_p = t.test(y ~ d)$p.value)
+hist(perm, breaks = 50, main = "Null distribution, built from the design")
+abline(v = observed, col = "red", lwd = 2)
+```
+
+The histogram *is* the null distribution --- no CLT required. Try re-running the
+chunk a few times: with n = 40 and lognormal outcomes, the permutation and t-test
+p-values usually agree roughly, but the permutation one needs no approximation to
+defend.
+
+# Reproduce: the collider from the DAG lecture
+
+Talent and luck are independent. Funding requires enough of either:
+
+```{r}
+n      <- 100000
+talent <- rnorm(n)
+luck   <- rnorm(n)
+funded <- (talent + luck > 1.5)   # top ~14% get funded
+
+cor(talent, luck)            # population: ~0
+cor(talent[funded], luck[funded])   # among the funded: strongly negative!
+plot(talent[funded][1:2000], luck[funded][1:2000], pch = ".",
+     xlab = "talent", ylab = "luck", main = "Funded startups only")
+```
+
+Nobody made talent and luck trade off --- *conditioning on the collider did*.
+
+# Reproduce: interference in a marketplace
+
+Buyers share a limited inventory. A coupon raises purchase propensity from 0.20 to 0.30. When
+supply binds, treated buyers take units control buyers would have bought, and the buyer-level
+A/B test overstates the effect of giving everyone the coupon.
+
+```{r}
+run_market <- function(treat, supply, p0 = 0.2, delta = 0.1) {
+  want <- rbinom(length(treat), 1, p0 + delta * treat); sold <- integer(length(treat)); left <- supply
+  for (i in sample(seq_along(treat))) if (want[i] == 1 && left > 0) { sold[i] <- 1L; left <- left - 1 }
+  sold
+}
+B <- 200
+for (ratio in c(0.75, 1, 2)) {
+  supply <- round(ratio * 0.2 * B)
+  est <- replicate(200, { tr <- rbinom(B, 1, 0.5); s <- run_market(tr, supply)
+    c(naive = mean(s[tr == 1]) - mean(s[tr == 0]),
+      global = mean(run_market(rep(1, B), supply)) - mean(run_market(rep(0, B), supply))) })
+  cat(sprintf("supply/demand = %.2f:  buyer-level A/B %.3f   global effect %.3f\n", ratio, mean(est["naive", ]), mean(est["global", ])))
+}
+```
+
+# In-class problem 1: the bad control, live
+
+Simulate an advertising funnel: exposure to an ad is randomized,
+`exposed ~ Bernoulli(0.5)`. Visiting the site depends on exposure and interest:
+`visit = 1{0.5*exposed + interest + noise > 1}`, where `interest ~ N(0,1)`.
+Purchases depend on exposure (through brand awareness) and interest:
+`purchase = 0.1*exposed + 0.5*interest + error`.
+
+**(a)** Regress `purchase` on `exposed` in the full sample. Since exposure is
+randomized, this is the causal effect. What do you get?
+**(b)** Now do what many dashboards do: run the same regression *only among visitors*.
+What happens to the estimated ad effect, and why? (Draw the DAG --- which variable is
+the collider?)
+
+```{r problem1}
+# your code here
+```
+
+# In-class problem 2: fix the marketplace experiment
+
+Using `run_market` above with `ratio = 0.75`:
+
+**(a)** Randomize the coupon at the *market* level instead (all buyers in a market treated or
+none), with 200 markets. Confirm the estimate is close to the global effect. Compare its
+standard error to the buyer-level test's.
+**(b)** Vary the treated share within markets (10%, 50%, 90% of buyers) and record the mean
+sales of *control* buyers in each case. What pattern do you see, and what does it diagnose?
+**(c)** One sentence: what feature of a business would make you confident the buyer-level test
+is fine?
+
+```{r problem2}
+# your code here
+```
+
+# In-class problem 3: design your own experiment
+
+Your product team wants to test a new checkout flow. The current completion rate is
+60%, and a change would only be worth engineering effort if it moves completion by
+at least 2 percentage points.
+
+**(a)** How many users per arm do you need at $\alpha = 0.05$, power 0.8?
+**(b)** The team says "we only have 5,000 users a week, and we want an answer in two
+weeks." What minimum detectable effect does that traffic actually buy you (solve
+`power.prop.test` for the detectable `p2` given n = 5000)?
+**(c)** Two sentences for the product manager: what do you recommend, and what is the
+risk of just running the underpowered test anyway?
+
+```{r problem3}
+# your code here
+```

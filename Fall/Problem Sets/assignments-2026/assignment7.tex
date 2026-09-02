@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\providecommand{\tabularnewline}{\\}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+
+\title{\Huge Assignment 7}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026 --- due at the start of Session 13}
+
+\makeatother
+
+\begin{document}
+
+\title{Assignment 7}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+\textbf{Instructions.} Two problems on binary choice and selection (Session 12). \texttt{R} with
+\texttt{fixest} (\texttt{feglm} for logit and probit) or Python with \texttt{pyfixest}. Turn in a PDF
+with your results and reasoning, and your code.
+
+\subsection*{1 Mortgage denials in Boston}
+
+The \texttt{Hmda} data (\texttt{Ecdat} package in R; also in the course repository) contain
+$2{,}380$ mortgage applications from the 1990 Boston HMDA study (Munnell et al.\ 1996). The outcome is
+\texttt{deny}. Use the specification from the Session 12 notebook: \texttt{black}, debt-to-income
+(\texttt{dir}), housing-expense-to-income (\texttt{hir}), loan-to-value indicators for medium
+($0.8 \le \texttt{lvr} \le 0.95$) and high ($> 0.95$), consumer and mortgage credit scores
+(\texttt{ccs}, \texttt{mcs}), public bad credit record (\texttt{pbcr}), and denied mortgage insurance
+(\texttt{dmi}).
+
+\begin{enumerate}[label=(\alph*)]
+\item Report the denial rate for Black and for white applicants. Then estimate the linear
+probability model, the probit, and the logit with the covariates above. Present the three in one
+table with robust standard errors for the LPM.
+\item The logit coefficient on \texttt{black} is roughly $1.8$ times the probit coefficient. Why is that
+the expected ratio, and why does it not mean the models disagree?
+\item Compute the effect of \texttt{black} on the denial probability three ways: the LPM coefficient;
+the logit \emph{average} marginal effect (average over applicants of the predicted probability with
+\texttt{black} set to $1$ minus set to $0$); and the logit effect \emph{at the means} of the
+covariates. Using the shape of the logistic CDF, explain when the last two differ (where would the
+``average applicant'' have to sit for the effect at the means to be much smaller than the average
+effect?) and why they are close in these data.
+\item Compare your estimates in (c) to the raw gap in (a). Two sentences: what accounts for the
+difference, and what would the coefficient on \texttt{black} have to be interpreted as for this
+regression to measure discrimination? (Munnell et al.\ argue one side; think about what an
+omitted variable would need to look like.)
+\item What share of the LPM's fitted probabilities lie outside $[0, 1]$? Which applicants are they?
+\item Classification. Using the logit's predicted probabilities, build the confusion matrix at a
+cutoff of $0.5$ and at $0.2$. Report accuracy, sensitivity (share of denials caught), and
+specificity. Note that always predicting ``approve'' has accuracy $0.88$. One paragraph: which
+cutoff would a lender's compliance officer prefer, which would a loan officer prefer, and why is
+``accuracy'' the wrong summary for a rare outcome?
+\end{enumerate}
+
+\subsection*{2 Interest rates you only see for approved loans}
+
+Return to the loan officers of Assignment 4, but now the outcome is the \emph{interest rate} on the
+loan, which exists only if the loan is approved. $4{,}000$ applications, each randomly assigned to
+one of $40$ officers with leniency $\ell_{j} \sim \mathcal{N}(0, 0.6^{2})$:
+\begin{align*}
+\text{approve}_{i} &= \mathbf{1}\{\,0.5\,\text{score}_{i} + \ell_{j(i)} + u_{i} > 0\,\} \\
+\text{rate}_{i} &= 6 - 0.8\,\text{score}_{i} + 0.5\,e_{i}, \qquad \text{observed only if approved,}
+\end{align*}
+with $\text{score}_{i} \sim \mathcal{N}(0,1)$ and $(u_{i}, e_{i})$ standard normal with correlation
+$\rho = 0.6$: applicants the officer is inclined to approve for reasons you do not see are also
+charged more. The question is the effect of the credit score on the rate offered, $-0.8$.
+
+\begin{enumerate}[label=(\alph*)]
+\item Simulate. Regress rate on score using approved loans only. Sign and explain the bias before
+you look at the number (Session 12: what is $\E[e \mid \text{approved}, \text{score}]$, and how does it
+move with score?).
+\item Heckman two-step: probit of approval on score and officer leniency; compute the inverse
+Mills ratio $\lambda(\hat z) = \phi(\hat z)/\Phi(\hat z)$ from the probit index; regress rate on
+score and $\hat\lambda$ in the approved sample. Compare the score coefficient to $-0.8$ and the
+coefficient on $\hat\lambda$ to $\rho\sigma_{e} = 0.3$.
+\item Redo (b) with a probit on score \emph{alone}, no leniency. Report the coefficient on score and
+its standard error, and the correlation between $\hat\lambda$ and score in the approved sample.
+One paragraph: what is the \emph{exclusion restriction} in this problem, why is officer leniency a
+good one, and what happens to the two-step estimator without it?
+\item Write the full-information likelihood for one observation (a probability for rejected
+applications; a density times a conditional probability for approved ones) and maximize it with
+\texttt{optim} (or \texttt{sampleSelection::selection} in R). Compare to (b).
+\item Managerial summary, two sentences: a fintech competitor proposes to price loans using the
+OLS from (a), estimated on the incumbent's approved book. What will go wrong when they lend to
+applicants the incumbent would have rejected?
+\end{enumerate}
+
+\end{document}

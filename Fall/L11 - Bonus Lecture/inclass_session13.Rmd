@@ -1,0 +1,224 @@
+---
+title: "In-Class Session 13: Censored Outcomes, Durations, and Counts"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 4)
+library(fixest)
+library(survival)   # ships with R
+set.seed(13)
+```
+
+This notebook reproduces the simulations behind Lectures 13a, 13b, and 13c (the slides use
+`ldv_sims.R`) and leaves you three problems. Only `fixest` and `survival` are needed; the
+one model neither package has (zero inflation) is written out as a likelihood.
+
+# Part 1: Censoring and Tobit
+
+## Reproduce: spending with many zeros
+
+Latent spending $y^* = -0.5 + 1.5x + \varepsilon$, $\varepsilon \sim N(0, 2^2)$; observed $y = \max(0, y^*)$.
+
+```{r}
+sim_tobit <- function(N = 2000, b0 = -0.5, b1 = 1.5, sig = 2, hetero = 0) {
+  x <- rnorm(N)
+  e <- rnorm(N, 0, sig * exp(hetero * x))      # hetero > 0: variance rises with x
+  ystar <- b0 + b1 * x + e
+  data.frame(x, ystar, y = pmax(0, ystar))
+}
+d <- sim_tobit()
+mean(d$y == 0)
+```
+
+OLS on everyone, OLS on the buyers, and the Tobit (a left-censored normal regression):
+
+```{r}
+ols_all <- lm(y ~ x, d)
+ols_pos <- lm(y ~ x, d, subset = y > 0)
+tob     <- survreg(Surv(y, y > 0, type = "left") ~ x, d, dist = "gaussian")
+rbind(ols_all = coef(ols_all), ols_pos = coef(ols_pos), tobit = coef(tob))
+tob$scale                                       # sigma (truth 2)
+```
+
+The probit check: a probit on $1\{y > 0\}$ should give about $\beta/\sigma = 0.75$.
+
+```{r}
+pro <- feglm(I(y > 0) ~ x, d, family = binomial("probit"))
+c(probit_slope = unname(coef(pro)[2]), tobit_ratio = unname(coef(tob)[2] / tob$scale))
+```
+
+Marginal effect on observed spending, averaged over the sample:
+
+```{r}
+coef(tob)[2] * mean(pnorm(predict(tob, type = "lp") / tob$scale))
+```
+
+# In-class problem 1: when Tobit breaks
+
+Re-simulate with `hetero = 0.4`, so the error variance grows with income. Tobit assumes
+homoskedastic normal errors.
+
+**(a)** Re-estimate the Tobit and the probit. Does the probit check still agree with
+$\hat\beta/\hat\sigma$? Which is further from the truth, the OLS slope or the Tobit slope?
+**(b)** One sentence: why does heteroskedasticity break Tobit's *consistency* when it only
+breaks OLS's standard errors?
+
+```{r problem1}
+# your code here
+```
+
+# Part 2: Duration models
+
+## Reproduce: subscription churn
+
+Weibull hazard with proportional effects: $h(t \mid x) = p\,t^{p-1}\exp(0.5\,\text{price} - 0.4\,\text{usage})$,
+$p = 0.7$. Observation stops at 24 months; some subscribers drop out of the panel early for unrelated reasons.
+
+```{r}
+sim_churn <- function(N = 3000, p = 0.7, b_price = 0.5, b_usage = -0.4, scale = 17) {
+  price <- rbinom(N, 1, 0.5); usage <- rnorm(N)
+  T_true <- (-log(runif(N)) / exp(b_price * price + b_usage * usage))^(1 / p) * scale
+  C <- pmin(24, ifelse(runif(N) < 0.15, runif(N, 1, 24), 24))
+  data.frame(time = pmin(T_true, C), event = as.integer(T_true <= C), price, usage)
+}
+dd <- sim_churn()
+mean(dd$event == 0)                             # share censored
+```
+
+Kaplan-Meier by group, then Cox and Weibull. `survreg` reports the accelerated-failure-time
+form; divide by minus the scale to get proportional-hazards coefficients.
+
+```{r}
+km <- survfit(Surv(time, event) ~ price, dd)
+plot(km, col = c("navy", "firebrick"), lwd = 2, conf.int = TRUE, xlab = "months", ylab = "S(t)")
+legend("topright", bty = "n", legend = c("no price increase", "price increase"), col = c("navy", "firebrick"), lwd = 2)
+
+cox <- coxph(Surv(time, event) ~ price + usage, dd)
+wei <- survreg(Surv(time, event) ~ price + usage, dd, dist = "weibull")
+rbind(cox = coef(cox), weibull_PH = -coef(wei)[-1] / wei$scale)
+1 / wei$scale                                   # Weibull shape p (truth 0.7)
+exp(coef(cox))                                  # hazard ratios
+```
+
+## Reproduce: the same model as a person-month logit, with fixest only
+
+Expand each spell into one row per month at risk, with an exit indicator in the last month
+of completed spells. A complementary log-log link with month fixed effects is the discrete-time
+version of proportional hazards.
+
+```{r}
+pm <- do.call(rbind, lapply(seq_len(nrow(dd)), function(i) {
+  m <- seq_len(ceiling(dd$time[i]))
+  data.frame(id = i, month = m, price = dd$price[i], usage = dd$usage[i],
+             exit = as.integer(m == max(m) & dd$event[i] == 1))
+}))
+nrow(pm)
+disc <- feglm(exit ~ price + usage | month, pm, family = binomial("cloglog"), vcov = ~id)
+rbind(cox = coef(cox), discrete_cloglog = coef(disc))
+```
+
+# In-class problem 2: heterogeneity that looks like duration dependence
+
+Simulate 3,000 subscribers of two types with *constant* hazards: half have monthly hazard
+0.04, half 0.30 (draw `T = rexp(n, rate)`). Censor at 24 months.
+
+**(a)** Fit a Weibull with no covariates and report the shape $p$. Is it below one?
+**(b)** Now add the type indicator as a covariate. What happens to $p$?
+**(c)** One sentence: in the churn data you will actually see, what would you need in order
+to tell falling individual hazards apart from sorting?
+
+```{r problem2}
+# your code here
+```
+
+# Part 3: Count data
+
+## Reproduce: purchases per customer-quarter
+
+Rate $\lambda_i = E_i \exp(-0.5 + 0.6\,\text{promo} + 0.2\,\text{tenure})\,\nu_i$ with gamma
+heterogeneity $\nu_i$ (variance 0.8), exposure $E_i \in \{1,2,3\}$ months, and 25% never-buyers.
+
+```{r}
+sim_counts <- function(N = 4000, alpha = 0.8, pi0 = 0.25) {
+  promo <- rbinom(N, 1, 0.5); tenure <- rnorm(N); months <- sample(1:3, N, replace = TRUE)
+  nu <- rgamma(N, shape = 1 / alpha, rate = 1 / alpha)
+  lam <- months * exp(-0.5 + 0.6 * promo + 0.2 * tenure) * nu
+  y <- ifelse(rbinom(N, 1, pi0) == 1, 0L, rpois(N, lam))
+  data.frame(y, promo, tenure, months)
+}
+dc <- sim_counts()
+c(mean = mean(dc$y), var = var(dc$y), zeros = mean(dc$y == 0))
+```
+
+Poisson (with and without robust standard errors) and negative binomial, all `fixest`, with
+the exposure as an offset:
+
+```{r}
+pois     <- fepois(y ~ promo + tenure, dc, offset = ~log(months), vcov = "iid")
+pois_rob <- fepois(y ~ promo + tenure, dc, offset = ~log(months), vcov = "hetero")
+nb       <- fenegbin(y ~ promo + tenure, dc, offset = ~log(months))
+etable(pois, pois_rob, nb, headers = c("Poisson", "Poisson robust", "NB"))
+1 / nb$theta                                    # overdispersion alpha (NB alone over-attributes)
+```
+
+The zero-inflated negative binomial, as a likelihood handed to `optim`:
+
+```{r}
+X <- cbind(1, dc$promo, dc$tenure); off <- log(dc$months); y <- dc$y
+zinb_nll <- function(th) {
+  la <- exp(X %*% th[1:3] + off); a <- exp(th[4]); pi <- plogis(th[5])
+  f <- dnbinom(y, size = 1 / a, mu = la)
+  -sum(ifelse(y == 0, log(pi + (1 - pi) * f), log(1 - pi) + log(f)))
+}
+zinb <- optim(c(coef(nb)[1:3], log(1 / nb$theta), 0), zinb_nll, method = "BFGS", hessian = TRUE)
+setNames(c(zinb$par[1:3], exp(zinb$par[4]), plogis(zinb$par[5])), c("const", "promo", "tenure", "alpha", "pi"))
+```
+
+Model comparison: AIC, BIC, and the Vuong test of ZINB against NB.
+
+```{r}
+ll <- c(pois = as.numeric(logLik(pois)), nb = as.numeric(logLik(nb)), zinb = -zinb$value)
+k <- c(3, 4, 5)
+rbind(AIC = -2 * ll + 2 * k, BIC = -2 * ll + log(nrow(dc)) * k)
+la_z <- exp(X %*% zinb$par[1:3] + off); a_z <- exp(zinb$par[4]); pi_z <- plogis(zinb$par[5])
+f_z  <- ifelse(y == 0, pi_z + (1 - pi_z) * dnbinom(0, size = 1 / a_z, mu = la_z), (1 - pi_z) * dnbinom(y, size = 1 / a_z, mu = la_z))
+f_nb <- dnbinom(y, size = nb$theta, mu = fitted(nb))
+m <- log(f_z) - log(f_nb)
+c(vuong_z = sqrt(length(m)) * mean(m) / sd(m))   # positive favors ZINB
+```
+
+## Reproduce: counts in a panel, Poisson FE versus log(1+y)
+
+Heavy buyers are targeted with more promotions, so promo is correlated with the customer effect.
+
+```{r}
+sim_panel <- function(N = 1500, T = 8, targeting = 0.8) {
+  pd <- expand.grid(id = 1:N, q = 1:T)
+  pd$eta <- rnorm(N, 0, 0.8)[pd$id]
+  pd$promo <- rbinom(nrow(pd), 1, plogis(-0.5 + targeting * pd$eta))
+  pd$y <- rpois(nrow(pd), exp(-0.8 + 0.6 * pd$promo + pd$eta))
+  pd
+}
+pd <- sim_panel()
+etable(fepois(y ~ promo, pd, vcov = ~id),
+       fepois(y ~ promo | id, pd, vcov = ~id),
+       feols(log1p(y) ~ promo | id, pd, vcov = ~id),
+       headers = c("Poisson", "Poisson + FE", "log(1+y) + FE"))
+```
+
+# In-class problem 3: which columns move?
+
+Re-simulate the panel with `targeting = 0` (promotions assigned at random) and re-run the
+three regressions.
+
+**(a)** Which columns change and which do not? Explain each in one line.
+**(b)** The $\log(1+y)$ coefficient is still far from 0.6 even with random assignment.
+What is it estimating? (Hint: Week 2, the transformations deck.)
+**(c)** Rerun with `T = 2` and then `T = 30`. Does the Poisson fixed-effects estimate change
+with $T$? Compare to what you know about the logit with fixed effects.
+
+```{r problem3}
+# your code here
+```

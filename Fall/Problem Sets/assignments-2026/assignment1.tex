@@ -1,0 +1,135 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\providecommand{\tabularnewline}{\\}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+
+\title{\Huge Assignment 1}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026 --- due at the start of Session 3}
+
+\makeatother
+
+\begin{document}
+
+\title{Assignment 1}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+\textbf{Instructions.} This assignment covers Sessions 1--2 only. You may use
+\texttt{R} or Python. Turn in (1) a PDF presenting your results and showing your work,
+and (2) your code. Derivations should use only the operator rules from Session 1
+(linearity of $\E[\cdot]$, the variance/covariance rules, the law of iterated
+expectations, and the law of total variance) --- if you find yourself writing an
+integral, you are working too hard.
+
+\subsection*{1 The algebra of expectations}
+
+Let $X$ and $Y$ be random variables and $a,b$ constants.
+\begin{enumerate}[label=(\alph*)]
+\item Starting from the definition of expectation for a discrete random variable,
+show that $\E\left[a + bX\right] = a + b\,\E\left[X\right]$.
+\item Using only linearity (and the definition $Var(X) = \E[(X-\E X)^2]$), show that
+$Var\left(a + bX\right) = b^{2}\, Var\left(X\right)$.
+\item Show that $Var\left(X + Y\right) = Var\left(X\right) + Var\left(Y\right) + 2\,Cov\left(X,Y\right)$.
+\item \emph{(A portfolio.)} Two assets have random returns $R_{1}, R_{2}$, each with
+variance $\sigma^{2}$ and correlation $\rho$. Find the variance of the equal-weighted
+portfolio return $\frac{1}{2}R_{1} + \frac{1}{2}R_{2}$. What happens as $\rho \rightarrow 1$?
+As $\rho \rightarrow -1$? In one sentence: why is this the entire logic of diversification?
+\item Define the prediction error $u \equiv y - \E\left[y|x\right]$. Show that for any
+function $g\left(x\right)$, $\E\left[g\left(x\right) u\right] = 0$.
+(Hint: law of iterated expectations.) In one sentence: why does this result mean that
+$\E[y|x]$ is the ``best'' predictor of $y$ given $x$?
+\end{enumerate}
+
+\subsection*{2 Conditional expectations and total variance}
+
+Suppose $\left(y, x\right)$ are bivariate normal with
+\[
+\mu = \left(\begin{array}{c} 1 \\ 2 \end{array}\right) \qquad\qquad
+\Sigma = \left(\begin{array}{cc} 4 & 1 \\ 1 & 1 \end{array}\right)
+\]
+so $Var(y) = 4$, $Var(x) = 1$, and $Cov(y,x)=1$. Recall that for the bivariate normal,
+$\E\left[y|x\right]$ is exactly linear: $\E\left[y|x\right] = \alpha + \beta x$.
+\begin{enumerate}[label=(\alph*)]
+\item Solve for $\alpha$ and $\beta$ using only the operator rules.
+(Hint: take expectations of both sides for one equation; take the covariance of both
+sides with $x$ for the other.)
+\item For the bivariate normal, $Var\left(y|x\right)$ does not depend on $x$. Use the law
+of total variance,
+$Var\left(y\right) = \E\left[Var\left(y|x\right)\right] + Var\left(\E\left[y|x\right]\right)$,
+to solve for $Var\left(y|x\right)$.
+\item Show that $\frac{Var\left(\E[y|x]\right)}{Var\left(y\right)} = \rho^{2}$, where
+$\rho$ is the correlation between $y$ and $x$. (This is the population $R^{2}$ of the
+regression of $y$ on $x$.)
+\item Now simulate 10,000 draws from this distribution. Verify (a)--(c) numerically:
+regress $y$ on $x$ and compare the coefficients to (a); compare the residual variance
+to (b); compare the $R^{2}$ to (c). Plot the mean of $y$ within bins of $x$ against the
+fitted line.
+\end{enumerate}
+
+\subsection*{3 Watching the theorems work}
+
+Let $X_{i} \sim \text{Exponential}(1)$ (so $\mu = 1$ and $\sigma^{2} = 1$, and the
+distribution is highly skewed).
+\begin{enumerate}[label=(\alph*)]
+\item In Session 1 we derived $Var\left(\bar{X}_{n}\right) = \sigma^{2}/n$ from the
+operator rules alone. For each $n \in \{10, 100, 1000\}$, simulate $S = 1{,}000$ sample
+means $\bar{X}_{n}^{(s)}$ and compare the variance of the simulated sample means to
+$\sigma^{2}/n$. Present the comparison in a small table.
+\item Plot histograms of $\bar{X}_{n}^{(s)}$ for each $n$. Which theorem are you watching,
+and what is it doing to the center and spread?
+\item Now plot histograms of the \emph{standardized} means
+$\sqrt{n}\left(\bar{X}_{n}^{(s)} - 1\right)$ for each $n$, overlaying a
+$\mathcal{N}\left(0, 1\right)$ density. Which theorem are you watching now? At what $n$
+does the normal approximation start looking trustworthy for this (skewed) distribution?
+\end{enumerate}
+
+\subsection*{4 Omitted variables, with the answer key in hand}
+
+Recall the ``silly example'' from Session 2: rectangular paintings with
+$\ln A_{i} = \ln W_{i} + \ln H_{i} + \varepsilon_{i}$, so the true coefficients are
+$\left(1, 1\right)$ by geometry.
+\begin{enumerate}[label=(\alph*)]
+\item Simulate 10,000 paintings with
+\[
+\left(\begin{array}{c} \ln W_{i} \\ \ln H_{i} \end{array}\right) \sim
+\mathcal{N}\left(\left(\begin{array}{c} 1 \\ 1 \end{array}\right),
+\left(\begin{array}{cc} 1 & \sigma_{wh} \\ \sigma_{wh} & 1 \end{array}\right)\right),
+\qquad \varepsilon_{i} \sim \mathcal{N}\left(0, 0.01\right)
+\]
+for $\sigma_{wh} = 0.6$. Run the \emph{long} regression of $\ln A$ on $\ln W$ and
+$\ln H$, and the \emph{short} regression of $\ln A$ on $\ln W$ only. Report both.
+\item Using the omitted variables bias formula from Session 2, compute what the short
+regression coefficient \emph{should} be, and compare to (a).
+\item Repeat (a) for $\sigma_{wh} \in \{-0.6, 0, 0.3, 0.9\}$ and plot the short-regression
+coefficient against $\sigma_{wh}$, with the OVB-formula prediction overlaid as a line.
+When is the short regression fine?
+\item Two sentences: your colleague says ``I get a precise, highly significant
+coefficient of 1.6; the standard error is tiny, so I trust it.'' What did they get
+wrong, and why didn't the standard error warn them?
+\end{enumerate}
+
+\end{document}

@@ -14,7 +14,13 @@ These are more advanced treatments:
 - [Microeconometrics by Cameron and Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
 - [Econometrics by Bruce Hansen](https://www.ssc.wisc.edu/~bhansen/econometrics/)
 
-The rough outline of the course is as follows:
+## Repository layout
+
+- `Fall/` — Econometrics I (first-year PhD, Fall). Lecture folders `L0`–`L11`, plus `Problem Sets/` and `Syllabus/`.
+- `Spring/` — Econometrics of Panel Data (Spring). Lecture folders `Lecture 1`–`Lecture 16`, plus `HW-*` and past syllabi.
+- `preamble.tex` and `resources/` are shared by both.
+
+The rough outline of the Spring course is as follows:
 1. Introductory Time Series
 2. Extremum Estimation I: MLE and M-estimators
 3. Extremum Estimation II: GMM Estimators

@@ -1,0 +1,224 @@
+%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[11pt]{article}
+\renewcommand{\rmdefault}{cmr}
+\renewcommand{\sfdefault}{cmss}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+\title{\Huge Econometrics I}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026}
+
+\makeatother
+
+\begin{document}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}lr}
+Lecture: Thursday 9:00am-12:00pm in KMC 7-191  & \tabularnewline
+Office hours: KMC 7-76, by appointment & \tabularnewline
+\url{https://calendly.com/ctc5-stern/30min} &  \tabularnewline
+Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}  &  \tabularnewline
+
+\end{tabular*}
+\par\end{center}
+
+\section*{Course Description}
+
+This is an econometrics course for first-year PhD students
+ who are interested in doing quantitative research in the
+social sciences. The aim of the course is to teach you to use popular
+applied econometric methods while developing your theoretical understanding
+of those methods.
+
+Topics include least squares, inference,
+causal diagrams, experiments, instrumental variables, panel data,
+difference-in-differences, regression discontinuity, synthetic control,
+treatment effects, maximum likelihood, binary choice models, and limited dependent
+variables (censored outcomes, durations, and counts).
+
+\section*{Prerequisites}
+
+I will assume you are proficient in calculus, basic probability and statistics, and linear algebra.
+
+I also assume proficiency in mathematical programming, which you will need to complete the assignments.
+You may use any software you like for the assignments.
+I recommend \texttt{R} or Python (both open source)  for those who aren't already committed to something else. 
+The course will not involve programming instruction, but I will provide worked examples in both \texttt{R} and Python.\\
+
+All of the assignments can (should?) be done using either \texttt{fixest} in \texttt{R} or \texttt{pyfixest} in Python. Course notebooks will be provided in both.
+
+If you aren't already familiar, now is a good time to learn to compose work in \texttt{LaTeX}. 
+It's also worth looking into applications that faciliate both composing and presenting code such as RMarkdown and Jupyter.
+
+
+\section*{Materials}
+
+You should own at least one econometrics textbook, and the suggested textbook for this course is
+Hansen's \href{https://www.ssc.wisc.edu/~bhansen/econometrics/}{Econometrics}.
+It used to be free as a PDF but now is for sale on Amazon and other bookstores.
+Hansen is the authoritative reference for this course, but it is more technical than our treatment;
+the calendar below maps his chapters to the lecture material.
+
+We will also lean on two freely available texts pitched closer to how this course is taught:
+\begin{itemize}
+\item Goff, \href{https://www.leonardgoff.com/teaching/Causal\%20inference\%20in\%20econometrics.pdf}{\emph{Causal Inference in Econometrics}} (lecture notes):
+	a readable bridge between this course and Hansen. Starred sections are optional; the appendices
+	review the probability, asymptotics, and inference material from the first weeks.
+\item Cunningham, \href{https://mixtape.scunning.com}{\emph{Causal Inference: The Mixtape}} (free online; chapter numbers below follow the second edition, ``The Remix''):
+	assigned as before-class reading for the research-design portion of the course.
+	Includes worked code in R, Stata, and Python.
+\end{itemize}
+
+Other useful textbooks:
+\begin{itemize}
+\item \emph{Econometric Analysis} (8th edition) by William Greene.
+\item Angrist and Pischke, \emph{Mostly Harmless Econometrics}: great as a complement to Greene or Hansen, but I don't recommend
+	    it as your primary econometrics reference.
+\item Wooldridge, \emph{Econometric Analysis of Cross Section and Panel Data}: somewhat more advanced, a very useful reference.
+\item Wager, \href{https://web.stanford.edu/~swager/causal_inf_book.pdf}{\emph{Causal Inference: A Statistical Learning Approach}} (free draft):
+	where causal inference meets machine learning; a reference for the Spring semester's machine-learning material.
+\item Hastie, Tibshirani, and Friedman, \href{https://hastie.su.domains/ElemStatLearn/}{\emph{The Elements of Statistical Learning}} (free PDF): the machine learning reference.
+\end{itemize}
+
+Other references:
+\begin{itemize}
+	\item Sargent and Stachurski's Quantitative Economics with Python (\url{https://python.quantecon.org/intro.html})
+\end{itemize}
+
+\section*{Assignments and Grading}
+
+Your grade will be based on seven short individual assignments (40\% in total, equally weighted),
+two quizzes (10\% each), and a final research project (40\%). Assignments are short and frequent
+by design --- two problems, due every other week after the first month --- so that the material
+from each lecture gets used while it is fresh.
+
+Assignments will have a mixture of theoretical questions and data-based
+questions. For each assignment, you should turn in (1) a PDF document
+presenting your results (and showing your work), and (2) your code. You are encouraged to discuss
+assignments with your classmates and work together (learning from your peers is very important during your PhD),
+but you must turn in your own work (including your own code). Assignments
+should be submitted through Brightspace.
+
+Late assignments will receive partial credit with penalties in proportion to how late they are. 
+Assignments more than one week late will not receive credit. 
+
+The group project will consist of three deliverables: 
+\begin{enumerate}
+\item A short description of your proposed project (up to three pages),
+submitted in the middle of the semester. 
+\item A presentation of your results during the final class session. 
+\item A research paper, turned in at the end of the semester (along with
+your code).
+\end{enumerate}
+Your team for the final project should consist of 1-3 students. The
+project can be on any topic (subject to my approval). 
+
+
+For the final project, I suggest choosing
+a published paper to reproduce, and in addition to reproducing the
+results, find at least one new way to test, extend, or improve on
+the paper's econometric analysis.
+I encourage you to look beyond incredibly famous papers
+with many thousands of citations for two reasons. First, there is usually a large
+subsequent literature -- too large for you to become an expert on just for this project.
+Second, these term projects can eventually become (or lead to things that will become)
+parts of your dissertation or published papers. That's more likely to happen if you
+take on a topic that hasn't already been over-studied. 
+
+
+Any regrade requests should be submitted in writing.
+
+\section*{Getting Help}
+
+My office hours are by appointment -- please do not hesitate to contact me to set up a meeting. 
+
+Also feel free to send me smaller questions by email, and I will try to respond within 48 hours. 
+
+
+\newpage
+\section*{Tentative Outline}
+Readings: H = Hansen, G = Goff, CM = Cunningham (Mixtape), Wo = Wooldridge. Read before class.
+\begin{center}
+\begin{tabular}{L{.08\textwidth} L{.08\textwidth}  L{.16\textwidth} L{.64\textwidth}}
+Session  & Date  & Readings & Topics and deliverables \\
+ & &  & \\
+\hline
+\hline
+1  & 9/3 & H 2,6; G App.~A--B & Probability and Statistics (by simulation); research workflow \\
+ &  &  & \\
+\hline
+2  & 9/10  &  H 3--4; G 3 &  Linear Regression: mechanics, interpretation, FWL, omitted variables  \\
+ &  &  & \\
+\hline
+3  & 9/17  & H 6,7,9; G App.~C & Inference: robust and clustered standard errors, testing, bootstrap  \\
+ &  &  & \textbf{\textit{Assignment 1 due}} \\
+\hline
+4  & 9/24  & H 7  &  Applied regression workshop: the wage equation end-to-end (marginal effects, interactions, measurement error)  \\
+ &  &  & \textbf{\textit{Assignment 2 due}}  \\
+\hline
+5 & 10/1 & H 18; G 1--2; CM 3--4 & Causality: potential outcomes, DAGs, good and bad controls; experiments and A/B test design\\
+ &  &  & \textbf{\textit{In-class quiz}}  \\
+\hline
+6  & 10/8 &  H 12; G 4; CM 7  & Instrumental Variables I: endogeneity, simultaneity, 2SLS \\
+ &  &   &  \textbf{\textit{Assignment 3 due}}  \\
+\hline
+7 & 10/15  & H 12; G 4 & Instrumental Variables II: weak instruments, LATE, judge and shift-share designs  \\
+ &  &    &   \\
+\hline
+8  & 10/22 & H 17; CM 8  &  Panel Data: fixed and random effects, event studies \\
+ &  &  & \textbf{\textit{Assignment 4 due}} \\
+\hline
+9  & 10/29  &  G 6; CM 8a--8b & Difference-in-Differences: parallel trends, staggered adoption, modern TWFE  \\
+ &  & &  \textbf{\textit{Final project proposals due}}  \\
+\hline
+10  & 11/5  & G 5; CM 6  &  Regression Discontinuity \\
+ &  &  & \textbf{\textit{Assignment 5 due}} \\
+\hline
+11  & 11/12  & G 2; CM 5, 9  &  Matching and Synthetic Control \\
+ &  &  &   \\
+\hline
+ 12 & 11/19  & H 5, 22 & Maximum Likelihood, Binary Choice, Heckman Selection  \\
+ &  &  & \textbf{\textit{Assignment 6 due}} \\
+\hline
+  & 11/26  &   & No class --- Thanksgiving \\
+ &  &  &   \\
+\hline
+13  & 12/3  & H 27; Wo 17, 19, 22 & Limited Dependent Variables: censored outcomes (Tobit), duration models, count data  \\
+ &  &  & \textbf{\textit{In-class quiz}}  \\
+ &  &  &  \textbf{\textit{Assignment 7 due}}   \\
+\hline
+ 14 & 12/10 & & \textbf{\textit{Final project presentations}} \\
+  &  &  & \\
+ \hline
+   & 12/17 & &  \textbf{\textit{Final projects due}}\\
+ &  &  & \\
+\hline
+\end{tabular}
+\par\end{center}
+\end{document}

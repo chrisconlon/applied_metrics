@@ -1,0 +1,1302 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage{teaching_slides}
+
+
+\title[L8a - Instrumental Variables I]{ Econometrics I}
+\subtitle{Lecture 6: Instrumental Variables I --- endogeneity, simultaneity, 2SLS}
+\author{Chris Conlon \\NYU Stern}
+\date{Fall 2026}
+
+%\usepackage[italic]{mathastext}
+
+
+
+%\usepackage{caption,subcaption}
+%\usepackage{booktabs}
+%\usepackage[flushleft]{threeparttable}
+
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.7}
+\usetikzlibrary{shapes,decorations,arrows,snakes, patterns, angles, quotes, calc,arrows.meta,fit,positioning}
+\tikzset{
+    -Latex,auto,node distance =1 cm and 1 cm,semithick,
+    state/.style ={ellipse, draw, minimum width = 0.7 cm},
+    point/.style = {circle, draw, inner sep=0.04cm,fill,node contents={}},
+    bidirected/.style={Latex-Latex,dashed},
+    el/.style = {inner sep=2pt, align=left, sloped}
+}
+
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Basic Idea}
+\begin{itemize}
+	\item Basic Idea of Instrumental Variable (IV):
+		\begin{itemize}
+			\item What if we have a variable that is correlated with $X$ \emph{but not with $Y$}
+			\item Then any changes in $Y$ caused by that variable will reflect causal changes by $X$
+		\end{itemize}
+\medskip
+\item Equation of interest:
+\begin{align*}
+	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{align*}
+	\item IVs break $X$ into two pieces that are themselves uncorrelated:
+		\begin{align*}
+			X_i =\gamma_0 + \gamma_1  Z_i + \eta_i
+		\end{align*}
+
+		\begin{itemize}
+			\item A piece that is not correlated with $\varepsilon$ ($Cov(Z,\varepsilon)=0$)
+			\item A piece that is correlated with $\varepsilon$ ($Cov(\eta,\varepsilon)\ne0$) -- source of the endogeneity problem
+			\item Finally, $Cov(Z,\eta)=0$
+		\end{itemize}
+	\item $Z_i$ is an {\bf instrumental variable}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Terminology Review}
+
+A ``Good" Regression:
+
+\begin{figure}[H]
+\begin{center}
+\resizebox{.4\textwidth}{!}{
+\begin{tikzpicture}
+
+\tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
+\tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
+\tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
+% vertices
+\node[vertex] (a) at  (0,0) {\makebox[7.5mm][c]{\small X}};;
+\node[vertex] (b) at  (5,0) {\makebox[7.5mm][c]{\small  $\varepsilon$}};;
+\node[vertex] (c) at  (2.5,-2) {\makebox[7.5mm][c]{\small Y}};
+%\node (d) at (2.5,0) {??};
+\node at (2.5,.66) {Exogenous};
+\node at (2.5,-2.75) {Endogenous};
+
+%edges
+\draw[edge1] (a) to (c);
+\draw[edge1] (b) to (c);
+%\draw[edge2] (a) to (d);
+%\draw[edge2] (b) to (d);                                            v
+
+% rectangle
+\draw[rounded corners=15pt]
+  (-1,-.75) rectangle ++(7,1.65);
+
+\draw[rounded corners=15pt]
+  (-1,-3.25) rectangle ++(7,2);
+
+\end{tikzpicture}}
+\end{center}
+\end{figure}
+
+\begin{itemize}{\small
+	\item {\bf Exogenous Variables:} Variables in the data that do not cause each other
+		\begin{itemize}
+			\item $\varepsilon$ is always exogenous, so exogenous also just means variables not correlated with $\varepsilon$
+		\end{itemize}
+	\item {\bf Endogenous Variables:} Variables that are determined by exogenous variables in the model
+		\begin{itemize}
+			\item $\varepsilon$ is always in $Y$ so $Y$ is always endogenous
+		\end{itemize}}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Omitted Variable Bias with Pictures}
+
+Selection/OVB:
+
+\begin{figure}[H]
+\begin{center}
+\resizebox{.4\textwidth}{!}{
+\begin{tikzpicture}
+
+\tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
+\tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
+\tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
+% vertices
+\node[vertex] (a) at  (0,-2) {\makebox[6mm][c]{\small X}};;
+\node[vertex] (b) at  (2.5,-.1) {\makebox[6mm][c]{\small  $\varepsilon$}};;
+\node[vertex] (c) at  (5,-2) {\makebox[6mm][c]{\small Y}};
+%\node (d) at (2.5,0) {??};
+\node at (2.5,.66) {Exogenous};
+\node at (2.5,-2.75) {Endogenous};
+
+%edges
+\draw[edge1] (a) to (c);
+\draw[edge1] (b) to (c);
+\draw[edge2] (a) to (b);
+%\draw[edge2] (b) to (d);                                            v
+
+% rectangle
+\draw[rounded corners=15pt]
+  (-1,-.75) rectangle ++(7,1.65);
+
+\draw[rounded corners=15pt]
+  (-1,-3.25) rectangle ++(7,2);
+
+\end{tikzpicture}}
+\end{center}
+\end{figure}
+
+\begin{itemize}{\small
+	\item In this picture $X$ is {\bf endogenous} because $\varepsilon$ now causes $X$ as well
+	\item What if there is another exogenous variable that \emph{does not} directly cause $Y$?
+	}
+\end{itemize}
+
+
+\end{frame}
+
+
+\begin{frame}{Omitted Variable Bias with Pictures}
+
+Instrumental Variable:
+
+\begin{figure}[H]
+\begin{center}
+\resizebox{.4\textwidth}{!}{
+\begin{tikzpicture}
+
+\tikzset{vertex/.style = {shape=circle,draw,minimum size=1em}}
+\tikzset{edge1/.style = {->,thick,> = latex',shorten <=2pt}}
+\tikzset{edge2/.style = {<-,thick, > = latex', shorten <=3pt, dashed}}
+% vertices
+\node[vertex] (a) at  (0,-2) {\makebox[6mm][c]{\small X}};;
+\node[vertex] (b) at  (4,-.1) {\makebox[6mm][c]{\small  $\varepsilon$}};;
+\node[vertex] (c) at  (5,-2) {\makebox[6mm][c]{\small Y}};
+\node[vertex] (d) at  (1,-.1) {\makebox[6mm][c]{\small  Z}};;
+%\node (d) at (2.5,0) {??};
+\node at (2.5,.66) {Exogenous};
+\node at (2.5,-2.75) {Endogenous};
+
+%edges
+\draw[edge1] (a) to (c);
+\draw[edge1] (b) to (c);
+\draw[edge2] (a) to (b);
+\draw[edge1] (d) to (a);                                            v
+
+% rectangle
+\draw[rounded corners=15pt]
+  (-1,-.75) rectangle ++(7,1.65);
+
+\draw[rounded corners=15pt]
+  (-1,-3.25) rectangle ++(7,2);
+
+\end{tikzpicture}}
+\end{center}
+\end{figure}
+
+\begin{itemize}{\small
+	\item $Z$ causes $Y$ \emph{only indirectly} through $X$
+	\item We can estimate ``causal effect" of $Z$ on $Y$ and this MUST be the causal effect of $Z$ on $X$ and the causal effect of $X$ on $Y$
+	\begin{itemize}
+		\item Mathematically we need to split effect of on $Z$ on $Y$ into effect of $Z$ on $X$ and $X$ on $Y$
+		\item Related concept in statistics: Path Analysis
+	\end{itemize}
+	}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Formal Definition of an Instrumental Variable}
+Model:
+\begin{align*}
+	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{align*}
+
+\begin{itemize}
+\item We call a variable $Z$ a a valid {\bf instrumental variable} if the following two conditions hold:
+\end{itemize}
+\begin{enumerate}
+	\item {\bf Relevance:} $Cov(X,Z)\ne 0$
+		\begin{itemize}
+			\item An arrow from $Z$ to $X$ in the pictures
+		\end{itemize}
+\medskip
+	\item {\bf Exogeneity:} $Cov(\varepsilon,Z)= 0$
+		\begin{itemize}
+			\item No arrow from $Z$ to $Y$ or $Z$ to $\varepsilon$ in the picture
+		\end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Key Assumption \#1 of Instrumental Variables}
+\begin{itemize}
+	\item {\bf Relevance:} $Cov(X,Z)\ne 0$
+\medskip
+\item This assumption just means that $X$ and $Z$ are correlated
+\medskip
+\item We observe both $X$ and $Z$, so can easily test this assumption by regressing:
+	\begin{align*}
+	X_i = \beta_0 + \beta_1 Z_i + \varepsilon_i
+	\end{align*}
+\item If $\beta_1 \neq 0$ in regression, we say instrument is relevant
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Key Assumptions \#2 of Instrumental Variables}
+\begin{itemize}
+	\item {\bf Exogeneity (or validity):} $Cov(\varepsilon,Z)= 0$
+\medskip
+\item This assumption means that $Z$ and $\varepsilon$ cannot be correlated
+\medskip
+\item We do not observe $\varepsilon$, so we \textbf{cannot} test this assumption
+\medskip
+\item In general, we need to ``defend" this assumption by telling a story about why $Z$ and $\varepsilon$ are unlikely to be correlated
+\medskip
+\item Much like parallel trends or strict exogeneity, these crucial identifying assumptions cannot
+be tested on their own. However, we can test them against each other. That is, the best we can
+do is ask the question "given this exogeneity assumption, does this other exogeneity assumption seem
+true?" But we can never test an exogeneity assumption in a self-contained way. 
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{IV: Causal Diagram}
+\begin{itemize}
+\item Recall the absence of direct path between $Z \rightarrow Y$. This is the \alert{exclusion restriction}.
+\item $Z \rightarrow X$ is the \alert{relevance} condition.
+\end{itemize}
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}
+    % x node set with absolute coordinates
+    \node[state] (x) at (0,0) {$X$};
+
+    \node[state] (y) [right =of x] {$Y$};
+    \node[state] (e) [above =of x] {$\varepsilon$};
+    \node[state] (z) [left =of x] {$Z$};
+
+    % Directed edge
+    \path (x) edge (y);
+    \path (e) edge (y);
+    \path (e) edge (x);
+    \path (z) edge (x);
+    
+    % Bidirected edge
+    \path[bidirected] (z) edge[bend right=60] node[below] {excluded} (y);
+\end{tikzpicture}
+\end{center}
+Idea: There is a path from $Z \rightarrow Y$ but only \alert{through} $X$ (this is the key).
+\end{frame}
+
+
+
+\begin{frame}{Best Defense of Exogeneity IV Assumption: Randomized Experiment}
+\begin{itemize}
+\item Back to the class size example:
+\begin{align*}
+score_i = \beta_0 + \beta_1 \textit{CS}_i + \varepsilon_i
+\end{align*}
+\item where:
+\begin{itemize}
+\item $score_i$: Test score of student $i$
+\item $CS_i$: Class size of student $i$
+\end{itemize}
+\medskip
+\item Suppose that we use a coin flip that sends kids that get a ``head" to a small class and kids getting a ``tails" to big class
+\begin{itemize}
+\item This is our randomized experiment!
+\end{itemize}
+\medskip
+\item Let's call the coin flip our instrument $Z$ (where $Z_i=1$ if heads, $Z_i=0$ if tails)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Best Defense of Exogeneity IV Assumption: Randomized Experiment}
+\vspace{-0.5em}
+\begin{align*}
+score_i = \beta_0 + \beta_1 \textit{CS}_i + \varepsilon_i
+\end{align*}
+\begin{itemize}
+\item Is $Z$ (our coin flip) a good instrument?
+\medskip
+\item {\bf Relevance:} $Cov(CS,Z)\ne 0$? Yes, if $Z_i=1$ kid gets small class, if $Z_i=0$ kid gets big class
+\begin{itemize}
+\item So the regression $CS_i=\beta_0 + \beta_1 Z_i + \varepsilon_i$ will estimate that $\beta_1<0$
+\end{itemize}
+\medskip
+\item {\bf Exogeneity:} $Cov(\varepsilon,Z)\ne 0$? Untestable -- so need to tell a story
+\begin{itemize}
+\item Story: Exogeneity holds because coin flip is random and does not depend on any student or parent characteristics that would affect test scores.  Therefore, there is nothing related to $Z$ (besides $X$) that is also related to test scores, so $\varepsilon$ and $Z$ must be uncorrelated.\\
+This is a good story! It's the ``magic'' of randomization.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{ Randomized Experiment as an IV}
+\begin{itemize}
+\item So a randomized experiment can be treated as an IV, but there is a big difference in
+	how we evaluate the assumption for an experimental or non-experimental setting
+\medskip
+\item When running an experiment, the exogeneity assumption is justified if the
+	randomization was implemented in way that was not correlated with anything else that could
+	influence outcomes. Attrition and manipulation can undermine exogeneity in an experimental context
+	if they create a correlation between treatment status and other factors that might influence outcomes.
+	 Thus, exogeneity amounts to an assumption about how the randomization was implemented.
+	\medskip
+	\item In contrast, the IV exogeneity assumption in a non-experimental context is a broad and vague statement
+	about how the world works; it's much more difficult to interpret and evaluate. The same is
+	true of strict exogeneity or parallel trends.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{IV Estimation: Example with a binary $Z \in\{0,1\}$}
+
+Let's begin with the simplest 0/1 model (this time for $Z$):
+\begin{align*}
+	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i\\
+\end{align*}
+
+\begin{itemize}
+	\item  $X$ is endogenous but we have a 0/1 instrument, $Z$
+	\begin{itemize}
+		\item Because $Z$ is 0/1 we can focus on group means.
+	\end{itemize}
+
+	\item What assumptions do we need to make?
+		\begin{itemize}
+			\item $Cov(X,Z)\ne 0$
+			\item $Cov(Z,\varepsilon) = 0$
+		\end{itemize}
+	\item The intuition from above: solve for the ``indirect" effect of $Z$ on $Y$
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{The Relationship Between $Y$ on $Z$}
+
+What is the relationship between $Y$ and $Z$, taking expectations?
+\begin{align*}
+		\E(Y|Z) =& E\left(\beta_0 + \beta_1 X + \varepsilon| Z\right)\\
+			   =& \beta_0 + \beta_1 \E(X|Z) + \underbrace{\E(\varepsilon|Z)}_{=0}\\
+			   =&\beta_0 + \beta_1 \E(X|Z)
+\end{align*}
+
+Since $Z$ is 0/1... 
+\begin{align*}
+	\E(Y|Z=1) =& \beta_0 + \beta_1 \E(X|Z=1)\\
+	\E(Y|Z=0) =& \beta_0 + \beta_1 \E(X|Z=0)
+\end{align*}
+
+Rearranging... 
+\begin{align*}
+	\E(Y|Z=1)-\E(Y|Z=0) = \beta_1\times\left(\E(X|Z=1)-\E(X|Z=0)\right)
+\end{align*}
+\end{frame}
+
+\begin{frame}{The IV Regression for a binary $Z \in\{0,1\}$}
+From the previous slide we have:
+\begin{align*}
+	\beta_1 = \frac{\E(Y|Z=1)-\E(Y|Z=0)}{\E(X|Z=1)-\E(X|Z=0)}
+\end{align*}
+
+
+From the LLN we can construct the following estimator:
+\begin{align*}
+	\hat\beta_1 = \frac{\bar Y_1 - \bar Y_0}{\bar X_1 - \bar X_0}
+\end{align*}
+\begin{itemize}
+	\item The subscript refers to $Z=1$ or $Z=0$
+	\item We call this the IV estimator
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Interpreting the Estimator for binary $Z \in \{0,1\}$}
+
+Estimator:
+	\begin{align*}
+			\hat\beta_1^{IV} = \frac{\bar Y_1 - \bar Y_0}{\bar X_1 - \bar X_0}
+	\end{align*}
+
+\begin{itemize}
+
+	\item For a binary $X$ we look at the change in $Y$ over the change in $X$:
+		\begin{align*}
+			\hat\beta_1^{OLS} = \frac{\bar Y_{X=1} - \bar Y_{X=0}}{\bar X_{X=1} - \bar X_{X=0}} = \Delta \bar Y
+		\end{align*}
+
+	\begin{itemize}
+		\item For a $0/1$ $X$, $\Delta \bar X = 1$
+		\item Basically looking at how much $Y$ changes for a change in $X$
+	\end{itemize}
+
+	\item Intuition for a 0/1 $Z$
+		\begin{itemize}
+			\item The effect of $X$ on $Y$ is still the change in $Y$ over a change in $X$
+			\item Use the change in $Y$ \emph{given $Z$} to shut down the effects of $\varepsilon$
+			\item Use the change in $X$ \emph{given $Z$} to get the right scaling
+		\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The IV  Regression with a Continuous $Z$}
+
+Same model as before:
+\begin{align*}
+	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{align*}
+
+
+
+\begin{itemize}
+	\item Now assume that $Z$ is continuous
+	\item How to capture the indirect effect of $Z$?
+		\begin{itemize}
+			\item Intuition from OLS: use the covariance between $Z$ and $Y$ as a measure of the relationship:
+	\begin{align*}
+	Cov(Y,Z) =& Cov(\beta_0 + \beta_1 X + \varepsilon,Z)\\
+			 =& \beta_1 Cov(X,Z)
+	\end{align*}
+			\item Rearranging:
+				\begin{align*}
+					\beta_1= \frac{Cov(Y,Z)}{Cov(X,Z)}
+				\end{align*}
+		\end{itemize}
+	\item {\bf Instrumental Variables Estimator:} $\hat\beta^{IV}_1 = s_{YZ}/ s_{XZ}$
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{IV Example}
+\begin{itemize}
+
+\item Suppose that we are interested in investigating the effect of studying on grades:
+\begin{align*}
+Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
+\end{align*}
+\item where
+\begin{itemize}
+\item $Y_i$: is GPA
+\item $X_i$: is study time (hours per day)
+\end{itemize}
+\medskip
+\item We expect that our OLS estimator $\hat{\beta}_1$ will be severely biased here (why?)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{IV Model}
+\begin{itemize}
+\item To get rid of OVB, we shall use an IV
+\medskip
+\item One possible IV: whether your roommate has a N64 (or playstation/whatever video game console kids use today)
+\medskip
+\item Important feature: Roommates are randomly assigned in college
+\begin{itemize}
+\item At least at Berea College (Kentucky) where this example comes from (see Stinebrickner and Stinebrickner (2008))
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Instrument Validity}
+\begin{itemize}
+\item First thing for any instrument is to think of validity. Two conditions:
+\begin{itemize}
+\item Instrument is $N64$, which is indicator variable that your roommate has N64
+\end{itemize}
+\end{itemize}
+\begin{enumerate}
+\item Relevance: $Cov(Z,X)\neq 0$; here $Cov(N64,study)\neq 0$
+\begin{itemize}
+\item Seems likely to hold as everyone prefers playing Mario Kart to studying
+\item Testable
+\end{itemize}
+\medskip
+\item Exogeneity: $Cov(Z,\varepsilon)= 0$; here $Cov(N64,\varepsilon)=0$
+\begin{itemize}
+\item Untestable
+\item Is it plausible? 
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Thinking About Exogeneity}
+\begin{itemize}
+\item Exogeneity: $Cov(Z,\varepsilon)= 0$
+\medskip
+\item ``Storytime" should talk about how two things hold
+\begin{enumerate}
+\item People select into $Z$ in some manner that is likely to be correlated with $Y$
+\begin{itemize}
+\item Concern: People that pick roommates that are ``fun" and have N64s are likely people who do not care too much about grades
+\end{itemize}
+\item $Z$ only affects $Y$ through $X$
+\begin{itemize}
+\item Concern: Having a roommate with a video game affects your GPA through other means than affecting your study hours
+\end{itemize}
+\end{enumerate}
+\medskip
+\item Either story ``invalidates" the instrument (but in different ways)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Thinking About Exogeneity}
+\begin{enumerate}
+\item Selection story: there is an omitted variable related to both $Z$ and $Y$
+\begin{itemize}
+\item Example: omitted variable is effort because students that really put in a lot of effort make sure they do not get a roommate with N64
+\end{itemize}
+\medskip
+\item Other channel story:
+\begin{itemize}
+\item Possible Story 1: Mario Kart helps me grasp physics, so I ace my physics exam
+\begin{itemize}
+\item so $Z$ directly affects Y \emph{independent} of $X$
+\end{itemize}
+\item Possible Story 2: Other people hang out in our room due to our N64, making it really loud and so I cannot study effectively
+\begin{itemize}
+\item so $Z$ affects Y through \emph{another} $X$
+\end{itemize}
+\end{itemize}
+\end{enumerate}
+\begin{itemize}
+\item Conceptually, there are two aspects to the exogeneity assumption: {\bf randomization} and {\bf exclusion}.
+Be careful: even when an IV is clearly random, it might not be excludable. 
+\end{itemize}
+\end{frame}
+
+\section{IV Math}
+\begin{frame}{IV Directly into Model (aka ``the reduced form'')}
+\begin{itemize}
+\item Suppose that our IV assumptions hold
+\medskip
+\item Then we can just directly replace $X$ with our IV in our model:
+\begin{align*}
+Y_i=\pi_0 + \pi_1 Z_i + \varepsilon_i
+\end{align*}
+\item where
+\begin{itemize}
+\item $Y_i$: is GPA
+\item $Z_i$: is whether roommate has N64
+\end{itemize}
+\medskip
+\item \textbf{Interpretation of $\hat{\beta}_1$:} Having a roommate with a N64 \textbf{causes} a $\hat{\beta}_1$ decrease in GPA
+\begin{itemize}
+\item Causal effect because validity of instrument, $cov(Z,\varepsilon)=0$, implies OLS is consistent for above equation.
+Of course we could question the instrument's validity.
+\end{itemize}
+\medskip
+\item But we want the effect of \emph{studying} on GPA!
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Two Stage Least Squares}
+A popular IV estimator is Two Stage Least Squares (2SLS)
+\begin{itemize}
+\item This effectively runs regression $Y_i=\beta_0 + \beta_1 Z_i + \varepsilon_i$, but \emph{scales} $\beta_1$ by how much $Z$ affects $X$
+\begin{itemize}
+\item If $Z$ affects $X$ at one-to-one rate, $\beta_1$ in above regression will capture effect of $X$
+\item If $Z$ affects $X$ only a little, we need to scale $\beta_1$ up a lot to say what effect of $X$ on $Y$ is
+\end{itemize}
+\medskip
+\item We therefore estimate in two steps:
+\begin{enumerate}
+\item Regress $X$ on $Z$ to capture effect of $Z$ on $X$
+\item Regress fitted values of step 1 to capture effect of $X$ on $Y$
+\end{enumerate}
+\smallskip
+\item Under IV assumptions, this gives us \textbf{causal} effect of $X$ on $Y$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{2SLS Implementation}
+\begin{itemize}
+\item Step 1: regress
+\begin{align*}
+X_i=\pi_0 + \pi_1 Z_i + \eta_i
+\end{align*}
+\item Step 2: take your predicted values from Step 1, $\hat{X}_i$, and regress
+\begin{align*}
+Y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i
+\end{align*}
+\item Under IV assumptions, step 1 finds the ``good part" of $X$ (that is not related to $\varepsilon$), and then step 2 takes that ``good part" of $X$ as a regression to find the causal relationship between $X$ and $Y$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{2SLS Estimator}
+\begin{itemize}
+\item Why is $\hat{\beta}_1^{2SLS}=\frac{Cov(Y,Z)}{Cov(X,Z)}$?
+\medskip
+\item True model:
+\begin{align*}
+Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
+\end{align*}
+\item Take covariance of both sides with respect to $Z$:
+\begin{align*}
+Cov(Y_i, Z_i)&=Cov(\beta_0 + \beta_1 X_i + \varepsilon_i, Z_i) \\
+Cov(Y_i, Z_i)& = Cov(\beta_0, Z_i) + Cov(\beta_1 X_i, Z_i) + Cov(\varepsilon_i, Z_i)\\
+Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilon_i, Z_i)$ by assumption} \\
+\implies & \beta_1 =\frac{Cov(Y,Z)}{Cov(X,Z)}
+\end{align*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]\frametitle{Single Variable IV in \texttt{R}: Manually}
+\begin{itemize}
+\item Data:
+\begin{itemize}
+\item $Y_i$: is GPA
+\item $X_i$: is study time (hours per day)
+\item $Z_i$: is indicator for roomate having N64
+\end{itemize}
+\medskip
+\item Running 2SLS by doing both steps manually:
+\medskip
+\item Step 1: Regress $X_i=\pi_0 + \pi_1 Z_i + v_i$ and get predicted study time, $\hat{X}_i$
+\begin{itemize}
+\item \texttt{Data\$xHat = predict(feols(X$\sim$Z, data=Data))}
+\end{itemize}
+\item Step 2: Regress $y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i$
+\begin{itemize}
+\item \texttt{m3 = feols(Y$\sim$xHat, data=Data)}
+\item \texttt{summary(m3, vcov= "HC1"))}
+\begin{itemize}
+\item Note: Standard errors will be wrong!
+\end{itemize}
+\end{itemize}
+	\begin{itemize}{\small
+		\item \texttt{predict} gives the fitted values of $X$ from the first stage
+		\item Then \texttt{feols} can be used (again) to get the second stage
+		\item Problem: the standard errors (even robust) will be wrong}
+	\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]\frametitle{Doing Single Variable IV in \texttt{R}: All at once}
+\texttt{R} can run 2SLS all at once:
+\begin{itemize}
+\item \texttt{m4 = feols(Y $\sim$ W $\mid$ X $\sim$  Z, data=Data)}
+\item First formula: Regress $Y$ on \alert{exogenous controls} $W$ (and endogenous $X$)
+\item Second formula: Write \alert{first-stage} regression for \alert{endogenous} $X$ (included in second stage automatically)
+\item \texttt{feols} will also adjust standard errors
+\end{itemize}
+This is basically why we use \texttt{feols} whenever we can.
+\end{frame}
+
+
+
+\begin{frame}{IV Setup with Matrix Notation}
+\begin{itemize}
+\item Consider a multiple regression equation
+\begin{align*}
+\boldsymbol{y}=\boldsymbol{\beta}\boldsymbol{X}+\boldsymbol{\varepsilon}
+\end{align*}
+The IV assumptions are now that
+\begin{itemize}
+\item $Cov\left(\boldsymbol{z}_{i},\varepsilon_{i}\right)=\boldsymbol{0}$
+\item $Cov\left(\boldsymbol{z}_{i},\boldsymbol{x}_{i}\right)$ has \emph{full rank}, i.e., rank $K$, where $K$ is
+	the number of regressors in $\bf{x}$
+\end{itemize}
+\item We can have multiple regressors as well as instruments. Some regressors can also be instruments; if $\boldsymbol{z}_{i}=\boldsymbol{x}_{i}$
+then we can just use OLS.
+\item Regressors that are instruments are \textbf{exogenous regressors}.
+Regressors that are not instruments are \textbf{endogenous regressors}.
+\item For the rank assumption, we need at least one instrument for each
+endogenous regressor.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{2SLS with Matrix Notation}
+\begin{itemize}
+\item The 2SLS formula is now
+\begin{align*}
+\boldsymbol{b}_{2SLS}=\left(\hat{\boldsymbol{X}}'\hat{\boldsymbol{X}}\right)^{-1}\hat{\boldsymbol{X}}'\boldsymbol{y}\\
+	\text{with }\hat{\boldsymbol{X}}=\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}
+\end{align*}
+\smallskip
+\item With homoscedasticity, the asymptotic variance of the estimator is
+\begin{align*}
+Var\left(\boldsymbol{b}_{2SLS}\right)=\frac{s^{2}}{n}\left[\boldsymbol{Z}'\boldsymbol{X}\left(\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\boldsymbol{X}'\boldsymbol{Z}\right]^{-1}
+\end{align*}
+\smallskip
+	\item Note: this  (asymptotically correct) estimate of the variance is not equal to the (incorrect) formula we would get
+	from na{\"i}vely applying OLS formulas to the second-stage regression.
+
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]\frametitle{Doing General IV Case in \texttt{R}}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+	\item Before the $\mid$: $Y \sim Controls$ (endogenous $X$ is automatically included)
+	\item After the $\mid$: $X \sim Z$ (excluded instruments only, the exogenous controls are included automatically)
+	\item Syntax differs for different packages $\rightarrow$ Be careful!
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{lstlisting}
+library(fixest)
+library(tidyverse)
+library(ddml)
+library(car)
+
+babydata <- data.frame(AE98) %>% 
+  mutate(BoyBoy = 1* (boy1st ==1 & boy2nd==1),
+         GirlGirl = 1* (boy1st ==0 & boy2nd==0))
+
+m5 = feols(workedm | morekids + boy1st + boy2nd + black + hispan + othrace + agem1 + agefstm | samesex ~ boy1st + boy2nd, 
+     data=babyData)
+\end{lstlisting}
+\end{column}
+\end{columns}
+
+
+\end{frame}
+
+
+
+\begin{frame}{Comparing 2SLS Variance to OLS Variance}{under Homoscedasticity}
+
+For the single-variable case, we can show that
+\begin{align*}
+	Var(\hat\beta_{2SLS}) = \frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X R^2_{XZ}}
+\mathbf{X}'\mathbf{e}_{OLS}=\mathbf{0}
+\end{align*}
+	\smallskip
+	OLS variance under homoscedasticity: $Var(\hat\beta^{OLS})=\frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X}$
+		\begin{itemize}
+			\item Since $R^2_{XZ}\leq 1$, IV variance is larger
+			\item The higher first stage $R^2_{XZ}$, the lower the variance. If $X$ and $Z$ are collinear, variance is equivalent to OLS.
+			\item If $R^2_{XZ}\approx 0$ then variance blows up!
+		\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Unbiasedness ``Proof''}
+\begin{align*}
+\E[\hat{\beta}_1^{2SLS}]&=\E\left[\frac{\sum\limits_{i=1}^N(z_i-\bar{z})(y_i-\bar{y})}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] \\
+&=\beta_1 + \E\left[ \frac{\sum\limits_{i=1}^N(z_i-\bar{z})\varepsilon_i}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] =\beta_1 + 0
+\end{align*}
+\end{frame}
+
+
+
+\section{Simultaneous Equations}
+\begin{frame}{Simultaneous Equations Models}
+
+New Model:
+\begin{align*}
+	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i\\
+	X_i = \alpha_0 + \alpha_1 Y_i + \nu_i
+\end{align*}
+
+\begin{itemize}
+	\item In many economic environments, variables both determine each other ``in equilibrium" or are determined together ``jointly"
+	\item A model where $X$ and $Y$ ``cause" each other	is called a {\bf simultaneous equations model}
+	\item Examples:
+		\begin{itemize}
+			\item Angrist \& Evans is an example of this: labor supply and fertility decisions are determined jointly, there is no one-way channel
+			\item Supply and demand is the canonical example: supply equations and demand equations are of interest but in equilibrium only observe $Q_S=Q_D$
+			\item Also common in macroeconomic contexts: interest rates, unemployment rates, etc.
+		\end{itemize}
+	%\item We will usually assume that $Cov(\varepsilon,\nu)=0$
+\end{itemize}
+
+\end{frame}
+
+% \begin{frame}{Simultaneity Bias}
+
+% {\small
+% Direct effect of $X$ on $Y$:
+% \[
+% 	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
+% \]
+
+% \vspace{2mm}
+
+% \only<1>{
+% \noindent First let's solve for $X$ and $Y$ \emph{jointly}
+
+% \begin{eqnarray*}
+% 	X_i & = & \alpha_0 + \alpha_1 Y_i + \nu_i\\
+% 		& = & \alpha_0 + \alpha_1 (\beta_0 + \beta_1 X_i + \varepsilon_i) + \nu_i\\
+% 		& = & \alpha_0 + \beta_0\alpha_1 + \alpha_1\beta_1 X_i + \alpha_1 \varepsilon_i + \nu_i
+% \end{eqnarray*}
+
+% Which implies...
+% \[
+% 	X_i = \frac{\alpha_0 + \alpha_1\beta_0 + \nu_i}{1-\alpha_1\beta_1} + \underbrace{\frac{\alpha_1}{1-\alpha_1\beta_1}\times \varepsilon_i}_{OVB}
+% \]
+
+% }
+
+% \only<2-4>{
+% \noindent What happens with OLS? Think about the OVB equation:
+
+% \begin{eqnarray*}
+% 	\hat\beta_1^{OLS} &\to & \beta_1 + \frac{Cov(X,\varepsilon)}{Var(X)}\\ 
+% 					& = & \beta_1 + \frac{Cov\left(\frac{\alpha_0 + \alpha_1\beta_0 + \nu_i}{1-\alpha_1\beta_1} + \frac{\alpha_1}{1-\alpha_1\beta_1}\times \varepsilon_i,\varepsilon_i\right)}{Var\left(\frac{\alpha_0 + \alpha_1\beta_0 + \nu_i}{1-\alpha_1\beta_1} + \frac{\alpha_1}{1-\alpha_1\beta_1}\times \varepsilon_i\right)}\\ 
+% 					& = & \beta_1 + \frac{\frac{\sigma_{\varepsilon\nu} + \alpha_1 \sigma^2_\varepsilon}{1-\alpha_1\beta_1}}{\frac{\sigma^2_\nu +\alpha_1^2\sigma^2_\varepsilon + 2\alpha_1\sigma_{\varepsilon\nu}}{(1-\alpha_1\beta_1)^2}}\\
+% 					& = & \beta_1 + (1-\alpha_1\beta_1)\times\frac{\alpha_1\sigma^2_\varepsilon + \sigma_{\varepsilon\nu}}{\alpha_1^2\sigma^2_\varepsilon + \sigma^2_\nu + 2\alpha_1 \sigma_{\varepsilon\nu}}
+% \end{eqnarray*}
+
+% }
+% }
+
+% \end{frame}
+
+% \begin{frame}{Understanding Simultaneity Bias}
+
+% OLS with Simultaneity:
+% \begin{align*}
+% 	\hat\beta_1^{OLS} \to \beta_1 + (1-\alpha_1\beta_1)\times\frac{\alpha_1\sigma^2_\varepsilon + \sigma_{\varepsilon\nu}}{\alpha_1^2\sigma^2_\varepsilon + \sigma^2_\nu + 2\alpha_1 \sigma_{\varepsilon\nu}}
+% \end{align*}
+
+% Consider the special case that $\varepsilon$ and $\nu$ are independent:
+% \begin{align*}
+% 	\hat\beta_1^{OLS} = \beta_1 \frac{\sigma^2_\nu}{\sigma^2_\nu + \alpha_1^2\sigma^2_\varepsilon} + \frac{1}{\alpha_1} \frac{\alpha_1^2\sigma^2_\varepsilon}{\sigma^2_\nu + \alpha_1^2 \sigma^2_\varepsilon}
+% \end{align*}
+% \begin{itemize}
+% 	\item OLS becomes a weighted average of two pieces:
+% 		\begin{enumerate}
+% 			\item $\beta_1$: the effect of $X$ on $Y$
+% 			\item $1/\alpha_1$: the feedback loop from $Y$ to $X$ back to $Y$
+% 		\end{enumerate}
+%  	\item This is {\bf simultaneity bias}
+
+% \end{itemize}
+% \end{frame}
+
+
+\begin{frame}{Working (1927)}
+Supply and Demand For Coffee, everything is linear
+\begin{eqnarray*}
+Q_t^d &=& \alpha_0 + \alpha_1 P_t + U_t\\
+Q_t^s &=& \beta_0 + \beta_1 P_t + V_t\\
+Q_t^d &=& Q_t^s
+\end{eqnarray*}
+Solving for $P_t,Q_t$:
+\begin{eqnarray*}
+P_t &=& \frac{\beta_0 - \alpha_0}{\alpha_1 - \beta_1} + \frac{V_t - U_t}{\alpha_1 - \beta_1}\\
+Q_t &=& \frac{\alpha_1 \beta_0 - \alpha_0 \beta_1}{\alpha_1 - \beta_1} + \frac{\alpha_1 V_t - \beta_1 U_t}{\alpha_1 - \beta_1}
+\end{eqnarray*}
+Price is a function of both error terms, and we can't use a clever substitution to cancel things out.
+\end{frame}
+
+\begin{frame}{Working (1927)}
+To make things really obvious:
+\begin{eqnarray*}
+Cov(P_t,U_t) = - \frac{Var(U_t)}{\alpha_1 -\beta_1} \\
+Cov(P_t,V_t) =  \frac{Var(V_t)}{\alpha_1 -\beta_1} 
+\end{eqnarray*}
+\begin{itemize}
+\item When demand slopes down ($\alpha_1 < 0)$ and supply slopes up $(\beta_1 > 0)$ then price is positively correlated with demand shifter $U_t$ and negatively correlated with supply shifter $V_t$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Working (1927)}
+\small
+\vspace{-0.2cm}
+\begin{eqnarray*}
+Cov(P_t, Q_t^d) &=& \alpha_1 Var P_t + Cov (P_t,U_t)\\
+Cov(P_t, Q_t^s) &=& \beta_1 Var P_t + Cov (P_t,V_t)
+\end{eqnarray*}
+\vspace{-1cm}
+\begin{itemize}
+\item Bias in OLS estimate (Demand) $Bias(\alpha_1) = \frac{Cov(P_t,U_t)}{Var P_t}$.
+\item Bias in OLS estimate (Supply) $Bias(\beta_1) = \frac{Cov(P_t,V_t)}{Var P_t}$.
+\item We can actually write both this way when $Cov(U_t,V_t) = 0$:
+\begin{eqnarray*}
+\text{OLS Estimate }= \frac{\alpha_1 Var(V_t) + \beta_1 Var (U_t)}{Var (V_t) + Var (U_t)}
+\end{eqnarray*}
+\item More variation in supply $V_t \rightarrow$ better estimate of demand.
+\item More variation in demand $U_t \rightarrow$ better estimate of supply.
+\item Led Working to say the \alert{statistical demand function} (OLS) is not informative about the economic demand function (or supply function).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{IV Can Solve Simultaneity Bias}
+
+Why cover simultaneity bias \emph{now}?
+
+\vspace{3mm}
+
+New Model:
+\begin{align*}
+	Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
+	X_i =& \alpha_0 + \alpha_1 Z_i + \alpha_2 Y_i + \nu_i
+\end{align*}
+
+\begin{itemize}
+	\item If we have data on $Z$, we can potentially use $Z$ as an instrument!
+	\item What conditions would $Z$ have to fulfill?
+		\begin{enumerate}
+			\item Instrument Relevance: $\alpha_1>0$
+			\item Instrument Exogeneity: $Cov(Z_i,\varepsilon_i)=0$
+		\end{enumerate}
+
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{Example: Angrist \& Evans}
+
+Model:
+\begin{align*}
+Hours_i =& \beta_0 + \beta_1 Children_i + \varepsilon_i\\
+Children_i =& \alpha_0 + \alpha_1 Hours_i + \alpha_2 SameSex_i + \nu_i
+\end{align*}
+
+\begin{itemize}
+	\item $SameSex$: indicator for whether first two children have same sex
+	\item Hours and children are determined jointly
+	\item Also $Cov(\varepsilon,\nu)$ is unlikely to be 0
+		\begin{itemize}{\footnotesize
+			\item Education can matter for both number of children and hours worked (so education is part of $\varepsilon$ and $\nu$)
+			\item Being married may matter for both
+			\item Quality of non-financial benefits (e.g., maternity leave)
+
+			}
+		\end{itemize}
+	\item So formally, the instrument $SameSex$ is supposed to help solve simultaneity
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Example: Angrist \& Evans}
+\begin{center}
+\includegraphics[scale=.45]{AE_tab8}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Example: Porter (1983)}
+\begin{itemize}
+	\item The Joint Executive Committee's (19th Century railroad cartel)
+	main business was transporting grain from Midwest to ports on East Coast.
+
+	\item Porter (1983) estimates the following simultaneous system:\[
+\begin{array}{cccc}
+\text{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+\\
+\text{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+\end{array}
+\]
+where
+\begin{itemize}
+\item $Q_{t}$ is the quantity (tonnage of grain) transported by the JEC
+\item $P_{t}$ is the price per ton of grain transported
+\item $L_{t}$ is a dummy for whether the Great Lakes were open to navigation
+\item $S_{t}$ is a vector of time dummies
+\item $I_{t}$ is an indicator for whether the JEC was colluding
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Porter (1983)}
+\begin{align*}
+	\text{demand:} & \log Q_{t} &=&  \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+\\
+	\text{supply:} & \log P_{t} &=&  \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+\end{align*}
+\begin{align*}
+	\text{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
+\\
+	\text{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
+\end{align*}
+\end{frame}
+% \begin{align*}
+% 	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
+% \\
+% 	ext{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
+% \end{align*}
+
+
+
+
+\begin{frame}{Example: Porter (1983)}
+\begin{center}
+\includegraphics[scale=.5]{Porter_t3}
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Example: Roberts and Schlenker (2013)}
+\begin{itemize}
+	\item How much does the biofuels mandate increase the price of grains?
+	It depends on supply and demand.
+
+	\item Roberts and Schlenker (2013) estimate the following supply and demand equations:
+\begin{align*}
+\begin{array}{cccl}
+\text{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
+\\
+\text{supply:} & \log Q_{st} & = & \beta_{0}+\beta_{1}\log P_{st}+\beta_{2}\omega_{t}+\varepsilon_{st}
+\end{array}
+\end{align*}
+\begin{itemize}
+\item $Q_{st}$ is global grain supply (calories)
+\item $Q_{dt}$ is global grain consumption ($Q_{st}\ne Q_{dt}$ because
+of storage)
+\item The prices are measured at different times (planting vs harvest time)
+\item $\omega_{t}$ is a yield shock (due to weather), used as an instrument
+for demand
+\item $\omega_{t-1}$ is used as an instrument for supply (through storage,
+past production matters for current prices)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Example: Roberts and Schlenker (2013)}
+\begin{center}
+\includegraphics[scale=.5]{RS_t1}
+\end{center}
+\end{frame}
+
+
+
+\begin{frame}{More weather-based IVs}
+From \href{https://www.iaee.org/en/publications/ejarticle.aspx?id=2243}{Hughes, Knittel, Sperling (2008)}
+\begin{center}
+\includegraphics[width=.9\textwidth]{Katrina_iv}
+\end{center}
+\end{frame}
+
+
+
+\begin{frame}{Simultaneity more examples}
+\begin{itemize}
+	\item \href{https://www.ptscott.com/papers/telecom_infrastructure.pdf}{Download speeds and mobile data consumption}:
+		Consumers use their smart phones more when download speeds are fast, but high usage leads to congestion, which slows
+		down speeds.
+
+	\bigskip
+	\item Road investment and travel demand: better roads are more appealing to travelers, and highly-used routes are likely
+		to receive more funding .
+
+	\bigskip
+	\item Public opinion influences policy, and policy influences public opinion (cigarettes, parental leave, same-sex marriage). 
+
+	\bigskip
+	\item Intensity of policing and crime rates. 
+\end{itemize}
+\end{frame}
+
+
+\section{Measurement Error}
+
+
+\begin{frame}{Measurement Error}
+
+The problem: the $X$ variable is measured with noise
+
+\begin{itemize}
+	\item The idea mathematically:
+		\begin{align*}
+			\text{\bf{TRUTH}: } Y &= \beta_0 + \beta_1 X + \varepsilon \\
+			\text{\bf{DATA}: }  Y &= \beta_0 + \beta_1 X^* + \varepsilon^*
+		\end{align*}
+		where $X^*$ is a noisy measure of $X$
+	\item Examples: 
+	\begin{itemize}
+		\item Recording errors in data entry
+		\item Recollection errors in survey data (these are frequent)
+		\item Rounding errors
+		\item Hard to measure variables (e.g., a firm's capital stock)
+	\end{itemize}
+	\item Note: we can also have measurement error in $Y$. Turns out these behave differently
+\end{itemize}
+
+	
+\end{frame}
+
+\begin{frame}{Visualizing Measurement Error: Self-Reported Australian Incomes}
+	
+Survey question: What is your income in thousands? 
+
+\begin{figure}[H]
+	\includegraphics[width=.575\textwidth]{measurementErrorPlot.pdf}	
+\end{figure}
+	
+	\begin{itemize}{\scriptsize
+		\item The lumps occur at 5s and 0s
+		\item E.g., people making 41k might say ``40" or ``45" instead of 41
+			
+		}
+	\end{itemize}
+
+	
+\end{frame}
+
+\begin{frame}{Measurement Error in $X$}{The Math of Measurement Error}
+
+\begin{itemize}
+	\item Consider adding and subtracting noise to the truth:
+		\begin{align*}
+			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
+				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
+				=& \beta_0 + \beta_1 X_i^* + V_i
+		\end{align*}
+	\item $X_i^*$ and $V_i$ likely to be correlated because $X^*$ is part of $V$
+	\item Extra assumptions:
+		\begin{itemize}
+			\item {\bf Classical Errors-in-Variables:}
+				\begin{align*}
+				X_i = X_i^* + u_i
+				n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
+				\end{align*}
+		\end{itemize}
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Measurement Error in $X$}{Classical Measurement Error}
+
+Under classical measurement error:
+	\begin{align*}
+		Y_i = \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1u_i + \varepsilon_i}_{V_i}
+	\end{align*}
+\begin{itemize}
+	\item Using the population definition of $\hat\beta^{OLS}$:{\small
+		\begin{align*}
+			\hat\beta^{OLS}\to & \frac{Cov(X^*,Y)}{Var(X^*)}\\
+							=&\frac{Cov(X+u,\beta_0 + \beta_1 X + \varepsilon)}{Var(X+u)}\\
+							=&\frac{Cov(X,\beta_0 + \beta_1 X + \varepsilon) + Cov(u,\beta_0 + \beta_1 X + \varepsilon)}{Var(X+u)}\\
+							=& \frac{\beta_1 Cov(X,X) + 0}{Var(X+u)}
+		\end{align*}}
+\end{itemize}
+	
+	
+\end{frame}
+
+\begin{frame}{Measurement Error in $X$}{Classical Measurement Error, Cont'd}
+
+\begin{itemize}
+	\item Continuing from above:{\small
+		\begin{align*}
+			\hat\beta^{OLS}\to & \frac{\beta_1 Cov(X,X) + 0}{Var(X+u)}\\
+							=& \beta_1\times\frac{Var(X)}{Var(X+u)}\\
+							=& \beta_1\times\underbrace{\frac{\sigma^2_X}{\sigma^2_X + \sigma^2_u}}_{\text{Attenuation}}
+		\end{align*}}
+	\item Estimated coefficient converges to the truth times an attenuation term
+		\begin{itemize}
+			\item Attenuation term is less than 1 $\Rightarrow$ pushes coefficient towards zero
+			\begin{itemize}
+			\item {\bf NB:} It does \emph{not} make the term more negative---it dampens the coefficient and preserves the sign
+			\end{itemize}
+			\item This ``attenuates" the effect of $X$ on $Y$. Hence the name: {\bf attenuation bias}
+		\end{itemize}
+		
+\end{itemize}
+	
+	
+\end{frame}
+
+\begin{frame}{Measurement Error in $X$}{Classical Measurement Error Intuition}	
+	\begin{itemize}
+		\item Why does measurement error attenuate the estimated effect of $X$ on $Y$?
+		\begin{itemize}
+			\item Noise in measured $X$ makes it more likely to see high $X$ and low $X$ with some $Y$ because of randomness
+			\item Extreme example: fix $X$ and keep adding noise---eventually $X^*$ will look like noise itself
+		\end{itemize}	
+		\item Notice the following rearranging of the attenuation term:
+			\[
+				\frac{\sigma^2_X}{\sigma^2_X + \sigma^2_u} = \frac{1}{1+(\sigma^2_u/\sigma^2_X)}
+			\]
+			\begin{itemize}
+				\item $\sigma^2_X/\sigma^2_u$ is called the {\bf signal-to-noise ratio}
+				\item Larger signal to noise ratio $\Rightarrow$ smaller bias
+				\item What matter is the \emph{relative} variance of $X$ to $u$
+				\item If $\sigma^2_u$ is small \emph{relative} to $\sigma^2_X$ then attenuation bias isn't too large
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Visualizing Measurement Error}
+	\begin{figure}[h]
+	\only<1>{
+		\includegraphics[width=.7\textwidth]{measurementErrorExample_1.pdf}
+	}
+	\only<2>{
+		\includegraphics[width=.7\textwidth]{measurementErrorExample_2.pdf}
+	}
+	\only<3>{
+		\includegraphics[width=.7\textwidth]{measurementErrorExample_3.pdf}
+	}
+	\end{figure}
+
+	\begin{itemize}
+		\only<1>{\item Suppose this is the true data. But...}
+		\only<2>{\item ... you only observe the noisy data...}
+		\only<3>{\item ... then what happens to the estimated slope?}
+	\end{itemize}
+
+
+\end{frame}
+
+
+
+
+
+\begin{frame}{Measurement Error and IVs}
+		\begin{align*}
+			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
+				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
+				=& \beta_0 + \beta_1 X_i^* + V_i
+		\end{align*}
+\begin{itemize}
+	\item How do we address attenuation bias using instrumental variables? 
+% note we need something correlated with the measurement but not the measurement error; an independent
+% measurement will do 		
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Measurement Error in $Y$}{No problemo}	
+	\begin{itemize}
+		\item Suppose the econometrician observes $Y^{*} = Y + u$, where $Y$ is the true value.
+\begin{align*}
+\begin{array}{ccl}
+Y_{i} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}\\
+Y_{i}+Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+Y_{i}^{*}\\
+Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right)
+\end{array}
+\end{align*}
+	\item Again, we can see this as changing the error term:
+\begin{align*}
+Y_{i}^{*}=\beta_{0}+\beta_{1}X_{i}+V_{i}
+\end{align*}
+where $V_{i}=\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right).$	
+		
+		\item As long as this is classical measurement error, i.e. $\E\left[u \mid X\right]= 0$,
+		then as long as exogeneity is satisfied with the original error term $\E\left[\varepsilon \mid X\right]=0$,
+		it will still be satisfied for the modified error term $\E\left[V \mid X\right]=0$.
+		
+\end{itemize}
+\end{frame}		
+
+
+
+
+\end{document}

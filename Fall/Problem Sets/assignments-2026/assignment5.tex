@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\providecommand{\tabularnewline}{\\}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+
+\title{\Huge Assignment 5}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026 --- due at the start of Session 10}
+
+\makeatother
+
+\begin{document}
+
+\title{Assignment 5}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+\textbf{Instructions.} Two problems on panel event studies and staggered
+difference-in-differences (Sessions 8--9). \texttt{R} with \texttt{fixest} (which has
+\texttt{i()}, \texttt{iplot()}, and \texttt{sunab()}) or Python with \texttt{pyfixest}. Turn in a PDF
+with your results and reasoning, and your code. Derive first, then simulate to check yourself.
+
+\subsection*{1 Staggered adoption of a pricing tool}
+
+$600$ firms observed for $16$ quarters. Firms adopt an algorithmic-pricing tool in one of three
+cohorts, quarter $5$, $9$, or $13$, or never; assign each firm to one of the four groups at random
+with equal probability. Log gross margin is
+\[
+y_{it} = \alpha_{i} + \gamma_{t} + \tau_{it} + \varepsilon_{it}, \qquad
+\alpha_{i} \sim \mathcal{N}(0, 0.3^{2}),\ \varepsilon_{it} \sim \mathcal{N}(0, 0.05^{2}),
+\]
+with $\gamma_{t}$ a random walk with drift ($\gamma_{t} = \gamma_{t-1} + 0.01 + 0.02\,\zeta_{t}$)
+common to all firms. The treatment effect ramps in, at a speed and to a level that differ by cohort:
+\[
+\tau_{it} = \bar\tau_{g}\cdot \min\!\left(1,\ \frac{k_{it} + 1}{s_{g}}\right) \text{ for } k_{it} = t - g \ge 0,
+\quad \text{and } 0 \text{ before adoption,}
+\]
+where cohort $g = 5$ has $\bar\tau = 0.10$, $s = 1$ (full effect immediately); $g = 9$ has
+$\bar\tau = 0.06$, $s = 2$; $g = 13$ has $\bar\tau = 0.03$, $s = 4$. Early adopters gain more
+and faster. Never-treated firms have $\tau = 0$.
+
+\begin{enumerate}[label=(\alph*)]
+\item Simulate. Compute the true average treatment effect on the treated: the mean of $\tau_{it}$
+over treated firm-quarters (post-adoption). Also report it by cohort.
+\item Estimate the static two-way fixed effects regression, $y$ on a post-adoption dummy with firm
+and quarter fixed effects, clustered by firm. Compare to (a). Which cohorts is it under- or
+over-weighting, and why? (Think about how many post-periods each cohort contributes.)
+\item Estimate the naive event study: $y$ on event-time dummies (reference $k = -1$; never-treated
+firms get the reference value) with firm and quarter fixed effects. Plot it. Run a joint test on the
+pre-period coefficients. They should reject even though no firm has a pre-trend. Explain, in the
+language of Session 9, what contaminates the pre-period coefficients here.
+\item Re-estimate with \texttt{sunab(cohort, quarter)} (Sun and Abraham 2021), plot, and compare the
+post-period coefficients to the true average of $\tau_{it}$ at each event time. Report the aggregated
+ATT and compare to (a).
+\item Drop the never-treated firms and re-run (d). What does \texttt{sunab} use as the control group
+now, and which event-time coefficients become unavailable? One paragraph.
+\item Managerial summary, three sentences: the analytics team reports the static two-way FE number
+from (b) as ``the effect of the tool.'' What is wrong with it, what number would you report instead,
+and to whom does it apply?
+\end{enumerate}
+
+\subsection*{2 Goodman-Bacon by hand}
+
+Two cohorts of equal size and three periods. The \emph{early} cohort is treated in periods $2$ and
+$3$; the \emph{late} cohort is treated in period $3$ only. There is no never-treated group. Potential
+outcomes: $y_{it}(0) = \alpha_{i} + \gamma_{t}$, and the treatment effect for a unit treated for
+$k + 1$ periods is $\tau(k)$, so the early cohort has effect $\tau(0)$ in period $2$ and
+$\tau(1)$ in period $3$, and the late cohort has effect $\tau(0)$ in period $3$.
+
+\begin{enumerate}[label=(\alph*)]
+\item Write the population mean of $y$ for each cohort-period cell (six cells) in terms of
+$\bar\alpha_{g}$, $\gamma_{t}$, and $\tau(\cdot)$.
+\item There are two $2\times 2$ difference-in-differences comparisons available. Comparison $A$ uses
+periods $1$--$2$ with the late cohort (not yet treated) as the control for the early cohort.
+Comparison $B$ uses periods $2$--$3$ with the \emph{early} cohort (already treated) as the control
+for the late cohort. Compute what each estimates in terms of $\tau(0)$ and $\tau(1)$. One of them
+is not a treatment effect. Which, and what is it instead?
+\item Show that the two-way fixed effects regression of $y$ on the treatment dummy with unit and
+period effects estimates $\tfrac{1}{2}A + \tfrac{1}{2}B$ in this design. (Hint: with equal cohort
+sizes and this timing, the within-unit-and-period residualized treatment dummy takes only a few
+values; the TWFE coefficient is a variance-weighted average of the $2\times 2$s, and here the two
+comparisons have equal variance. You may argue from symmetry rather than grinding the algebra.)
+\item Let $\tau(0) = 0.5$ and $\tau(1) = 1.0$: the effect grows the longer a firm has the tool.
+What does TWFE estimate? Compare it to every true effect in the design. Now let $\tau(1) = 1.5$.
+\item Simulate the design ($100$ firms per cohort, small noise) and confirm (c) and (d): compute
+$A$ and $B$ from the six cell means and compare their average to \texttt{feols(y \~{} D | id + t)}.
+\item One paragraph: what feature of the design makes comparison $B$ appear, why is it harmless
+when $\tau(k)$ is constant in $k$, and what do Callaway--Sant'Anna and Sun--Abraham do about it?
+\end{enumerate}
+
+\end{document}
