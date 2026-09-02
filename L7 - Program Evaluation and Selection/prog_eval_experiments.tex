@@ -395,6 +395,93 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
 \end{frame}
 
 
+\begin{frame}{Randomization Inference: the design is the distribution}
+\begin{itemize}
+	\item So far our inference has leaned on the CLT: ``$\bar{X}$ is approximately
+	normal.'' In a randomized experiment there is a cleaner option that needs
+	\alert{no asymptotics at all}.
+
+	\medskip
+	\item Fisher's idea: under the \alert{sharp null} --- the treatment did nothing
+	\emph{for anyone}, $Y_i(1) = Y_i(0)$ --- the outcomes are just fixed numbers, and
+	the \alert{only} randomness in your data is the coin flips that assigned treatment.
+
+	\medskip
+	\item So every other way the coin flips could have landed is an equally likely
+	world where the treatment labels moved but the outcomes did not.
+
+	\medskip
+	\item That means we can compute the \emph{exact} distribution of any test
+	statistic under the null --- by re-randomizing the labels ourselves.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Randomization Inference: mechanics}
+\begin{enumerate}
+	\item Compute your statistic on the real assignment (say, the difference in mean
+	conversion between treated and control).
+
+	\medskip
+	\item \alert{Shuffle the treatment labels} (respecting the actual design: same
+	number treated), and recompute the statistic. Repeat 10{,}000 times.
+
+	\medskip
+	\item The p-value is the share of shuffled assignments whose statistic is at
+	least as extreme as the real one.
+\end{enumerate}
+\bigskip
+\begin{itemize}
+	\item No normality, no variance formula, no $n \rightarrow \infty$: the p-value
+	is exact in your actual sample, whatever the outcome's distribution.
+	\item Skewed revenue with $n = 40$? Fine. That is exactly where the
+	$t$-approximation is at its worst.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Randomization Inference in ten lines}
+\begin{lstlisting}
+observed <- mean(y[d == 1]) - mean(y[d == 0])
+perm <- replicate(10000, {
+  d_star <- sample(d)                # reshuffle labels, same # treated
+  mean(y[d_star == 1]) - mean(y[d_star == 0])
+})
+p_value <- mean(abs(perm) >= abs(observed))
+hist(perm); abline(v = observed, col = "red", lwd = 2)
+\end{lstlisting}
+\medskip
+The histogram \emph{is} the null distribution --- your CLT picture from Lecture 1b,
+except we built it from the design instead of assuming it.
+\end{frame}
+
+
+\begin{frame}{Randomization Inference: why practitioners care}
+\begin{itemize}
+	\item \alert{It respects the actual design.} Cluster-randomized experiment
+	(markets, stores, classrooms)? Permute \emph{clusters}, and correct
+	cluster-level inference falls out automatically --- no formulas, no ``how many
+	clusters is enough?'' anxiety.
+
+	\medskip
+	\item \alert{You have already seen it.} The synthetic-control placebo test
+	(Session 11) --- ``how unusual is California's gap compared to reassigning the
+	policy to every other state?'' --- is randomization inference by another name.
+	So is Fisher's exact test in your A/B dashboard.
+
+	\medskip
+	\item \alert{The fine print:} the sharp null is ``no effect for \emph{anyone},''
+	which is stronger than ``the average effect is zero.'' Rejecting it says
+	\emph{somebody} was affected. For ATE-focused (``Neyman'') inference and the
+	design-based view generally: Wager Ch.~1, Imbens \& Rubin.
+
+	\medskip
+	\item Modest samples, skewed outcomes, clustered designs: when a referee doubts
+	your standard errors, a permutation p-value is a very hard object to argue with.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Experiments in the Social Science}
 \begin{itemize}
   \item Randomized Controlled Trials have long been the gold standard for research

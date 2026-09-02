@@ -34,6 +34,32 @@ plot(100 * lifts / 0.02, n_req / 1000, type = "b", log = "y",
 Small lifts are *brutally* expensive to detect --- this is the Lewis--Rao point about
 advertising experiments.
 
+# Reproduce: randomization inference in ten lines
+
+A small experiment with a skewed outcome --- exactly where the t-approximation is
+shakiest. 40 sellers, half treated, revenue is lognormal, true effect is a 30% lift:
+
+```{r}
+n <- 40
+d <- sample(rep(0:1, n / 2))
+y <- exp(rnorm(n, mean = 3, sd = 1)) * (1 + 0.3 * d)
+
+observed <- mean(y[d == 1]) - mean(y[d == 0])
+perm <- replicate(10000, {
+  d_star <- sample(d)               # reshuffle labels, same # treated
+  mean(y[d_star == 1]) - mean(y[d_star == 0])
+})
+c(observed = observed, p_value = mean(abs(perm) >= abs(observed)),
+  t_test_p = t.test(y ~ d)$p.value)
+hist(perm, breaks = 50, main = "Null distribution, built from the design")
+abline(v = observed, col = "red", lwd = 2)
+```
+
+The histogram *is* the null distribution --- no CLT required. Try re-running the
+chunk a few times: with n = 40 and lognormal outcomes, the permutation and t-test
+p-values usually agree roughly, but the permutation one needs no approximation to
+defend.
+
 # Reproduce: the collider from the DAG lecture
 
 Talent and luck are independent. Funding requires enough of either:

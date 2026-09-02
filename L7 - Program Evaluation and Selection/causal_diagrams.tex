@@ -91,6 +91,34 @@ In the graph on the last slide there are two paths from $D$ to $Y$:
 \end{frame}
 
 
+\begin{frame}{The grammar: three ways association flows}
+Every path, however long, is built from three pieces (Mixtape Ch.~3):
+\begin{center}
+\begin{tabular}{llll}
+\hline
+Motif & Shape & Default & Conditioning on the middle node \\
+\hline
+\alert{Chain} & $A \rightarrow B \rightarrow C$ & open & \alert{blocks} it \\
+\alert{Fork} & $A \leftarrow B \rightarrow C$ & open & \alert{blocks} it \\
+\alert{Collider} & $A \rightarrow B \leftarrow C$ & \alert{blocked} & \alert{opens} it \\
+\hline
+\end{tabular}
+\end{center}
+\bigskip
+\begin{itemize}
+	\item Association flows between two variables if \alert{any} path between them is
+	open. A path is open unless it is blocked at some node along the way.
+
+	\item Everything on the coming slides --- good controls, bad controls, selection
+	bias --- is just these three rows applied to a picture.
+	(The formal name for the full rule is \emph{d-separation}.)
+
+	\item The collider row is the one that breaks intuition: it is the only place
+	where controlling for something \emph{creates} association.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Good controls: closing a backdoor}
 \begin{columns}
 \begin{column}{0.45\textwidth}
@@ -222,6 +250,78 @@ In the graph on the last slide there are two paths from $D$ to $Y$:
 \end{frame}
 
 
+\begin{frame}{M-bias: even a pre-treatment control can hurt}
+\begin{columns}
+\begin{column}{0.45\textwidth}
+\begin{center}
+\begin{tikzpicture}[every node/.style={draw, circle, minimum size=8mm, inner sep=1pt}, node distance=13mm]
+	\node (D) {$D$};
+	\node[right=22mm of D] (Y) {$Y$};
+	\node[above=9mm of $(D)!0.5!(Y)$, fill=gray!25] (X) {$X$};
+	\node[above left=8mm and 4mm of X] (U1) {$U_1$};
+	\node[above right=8mm and 4mm of X] (U2) {$U_2$};
+	\draw[->, thick] (D) -- (Y);
+	\draw[->, thick] (U1) -- (D);
+	\draw[->, thick] (U1) -- (X);
+	\draw[->, thick] (U2) -- (X);
+	\draw[->, thick] (U2) -- (Y);
+\end{tikzpicture}
+\end{center}
+\smallskip
+{\small $U_1, U_2$ unobserved; $X$ observed \alert{before} treatment.}
+\end{column}
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+	\item The comforting heuristic ``pre-treatment controls are always safe'' is
+	\alert{false}. Here $X$ is measured before $D$ --- and it is a \alert{collider}
+	on the path $D \leftarrow U_1 \rightarrow X \leftarrow U_2 \rightarrow Y$.
+
+	\item Unconditionally that path is blocked at $X$; \alert{controlling for $X$
+	opens it}, importing bias where there was none.
+
+	\item Story: $D$ = adopting analytics software, $Y$ = productivity, $X$ = a
+	pre-adoption ``tech enthusiasm'' survey score driven by managerial ambition
+	($U_1$, which also drives adoption) and workforce skill ($U_2$, which also
+	drives productivity).
+
+	\item Timing is not enough --- you have to think about \emph{why} the control
+	varies. (Cinelli, Forney \& Pearl 2022, Model 7.)
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{A field guide to controls}
+\begin{center}
+\small
+\begin{tabular}{lll}
+\hline
+Candidate control $X$ & Control for it? & Why \\
+\hline
+Common cause of $D$ and $Y$ (confounder) & \alert{Yes} & closes the backdoor \\
+Proxy for an unobserved confounder & Usually yes & closes it partially \\
+Pre-treatment predictor of $Y$ only & Yes (\alert{precision}) & shrinks SEs, no path to $D$ \\
+Mediator ($D \rightarrow X \rightarrow Y$) & No$^{*}$ & blocks the effect itself \\
+Collider (caused by two paths' worth of causes) & \alert{Never} & opens a closed path \\
+Descendant of $Y$ & \alert{Never} & conditioning on the outcome \\
+Instrument (affects $D$ only) & No & \alert{amplifies} remaining bias \\
+\hline
+\end{tabular}
+\end{center}
+\smallskip
+\begin{itemize}
+	\item Row 3 is the positive surprise: in an A/B test, adjusting for
+	\emph{pre-experiment} outcomes (last month's spend) is pure precision gain ---
+	this is what platform experimentation teams do routinely.
+	\item $^{*}$Unless the \alert{direct} effect is your estimand and you have an
+	instrument for the mediator --- the case study coming next.
+	\item The full 18-model catalog: Cinelli, Forney \& Pearl (2022), ``A Crash
+	Course in Good and Bad Controls.''
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Case study: when prices respond to your experiment}
 \begin{columns}
 \begin{column}{0.45\textwidth}
@@ -327,6 +427,32 @@ authors need to be absent.
 \end{frame}
 
 
+\begin{frame}{You don't have to do this in your head}
+\begin{itemize}
+	\item \alert{dagitty} (\url{https://dagitty.net}, also an R package): draw your
+	DAG in the browser and it computes, automatically,
+	\begin{itemize}
+		\item every \alert{minimal adjustment set} that identifies your effect
+		(``control for exactly these''), and
+		\item the \alert{testable implications}: conditional independencies your DAG
+		claims, which you can check in data. A DAG is a falsifiable object, not a
+		vibe.
+	\end{itemize}
+
+	\medskip
+	\item Workflow worth adopting: draw the DAG \emph{before} touching the data;
+	put it in your appendix; let referees argue with the arrows instead of guessing
+	your assumptions.
+
+	\medskip
+	\item Pearl's machinery goes much further --- front-door identification,
+	do-calculus, combining experimental and observational data (``data fusion'') ---
+	see H\"unermund \& Bareinboim (2021) if you want the full toolkit. For this
+	course, backdoors and colliders do 95\% of the work.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Where DAGs strain (and economists push back)}
 \begin{itemize}
 	\item \alert{Simultaneity}: supply and demand determine price and quantity
@@ -377,12 +503,14 @@ authors need to be absent.
 \begin{frame}{Recap}
 \begin{itemize}
 	\item A DAG is a set of causal assumptions; the missing arrows do the work.
-	\item Backdoor paths are confounding; blocking them is what ``controlling for''
-	means.
+	\item Three motifs --- chain, fork, collider --- are the whole grammar. Backdoor
+	paths are confounding; blocking them is what ``controlling for'' means.
 	\item Colliders reverse the logic: conditioning \emph{creates} association.
-	Selection into the sample is a collider.
-	\item Bad controls: post-treatment variables and colliders. Ask \emph{when} the
-	variable was determined and \emph{whether treatment helped put units in the sample}.
+	Selection into the sample is a collider, and M-bias shows even pre-treatment
+	controls can be colliders.
+	\item Bad controls: ask \emph{why} the variable varies, not just \emph{when} it
+	was measured. When in doubt, the field guide --- or let dagitty compute the
+	adjustment set.
 	\item Every design in this course is a claim about missing arrows --- draw the
 	picture before you believe the number.
 \end{itemize}
@@ -396,7 +524,7 @@ authors need to be absent.
 \bigskip
 \begin{itemize}
 	\item Open \texttt{inclass\_session5.Rmd} (in the \texttt{L7 - Program Evaluation and Selection} folder of the course repo).
-	\item Reproduce the power calculations and the funded-startup collider.
+	\item Reproduce the power calculations, the ten-line randomization inference, and the funded-startup collider.
 	\item Then work the two problems with a neighbor:
 	\begin{enumerate}
 		\item The bad control, live
