@@ -30,7 +30,6 @@ We will compare **different standard errors**:
 - Robust (heteroskedasticity-consistent)
 - Clustered by individual
 - Two-way clustered by individual and year
-- Driscoll–Kraay (panel HAC)
 
 ---
 
@@ -93,29 +92,16 @@ summary(mod2, vcov = ~nr)
 summary(mod2, vcov = ~nr + year)
 ```
 
-## Driscoll–Kraay
-
-Requires panel structure specified:
-
-```{r dk}
-mod_panel <- feols(lwage ~  exper + expersq | nr, 
-                   data = wagepan, panel.id = ~nr + year)
-summary(mod_panel, vcov = "DK")
-```
-
----
-
 # Compare Results
 
 ```{r compare}
 etable(
-  mod_panel,
+  mod2,
   vcov = list(
     "Classical" = "iid",
     "Hetero" = "hetero",
     "Clustered (id)" = ~nr,
-    "Two-way (id+year)" = ~nr + year,
-    "Driscoll-Kraay" = "DK"
+    "Two-way (id+year)" = ~nr + year
     )
 )
 ```
@@ -124,8 +110,7 @@ etable(
 
 # Conclusion
 
-- **Clustered SEs** (by individual) are standard in panel wage regressions.  
-- **Two-way clustering** (id × year) is common when shocks are correlated across both dimensions.  
-- **Driscoll–Kraay** SEs are robust to heteroskedasticity, autocorrelation, and cross-sectional dependence.  
+- **Clustered SEs** (by individual) are standard in panel wage regressions.
+- **Two-way clustering** (id × year) is common when shocks are correlated across both dimensions.
 
 ---

@@ -239,3 +239,6 @@ TSWLatexianTemp*
 *.tmp
 
 .DS_Store
+
+# Reference textbooks (not redistributable; keep out of public repo)
+other_resources/

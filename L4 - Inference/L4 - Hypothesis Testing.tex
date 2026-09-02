@@ -4,9 +4,9 @@
 
 
 \title[L4 - Inference and Standard Errors]{ Econometrics I}
-\subtitle{Lecture 4: Inference and Standard Errors}
+\subtitle{Lecture 3b: Hypothesis Testing}
 \author{Chris Conlon}
-\date{Fall 2025}
+\date{Fall 2026}
 
 \begin{document}
 \maketitle
@@ -83,10 +83,15 @@ using a {\bf z test}.
 	the z test above, we reject only in the tails of the normal distribution. See: Neyman-Pearson Lemma.
 	
 	\medskip
-	\item Choosing the rejection region appropriately maximizes the test's {\bf power}, the 
+	\item Choosing the rejection region appropriately maximizes the test's {\bf power}, the
 	probability of rejecting the null hypothesis when it is indeed false. Power is often harder
 	to quantify and not something we typically choose. Power is one minus the rate of
-	type II errors (\textbf{false negatives}), or failures to reject the null hypothesis when it is false. 
+	type II errors (\textbf{false negatives}), or failures to reject the null hypothesis when it is false.
+
+	\medskip
+	\item Size and power come back in a big way when we \alert{design} experiments
+	(A/B tests, sample-size calculations) in a couple of weeks --- there, power is
+	exactly the thing you choose.
 \end{itemize}
 \end{frame}
 
@@ -253,34 +258,6 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 \end{itemize}
 	
 \end{frame}
-
-\begin{frame}{Example of Reading a t-Table}
-Example of a table of critical values for t distribution from a textbook:
-\begin{table}[htp]
-\begin{tabular}{ccc}
-\hline\hline 
-Degrees of Freedom & .10 & .05\\
-\hline
-1 & 6.31 & 12.71\\
-2 & 2.92 & 4.30\\
-$\vdots$ & &\\
-{\color{red} 28} & 1.70 & {\color{red} \bf 2.05} \\
-$\vdots$ & &\\
-{\color{red}$\infty$}  & 1.65 & {\color{red} \bf 1.96} \\
-\hline
-\end{tabular}
-
-\end{table}
-
-\begin{itemize}
-	\item If $N$ were very large we would use the $\mathcal{N}(0,1)$ approximation which is exactly the case that $df=\infty$
-	\item If $N<\infty$ we can use a table like this, or a computer does it for us
-	\item \emph{Example:} If $N=30$, $K=2$, then $df = N-K=28$ the 5\% cutoff value is 2.05 
-\end{itemize}
-
-\end{frame}
-
-
 
 % HERE
 
@@ -773,6 +750,22 @@ The bootstrap I have presented is sometimes known as the \alert{nonparametric bo
 \end{itemize}
 \end{frame}
 
+
+\begin{frame}{Workbook time}
+\begin{center}
+{\LARGE \alert{Let's look at the workbook now.}}
+\end{center}
+\bigskip
+\begin{itemize}
+	\item Open \texttt{inclass\_session3.Rmd} (in the \texttt{L4 - Inference} folder of the course repo).
+	\item Reproduce the robust/clustered SE comparisons and the ten-line bootstrap.
+	\item Then work the two problems with a neighbor:
+	\begin{enumerate}
+		\item When two t-tests mislead
+		\item How many clusters is enough?
+	\end{enumerate}
+\end{itemize}
+\end{frame}
 
 
 \end{document}

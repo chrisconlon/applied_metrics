@@ -9,25 +9,27 @@
 }
 
 \title{Econometrics I}
-\subtitle{Lecture 1: Probability}
+\subtitle{Lecture 1: Probability and Statistics}
 
 %\author{Chris Conlon \\NYU Stern}
-\date{Fall 2025}
+\date{Fall 2026}
 \maketitle
 
 
 \begin{frame}{Roadmap}
 \begin{enumerate}
-	\item Probability spaces
-	\item Random variables
+	\item Probability spaces and random variables
 	\item Distribution and density functions
-	\item Moments of random variables, mean and variance
-	\item Conditional expectations
-	\item Multivariate distributions
-	\item Independence
-	\item Bayes's Theorem
-	\item Law of Iterated Expectations
+	\item \alert{The algebra of expectations}: $\E[\cdot]$, $Var[\cdot]$, and $Cov[\cdot,\cdot]$ as operators
+	\item Multivariate distributions and independence
+	\item Conditional probability and Bayes's Theorem
+	\item Conditional expectations, iterated expectations, total variance
+	\item Matrix notation (details in the self-study handout)
 \end{enumerate}
+\bigskip
+One theme for today: most of this course is \alert{applying a small set of rules}
+for expectations and variances, over and over. Learn to push the operators around
+and the rest of the semester is bookkeeping.
 \end{frame}
 
 
@@ -169,40 +171,6 @@ F\left(x\right) = \frac{1}{2} \left[ 1 + \text{erf}\left(\frac{x-\mu}{\sigma \sq
 
 
 
-\begin{frame}[fragile]{Exponential CDF}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\begin{center}
-\includegraphics[height=.5\textheight]{exp-cdf} 
-\end{center}
-\end{column}
-\begin{column}{0.5\textwidth} 
-\begin{lstlisting}
-if(!(require(ggplot2))){install.packages('ggplot2')}
-ggplot(data.frame(x = c(-1, 4)), aes(x = x)) +
-stat_function(fun = pexp) +
-ylab("cdf") +
-ggtitle("Exponential CDF")
-\end{lstlisting}
-\end{column}
-\end{columns}
-\[
-F\left(x\right) = \begin{cases}
-	0 & \text{ if }x<0\\
-	1 - e^{- \lambda x}  & \text{ if }x\ge 0
-\end{cases}
-\]
-where $\lambda > 0$ is the rate parameter, plotted here for $\lambda=1$.
-
-\end{frame}
-
-
-\begin{frame}{Check properties of exponential CDF}
-
-\end{frame}
-
-
-
 \begin{frame}[fragile]{Bernoulli CDF}
 \begin{columns}
 \begin{column}{0.5\textwidth}
@@ -277,32 +245,6 @@ f\left(x\right) = \frac{1}{\sigma \sqrt{2 \pi}} \exp\left[ -\frac{1}{2}\left(\fr
 
 
 
-\begin{frame}[fragile]{Exponential PDF}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\begin{center}
-\includegraphics[height=.5\textheight]{exp-pdf} 
-\end{center}
-\end{column}
-\begin{column}{0.5\textwidth} 
-\begin{lstlisting}
-if(!(require(ggplot2))){install.packages('ggplot2')}
-ggplot(data.frame(x = c(-1, 4)), aes(x = x)) +
-stat_function(fun = dexp) +
-ylab("pdf") +
-ggtitle("Exponential PDF")
-\end{lstlisting}
-\end{column}
-\end{columns}
-\[
-f\left(x\right) = \begin{cases}
-	0 & \text{ if }x<0\\
-	\lambda e^{- \lambda x} & \text{ if }x\ge 0
-\end{cases}
-\]
-where $\lambda > 0$ is the rate parameter, plotted here for $\lambda=1$.
-\end{frame}
-
 \begin{frame}{Discrete vs continuous random variables}
 \begin{itemize}
 	\item Note that for discrete distributions like the Bernoulli distribution, we
@@ -327,6 +269,8 @@ where $\lambda > 0$ is the rate parameter, plotted here for $\lambda=1$.
 
 
 
+
+\section{The Algebra of Expectations}
 
 \begin{frame}{Expectations}
 \begin{itemize}
@@ -363,6 +307,30 @@ where $\lambda > 0$ is the rate parameter, plotted here for $\lambda=1$.
 	\item Note that functions of random variables are random variables themselves, so we're not adding much here.
 
 \end{itemize}
+\end{frame}
+
+
+\begin{frame}{$\E[\cdot]$ is an operator: learn its rules}
+Treat $\E[\cdot]$ like you treat the derivative: an \alert{operator} with a short list of rules.
+\begin{itemize}
+	\item \alert{Linearity} (constants $a$, $b$; any random variables $X$, $Y$):\[
+		\E\left[a + bX\right] = a + b\,\E\left[X\right] \quad \quad
+		\E\left[aX + bY\right] = a\,\E\left[X\right] + b\,\E\left[Y\right]
+	\]
+	This holds \emph{always} --- no independence required.
+
+	\medskip
+	\item Constants pass through; sums split; that's it.
+
+	\medskip
+	\item What linearity does NOT give you:\[
+		\E\left[XY\right] \neq \E\left[X\right]\E\left[Y\right] \quad \quad
+		\E\left[g(X)\right] \neq g\left(\E\left[X\right]\right)
+	\]
+	(the first gap is \alert{covariance}; the second is \alert{Jensen's inequality})
+\end{itemize}
+\medskip
+Nearly every derivation this semester is: apply linearity, track the pieces that don't split.
 \end{frame}
 
 
@@ -426,23 +394,6 @@ What does this mean if $k=1$?
 	\medskip
 	\item What are the mean and variance of this distribution?
 	
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}{Moment-generating function}
-\begin{itemize}
-	\item The moment generating function of $X$ is \[
-		m_X \left(t\right) = \E\left[\exp\left(tX\right)\right],
-	\]	
-	as long as this expectation is defined for $t$ in a neighborhood of zero. 
-	
-	\medskip 
-	\item $\frac{d^k m_X \left(0\right) }{dt^k}$ equals the $k$th moment of $X$.
-
-	\medskip
-	\item If two random variables have the same moment generating function, they have the same distribution. [We can use this later].
 \end{itemize}
 \end{frame}
 
@@ -549,13 +500,45 @@ where ${\bf x} = \left(x_1,\dots,x_T\right)\in \mathbb{R}^T$.
 \begin{frame}{Properties of expectations and covariance II}
 \begin{itemize}
 	\item For constants $a,b$, you should be able to show that\[
-		\E\left[ a X + b Y\right] = a  \cdot \E\left[ X\right] + b \cdot \E\left[ Y\right] 
+		\E\left[ a X + b Y\right] = a  \cdot \E\left[ X\right] + b \cdot \E\left[ Y\right]
 	\]
 
 	\medskip
 	\item From this, it follows that\[
-		Cov\left[ a X + b Y, Z \right] = a \cdot Cov\left[X , Z\right] + b \cdot Cov\left[Y , Z\right] 
+		Cov\left[ a X + b Y, Z \right] = a \cdot Cov\left[X , Z\right] + b \cdot Cov\left[Y , Z\right]
 	\]
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Variances of sums}
+Two more rules, both provable with linearity alone:
+\begin{itemize}
+	\item For any $X$, $Y$:\[
+		Var\left(X + Y\right) = Var\left(X\right) + Var\left(Y\right) + 2\, Cov\left(X,Y\right)
+	\]
+
+	\medskip
+	\item For $X_1,\dots,X_n$ \alert{uncorrelated} with common variance $\sigma^2$:\[
+		Var\left(\sum_{i=1}^n X_i \right) = \sum_{i=1}^n Var\left(X_i\right) = n \sigma^2
+	\]
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Cashing in: the variance of a sample mean}
+Let $X_1,\dots,X_n$ be uncorrelated draws with mean $\mu$ and variance $\sigma^2$, and let
+$\overline{X}_n = \frac{1}{n}\sum_{i=1}^n X_i$. Using \alert{only the operator rules}:
+\begin{align*}
+	\E\left[\overline{X}_n\right] &= \frac{1}{n}\sum_{i=1}^n \E\left[X_i\right] = \mu
+	& \text{(linearity)}\\[6pt]
+	Var\left(\overline{X}_n\right) &= \frac{1}{n^2} Var\left(\sum_{i=1}^n X_i\right) = \frac{1}{n^2} \cdot n\sigma^2 = \frac{\sigma^2}{n}
+	& \text{(} Var(bX) = b^2 Var(X) \text{)}
+\end{align*}
+\begin{itemize}
+	\item No distributions, no integrals: just the rules.
+	\item $\sqrt{\sigma^2/n}$ is the \alert{standard error} of the mean --- our first standard error.
+	\item Later today we simulate this and watch $\sigma^2/n$ show up in the data.
 \end{itemize}
 \end{frame}
 
@@ -734,128 +717,59 @@ Imagine a scientist develops a test for a disease.
 	\item The {\bf Law of Iterated Expectations} holds that\[
 			\E\left[\E\left[g\left(X\right)|Y\right]\right] = \E\left[g\left(X\right)\right]
 	\]
-	
+
+	\medskip
+	\item This is the last operator rule, and the one we will use most:
+		``average within groups, then average the group averages.''
+
 	\medskip
 	\item Define $\varepsilon = Y - \E\left[Y|X\right]$. What is $\E\left[\varepsilon X\right]$?
 \end{itemize}
 \end{frame}
 
 
-
-\section{Linear Algebra Review}
-
-\begin{frame}
-
-\begin{center}
-	{\Large \bf Linear Algebra Review}	
-\end{center}
-
-\end{frame}
-
-
-\begin{frame}{Basic Definitions}
+\begin{frame}{Law of Total Variance}
 \begin{itemize}
-	\item A {\bf vector} in $\mathbb{R}^n$ is a column of numbers $(x_1,x_2,...,x_n)$.
-	\item A {\bf matrix} in $\mathbb{R}^{n\times m}$ is $m$ columns of length $n$ vectors (so $n$ is the number of rows and $m$ is the number of columns). We denote an element of a matrix by $m_{ij}$ for row $i$ and column $j$:
-	\begin{align*}
-		M = \left(\begin{array}{cc}
-			m_{11} & m_{12}\\
-			m_{21} & m_{22}
-		\end{array}\right)
-	\end{align*}
-	\item For an entity on which there are many pieces of data, we store the data in a vector $x_i$
-	\begin{itemize}
-		\item[]\emph{Example:} For the USA could have $x_{USA} = \left(GDP_{USA}, Population_{USA},...\right)$
-	\end{itemize}
-	\item For many entities we can store all the data in a data matrix, $X$.
-	\begin{itemize}
-		\item[]\emph{Example:} For two countries:
-			\begin{align*}
-		X = \left(\begin{array}{ll}
-			GDP_{USA} & Population_{USA}\\
-			GDP_{Canada} & Population_{Canada}
-		\end{array}\right)
-			\end{align*}
-	\end{itemize}
+	\item The conditional-variance cousin of iterated expectations:\[
+		Var\left(Y\right) = \underbrace{\E\left[Var\left(Y|X\right)\right]}_{\text{within-group}}
+		 + \underbrace{Var\left(\E\left[Y|X\right]\right)}_{\text{between-group}}
+	\]
+
+	\medskip
+	\item Total variation in wages $=$ variation \emph{within} education groups $+$
+		variation in average wages \emph{across} education groups.
+
+	\medskip
+	\item This decomposition is $R^2$, ANOVA, and ``how much can $X$ explain?'' all at once
+		--- we will meet it again in Lecture 2.
 \end{itemize}
-
 \end{frame}
 
 
-\begin{frame}{Matrix Multiplication}
-	\begin{itemize}
-		\item For two vectors of equal length define the {\bf dot product} as $v\cdot w$ or $\langle v, w \rangle$:
-			\[
-				v\cdot w = \sum_{i=1}^n v_i\times w_i
-			\]
-		\item For two matrices, $A$ and $B$ of sizes $n\times m$ and $m\times k$ define the {\bf matrix product} $C=AB$ as the $n\times k$ matrix with entries $c_{ij}=\sum_{l=1}^ma_{il}b_{lj}$
-		\begin{itemize}
-			\item Easy way to remember: $(i,j)^{th}$ element of product is dot product of $i^{th}$ row and $j^{th}$ column of $A$ and $B$ respectively.
-			\item Not all matrices can be multiplied: left matrix must have column length equal to right matrix's row length
-			\item Multiplication is NOT commutative: $AB\ne BA$ even if they both exist
-		\end{itemize}
-	\end{itemize}
-	\url{https://eli.thegreenplace.net/2015/visualizing-matrix-multiplication-as-a-linear-combination/}
-\end{frame}
 
+\section{Matrix Notation}
 
-\begin{frame}{Transposes}
-\begin{itemize}	
-	\item Define the {\bf transpose} of $A$ as the matrix $A'$ with elements $a'_{ij} = a_{ji}$ (reverse columns and rows)
-	\item A matrix is {\bf symmetric} if $A'=A$
-	\item {\bf Important Properties:}
-		\begin{itemize}
-			\item The matrix $B = A'A$ is \emph{always} a square matrix
-			\item The matrix $B=A'A$ is always symmetric
-			\item $(A')' = A$
-			\item {\bf Multiplication Rule:} $(AB)' = B'A'$
-			\item {\bf Addition Rule:} $(A+B)' = A'+B'$
-		\end{itemize}
-	\item Note that dot products can also be written as an {\bf inner product}: $v\cdot w = v' w$.
-	\item Note that the {\bf outer product} of two vectors is a matrix rather than a scalar: $v w'$.
-
-\end{itemize}
-
-\end{frame}
-
-\begin{frame}{Inverses}
+\begin{frame}{Matrix notation: the 15-minute version}
+Full review (with worked examples) is in the \alert{self-study linear algebra handout} --- read it before next class. What you must recognize on sight:
 \begin{itemize}
-	\item The {\bf Identity Matrix}, $I$, is a matrix with 1s on the diagonal and 0s elsewhere. Clearly $AI = A$.	
-	\item Define the {\bf left inverse} of $A$ to be the matrix $A^{-1}$ such that $A^{-1}A=I$
-	\begin{itemize}
-		\item Can analogously define right inverse
-		\item Right and left inverse will NOT be the same if $A$ is not a square matrix
-		\item Right and left inverse WILL be equal if $A$ is square (then we just say inverse)
-	\end{itemize}
-	\item {\bf Important Properties:}
-		\begin{itemize}
-			\item {\bf Multiplication Rule:} $(AB)^{-1} = B^{-1}A^{-1}$
-			\item {\bf Tranpose Rule:} $(A')^{-1} = (A^{-1})'$
-			\item {\bf Dot Product:} $v\cdot w = v'w$
-		\end{itemize}
+	\item Data: $n$ observations on $k$ variables is a matrix $X$ ($n \times k$); one observation is a row $x_i'$; $y$ is $n \times 1$.
+
+	\medskip
+	\item Transpose: $(AB)' = B'A'$. \quad $X'X$ is $k\times k$, square, and symmetric.
+
+	\medskip
+	\item Inverse: $A^{-1}A = I$; \quad $(AB)^{-1} = B^{-1}A^{-1}$. \quad $(X'X)^{-1}$ exists only when
+	no column of $X$ is a linear combination of the others --- this fact will come back as
+	\alert{multicollinearity} in Lecture 2.
+
+	\medskip
+	\item The one formula to start getting comfortable with now:\[
+		\hat{\beta} = \left(X'X\right)^{-1}X'y
+	\]
 \end{itemize}
-
+\medskip
+You will \emph{read} matrix notation constantly this semester; you will almost never manipulate it by hand.
 \end{frame}
-
-\begin{frame}{Matrix Calculus}
-	\begin{itemize}
-		\item For a function $f:\mathbb{R}^n\to\mathbb{R}^m$ recall the definition of the derivative or Jacobian of $f$:
-			\[
-				Df = \left(\begin{array}{ccc}
-					\frac{\partial f_1}{\partial x_1} & \dots & \frac{\partial f_m}{x_1}\\
-					\vdots & & \\
-					\frac{\partial f_1}{\partial x_n} & \dots & \frac{\partial f_m}{x_n}
-					 \end{array}\right)
-			\]
-		\item We WON'T be doing anything too complicated! But we can define two important functions given a vector $x$ and a matrix $A$:
-		\begin{itemize}
-			\item For $Ax$, $D(Ax) = A$ (as a line in 1-D calc)
-			\item For $x'Ax$, $D(x'Ax) = x'(A+A')$ (as a quadratic in 1-D calc)
-		\end{itemize}
-	\end{itemize}
-	The matrix cookbook \url{https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf} has a lot (more) helpful properties.
-\end{frame}
-
 
 
 \section{Thanks}

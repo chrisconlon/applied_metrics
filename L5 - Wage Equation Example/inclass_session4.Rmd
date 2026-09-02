@@ -1,0 +1,101 @@
+---
+title: "In-Class Session 4: Applied Regression Workshop"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+set.seed(93)
+library(fixest)
+```
+
+This is the hands-on session: everything here uses the Cornwell--Rupert wage data
+from the lecture. (Yes, it's a labor example --- it's the canonical one for regression
+mechanics; your assignments use data closer to your fields.)
+
+# Reproduce: the Mincer regression
+
+```{r}
+wages <- read.csv("cornwell-rupert.csv")
+names(wages) <- trimws(names(wages))
+wages$EXP2 <- wages$EXP^2
+m1 <- feols(LWAGE ~ ED + EXP + EXP2 + FEM + UNION, data = wages)
+summary(m1)
+```
+
+Interpretation check: the coefficient on `ED` is in *log points* per year of
+schooling. For small values these are approximately percent changes; exactly,
+a coefficient $b$ means a $100(e^{b}-1)\%$ change.
+
+```{r}
+b <- coef(m1)["ED"]
+c(log_points = unname(b), exact_pct = unname(100 * (exp(b) - 1)))
+```
+
+# Reproduce: interactions with `i()` and heterogeneous returns
+
+Do returns to education differ by sex?
+
+```{r}
+m2 <- feols(LWAGE ~ ED * FEM + EXP + EXP2 + UNION, data = wages)
+summary(m2)
+```
+
+# Reproduce: the delta method by hand
+
+Suppose we want the standard error of the *experience level that maximizes wages*,
+$\theta = -\beta_{EXP} / (2\beta_{EXP^2})$ --- a nonlinear function of two
+coefficients. The delta method: $\widehat{Var}(\hat\theta) = \nabla g' \, \hat V \, \nabla g$.
+
+```{r}
+m3 <- feols(LWAGE ~ ED + EXP + EXP2, data = wages)
+b  <- coef(m3); V <- vcov(m3)
+b1 <- b["EXP"]; b2 <- b["EXP2"]
+theta <- -b1 / (2 * b2)
+grad  <- c(EXP = -1 / (2 * b2), EXP2 = b1 / (2 * b2^2))
+se_theta <- sqrt(t(grad) %*% V[c("EXP", "EXP2"), c("EXP", "EXP2")] %*% grad)
+c(theta = unname(theta), se = as.numeric(se_theta))
+```
+
+# Reproduce: the bootstrap alternative
+
+```{r}
+B <- 499
+boot_theta <- replicate(B, {
+  idx <- sample(nrow(wages), replace = TRUE)
+  bb  <- coef(feols(LWAGE ~ ED + EXP + EXP2, data = wages[idx, ]))
+  -bb["EXP"] / (2 * bb["EXP2"])
+})
+c(boot_se = sd(boot_theta))
+quantile(boot_theta, c(0.025, 0.975))
+```
+
+Compare to the delta-method interval --- close, with no calculus required.
+
+# In-class problem 1: a union premium for whom?
+
+**(a)** Add a `UNION` $\times$ `ED` interaction to the Mincer regression. What is the
+estimated return to education for union vs. non-union workers?
+**(b)** Test the hypothesis that the returns are equal (i.e., the interaction is zero)
+--- and then test the *joint* hypothesis that union status doesn't matter at all
+(level and interaction both zero).
+**(c)** One sentence: why are these two different questions?
+
+```{r problem1}
+# your code here
+```
+
+# In-class problem 2: attenuation, live
+
+**(a)** Create a noisy version of education: `ED_noisy = ED + rnorm(n, sd = 2)`.
+Re-run the basic Mincer regression with `ED_noisy` in place of `ED`. What happened
+to the coefficient?
+**(b)** The reliability ratio is $\lambda = Var(ED) / (Var(ED) + 4)$. Compute it and
+check that the noisy coefficient is roughly $\lambda$ times the clean one.
+**(c)** Now try `sd = 6`. One sentence: in which direction does measurement error in a
+regressor push your estimate, and can more data fix it?
+
+```{r problem2}
+# your code here
+```

@@ -1,0 +1,82 @@
+---
+title: "In-Class Session 2: Linear Regression"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+set.seed(93)
+library(MASS)
+```
+
+This notebook reproduces the simulations from Lecture 2 and leaves you two short
+problems.
+
+# Reproduce: the multivariate normal and the regression line
+
+The lecture derived the regression function from the bivariate normal. Simulate it:
+
+```{r}
+mu <- c(0, 0)
+Sigma <- matrix(c(4, -1, -1, 1), 2, 2)
+yx <- mvrnorm(5000, mu, Sigma)
+plot(yx[, 2], yx[, 1], pch = ".", xlab = "x", ylab = "y")
+abline(lm(yx[, 1] ~ yx[, 2]), col = "red", lwd = 2)
+```
+
+The theoretical slope is $Cov(y,x)/Var(x) = -1/1 = -1$:
+
+```{r}
+coef(lm(yx[, 1] ~ yx[, 2]))
+```
+
+# Reproduce: the Silly Example, with the answer key in hand
+
+Paintings: $\ln A_i = \ln W_i + \ln H_i + \varepsilon_i$, so the truth is $(1, 1)$.
+
+```{r}
+Sigma_wh <- matrix(c(1, 0.6, 0.6, 1), 2, 2)
+wh   <- mvrnorm(10000, mu = c(1, 1), Sigma_wh)
+logW <- wh[, 1]; logH <- wh[, 2]
+logA <- logW + logH + rnorm(10000, sd = 0.1)
+
+coef(lm(logA ~ logW))         # short regression: biased (should be ~1.6)
+coef(lm(logA ~ logW + logH))  # long regression: both ~1
+```
+
+The short-regression slope is exactly $1 + \frac{Cov(\ln H, \ln W)}{Var(\ln W)} = 1.6$
+--- the omitted variables bias formula, live.
+
+# In-class problem 1: Frisch--Waugh with your own hands
+
+Simulate $y_i = 1 + 2 x_{1i} + 3 x_{2i} + \varepsilon_i$ where $x_1$ and $x_2$ are
+correlated (correlation 0.5, both standard normal), $n = 5000$.
+
+**(a)** Run the full regression and record the coefficient on $x_2$.
+**(b)** Now do it the Frisch--Waugh way: regress $y$ on $x_1$ and keep the residuals;
+regress $x_2$ on $x_1$ and keep the residuals; regress the first residuals on the
+second. Compare the slope to (a).
+**(c)** One sentence: what does this tell you about how to *read* a multiple
+regression coefficient?
+
+```{r problem1}
+# your code here
+```
+
+# In-class problem 2: a regression is a table of means
+
+An app store has apps in three price tiers (free, \$0.99, \$4.99). Suppose average
+user ratings are 3.2, 3.8, and 4.1 in the three tiers, each with noise
+$\sim \mathcal{N}(0, 0.5^2)$, with 2,000 apps per tier.
+
+**(a)** Simulate the data and compute the mean rating in each tier (`tapply` is handy).
+**(b)** Regress rating on `factor(tier)` and look at the fitted values. Show the
+regression reproduces the three means exactly.
+**(c)** Now regress rating on price as a *numeric* variable (0, 0.99, 4.99). What does
+this regression impose that the saturated one does not? Where does the fitted line
+miss the group means?
+
+```{r problem2}
+# your code here
+```

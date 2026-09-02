@@ -3,9 +3,9 @@
 
 
 \title{Econometrics I}
-\subtitle{Lecture 2: Asymptotic Statistics}
+\subtitle{Lecture 1b: How Averages Behave (Asymptotics by Simulation)}
 \author{Chris Conlon \\NYU Stern}
-\date{Fall 2025}
+\date{Fall 2026}
 
 \begin{document}
 \maketitle
@@ -13,12 +13,16 @@
 
 \begin{frame}{Roadmap}
 \begin{enumerate}
-	\item Sample and population means
-	\item Convergence in probability
-	\item Law of Large Numbers
-	\item Convergence in distribution
-	\item Central Limit Theorem
+	\item What does it mean for random variables to ``converge''?
+	\item Law of Large Numbers: averages settle down
+	\item Central Limit Theorem: averages are approximately normal
+	\item Seeing both in simulation
+	\item Standard errors: the payoff
 \end{enumerate}
+\bigskip
+The style of this segment is the style of the course: we \alert{state} the big theorems,
+\alert{derive} what we can with the operator rules from Part 1, and \alert{simulate}
+everything else. (Formal treatments: Hansen Ch.~6; Goff Appendix~B.)
 \end{frame}
 
 \begin{frame}{Convergence}
@@ -50,102 +54,31 @@ But our statistic could just be the identity function $S_n = \{X_i\}_{i=1}^n$ or
 
 
 
-\begin{frame}{Convergence in Probability}
-We say that the statistic $S_n$ \alert{converges in probability} to $S$ which we write as $S_n \overset{p}{\to} S$ if
-\begin{align*}
-\lim_{n \rightarrow 0} \Pr \left( \norm{S_n - S} > \epsilon \right) \rightarrow 0
-\end{align*}
+\begin{frame}{Two kinds of convergence (informally)}
+We need exactly two notions this semester:
 \begin{itemize}
-	\item This means that the \alert{probability} that random variables $S_n$ and $S$ are far apart will not be large as $n\rightarrow \infty$.
-	\item Continuous mapping theorem says if: $S_n \overset{p}{\to} S$ then $g(S_n) \overset{p}{\to} g(S)$ if $g(\cdot)$ is a continuous function.
-	\item Example: $X_i$ is i.i.d $\mathcal{N}(\mu,\sigma^2)$ what does $S_n = \frac{1}{n} \sum_{i=1}^n X_i$ converge in probability to?
-	\item Example: $X_n = \frac{1}{n}$ with probability $1-\frac{1}{n}$ and $n$ with probability $\frac{1}{n}$. What does this converge in probability to?
+	\item $S_n \overset{p}{\to} S$ (\alert{convergence in probability}): as $n$ grows, $S_n$ is
+	almost certainly \emph{close to} $S$. Usually $S$ is a \alert{fixed number} --- this is the
+	sense in which an estimator is \alert{consistent}.
+
+	\medskip
+	\item $X_n \overset{d}{\to} X$ (\alert{convergence in distribution}): as $n$ grows, the
+	\emph{histogram} of $X_n$ settles into the distribution of $X$. Usually $X$ is
+	\alert{normal} --- this is where standard errors and $t$-statistics come from.
+
+	\medskip
+	\item Bonus fact (\alert{continuous mapping}): smooth functions preserve convergence:
+	if $S_n \overset{p}{\to} S$ then $g(S_n) \overset{p}{\to} g(S)$ for continuous $g$.
 \end{itemize}
+\medskip
+Formal definitions (and ``almost sure'' convergence, which we skip): Hansen Ch.~6, Goff Appendix~B.
+In an hour you will have \emph{watched} both kinds happen in simulation.
 \end{frame}
 
-\begin{frame}{Convergence Almost Surely}
-We say that the statistic $S_n$ \alert{converges almost surely} to $S$ which we write as $S_n \overset{a.s.}{\to} S$ if
-\begin{align*}
-\Pr \left( \lim_{n\rightarrow \infty} S_n = S \right)=1
-\end{align*}
-\begin{itemize}
-	\item This means that the \alert{probability} that random variables $S_n$ is equal to $S$ approaches one as as $n\rightarrow \infty$.
-	\item This implies \alert{convergence in probability} (but not \textit{vice versa}). It is \alert{stronger convergence}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Convergence In Distribution}
-We say that the statistic $X_n$ \alert{converges in distribution} to $S$ which we write as $X_n \overset{d}{\to} X$ if
-\begin{align*}
-\lim_{n\rightarrow \infty} F_n(x) =F(x) \text{ at all points $x$ where } F \text{ is continuous}.
-\end{align*}
-\begin{itemize}
-	\item This means that as $n \rightarrow \infty$ their c.d.f's agree (but not necessarily their p.d.f.'s)
-		\item Continuous mapping theorem says if: $X_n \overset{d}{\to} X$ then $g(X_n) \overset{d}{\to} g(X)$ if $g(\cdot)$ is a continuous function.
-		\item This is a \alert{weaker} sense of convergence and is implied by \alert{convergence in probability} (but not \textit{vice versa}).
-		\item A common goal is to show that some statistic of the sequence $\{X_I\}_{i=1}^n$ is distributed normally.
-\end{itemize}
-\end{frame}
-
-
-
-
-\begin{frame}{Convergence: comments}
-
-\begin{itemize}
-\item For a constant $k$,
-\[
-	X_N \overset{a.s.}{\rightarrow} k \qquad \text{implies} \qquad  X_N \overset{p}{\rightarrow} k \qquad \text{iff} \qquad X_N \overset{d}{\rightarrow}  k
-\]
-
-\item Note that 
-	\begin{itemize}	
-		\item convergence in probability usually comes up in the context of $X_N$ converging to a {\bf fixed value}; 
-		\item convergence in distribution usually comes up in the context of $X_N$ converging to a {\bf random variable}.	
-			
-	\end{itemize}
-	
-\end{itemize}
-
-\end{frame}
 
 
 
 \section{The Big Theorems}
-
-\begin{frame}{Markov Inequality}
-Let $X$ be a \alert{non-negative} random variable with finite expectation $\E[X]$ then for any $a >0$ 
-\begin{align*}
-\Pr(X \geq a) \leq \frac{\E[X]}{a}
-\end{align*}
-This basically says ``if $\E[X]$ is small, the it is unlikely that $X$ is large''.\\ \vspace{0.25cm}
-\pause
-
-Proof: Define $Y$ so that $X \geq Y$:
-\begin{align*}
-Y&=\left\{\begin{array}{ll}a & X \geq a \\ 0 & X<a\end{array}\right.\\
-\text{Note that: }& \E[X] \geq \E[Y] = a \cdot \Pr{}\{X \geq a\}. \text{ and divide by } a.
-\end{align*}
-\end{frame}
-
-\begin{frame}{Chebyshev Inequality}
-Let $X$ be a \alert{non-negative} random variable with finite expectation $\E[X]$ \alert{and variance} $\E[(X-\mu)^2]=\sigma^2$.
-\begin{align*}
-\Pr\{|X-\mu| \geq k\} \leq \frac{\sigma^2}{k^2}
-\end{align*}
-This basically says ``if $Var(X)$ is small, the it is unlikely that $X$ is too far from the mean''.\\ \vspace{0.25cm}
-\pause
-
-Proof: Define $Z=(X-\mu)^2$ as our non-negative random variable.
-\begin{align*}
-\Pr\{|X-\mu| \geq k\}=\Pr\left\{(X-\mu)^2 \geq k^2\right\}\\ 
-\end{align*}
-Now apply Markov inequality to $Z$ where $a=k^2$.
-\end{frame}
-
-
-
 
 \begin{frame}{The Law of Large Numbers}
 \begin{center}
@@ -169,38 +102,25 @@ The Law of Large Numbers says the sample average converges in probability to its
 \end{frame}
 
 
-\begin{frame}{Proof: Law of Large Numbers}
+\begin{frame}{Why the LLN works: you already did the hard part}
+In Part 1 we used \alert{only the operator rules} to show:
 \begin{align*}
-S_n = \frac{1}{n} (X_1 + X_2 + X_3 + \cdots + X_n)
+\E\left[\bar{X}_n\right] = \mu \qquad \text{and} \qquad \Var\left(\bar{X}_n\right) = \frac{\sigma^2}{n}
 \end{align*}
-Easy to see that $\E[S_n] = \mu$, and that
-\begin{align*}
-\Var (S_n) &= \Var\left(\frac{1}{N}(X_1 + X_2 + \cdots X_n) \right)= \frac{1}{n^2} \Var \left(X_1 + X_2 + \cdots X_n \right) \\
-&= \frac{1}{n}\sum_{i=1}^n \Var(X_i)= \frac{n \sigma^2}{n^2} = \frac{\sigma^2}{n} 
-\end{align*}
-Now we apply Chebyshev with $k=\epsilon$:
-\begin{align*}
-\Pr\left(|S_n - \mu| \geq \varepsilon\right) &\leq \frac{\sigma^2}{n \cdot \varepsilon^2}\\
-\end{align*}
-Which goes to zero as $n \rightarrow \infty$.
-\end{frame}
-
-
-\begin{frame}{LLN generalization: intuition}
 \begin{itemize}
-	 \item We argued above that the variance of the sample mean converges to zero;
-			Chebyshev's inequality allows us to make the leap from this fact to convergence in probability
-			of sample means to population means. 
-
-
-	\item Notice that we didn't need to know the distribution of $X_i$. For a generic distribution (with finite variance), we would not necessarily know the distribution of the sample mean, but it's often the case that the sample mean of i.i.d. variables will have expectation $\mu$, and its variance
-	will be proportional to $1/N$.
-			
+	\item The average is \alert{centered in the right place}, and its \alert{variance dies} as $n$ grows.
+	A random variable whose variance goes to zero has nowhere to go but its mean.
 
 	\medskip
-	\item For i.i.d. sequences (with finite first and second moments), sample means are unbiased estimators of population means, and their variance converges to zero.
+	\item That last step (``low variance $\Rightarrow$ probably close to the mean'') is
+	made rigorous by \alert{Chebyshev's inequality}:
+	$\Pr\left(|\bar{X}_n - \mu| \geq \varepsilon\right) \leq \frac{\sigma^2}{n\varepsilon^2} \rightarrow 0$.
+	(Full proof: Hansen 7.4; Goff B.2.)
 
-	\item $\hat{\theta}$ is an \alert{unbiased} estimator of $\theta$ if $\E\left[\hat{\theta}\right] = \theta$.
+	\medskip
+	\item Notice what we did \emph{not} need: the distribution of $X_i$. Any distribution
+	with a finite mean and variance works --- and versions exist for non-identical,
+	dependent data too.
 \end{itemize}
 \end{frame}
 
@@ -495,28 +415,6 @@ Which goes to zero as $n \rightarrow \infty$.
 
 
 
-\begin{frame}{Moment generating functions revisited}
-\begin{center}
-\begin{minipage}{.8\textwidth}
-	\begin{block}{Levy's continuity theorem (MGF version)}
-	Let $X_n$ have MGF $M_n\left(t\right)$. If  $M_n\left(t\right)$ 
- 	converges pointwise to $M\left(t\right)$, the MGF of $X$, then\[
-	X_n \overset{d}{\rightarrow} X
-	\]
-	
-	\end{block}
-\end{minipage}
-
-\begin{itemize}
-	\item Recall: when two variables have same MGF, they have the same distribution
-	\item Idea for CLT proof: show that MGF of $X_{N}$ becomes the normal MGF
-\end{itemize}
-\end{center}
-I am not going to prove the CLT (sorry!).
-\end{frame}
-
-
-
 \begin{frame}{LLN and CLT Illustration}
 \begin{itemize}
 	\item Simulate $X_i\sim \text{Bernoulli}\left(p\right)$ for $i=1,2,\dots,N$.
@@ -674,16 +572,10 @@ clt_function_scaled(1000,.4)
 	\item In empirical economics, we generally use this approximation, but it's important to keep
 			in mind that it's not always a good approximation, particularly for small sample sizes when
 			the underlying distribution of the random variable is not itself normal.
-\end{itemize}
-\end{frame}
 
-
-\begin{frame}{CLT extensions}
-
-\begin{itemize}
-	\item Like the LLN, there are versions of the CLT that get away from both the {\bf identical} and {\bf independent}
-			aspects of the version we presented. But we \emph{do} need related conditions. See: {\bf ergodicity}, 
-			{\bf stationarity}, {\bf weak dependence}.
+	\item Like the LLN, versions of the CLT exist for non-identical and dependent data
+			(see: {\bf ergodicity}, {\bf stationarity}, {\bf weak dependence}) --- this matters
+			when we get to clustered and time-series data.
 \end{itemize}
 \end{frame}
 
@@ -796,6 +688,23 @@ s_N^2 \equiv \frac{1}{N-1}\sum_{i=1}^{N} \left(X_i - \bar{X}_N \right)^2
 
 	\item Note that \emph{standard errors} refer to an estimate of the \emph{standard deviation}
 			of an estimator.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Workbook time}
+\begin{center}
+{\LARGE \alert{Let's look at the workbook now.}}
+\end{center}
+\bigskip
+\begin{itemize}
+	\item Open \texttt{inclass\_session1.Rmd} (in the \texttt{L1 - Probability} folder of the course repo).
+	\item Reproduce the simulations we just saw --- run every chunk yourself.
+	\item Then work the two problems with a neighbor:
+	\begin{enumerate}
+		\item Diversification is a variance rule
+		\item Total variance in a customer base
+	\end{enumerate}
 \end{itemize}
 \end{frame}
 

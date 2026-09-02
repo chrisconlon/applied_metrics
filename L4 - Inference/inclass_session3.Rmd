@@ -1,0 +1,94 @@
+---
+title: "In-Class Session 3: Inference and Standard Errors"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+set.seed(93)
+library(fixest)
+library(MASS)
+```
+
+This notebook reproduces the standard-error comparisons from Lecture 3 and leaves
+you two short problems.
+
+# Reproduce: robust vs. classical under heteroskedasticity
+
+A DGP where the error variance grows with $x$:
+
+```{r}
+n <- 2000
+x <- rnorm(n)
+y <- 1 + 2 * x + x^2 * rnorm(n)   # heteroskedastic errors
+df <- data.frame(y, x)
+
+m <- feols(y ~ x, data = df)
+summary(m)                    # classical
+summary(m, vcov = "hetero")   # HC1 "robust"
+```
+
+Same point estimate, different standard errors --- and here the classical one is too
+small.
+
+# Reproduce: clustering
+
+Group-level shocks, 25 groups of 20:
+
+```{r}
+G <- 25; ng <- 20
+g  <- rep(1:G, each = ng)
+xg <- rnorm(G)[g] + rnorm(G * ng)       # x correlated within group
+eg <- rnorm(G)[g] + rnorm(G * ng)       # error correlated within group
+yg <- 1 + 2 * xg + eg
+dfc <- data.frame(yg, xg, g)
+
+mc <- feols(yg ~ xg, data = dfc)
+rbind(classical = se(mc),
+      robust    = se(summary(mc, vcov = "hetero")),
+      cluster   = se(summary(mc, vcov = ~g)))
+```
+
+# Reproduce: the bootstrap in ten lines
+
+```{r}
+B <- 999
+boot_slopes <- replicate(B, {
+  idx <- sample(n, replace = TRUE)
+  coef(lm(y ~ x, data = df[idx, ]))["x"]
+})
+c(boot_se = sd(boot_slopes), robust_se = se(summary(m, vcov = "hetero"))["x"])
+quantile(boot_slopes, c(0.025, 0.975))   # percentile CI
+```
+
+# In-class problem 1: when two t-tests mislead
+
+Simulate $y_i = 1 + 0.15 x_{1i} + 0.15 x_{2i} + \varepsilon_i$ with
+$corr(x_1, x_2) = 0.95$, $\varepsilon \sim \mathcal{N}(0,1)$, $n = 300$.
+
+**(a)** Run the regression. Look at the individual t-statistics on $x_1$ and $x_2$.
+**(b)** Now test the *joint* hypothesis $\beta_1 = \beta_2 = 0$ (in `fixest`:
+`wald(model, "x")` tests all coefficients matching `"x"`; or use an F-test comparing
+to the intercept-only model).
+**(c)** Two sentences: why can both individual tests fail to reject while the joint
+test rejects decisively? Which picture from lecture is this?
+
+```{r problem1}
+# your code here
+```
+
+# In-class problem 2: how many clusters is enough?
+
+Take the clustering DGP from above, but wrap it in a function of $G$ (keep total
+$n = 500$ fixed: $G$ groups of $500/G$).
+
+**(a)** For $G \in \{5, 10, 25, 50\}$, simulate 200 datasets each, and compute the
+*coverage* of the 95% cluster-robust confidence interval for $\beta = 2$.
+**(b)** What happens with very few clusters, and what does this imply about the
+"cluster at the state level" advice when there are only a handful of states in your
+data?
+
+```{r problem2}
+# your code here
+```

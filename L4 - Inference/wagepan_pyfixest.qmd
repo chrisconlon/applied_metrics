@@ -1,0 +1,107 @@
+---
+title: "Wage Panel Data with pyfixest"
+author: "Prof. Conlon"
+format:
+  html:
+    embed-resources: true
+jupyter: python3
+---
+
+## Introduction
+
+This is the Python twin of `wagepan_fixest.Rmd`. We estimate a **Mincer-type wage
+equation** on the panel dataset `wagepan`:
+
+$$
+\ln(wage_{it}) = \beta_0 + \beta_1 educ_i + \beta_2 exper_{it} + \beta_3 exper^2_{it} + u_{it}
+$$
+
+where $i$ indexes individuals and $t$ indexes years, and we compare **different
+standard errors**:
+
+- Classical (homoskedastic)
+- Robust (heteroskedasticity-consistent)
+- Clustered by individual
+- Two-way clustered by individual and year
+
+Setup (one time): `pip install pyfixest wooldridge` (or `uv pip install ...`).
+
+```{python}
+import pandas as pd
+import pyfixest as pf
+import wooldridge
+
+wagepan = wooldridge.data("wagepan")
+wagepan[["nr", "year", "lwage", "educ", "exper", "expersq"]].head()
+```
+
+Variables:
+
+- `lwage`: log wage
+- `educ`: years of education
+- `exper`: work experience
+- `expersq`: experience squared
+- `nr`: individual ID
+- `year`: calendar year
+
+## Baseline Regression
+
+We estimate without fixed effects (classical standard errors):
+
+```{python}
+mod1 = pf.feols("lwage ~ educ + exper + expersq", data=wagepan)
+mod1.summary()
+```
+
+## Individual Fixed Effects
+
+Usually, we add **individual fixed effects**. The formula syntax is the same as
+`fixest`: everything after `|` is absorbed as a fixed effect. Note that `educ` drops
+out --- it does not vary within person.
+
+```{python}
+mod2 = pf.feols("lwage ~ exper + expersq | nr", data=wagepan)
+mod2.summary()
+```
+
+## Different Standard Errors
+
+The point estimates below never change --- only the standard errors do.
+
+### Heteroskedasticity-Robust
+
+```{python}
+pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov="hetero").summary()
+```
+
+### Clustered by Individual
+
+```{python}
+pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov={"CRV1": "nr"}).summary()
+```
+
+### Two-Way Clustered (nr × year)
+
+```{python}
+pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov={"CRV1": "nr+year"}).summary()
+```
+
+## Compare Results
+
+```{python}
+mods = {
+    "Classical": pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov="iid"),
+    "Hetero": pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov="hetero"),
+    "Clustered (id)": pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov={"CRV1": "nr"}),
+    "Two-way (id+year)": pf.feols("lwage ~ exper + expersq | nr", data=wagepan, vcov={"CRV1": "nr+year"}),
+}
+pd.DataFrame(
+    {name: m.se().round(5) for name, m in mods.items()}
+)
+```
+
+## Conclusion
+
+- **Clustered SEs** (by individual) are standard in panel wage regressions.
+- **Two-way clustering** (id × year) is common when shocks are correlated across both
+  dimensions.

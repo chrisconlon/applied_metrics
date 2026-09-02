@@ -2,9 +2,9 @@
 \usepackage{teaching_slides}
 
 \title[L3 - Linear Regression]{ Econometrics I}
-\subtitle{Lecture 3: Linear Regression}
+\subtitle{Lecture 2: Linear Regression}
 \author{Chris Conlon \\NYU Stern}
-\date{Fall 2025}
+\date{Fall 2026}
 
 
 \begin{document}
@@ -170,7 +170,7 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 	\medskip
 	\item Unfortunately, social scientists are often unable to rely on experimental variation, and strict exogeneity 
 	is rarely plausible in the context of naturally occurring data. For this reason, in future lectures we will consider
-	different identification assumptions, but strit exogeneit is a starting point. 
+	different identification assumptions, but strict exogeneity is a starting point.
 \end{itemize}
 \end{frame}
 
@@ -893,7 +893,27 @@ which we now turn to.
 	\smallskip
 	\item This example also makes a point about omitted variables bias: if height is unobserved, the regression
 	of $\ln A$ on only $\ln W$ will deliver the biased coefficient above.
-	
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Silly Example: check it by simulation}
+The virtue of a silly example: we \alert{know} the truth ($\beta_1 = \beta_2 = 1$), so we can
+watch the bias appear and disappear.
+\begin{lstlisting}
+library(MASS)
+Sigma <- matrix(c(1, 0.6, 0.6, 1), 2, 2)     # corr(log W, log H) = 0.6
+wh    <- mvrnorm(10000, mu = c(1, 1), Sigma)
+logW  <- wh[,1]; logH <- wh[,2]
+logA  <- logW + logH + rnorm(10000, sd = 0.1) # true betas = (1, 1)
+
+coef(lm(logA ~ logW))         # short regression: slope approx 1.6 (biased!)
+coef(lm(logA ~ logW + logH))  # long regression:  both approx 1 (as they should be)
+\end{lstlisting}
+\begin{itemize}
+	\item The short-regression slope is $1 + \frac{Cov(\ln H, \ln W)}{Var(\ln W)} = 1.6$ --- exactly the formula from the previous slide.
+	\item This is the template for the whole course: \alert{derive} the bias with the operator rules, then \alert{simulate} to confirm.
 \end{itemize}
 \end{frame}
 
@@ -1115,36 +1135,19 @@ where ${\bf X} {\bf b} =  \widehat{{\bf y}}$ is the prediction or {\bf fitted va
 
 
 
-\begin{frame}{Sums of Squares}
-\begin{itemize}
-	\item Define \[
-\boldsymbol{M}_{0}=I-n^{-1}\boldsymbol{1}\boldsymbol{1}'.
-\]
-note that $\boldsymbol{M}_{0}$ is symmetric and {\bf idempotent}.
-
-\smallskip
-\item Notice that $ {\bf y}'\boldsymbol{M}_{0}{\bf y}$ is the SST. 
-
-\smallskip
-\item Also, we can show that
-\[
-\boldsymbol{y}'\boldsymbol{M}_{0}\boldsymbol{y}=\boldsymbol{b}'\boldsymbol{X}'\boldsymbol{M}_{0}\boldsymbol{X}\boldsymbol{b}+\boldsymbol{e}'\boldsymbol{e},
-\]
-where the first term on the RHS is known as the \textbf{regression
-sum of squares (SSR)}, and the second term is the \textbf{error sum
-of squares (SSE)}.\[
-SST = SSR + SSE
-\]
-	
-\end{itemize}
-\end{frame}
-
 \begin{frame}{Coefficient of Determination}
 \begin{itemize}
-	\item The coefficient of determination is defined as the proportion of the variation in the dependent variable
+	\item The variation in $y$ splits cleanly into explained and unexplained pieces
+	(this is the \alert{law of total variance} from Lecture 1, in sample form):\[
+	\underbrace{SST}_{\text{total}} = \underbrace{SSR}_{\text{explained}} + \underbrace{SSE}_{\text{residual}}
+	\]
+	(The matrix version of this decomposition: Hansen 3.13.)
+
+	\smallskip
+	\item The coefficient of determination is the proportion of the variation in the dependent variable
 	explained by the model:\[
-	R^{2} = \frac{SSR}{SST} =  \frac{\boldsymbol{b}'\boldsymbol{X}'\boldsymbol{M}_{0}\boldsymbol{X}\boldsymbol{b}}{\boldsymbol{y}'\boldsymbol{M}_{0}\boldsymbol{y}}
-	= 1 -  \frac{{\bf e}'{\bf e}}{\boldsymbol{y}'\boldsymbol{M}_{0}\boldsymbol{y}}
+	R^{2} = \frac{SSR}{SST}
+	= 1 -  \frac{{\bf e}'{\bf e}}{\sum_i \left(y_i - \bar{y}\right)^2}
 \]
 
 	\smallskip
@@ -1169,15 +1172,16 @@ SST = SSR + SSE
 	{\bf b}_{OLS} | {\bf X} \sim \mathcal{N}\left(\boldsymbol{\beta},\sigma^{2} \left({\bf X}'{\bf X}  \right)^{-1} \right)
 	\]
 
+	\item Unbiasedness is a two-line operator derivation. Substitute ${\bf y}$ into the OLS formula:
+	\begin{align*}
+		{\bf b}_{OLS} &= \left({\bf X}'{\bf X}\right)^{-1}{\bf X}'\left({\bf X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}\right)
+		= \boldsymbol{\beta} + \left({\bf X}'{\bf X}\right)^{-1}{\bf X}'\boldsymbol{\varepsilon}\\
+		\E\left[{\bf b}_{OLS}|{\bf X}\right] &= \boldsymbol{\beta} + \left({\bf X}'{\bf X}\right)^{-1}{\bf X}'\underbrace{\E\left[\boldsymbol{\varepsilon}|{\bf X}\right]}_{=0 \text{ (strict exog.)}} = \boldsymbol{\beta}
+	\end{align*}
 
-
-
-
-	\item Proof on board
-
-	\item Note: proof that it's unbiased and expression for variance
-	do not require normally error terms, but it would be hard to say what the finite sample
-	distribution is, exactly, without normality. 
+	\item Note: unbiasedness and the variance expression
+	do not require normal error terms, but it would be hard to say what the finite sample
+	distribution is, exactly, without normality.
 
 \end{itemize}
 \end{frame}
@@ -1245,8 +1249,9 @@ SST = SSR + SSE
 	(check this by expanding and applying the law of iterated expectations)
 
 	\item Result: OLS is the value of $\boldsymbol{\gamma}$ that minimizes mean square error. This does not
-	require normality of the error terms. (Proof on board)
-	
+	require normality of the error terms. (Good operator practice: expand the square and apply
+	the law of iterated expectations.)
+
 \end{itemize}
 \end{frame}
 
@@ -1266,8 +1271,10 @@ is the {\bf best linear unbiased estimator} (BLUE).
 	\item If error terms are not homoscedastic, OLS is still unbiased given strict
 	exogeneity, but lower-variance estimators are possible (see: Generalized Least Squares)
 
-	\item Proof on board
-	
+	\item We won't prove this (Hansen 4.7). In practice the modern response to
+	heteroskedasticity is not a ``better'' estimator but \alert{robust standard errors}
+	for OLS --- next lecture.
+
 \end{itemize}
 \end{frame}
 
@@ -1467,12 +1474,26 @@ and we now have an endogeneity problem because $x_{2,i} = u_{2,i} + u_{3,i}$ and
 	where $ \sim^{a}$ signifies convergence in distribution. 
 
 	\item This is just like the finite-sample distribution
-	we got with normally distributed error terms. 
+	we got with normally distributed error terms.
 \end{itemize}
 \end{frame}
 
 
-
+\begin{frame}{Workbook time}
+\begin{center}
+{\LARGE \alert{Let's look at the workbook now.}}
+\end{center}
+\bigskip
+\begin{itemize}
+	\item Open \texttt{inclass\_session2.Rmd} (in the \texttt{L3 - Linear Regression} folder of the course repo).
+	\item Reproduce the bivariate-normal regression and the Silly Example.
+	\item Then work the two problems with a neighbor:
+	\begin{enumerate}
+		\item Frisch--Waugh with your own hands
+		\item A regression is a table of means
+	\end{enumerate}
+\end{itemize}
+\end{frame}
 
 
 \end{document}
