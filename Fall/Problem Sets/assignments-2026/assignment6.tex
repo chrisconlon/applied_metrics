@@ -1,0 +1,121 @@
+\documentclass[11pt]{article}
+\usepackage{geometry}
+\geometry{verbose}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true,
+ bookmarks=false,
+ breaklinks=false,pdfborder={0 0 1},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\Var}{\mathrm{Var}}
+\providecommand{\tabularnewline}{\\}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+\usepackage{array}
+\usepackage{enumitem}
+
+\title{\Huge Assignment 6}
+\author{\Large Chris Conlon}
+\date{\Large Fall 2026 --- due at the start of Session 12}
+
+\makeatother
+
+\begin{document}
+
+\title{Assignment 6}
+\maketitle
+\begin{center}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l}
+Econometrics I & $\qquad$ & Professor Chris Conlon\tabularnewline
+NYU Stern &  & Email: \href{mailto:cconlon@stern.nyu.edu}{cconlon@stern.nyu.edu}\tabularnewline
+\end{tabular*}
+\par\end{center}
+
+\textbf{Instructions.} Two problems on regression discontinuity and synthetic control
+(Sessions 10--11). \texttt{R} with \texttt{fixest} or Python with \texttt{pyfixest}. For the synthetic
+control you may use a package (\texttt{Synth}, \texttt{tidysynth}, or \texttt{synthdid} in R;
+\texttt{pysyncon} in Python) or write the eight-line version described in Problem 2. Turn in a PDF
+with your results and reasoning, and your code.
+
+\subsection*{1 Rating rounding: sharp, then fuzzy}
+
+\emph{Based on Anderson and Magruder (2012), who use Yelp's half-star rounding.} A platform
+computes each restaurant's average rating $r_{i}$ to two decimals but \emph{displays} it rounded to
+the nearest half star. Restaurants with $r_{i} \ge 3.75$ display four stars; those just below display
+three and a half. Simulate $3{,}000$ restaurants with $r_{i} \sim \text{Uniform}(3.25, 4.25)$, let
+$x_{i} = r_{i} - 3.75$ be the distance to the threshold, and let log weekly revenue be
+\[
+y_{i} = 10 + 1.5\,x_{i} + 0.8\,x_{i}^{2} + 0.6\cdot\mathbf{1}\{x_{i} \ge 0\} + \varepsilon_{i},
+\qquad \varepsilon_{i} \sim \mathcal{N}(0, 1).
+\]
+Underlying quality matters smoothly; the displayed star adds a jump of $0.6$ at the threshold.
+
+\begin{enumerate}[label=(\alph*)]
+\item Naive comparison: mean $y$ for restaurants displaying four stars minus those displaying three and
+a half. Why is this not the effect of the extra half star?
+\item Binscatter: mean $y$ in $20$ equal-width bins of $x$; plot with a vertical line at zero.
+\item Local linear RDD: regress $y$ on $\mathbf{1}\{x \ge 0\}$, $x$, and their interaction, using
+restaurants within $h$ of the threshold, for $h = 0.5$, $0.25$, and $0.10$. Report the jump and its
+robust standard error at each bandwidth. What is the tradeoff as $h$ shrinks, and how does the
+$0.8\,x^{2}$ term in the truth show up in it?
+\item Placebo cutoffs at $x = -0.25$ and $x = +0.25$, same bandwidth $0.25$. What should you find,
+and what do you find?
+\item Manipulation check: compare the number of restaurants just below and just above the threshold
+(within $0.05$). Explain in one paragraph what a pile-up just above would suggest in the real
+setting, and why it would invalidate the design.
+\item Fuzzy version. Now the displayed star does not move revenue directly; instead it raises the
+chance the platform \emph{features} the restaurant. Simulate an unobserved quality $q_{i} \sim
+\mathcal{N}(0,1)$ and
+\[
+F_{i} = \mathbf{1}\{-0.8 + 1.4\cdot\mathbf{1}\{x_{i} \ge 0\} + 0.8\,q_{i} + \nu_{i} > 0\},\quad
+y_{i} = 10 + 1.5\,x_{i} + 0.8\,x_{i}^{2} + 1.0\,F_{i} + 0.8\,q_{i} + \varepsilon_{i},
+\]
+with $\nu_{i}, \varepsilon_{i} \sim \mathcal{N}(0,1)$. The effect of being featured is $1.0$.
+Within $h = 0.25$: (i) regress $y$ on $F$ (and the running-variable terms); (ii) estimate the
+reduced form and the first stage at the threshold; (iii) form the Wald ratio and compare to 2SLS
+with the threshold dummy as the instrument for $F$. Why does (i) fail and (iii) work, and for
+which restaurants is the 2SLS number the effect of being featured?
+\end{enumerate}
+
+\subsection*{2 A soda tax, one city, thirty donors}
+
+A city imposes a soda tax at the start of quarter $13$ of a $20$-quarter panel; $30$ other cities do
+not. Per-capita soda sales follow a factor structure,
+\[
+Y_{jt} = 100 + 5\left(\lambda_{1t}\,\mu_{j1} + \lambda_{2t}\,\mu_{j2}\right) + \varepsilon_{jt},
+\qquad \varepsilon_{jt} \sim \mathcal{N}(0,1),
+\]
+with $\lambda_{1t}$ a linear trend from $0$ to $2$ over the $20$ quarters, $\lambda_{2t} \sim \mathcal{N}(0,1)$
+i.i.d.\ over $t$, and city loadings $\mu_{j1}, \mu_{j2} \sim \text{Uniform}(0,1)$ for the donors. Give the
+treated city loadings $(0.9, 0.5)$: it is a fast-growing city. The tax cuts its sales by
+$10\%$ in every post-tax quarter (multiply $Y_{1t}$ by $0.9$ for $t \ge 13$).
+
+\begin{enumerate}[label=(\alph*)]
+\item Simulate. Plot the treated city against the average of the donors. Estimate the effect by
+difference-in-differences with all donors as the control group. Why is it biased here, and in which
+direction?
+\item Build the synthetic control: donor weights $w \ge 0$, $\sum_{j} w_{j} = 1$, chosen to minimize
+the pre-period squared gap $\sum_{t \le 12}\big(Y_{1t} - \sum_{j} w_{j}Y_{jt}\big)^{2}$. (Eight-line
+version: parameterize $w_{j} = e^{\theta_{j}}/\sum_{k} e^{\theta_{k}}$ and hand the objective to
+\texttt{optim}; or use \texttt{quadprog::solve.QP}; or a package.) Report the weights above $0.05$,
+the pre-period RMSPE, and the average post-period gap. Compare to the truth and to (a).
+\item Why does the synthetic control get this right when DiD does not? Answer in terms of the factor
+loadings.
+\item Placebo in space: give the treatment to each donor in turn (with the treated city removed from
+the donor pool), compute each donor's ratio of post- to pre-period RMSPE, and place the treated
+city's ratio in that distribution. Report the implied $p$-value. What does this test assume?
+\item Now move the treated city's loadings to $(1.3, 0.5)$, outside the range of the donors. Re-run
+(b). What happens to the pre-period fit, and what does that tell you about when synthetic control
+can and cannot be used?
+\end{enumerate}
+
+\end{document}
