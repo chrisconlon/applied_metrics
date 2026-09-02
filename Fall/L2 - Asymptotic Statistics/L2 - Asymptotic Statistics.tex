@@ -348,6 +348,49 @@ In Part 1 we used \alert{only the operator rules} to show:
 \end{frame}
 
 
+\begin{frame}{Mean squared error: bias$^2$ + variance}
+How good is an estimator? Measure its typical squared miss, and split it with the operator rules:
+\begin{align*}
+	\text{MSE}(\hat\theta) = \E\big[(\hat\theta - \theta)^2\big]
+	= \underbrace{\big(\E[\hat\theta] - \theta\big)^2}_{\text{Bias}^2}
+	+ \underbrace{\E\big[(\hat\theta - \E[\hat\theta])^2\big]}_{\text{Variance}}
+\end{align*}
+(Add and subtract $\E[\hat\theta]$, square; the cross term is $2\,\text{Bias}\cdot\E[\hat\theta - \E\hat\theta] = 0$.)
+\begin{itemize}
+	\item Unbiased estimators have MSE $=$ Variance. That does not make them the best: a little bias
+	that buys a lot of variance reduction is a good trade.
+	\medskip
+	\item Consistency in one line: if $\text{MSE}(\hat\theta) \to 0$ then $\hat\theta \xrightarrow{p} \theta$
+	(Chebyshev). Bias must vanish \emph{and} variance must vanish.
+	\medskip
+	\item Small example: $\frac{1}{n}\sum(X_i - \bar X)^2$ is biased for $\sigma^2$ (divide by $n-1$ to fix it)
+	yet has \emph{lower} MSE than the unbiased version. Same logic on the next slide, with a knob.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The tradeoff, simulated}
+\vspace{-.15cm}
+$X_i \sim N(\mu, \sigma^2)$, $\mu = 1$, $\sigma = 3$, $n = 20$. \alert{Shrink} the sample mean toward zero:
+$\hat\theta_\lambda = (1 - \lambda)\bar X$, so $\text{Bias} = -\lambda\mu$, $\text{Var} = (1-\lambda)^2\sigma^2/n$.
+\begin{columns}[T]
+\begin{column}{0.54\textwidth}
+\includegraphics[width=\textwidth]{bias_variance}
+\end{column}
+\begin{column}{0.46\textwidth}
+\small
+\begin{itemize}
+	\item Lines: formulas. Dots: 5{,}000 simulated samples.
+	\item $\lambda = 0$ is unbiased and not the minimum; shrinking by a third cuts MSE from $0.45$ to $0.31$.
+	\item The catch: $\lambda^* = \frac{\sigma^2/n}{\mu^2 + \sigma^2/n}$ depends on the unknown $\mu$.
+	With many means at once (teachers, stores, sellers) the data supply it: empirical Bayes, Week 8.
+	\item Ridge and lasso are this picture with $\lambda$ picked by cross-validation.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
 % \begin{frame}{Almost sure convergence}
 % \begin{center}
 % \begin{minipage}{.8\textwidth}

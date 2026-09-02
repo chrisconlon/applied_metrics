@@ -181,22 +181,7 @@ Particularly important for $\{0,1\}$ dummy variables with uneven groups.
 % You can read more about this in Ch3 of Hansen. [Skip derivation]
 % \end{frame}
 
-\begin{frame}{Bias Variance Decomposition}
-We can decompose any estimator into two components
-\begin{eqnarray*}
-\underbrace{\mathbb{E}[(y- \hat{f}(x))^2]}_{MSE} =\underbrace{\left( \mathbb{E}[ \hat{f}(x) - f(x)] \right)^2}_{Bias^2}  +  \underbrace{\mathbb{E} \left[ \left(  \hat{f}(x) - \mathbb{E}[\hat{f}(x)]  \right)^2 \right]}_{Variance} 
-\end{eqnarray*}
-\begin{itemize}
-\item What minimizes MSE?
-\begin{eqnarray*}
-f(x_i) = \mathbb{E}[Y_i \mid X_i]  
-\end{eqnarray*}
-\item In general we face a tradeoff between bias and variance.
-\item In OLS we minimize the variance among unbiased estimators assuming that the true $f(x_i)= X_i \beta$ is linear. (But is it?)
-\end{itemize}
-\end{frame}
-
-
+% Bias-variance decomposition moved to L2 (estimator MSE, with a shrinkage simulation), Fall 2026.
 \begin{frame}{Variance of $\widehat{\beta}_{OLS}$}
 \begin{itemize}
 	\item A useful identity for linear algebra:
