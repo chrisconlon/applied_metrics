@@ -1,0 +1,8 @@
+\begin{tabular}{lccccc}\toprule
+ & Pooled OLS & First diff. & Within (FE) & Random eff. & Mundlak \\ \midrule
+$\widehat\beta$ (truth $= 0.10$) & 0.246 & 0.105 & 0.116 & 0.127 & 0.116 \\
+SE (cluster firm) & (0.023) & (0.013) & (0.011) & (0.011) & (0.011) \\
+Coef.\ on $\bar x_i$ & & & & & 0.376 (0.054) \\
+Firm FE & no & (differenced) & yes & quasi ($\hat\theta=0.72$) & no \\
+$N \times T$ & 1600 & 1400 & 1600 & 1600 & 1600 \\
+\bottomrule\end{tabular}

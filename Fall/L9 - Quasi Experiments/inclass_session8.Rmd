@@ -1,0 +1,224 @@
+---
+title: "In-Class Session 8: Panel Data, Fixed Effects, and Event Studies"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 4)
+library(fixest)
+library(data.table)
+set.seed(8)
+```
+
+This notebook reproduces the simulations behind Lectures 8a and 8b (the slides use
+`panel_sims.R`, which has the same code with more plotting) and leaves you four short
+problems. Everything is simulated, so you always know the right answer.
+
+# Part 1: Panel data and fixed effects
+
+## Reproduce: the management-practices panel
+
+Firm quality $\alpha_i$ raises productivity *and* makes firms adopt better practices.
+The true effect of practices on log productivity is $\beta = 0.10$.
+
+```{r}
+beta_true <- 0.10
+sim_panel <- function(N = 200, T = 8, rho = 0.7, sd_alpha = 0.5, sd_eps = 0.3, me_sd = 0) {
+  alpha <- rnorm(N, 0, sd_alpha)
+  gamma <- rnorm(T, 0, 0.1)
+  d <- CJ(firm = 1:N, year = 1:T)
+  d[, alpha := alpha[firm]]
+  d[, x := rho * alpha + sqrt(1 - rho^2) * (rnorm(N)[firm] * 0.6) + rnorm(.N, 0, 0.8)]
+  d[, y := 1 + beta_true * x + alpha + gamma[year] + rnorm(.N, 0, sd_eps)]
+  if (me_sd > 0) d[, x := x + rnorm(.N, 0, me_sd)]
+  d[]
+}
+d <- sim_panel()
+```
+
+Pooled OLS, the within (FE) estimator, and first differences:
+
+```{r}
+fit_pooled <- feols(y ~ x, d, cluster = ~firm)
+fit_fe     <- feols(y ~ x | firm + year, d, cluster = ~firm)
+fit_fd     <- feols(d(y) ~ d(x), d, panel.id = ~firm + year, cluster = ~firm)
+etable(fit_pooled, fit_fe, fit_fd, headers = c("pooled", "within", "first diff"))
+```
+
+## Reproduce: random effects by hand
+
+Random effects is GLS with equicorrelated errors, which is OLS after *quasi*-demeaning
+with weight $\theta = 1 - \sqrt{\sigma^2_\varepsilon / (\sigma^2_\varepsilon + T\sigma^2_\alpha)}$.
+Estimate the two variances from the within and between regressions (Swamy--Arora), then transform.
+
+```{r}
+re_fit <- function(d) {
+  within <- feols(y ~ x | firm, d)
+  s2_eps <- sum(resid(within)^2) / (nrow(d) - uniqueN(d$firm) - 1)
+  b <- d[, .(ybar = mean(y), xbar = mean(x), T_i = .N), by = firm]
+  between <- lm(ybar ~ xbar, b)
+  s2_alpha <- max(0, sum(resid(between)^2) / between$df.residual - s2_eps / mean(b$T_i))
+  d <- merge(d, b, by = "firm")
+  d[, theta := 1 - sqrt(s2_eps / (s2_eps + T_i * s2_alpha))]
+  fit <- lm(I(y - theta * ybar) ~ I(x - theta * xbar), d)
+  list(beta = unname(coef(fit)[2]), se = unname(sqrt(diag(vcov(fit)))[2]),
+       theta = mean(d$theta), s2_eps = s2_eps, s2_alpha = s2_alpha)
+}
+re <- re_fit(d)
+str(re)
+```
+
+Compare $\hat\theta$ to the formula: with $T = 8$ and $\sigma^2_\alpha / \sigma^2_\varepsilon \approx$
+`r round(re$s2_alpha / re$s2_eps, 2)`, RE is already most of the way to FE. Yet it is biased,
+because $\alpha_i$ is correlated with $x$.
+
+## Reproduce: Mundlak (correlated random effects)
+
+Add the firm mean of $x$ as a regressor. The coefficient on $x_{it}$ is the FE estimate; the
+coefficient on $\bar x_i$ is a cluster-robust Hausman test.
+
+```{r}
+d[, xbar := mean(x), by = firm]
+fit_mund <- feols(y ~ x + xbar | year, d, cluster = ~firm)
+etable(fit_fe, fit_mund, headers = c("within", "Mundlak"))
+```
+
+# In-class problem 1: turn the correlation off and on
+
+Re-simulate with `rho = 0` (no correlation between quality and practices) and with
+`rho = 0.9`. For each, report pooled, within, and RE estimates. Which estimator moves,
+and which stays put? Then explain in one sentence what the RE assumption is buying you
+when `rho = 0`.
+
+```{r}
+# your code here
+```
+
+# In-class problem 2: measurement error
+
+Re-simulate with `rho = 0` and `me_sd = 0.5` (noise added to the observed practices score).
+Now pooled OLS has no omitted-variable problem. Compare pooled and within estimates to
+$0.10$. Which is more attenuated, and why does demeaning make measurement error worse?
+(Hint: what does demeaning do to the *signal* variance of $x$ versus the *noise* variance?)
+
+```{r}
+# your code here
+```
+
+# Part 2: Event studies
+
+## Reproduce: the single-timing event study
+
+400 firms, 24 quarters. Half adopt a pricing tool in quarter 13; the effect ramps from
+0.0125 to 0.05 over four quarters. Never-treated firms get the reference value of event time
+so they stay in the regression and identify the period effects.
+
+```{r}
+tau_true <- function(k) ifelse(k >= 0, 0.05 * pmin(1, (k + 1) / 4), 0)
+sim_es <- function(N = 400, T = 24, E0 = 13, trend = 0, anticipate = 0, sd_eps = 0.08) {
+  d <- CJ(firm = 1:N, t = 1:T)
+  d[, treated := as.integer(firm <= N / 2)]
+  d[, alpha := rnorm(N, 0, 0.3)[firm]]
+  gam <- cumsum(rnorm(T, 0.005, 0.02))
+  d[, k := ifelse(treated == 1, t - E0, -1L)]          # controls carry the reference value
+  d[, tau := ifelse(treated == 1, tau_true(t - E0), 0)]
+  if (anticipate > 0) d[treated == 1 & (t - E0) < 0 & (t - E0) >= -anticipate, tau := 0.0125]
+  d[, y := alpha + gam[t] + tau + trend * treated * (t - E0) + rnorm(.N, 0, sd_eps)]
+  d[]
+}
+es <- sim_es()
+fit_es <- feols(y ~ i(k, ref = -1) | firm + t, es, cluster = ~firm)
+iplot(fit_es, ref.line = -0.5, main = "Event study: log gross margin around adoption")
+lines(-12:11, tau_true(-12:11), col = "red", lwd = 2)
+```
+
+The joint test on the pre-period coefficients, and the static two-way FE coefficient for comparison:
+
+```{r}
+wald(fit_es, keep = "k::-")
+es[, post := treated * (t >= 13)]
+coef(feols(y ~ post | firm + t, es, cluster = ~firm))
+mean(tau_true(0:11))    # what the static coefficient is averaging
+```
+
+# In-class problem 3: anticipation
+
+Re-simulate with `anticipate = 2`: firms start adjusting two quarters before the tool goes live.
+
+1. Re-estimate and plot. What happens to the pre-period coefficients, and what happens to
+   the *post*-period coefficients even though the true post effects have not changed?
+2. Fix it by changing the reference period to `k = -3` (`ref = -3`). Confirm the post-period
+   estimates are back on the red line.
+3. Bonus: instead of moving the reference, drop quarters $k = -2, -1$ from the sample. Does it
+   work? What did you give up?
+
+```{r}
+# your code here
+```
+
+# Part 3: The returns event study
+
+## Reproduce: earnings announcements and CARs
+
+200 firms, one announcement each, 261 trading days per firm. The market model is estimated on
+days $-250$ to $-11$; abnormal returns are computed on $-10$ to $+10$. A one-SD earnings
+surprise moves the stock 2% on day 0 and drifts another 1% over the next ten days.
+
+```{r}
+N_c <- 200; days <- -250:10
+S <- rnorm(N_c)
+car <- CJ(firm = 1:N_c, day = days)
+car[, `:=`(S = S[firm], beta = rnorm(N_c, 1, 0.3)[firm], a = rnorm(N_c, 0, 2e-4)[firm],
+           Rm = rnorm(.N, 4e-4, 0.010))]        # each firm on its own calendar dates
+car[, ar_true := fifelse(day == 0, 0.02 * S, fifelse(day >= 1 & day <= 10, 0.001 * S, 0))]
+car[, R := a + beta * Rm + ar_true + rnorm(.N, 0, 0.02)]
+
+est <- car[day <= -11, { f <- lm(R ~ Rm); .(a_hat = coef(f)[1], b_hat = coef(f)[2], s_hat = summary(f)$sigma) }, by = firm]
+car <- merge(car, est, by = "firm")
+car[, AR := R - a_hat - b_hat * Rm]
+ev <- car[day >= -10 & day <= 10][, CAR := cumsum(AR), by = firm]
+```
+
+Average abnormal returns by day, split by the sign of the surprise:
+
+```{r}
+agg <- ev[, .(AAR = mean(AR), CAAR = mean(CAR)), by = .(pos = S > 0, day)][order(pos, day)]
+plot(agg[pos == TRUE, day], 100 * agg[pos == TRUE, CAAR], type = "b", pch = 16, col = "navy",
+     ylim = 100 * range(agg$CAAR), xlab = "event day", ylab = "CAAR (%)")
+lines(agg[pos == FALSE, day], 100 * agg[pos == FALSE, CAAR], type = "b", pch = 16, col = "firebrick")
+abline(h = 0, lty = 3); abline(v = 0, lty = 2)
+legend("topleft", bty = "n", legend = c("positive surprise", "negative surprise"), col = c("navy", "firebrick"), lwd = 1)
+```
+
+CARs over windows, with the cross-sectional $t$-statistic, and the earnings response coefficient:
+
+```{r}
+win <- function(k1, k2) ev[day >= k1 & day <= k2, .(CAR = sum(AR), s_hat = s_hat[1], S = S[1]), by = firm]
+for (w in list(c(-10, -2), c(-1, 1), c(0, 10))) {
+  z <- win(w[1], w[2])
+  cat(sprintf("window [%3d,%3d]: CAAR = %6.2f%%  t = %5.2f   (S>0: %5.2f%%, S<0: %5.2f%%)\n",
+              w[1], w[2], 100 * mean(z$CAR), mean(z$CAR) / (sd(z$CAR) / sqrt(nrow(z))),
+              100 * mean(z[S > 0, CAR]), 100 * mean(z[S < 0, CAR])))
+}
+feols(CAR ~ S, win(0, 10), vcov = "hetero")     # truth: slope 0.03
+```
+
+# In-class problem 4: clustered event dates
+
+Every firm above announced on a different calendar day, so their abnormal returns are
+independent. Now suppose all 200 firms announce on the *same* day (think: earnings season
+compressed into one date, or a regulation that hits every bank at once). Simulate this by
+drawing **one** market-return series and giving it to every firm (replace the per-row `Rm`
+draw with a per-day draw shared across firms), and add a common shock of $-1\%$ to every
+firm's return on day $0$ that has nothing to do with earnings.
+
+1. Recompute the window $[0, 0]$ CAAR and its cross-sectional $t$-statistic for the full sample.
+   What does the test conclude, and is it right?
+2. Now regress $\text{CAR}_i(0, 0)$ on $S_i$. Is the *slope* still estimated correctly?
+   Explain why the ERC survives what the average CAR does not.
+3. What would you do differently in a real study where events cluster in time?
+
+```{r}
+# your code here
+```
