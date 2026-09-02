@@ -1,0 +1,109 @@
+---
+title: "In-Class Session 2b: Transformations"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+set.seed(93)
+library(fixest)
+```
+
+This worksheet accompanies the *Transformations* deck: run the demonstrations, then
+work the two problems.
+
+# Reproduce: log points vs. percent
+
+The exact percentage effect of a coefficient $\beta$ in a log-$y$ model is
+$100(e^{\beta}-1)$:
+
+```{r}
+beta <- c(0.05, 0.30, 0.70, -0.70)
+data.frame(beta = beta,
+           naive_pct = 100 * beta,
+           exact_pct = round(100 * (exp(beta) - 1), 1))
+```
+
+Note the asymmetry at $\pm 0.70$.
+
+# Reproduce: skewness and leverage, levels vs. logs
+
+Simulate a "firm revenue" outcome that is lognormal --- many corner stores, a few
+Walmarts --- where revenue depends on (log) foot traffic with elasticity 1:
+
+```{r}
+n <- 1000
+log_traffic <- rnorm(n, mean = 5, sd = 1)
+log_revenue <- 2 + 1 * log_traffic + rnorm(n, sd = 0.5)
+revenue <- exp(log_revenue); traffic <- exp(log_traffic)
+
+par(mfrow = c(1, 2))
+hist(revenue, breaks = 50, main = "Revenue (levels)", xlab = "")
+hist(log(revenue), breaks = 50, main = "Revenue (logs)", xlab = "")
+```
+
+Now watch what one giant firm does to the levels regression and not the log one:
+
+```{r}
+# add one Walmart: enormous traffic and revenue, same elasticity
+traffic2 <- c(traffic, 5e4); revenue2 <- c(revenue, exp(2) * 5e4 * 1.6)
+rbind(
+  levels_slope = c(without = coef(lm(revenue ~ traffic))[2],
+                   with_walmart = coef(lm(revenue2 ~ traffic2))[2]),
+  log_slope    = c(without = coef(lm(log(revenue) ~ log(traffic)))[2],
+                   with_walmart = coef(lm(log(revenue2) ~ log(traffic2)))[2])
+)
+```
+
+One observation moved the levels slope; the log regression barely noticed.
+
+# Reproduce: rare events, relative vs. absolute
+
+```{r}
+p0 <- 0.0002                       # baseline fraud rate: 2 in 10,000
+p1 <- 2 * p0                       # "doubles the risk!"
+c(relative_change = "+100%", absolute_change_pp = 100 * (p1 - p0))
+```
+
+# In-class problem 1: recover a price elasticity (and prove units don't matter)
+
+Simulate weekly demand for a product across 500 store-weeks with a known price
+elasticity of $-2$:
+`log_q = 8 - 2*log(price) + noise`, where `price ~ Uniform(2, 6)` dollars and
+`noise ~ N(0, 0.3^2)`.
+
+**(a)** Estimate the log--log regression. Interpret the slope in one sentence a
+pricing manager would understand.
+**(b)** Re-run with price measured in *cents* (multiply by 100). What happens to the
+slope? To the intercept? Why is this exactly what the lecture promised?
+**(c)** Now run the regression in *levels* (`q` on `price`, no logs) for both dollars
+and cents. What happens to the slope? One sentence: why do economists report
+elasticities instead of "units per dollar"?
+
+```{r problem1}
+# your code here
+```
+
+# In-class problem 2: the log(0) trap (Chen--Roth, live)
+
+Simulate 2,000 sellers on a platform. Half are randomly "promoted" (treatment).
+Weekly sales: each seller makes a sale with probability 0.3 if untreated and 0.5 if
+treated; *given* any sale, revenue is lognormal:
+`revenue = sold * exp(rnorm(n, mean = 3, sd = 1))` --- so the data has lots of exact
+zeros.
+
+**(a)** Estimate the treatment effect using `log(1 + revenue)` as the outcome.
+**(b)** Now measure revenue in *cents* instead of dollars and re-estimate. Compare
+(a) and (b). What just happened, and why is this disqualifying for a "percentage
+effect" interpretation?
+**(c)** Estimate a Poisson regression on the *level* of revenue
+(`fepois(revenue ~ treated, data = df)`) for both dollars and cents. What happens to the
+treatment coefficient now, and how do you interpret it?
+**(d)** Two sentences: separate what the promotion did to the *extensive* margin
+(any sale) from the *intensive* margin (revenue given a sale) --- which margin is
+your Poisson coefficient mostly picking up here?
+
+```{r problem2}
+# your code here
+```
