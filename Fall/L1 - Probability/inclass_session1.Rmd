@@ -145,10 +145,10 @@ library(MASS)
 
 # In-class problem 2: mean independent, or just uncorrelated?
 
-Let $X \sim \mathcal{N}(0,1)$ and $\varepsilon = X^2 - 1$ (so $\E[\varepsilon] = 0$).
+Let $X \sim \mathcal{N}(0,1)$ and $\varepsilon = X^2 - 1$ (so $\mathbb{E}[\varepsilon] = 0$).
 
 **(a)** Verify by simulation that $Cov(X, \varepsilon) = 0$.
-**(b)** Compute $\E[\varepsilon \mid X > 1]$ and $\E[\varepsilon \mid |X| < 0.5]$ from the simulated
+**(b)** Compute $\mathbb{E}[\varepsilon \mid X > 1]$ and $\mathbb{E}[\varepsilon \mid |X| < 0.5]$ from the simulated
 data. Is $\varepsilon$ mean independent of $X$?
 **(c)** One sentence: if $\varepsilon$ were the error in a regression of $Y$ on $X$, which of the
 two assumptions from lecture would hold, and why does it matter which?
