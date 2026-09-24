@@ -65,8 +65,8 @@ log--log & $\ln y = \beta_0 + \beta_1 \ln x$ & \alert{elasticity}: \% $\Delta y$
 
 	\medskip
 	\item Logs turn multiplicative into additive:\[
-	y_t = y_0 (1+g_1)(1+g_2)\cdots \quad \Longrightarrow \quad
-	\ln y_t = \ln y_0 + \textstyle\sum_t \ln(1+g_t)
+	y_t = y_0 (1+g_1)(1+g_2)\cdots(1+g_t) \quad \Longrightarrow \quad
+	\ln y_t = \ln y_0 + \textstyle\sum_{s=1}^{t} \ln(1+g_s)
 	\]
 
 	\medskip
@@ -89,10 +89,10 @@ log--log & $\ln y = \beta_0 + \beta_1 \ln x$ & \alert{elasticity}: \% $\Delta y$
 	\]
 
 	\medskip
-	\item Fine for small coefficients: $\beta = 0.05$ is 5.1\%. Not fine for big ones:
+	\item Fine for small coefficients: $\beta_1 = 0.05$ is 5.1\%. Not fine for big ones:
 	\begin{center}
 	\begin{tabular}{ccc}
-	$\beta$ & ``$100\beta$\%'' & exact \\
+	$\beta_1$ & ``$100\beta_1$\%'' & exact: $100\left(e^{\beta_1}-1\right)$\% \\
 	\hline
 	0.05 & 5\% & 5.1\% \\
 	0.30 & 30\% & 35\% \\
@@ -221,7 +221,7 @@ is in the regression.
 	Log-odds are unbounded and (roughly) the right scale for effects to be additive.
 
 	\medskip
-	\item Modeling log-odds as $x'\beta$ \alert{is} logistic regression --- coming in
+	\item Modeling log-odds as ${\bf x}'\boldsymbol{\beta}$ \alert{is} logistic regression --- coming in
 	Session 12. Coefficients are changes in log-odds; $e^{\beta}$ is an
 	\alert{odds ratio}.
 \end{itemize}
@@ -270,7 +270,7 @@ is in the regression.
 
 	\medskip
 	\item \alert{Polynomials and splines}: transformations of $x$ that stay
-	linear-in-parameters --- the $exper^2$ term you have already met.
+	linear-in-parameters --- the $\text{exp}^2$ term you have already met.
 \end{itemize}
 \end{frame}
 

@@ -54,28 +54,28 @@ Today: how to get the sampling uncertainty right. Keep asking the other question
 
 \begin{frame}{OLS}
 \begin{align*}
-y_i = \beta_0 + \beta x_i + u_i
+y_i = \beta_0 + \beta_1 x_i + \varepsilon_i
 \end{align*}
 Recall the three basic OLS assumptions
 \begin{enumerate}
-\item $\mathbb{E}(u_i |X_i ) = 0$
-\item $(X_i,Y_i)$, $i =1,\ldots,n$, are i.i.d.
-\item Large outliers are rare $\mathbb{E}[Y^4]< \infty$ and $\mathbb{E}[X^4]<\infty$.
+\item $\E\left[\varepsilon_i |x_i \right] = 0$
+\item $(x_i,y_i)$, $i =1,\ldots,n$, are i.i.d.
+\item Large outliers are rare: $\E\left[y_i^4\right]< \infty$ and $\E\left[x_i^4\right]<\infty$.
 \end{enumerate}
 \end{frame}
 
 \begin{frame}{Unbiasedness and Consistency}
 \begin{itemize}
-\item Unbiasedness means on average we don't over or under estimate $\widehat{\beta}$
+\item Unbiasedness means that, on average, an estimator $\widehat{\theta}$ neither over- nor under-estimates the true $\theta$:
 \begin{align*}
-\E[\widehat{\beta} ] - \beta_0 = 0
+\E[\widehat{\theta} ] - \theta = 0
 \end{align*}
-\item Consistency tells us that we approach the true $\beta_0$ as $n \rightarrow \infty$.
+\item Consistency tells us that we approach the true $\theta$ as $n \rightarrow \infty$.
 \begin{align*}
-\widehat{\beta}  \overset{p}{\to} \beta_0
+\widehat{\theta}  \overset{p}{\to} \theta
 \end{align*}
-\item Example: $X_{(1)}$ is unbiased but not consistent for the mean.
-\item Example $\frac{n}{n-5} \overline{X}$ is consistent but biased for the mean.
+\item Example: $X_{1}$ (the first observation) is unbiased but not consistent for the mean.
+\item Example: $\frac{n}{n-5} \overline{X}$ is consistent but biased for the mean.
 \end{itemize}
 \end{frame}
 
@@ -106,7 +106,7 @@ Recall the three basic OLS assumptions
 
 	\medskip
 	\item Even if they aren't errors, they may reflect a different mode in the data generating process. They may require
-		a different or more general model to account for them properly. Consider the justificaiton of a linear
+		a different or more general model to account for them properly. Consider the justification of a linear
 		model based on Taylor's theorem (local linear approximation). With such a justification for your modeling
 		strategy, it would not make sense to include an outlier in $x$.
 	\medskip
@@ -122,11 +122,11 @@ Recall the three basic OLS assumptions
 \begin{itemize}
 \item One way to find influential observations is to calculate the {\bf leverage} of each observation $i$. We begin with the hat matrix:
 \begin{align*}
-P = {\bf X} ({\bf X} '{\bf X})^{-1}  {\bf X}'
+{\bf P} = {\bf X} ({\bf X} '{\bf X})^{-1}  {\bf X}'
 \end{align*}
 and consider the diagonal elements, which are labeled $h_{ii}$
 \begin{align*}
-h_{ii} = \bf{x}_i `({\bf X} '{\bf X})^{-1}  \bf{x}_i
+h_{ii} = {\bf x}_i' ({\bf X} '{\bf X})^{-1}  {\bf x}_i
 \end{align*}
 
 \medskip
@@ -141,7 +141,7 @@ Particularly important for $\{0,1\}$ dummy variables with uneven groups.
 \begin{itemize}
 \item This is sometimes called the {\bf Jackknife}
 \item Sometimes it is helpful to know what would happen if we omitted a single observation $i$
-\item Turns out we don't need to run $N$ regressions
+\item Turns out we don't need to run $n$ regressions
 \begin{align*}
 {\bf b}_{-i} &= ({\bf X}_{-i}'{\bf X}_{-i})^{-1} {\bf X}_{-i}' {\bf y}_{-i} \\
 &={\bf b}_{OLS} -  ({\bf X} '{\bf X})^{-1} {\bf x}_i  \tilde{e}_i  \quad \mbox{ where } \tilde{e}_i = (1-h_{ii})^{-1} e_i
@@ -182,24 +182,24 @@ Particularly important for $\{0,1\}$ dummy variables with uneven groups.
 % \end{frame}
 
 % Bias-variance decomposition moved to L2 (estimator MSE, with a shrinkage simulation), Fall 2026.
-\begin{frame}{Variance of $\widehat{\beta}_{OLS}$}
+\begin{frame}{Variance of ${\bf b}_{OLS}$}
 \begin{itemize}
-	\item A useful identity for linear algebra:
+	\item A useful identity for linear algebra (scalar $a$, fixed matrix ${\bf A}$, random vector ${\bf z}$):
 \begin{align*}
-\operatorname { Var } (a \cdot \symbf{Z} ) &= a^2 \cdot \Var(\symbf{Z})\\
-\operatorname { Var } (A \cdot \symbf{Z} ) &= A \cdot  \Var(\symbf{Z}) \cdot A'
+\Var (a {\bf z} ) &= a^2 \Var({\bf z})\\
+\Var ({\bf A} {\bf z} ) &= {\bf A}  \Var({\bf z}) {\bf A}'
 \end{align*}
 
 \smallskip
-\item Since $\symbf{b_{OLS}} = (\symbf{X'} \symbf{X} )^{-1} \symbf{X'} \symbf{y}$,
+\item Since ${\bf b}_{OLS} = ({\bf X}' {\bf X} )^{-1} {\bf X}' {\bf y}$,
 \begin{align*}
-\Var (\symbf{b_{OLS}} \mid  \symbf{X}) = (\symbf{X'} \symbf{X} )^{-1} \, \symbf{X'} \, \Var (\symbf{y} \mid \symbf{X}) \,  \symbf{X} \, (\symbf{X'X} )^{-1}
+\Var ({\bf b}_{OLS} \mid  {\bf X}) = ({\bf X}' {\bf X} )^{-1} \, {\bf X}' \, \Var ({\bf y} \mid {\bf X}) \,  {\bf X} \, ({\bf X}'{\bf X} )^{-1}
 \end{align*}
 
 \smallskip
-\item Recalling that $\Var ( \symbf{y} \mid \symbf{X} )  = \Var ( \symbf{\varepsilon}  \mid \symbf{X}  ) $,  (because $\Var( \symbf{X} \mid \symbf{X})=0$)
+\item Recalling that $\Var ( {\bf y} \mid {\bf X} )  = \Var ( \boldsymbol{\varepsilon}  \mid {\bf X}  ) $ (because ${\bf X}\boldsymbol{\beta}$ is fixed given ${\bf X}$),
 \begin{align*}
-\Var( \symbf{b_{OLS}} \mid \symbf{X}) = (\symbf{X'X})^{-1}\, \symbf{X'}\, \Var ( \symbf{\varepsilon} \mid \symbf { X } ) \, \symbf{X} \, (\symbf{X'X})^{-1}
+\Var( {\bf b}_{OLS} \mid {\bf X}) = ({\bf X}'{\bf X})^{-1}\, {\bf X}'\, \Var ( \boldsymbol{\varepsilon} \mid {\bf X} ) \, {\bf X} \, ({\bf X}'{\bf X})^{-1}
 \end{align*}
 \end{itemize}
 \end{frame}
@@ -207,37 +207,37 @@ Particularly important for $\{0,1\}$ dummy variables with uneven groups.
 
 
 
-\begin{frame}{Variance of $\widehat{\beta}_{OLS}$}
-Start with the variance of the residuals to form a \alert{diagonal} matrix $D$:
+\begin{frame}{Variance of ${\bf b}_{OLS}$}
+Start with the variance of the errors to form a \alert{diagonal} matrix ${\bf D}$:
 \begin{align*}
-\operatorname { Var } ( \boldsymbol{\varepsilon} | \mathbf { X } ) &= \mathbb { E } \left( \boldsymbol{\varepsilon \varepsilon} ^ { \prime } \mid \mathbf { X } \right){ = } \mathbf { D }\\
-\mathbf { D } &= \operatorname { diag } \left( \sigma _ { 1 } ^ { 2 } , \ldots , \sigma _ { n } ^ { 2 } \right) = \left( \begin{array} { c c c c } { \sigma _ { 1 } ^ { 2 } } & { 0 } & { \cdots } & { 0 } \\ { 0 } & { \sigma _ { 2 } ^ { 2 } } & { \cdots } & { 0 } \\ { \vdots } & { \vdots } & { \ddots } & { \vdots } \\ { 0 } & { 0 } & { \cdots } & { \sigma _ { n } ^ { 2 } } \end{array} \right)
+\Var ( \boldsymbol{\varepsilon} | {\bf X} ) &= \E \left[ \boldsymbol{\varepsilon} \boldsymbol{\varepsilon}' \mid {\bf X} \right] = {\bf D}\\
+{\bf D} &= \operatorname { diag } \left( \sigma _ { 1 } ^ { 2 } , \ldots , \sigma _ { n } ^ { 2 } \right) = \left( \begin{array} { c c c c } { \sigma _ { 1 } ^ { 2 } } & { 0 } & { \cdots } & { 0 } \\ { 0 } & { \sigma _ { 2 } ^ { 2 } } & { \cdots } & { 0 } \\ { \vdots } & { \vdots } & { \ddots } & { \vdots } \\ { 0 } & { 0 } & { \cdots } & { \sigma _ { n } ^ { 2 } } \end{array} \right)
 \end{align*}
 \begin{itemize}
-\item $\mathbf{D}$ is diagonal because $\mathbb { E }[\varepsilon_i \varepsilon_j \mid  X] = \mathbb { E }[\varepsilon_i  \mid x_i] \cdot \mathbb { E }[\varepsilon_j  \mid  x_j]=0$ (independence)
-\item The elements of $D_i$ are given by $\mathbb { E }[\varepsilon_i^2 \mid  X] = \mathbb { E }[\varepsilon_i^2 \mid x_i] = \sigma_i^2$.
-\item In the \alert{homoskedastic} case $\mathbf{D} = \sigma^2 \mathbf{I}_n$.
+\item ${\bf D}$ is diagonal because, for $i \ne j$, $\E[\varepsilon_i \varepsilon_j \mid  {\bf X}] = \E[\varepsilon_i  \mid {\bf x}_i] \cdot \E[\varepsilon_j  \mid  {\bf x}_j]=0$ (independence across observations)
+\item The diagonal elements of ${\bf D}$ are $\E[\varepsilon_i^2 \mid  {\bf X}] = \E[\varepsilon_i^2 \mid {\bf x}_i] = \sigma_i^2$.
+\item In the \alert{homoskedastic} case ${\bf D} = \sigma^2 {\bf I}_n$.
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{Variance of $\widehat{\beta}$}
+\begin{frame}{Variance of ${\bf b}_{OLS}$}
 \small
+Let $\widetilde{{\bf D}} = \operatorname{diag}\left(\varepsilon_1^2,\ldots,\varepsilon_n^2\right)$. Then
 \begin{align*}
-\mathbf { D } = \operatorname { diag } \left( \sigma _ { 1 } ^ { 2 } , \ldots , \sigma _ { n } ^ { 2 } \right)
-= \mathbb { E } \left( \varepsilon_i \varepsilon_i'  \mid \mathbf { X } \right)
-= \mathbb { E } \left( \widetilde{\mathbf{D}} \mid  \mathbf { X } \right)
+{\bf D} = \operatorname { diag } \left( \sigma _ { 1 } ^ { 2 } , \ldots , \sigma _ { n } ^ { 2 } \right)
+= \E \left[ \widetilde{{\bf D}} \mid  {\bf X} \right]
 \end{align*}
 
-We can estimate $\widehat{\mathbf{V}}_{\widehat{\beta}}$ by plugging in $\widetilde{\mathbf{D}} \rightarrow \mathbf{D}$:
+An (infeasible, since $\boldsymbol{\varepsilon}$ is unobserved) estimator of ${\bf V}_{{\bf b}} = \Var({\bf b}_{OLS}|{\bf X})$ plugs in $\widetilde{{\bf D}}$ for ${\bf D}$:
 \begin{align*}
-\mathbf{V}_{\widehat{\beta}} &= (X'X)^{-1} (X'  \widetilde{\mathbf{D}} X) (X'X)^{-1}
-= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' \varepsilon_i^2  \right) (X'X)^{-1} 
+\widehat{{\bf V}}_{{\bf b}}^{\text{ideal}} &= ({\bf X}'{\bf X})^{-1} ({\bf X}'  \widetilde{{\bf D}} {\bf X}) ({\bf X}'{\bf X})^{-1}
+= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n {\bf x}_i {\bf x}_i' \varepsilon_i^2  \right) ({\bf X}'{\bf X})^{-1} 
 \end{align*}
 The expectation shows us this estimator is unbiased:
 \begin{align*}
-\mathbb{E}[\mathbf{V}_{\widehat{\beta}} \mid X] &= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i'\, \mathbb{E}[\varepsilon_i^2 | X] \right) (X'X)^{-1} \\
-&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' \, \sigma_i^2 \right) (X'X)^{-1} = (X'X)^{-1} (X' \mathbf{D} X) (X'X)^{-1} 
+\E[\widehat{{\bf V}}_{{\bf b}}^{\text{ideal}} \mid {\bf X}] &= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n {\bf x}_i {\bf x}_i'\, \E[\varepsilon_i^2 | {\bf X}] \right) ({\bf X}'{\bf X})^{-1} \\
+&= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n {\bf x}_i {\bf x}_i' \, \sigma_i^2 \right) ({\bf X}'{\bf X})^{-1} = ({\bf X}'{\bf X})^{-1} ({\bf X}' {\bf D} {\bf X}) ({\bf X}'{\bf X})^{-1} = {\bf V}_{{\bf b}}
 \end{align*}
 \end{frame}
 
@@ -245,25 +245,25 @@ The expectation shows us this estimator is unbiased:
 
 
 \begin{frame}{Heteroskedasticity Consistent (HC) Variance Estimates}
-What we need is a consistent estimator for $\hat{\varepsilon}^2_i$.
+Replace the unobserved $\varepsilon^2_i$ with squared OLS residuals $e_i^2$:
 \begin{align*}
-\mathbf{V}_{\widehat{\beta}}^{HC0}&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' \hat{\varepsilon}_i^2 \right) (X'X)^{-1} \\
-\mathbf{V}_{\widehat{\beta}}^{HC1}&= (X'X)^{-1} \left(\sum_{i=1}^N x_i x_i' \hat{\varepsilon}_i^2 \right) (X'X)^{-1} \cdot \left(\frac{n}{n-k}  \right)
+\widehat{{\bf V}}_{{\bf b}}^{HC0}&= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n {\bf x}_i {\bf x}_i' e_i^2 \right) ({\bf X}'{\bf X})^{-1} \\
+\widehat{{\bf V}}_{{\bf b}}^{HC1}&= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n {\bf x}_i {\bf x}_i' e_i^2 \right) ({\bf X}'{\bf X})^{-1} \cdot \left(\frac{n}{n-K}  \right)
 \end{align*}
-Could use leave one out variance estimate:
+Could use leave-one-out residuals $\tilde{e}_i = (1-h_{ii})^{-1}e_i$:
 \begin{align*}
-\mathbf{V}_{\widehat{\beta}}^{HC2}&= (X'X)^{-1} \left(\sum_{i=1}^N (1-h_{ii})^{-1} x_i x_i' \hat{\varepsilon}_i^2 \right) (X'X)^{-1} \\
-\mathbf{V}_{\widehat{\beta}}^{HC3}&= (X'X)^{-1} \left(\sum_{i=1}^N (1-h_{ii})^{-2} x_i x_i' \hat{\varepsilon}_i^2 \right) (X'X)^{-1} \\
+\widehat{{\bf V}}_{{\bf b}}^{HC2}&= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n (1-h_{ii})^{-1} {\bf x}_i {\bf x}_i' e_i^2 \right) ({\bf X}'{\bf X})^{-1} \\
+\widehat{{\bf V}}_{{\bf b}}^{HC3}&= ({\bf X}'{\bf X})^{-1} \left(\sum_{i=1}^n (1-h_{ii})^{-2} {\bf x}_i {\bf x}_i' e_i^2 \right) ({\bf X}'{\bf X})^{-1}
 \end{align*}
 \end{frame}
 
 \begin{frame}{Heteroskedasticity Consistent (HC) Variance Estimates}
 \begin{itemize}
-\item We know that $\mathbf{V}_{\widehat{\beta}}^{HC3} > \mathbf{V}_{\widehat{\beta}}^{HC2} > \mathbf{V}_{\widehat{\beta}}^{HC0}$ because $(1- h_{ii}) <1$.
-\item $HC3$ are the most \alert{conservative} and also place the most weight on potential outliers.
+\item We know that $\widehat{{\bf V}}_{{\bf b}}^{HC3} \ge \widehat{{\bf V}}_{{\bf b}}^{HC2} \ge \widehat{{\bf V}}_{{\bf b}}^{HC0}$ (in the positive-semidefinite sense) because $0 < 1- h_{ii} \le 1$.
+\item $HC3$ are the most \alert{conservative} and also place the most weight on high-leverage observations.
 \item \texttt{Stata} uses $HC1$ as the default and it is what most people refer to when they say \alert{robust standard errors}.
-\item These are often called White (1980) SE's or Eicher-Huber-White SE's.
-\item In small sample some evidence that $HC2$ has better \alert{coverage}, (what is that?)
+\item These are often called White (1980) SE's or Eicker-Huber-White SE's.
+\item In small samples there is some evidence that $HC2$ has better \alert{coverage} (what is that?)
 \end{itemize}
 \end{frame}
 
@@ -308,7 +308,7 @@ Could use leave one out variance estimate:
 \begin{frame}{Heteroscedasticity vs. Correlation}
 \begin{itemize}
 	\item Recall that we defined the homoscedasticity assumption as:\[
-	Var\left(\boldsymbol{\varepsilon} \right) =\sigma^2 {\bf I}
+	\Var\left(\boldsymbol{\varepsilon} | {\bf X}\right) =\sigma^2 {\bf I}
 	\]
 	this assumption has two aspects:
 	\begin{enumerate}
@@ -317,7 +317,7 @@ Could use leave one out variance estimate:
 	\end{enumerate}
 
 	\item The terminology can be misleading here, because what people refer to as ``heteroscedasticity-robust''
-	standard errors (the variance estimators on the previous slide) are robust to violations of 1 but not 2. 
+	standard errors (the HC0--HC3 estimators above) are robust to violations of 1 but not 2. 
 
 	\item We need to do a bit more to estimate standard errors in a way that is robust to correlated data. 
 
@@ -343,7 +343,7 @@ Could use leave one out variance estimate:
 
 
 \begin{frame}{Correlation II}
- Different correlation patterns call for different estimators of $\boldsymbol{\Sigma}$, the variance of ${\bf b}_{OLS}$
+ Different correlation patterns call for different estimators of ${\bf V}_{{\bf b}} = \Var\left({\bf b}_{OLS}|{\bf X}\right)$.
 	Some common alternatives to the no-correlation baseline:
 \begin{enumerate}
 	\item Clustered standard errors, when there is correlation between observations
@@ -364,7 +364,7 @@ Suppose we want to relax our i.i.d. assumption:
 \item Each observation $t$ is a \alert{year} and each entity $i$ is a \alert{state}.
 \item Each observation $t$ is a \alert{week} and each entity $i$ is a \alert{shopper}.
 \end{itemize}
-We might expect that $\operatorname { Cov } (u_{g1},u_{g2},\ldots,u_{gN}) \neq 0 \rightarrow$ independence is a bad assumption. 
+We might expect that $\Cov (\varepsilon_{ig},\varepsilon_{jg}) \neq 0$ for $i \ne j$ in the same group $g$ $\rightarrow$ independence is a bad assumption. 
 \end{frame}
 
 \begin{frame}{Clustering: Intuition}
@@ -372,7 +372,7 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 \begin{itemize}
 \item If correlation is within an individual over time we call it \alert{serial correlation} or \alert{autocorrelation}
 \item Just like in time-series$\rightarrow$ we have fewer effective independent observations in our sample.
-\item Asymptotics now about the number of groups $G \rightarrow \infty$ not observations $N \rightarrow \infty$
+\item Asymptotics now about the number of groups $G \rightarrow \infty$ not observations $n \rightarrow \infty$
 \end{itemize}
 \end{frame}
 
@@ -382,13 +382,13 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 	\item Suppose data are organized into distinct groups $g=1,2,\dots,G$. Let $g\left(i\right)$
 	be the group identity of observation $i$. 
 	\begin{itemize}
-		\item e.g., with county-level data, we have $g\left(Manhattan\right)=NY$.
+		\item e.g., with county-level data, we have $g\left(\text{Manhattan}\right)=\text{NY}$.
 	\end{itemize}
 
 
 	\medskip
-	\item We assume $\E\left[\varepsilon_i \varepsilon_j\right]=0$ as long as $g\left(i\right)\ne g\left(j\right)$,
-	and we do not restrict the correlation $\E\left[\varepsilon_i \varepsilon_j\right]$
+	\item We assume $\E\left[\varepsilon_i \varepsilon_j | {\bf X}\right]=0$ as long as $g\left(i\right)\ne g\left(j\right)$,
+	and we do not restrict the correlation $\E\left[\varepsilon_i \varepsilon_j | {\bf X}\right]$
 	for observations within the same group.
 
 	\medskip
@@ -401,14 +401,14 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 \begin{frame}{Clustering II}
 \begin{itemize}
 	\item Recall the sandwich formula for standard errors:
-	\begin{align*}
-		n^{-1} \E\left[\symbf {x_i} \symbf {x_i'} \right]^{-1} \Var \left[\symbf {x_i} \varepsilon_i \right] \E\left[\symbf {x_i} \symbf {x_i'} \right]^{-1}.
-	\end{align*}
+		\begin{align*}
+		\Var\left({\bf b}_{OLS}\right) \approx	n^{-1} \E\left[{\bf x}_i {\bf x}_i' \right]^{-1} \Var \left[{\bf x}_i \varepsilon_i \right] \E\left[{\bf x}_i {\bf x}_i' \right]^{-1}.
+		\end{align*}
 
-	% \item The estimator for the middle part without clustering was
-	\begin{align*}
-	\symbf{\Var}\left[\symbf {x_i} \varepsilon_i \right] = n^{-1} \sum_{i} \symbf{x_i} \symbf{x_i'}  e_i^2
-	\end{align*}
+		% \item The estimator for the middle part without clustering was
+		\begin{align*}
+		\widehat{\Var}\left[{\bf x}_i \varepsilon_i \right] = n^{-1} \sum_{i} {\bf x}_i {\bf x}_i'  e_i^2
+		\end{align*}
 
 	% \item With clustering, it will be \[
 	% {\symbf V}_{clu} = n^{-1} \sum_{i=1}^{n}\sum_{j=1}^{n} {\symbf x}_i\,  {\symbf x}'_j \, e_i\, e_j \cdot {\mathbb{I}}\left[(i,j) \in \text{Group}_g \right]
@@ -457,50 +457,52 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 % \end{frame}
 
 
-\begin{frame}{Clustering Derviation}
-Begin by stacking up observations in each group $\mathbf{y}_{g }  = [y_{g1},\ldots,y_{g n_g}]$, we can write OLS three ways:
+\begin{frame}{Clustering Derivation}
+Begin by stacking up observations in each group, ${\bf y}_{g }  = (y_{1g},\ldots,y_{n_g g})'$; we can write the model three ways:
 \begin{align*}
-y_{ig } &= x_{ig}' \beta + \varepsilon_{ig}\\
-\mathbf{y}_{g } &= \mathbf{X}_{g} \beta + \boldsymbol{\varepsilon}_{g}\\
-\mathbf{Y} &= \mathbf{X} \beta + \boldsymbol{\varepsilon}
+y_{ig } &= {\bf x}_{ig}' \boldsymbol{\beta} + \varepsilon_{ig}\\
+{\bf y}_{g } &= {\bf X}_{g} \boldsymbol{\beta} + \boldsymbol{\varepsilon}_{g}\\
+{\bf y} &= {\bf X} \boldsymbol{\beta} + \boldsymbol{\varepsilon}
 \end{align*}
-All of these are equivalent:
+All of these give the same OLS estimator:
 \begin{align*}
-\widehat {  \beta  } &= \left( \sum _ { g = 1 } ^ { G } \sum _ { i = 1 } ^ { n _ { g } } x _ { i g }' { x } _ { i g } \right) ^ { - 1 } \left( \sum _ { g = 1 } ^ { G } \sum _ { i = 1 } ^ { n _ { g } } x _ { i g }' y _ { i g } \right)\\
-\widehat {  \beta  }  &=  \left(  \sum _ { g = 1 } ^ { G } \mathbf{X}_g' \mathbf{X}_g \right)^{-1} \left(  \sum _ { g = 1 } ^ { G } \mathbf{X}_g' \mathbf{y}_g \right)\\
-\widehat {  \beta  }  &=  \left( \mathbf{X}' \mathbf{X} \right)^{-1} \left(   \mathbf{X}' \mathbf{Y} \right)\\
+{\bf b}_{OLS} &= \left( \sum _ { g = 1 } ^ { G } \sum _ { i = 1 } ^ { n _ { g } } {\bf x} _ { i g } {\bf x} _ { i g }' \right) ^ { - 1 } \left( \sum _ { g = 1 } ^ { G } \sum _ { i = 1 } ^ { n _ { g } } {\bf x} _ { i g } y _ { i g } \right)\\
+{\bf b}_{OLS}  &=  \left(  \sum _ { g = 1 } ^ { G } {\bf X}_g' {\bf X}_g \right)^{-1} \left(  \sum _ { g = 1 } ^ { G } {\bf X}_g' {\bf y}_g \right)\\
+{\bf b}_{OLS}  &=  \left( {\bf X}' {\bf X} \right)^{-1} \left(   {\bf X}' {\bf y} \right)
 \end{align*}
 \end{frame}
 
 \begin{frame}{Clustering Derivation (Continued)}
 The error terms have covariance within each cluster $g$ as:
 \begin{align*}
- \boldsymbol{\Sigma}_ { g } = \mathbb { E } \left( \boldsymbol{\varepsilon} _ { g }  \boldsymbol{ \varepsilon } _ { g } ^ { \prime } \mid \boldsymbol { X } _ { g } \right)
+ \boldsymbol{\Sigma}_ { g } = \E \left[ \boldsymbol{\varepsilon} _ { g }  \boldsymbol{ \varepsilon } _ { g } ^ { \prime } \mid {\bf X} _ { g } \right]
 \end{align*}
 
-In order to calculate $\widehat{V}_{\widehat{\beta}}$ we replace the covariance matrix $\mathbf{D}$ with $\Omega$ and consider an estimator $\widehat{\Omega}_n$. We exploit \alert{independence across clusters}:
+In order to calculate ${\bf V}_{{\bf b}}$ we replace the diagonal matrix ${\bf D}$ with a block-diagonal one. We exploit \alert{independence across clusters}:
 \begin{align*}
-\operatorname { var } \left( \left( \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol{\varepsilon}_{ g } \right) \mid \boldsymbol { X } \right) = \sum _ { g = 1 } ^ { G } \operatorname { var } \left( \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol{\varepsilon} _ { g } | \boldsymbol { X } _ { g } \right)
-= \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \mathbb { E } \left( \boldsymbol{\varepsilon} _ { g } \boldsymbol{\varepsilon}_ { g } ^ { \prime } | \boldsymbol { X } _ { g } \right) \boldsymbol { X } _ { g }
-= \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol { \Sigma } _ { g } \mathbf { X } _ { g } 
- \equiv \Omega_N
+\Var \left( \sum _ { g = 1 } ^ { G } {\bf X} _ { g } ^ { \prime } \boldsymbol{\varepsilon}_{ g } \mid {\bf X} \right) = \sum _ { g = 1 } ^ { G } \Var \left( {\bf X} _ { g } ^ { \prime } \boldsymbol{\varepsilon} _ { g } | {\bf X} _ { g } \right)
+= \sum _ { g = 1 } ^ { G } {\bf X} _ { g } ^ { \prime } \E \left[ \boldsymbol{\varepsilon} _ { g } \boldsymbol{\varepsilon}_ { g } ^ { \prime } | {\bf X} _ { g } \right] {\bf X} _ { g }
+= \sum _ { g = 1 } ^ { G } {\bf X} _ { g } ^ { \prime } \boldsymbol { \Sigma } _ { g } {\bf X} _ { g } 
+ \equiv \boldsymbol{\Omega}_n
 \end{align*}
-And an estimate of the variance:
+So the variance is:
 \begin{align*}
-\boldsymbol { V } _ { \widehat { \boldsymbol { \beta } } } = \operatorname { var } ( \widehat { \boldsymbol { \beta } } \mid  \boldsymbol { X } )
-= \left( \mathbf { X } ^ { \prime } \mathbf { X } \right) ^ { - 1 } \boldsymbol { \Omega } _ { n } \left( \mathbf { X } ^ { \prime } \mathbf { X } \right) ^ { - 1 }
+{\bf V} _ { {\bf b} } = \Var ( {\bf b}_{OLS} \mid  {\bf X} )
+= \left( {\bf X} ^ { \prime } {\bf X} \right) ^ { - 1 } \boldsymbol { \Omega } _ { n } \left( {\bf X} ^ { \prime } {\bf X} \right) ^ { - 1 }
 \end{align*}
 \end{frame}
 
 
 
 \begin{frame}{Clustered SE's}
+Replace $\boldsymbol{\Sigma}_g$ with ${\bf e}_g {\bf e}_g'$, where ${\bf e}_g$ are the OLS residuals for cluster $g$:
 \begin{align*}
-\widehat { \boldsymbol { V } } _ { OLS } ^ { \mathrm { CR } 1 } = \left( \boldsymbol { X } ^ { \prime } \boldsymbol { X } \right) ^ { - 1 } \left( \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \boldsymbol { e }_ { g }  \boldsymbol { e }_ { g } ^ { \prime } \boldsymbol { X } _ { g } \right) \left( \boldsymbol { X } ^ { \prime } \boldsymbol { X } \right) ^ { - 1 }\\
-\widehat { \boldsymbol { V } } _ { OLS } ^ { \mathrm { CR } 3 } = \left( \boldsymbol { X } ^ { \prime } \boldsymbol { X } \right) ^ { - 1 } \left( \sum _ { g = 1 } ^ { G } \boldsymbol { X } _ { g } ^ { \prime } \widetilde { \boldsymbol { e } } _ { g }  \widetilde { \boldsymbol { e } } _ { g } ^ { \prime } \boldsymbol { X } _ { g } \right) \left( \boldsymbol { X } ^ { \prime } \boldsymbol { X } \right) ^ { - 1 }
+\widehat { {\bf V} } _ { {\bf b} } ^ { \mathrm { CR } 1 } = \frac{G}{G-1}\frac{n-1}{n-K} \left( {\bf X} ^ { \prime } {\bf X} \right) ^ { - 1 } \left( \sum _ { g = 1 } ^ { G } {\bf X} _ { g } ^ { \prime } {\bf e}_ { g }  {\bf e}_ { g } ^ { \prime } {\bf X} _ { g } \right) \left( {\bf X} ^ { \prime } {\bf X} \right) ^ { - 1 }\\
+\widehat { {\bf V} } _ { {\bf b} } ^ { \mathrm { CR } 3 } = \left( {\bf X} ^ { \prime } {\bf X} \right) ^ { - 1 } \left( \sum _ { g = 1 } ^ { G } {\bf X} _ { g } ^ { \prime } \widetilde { {\bf e} } _ { g }  \widetilde { {\bf e} } _ { g } ^ { \prime } {\bf X} _ { g } \right) \left( {\bf X} ^ { \prime } {\bf X} \right) ^ { - 1 }
 \end{align*}
 \begin{itemize}
-\item Can replace  $\mathbf{e}_g  \rightarrow \tilde { \mathbf{e}}_g $ for leave-one out like $HC3$ (these are called $CR3$).
+\item CR1 is the Stata/\texttt{fixest} default; without the leading factor it is CR0.
+\item Can replace  ${\bf e}_g  \rightarrow \widetilde{{\bf e}}_g = \left({\bf I} - {\bf X}_g\left({\bf X}'{\bf X}\right)^{-1}{\bf X}_g'\right)^{-1}{\bf e}_g$ for leave-one-cluster-out residuals like $HC3$ (these are called $CR3$).
 \end{itemize}
 \end{frame}
 
@@ -528,14 +530,14 @@ feols(y~ x1 + x2, data=df, vcov=~group_id+time_id)
 
 \begin{frame}{Newey West Standard Errors (HAC)}
 \begin{itemize}
-\item In serially correlated data we need to account for $\operatorname{ Cov } (\varepsilon_{t},\varepsilon_{t-1},\ldots ) \neq 0$.
+\item In serially correlated data we need to account for $\Cov (\varepsilon_{t},\varepsilon_{t-l}) \neq 0$ for lags $l \ge 1$.
 \item Clustering is one solution, but we may end up throwing away all of our data.
 \item Instead we could estimate the serial correlation.
 \item May also want standard errors that are \alert{heteroskedasticity AND autocorrelation consistent} (HAC).
 \item Have to select a number of lags $L$
 \end{itemize}
 \begin{align*}
-\widehat { \Omega } _ { n,L }^{HAC} &= \sum _ { t = 1 } ^ { T }  e _ { t }^2 x_t x_t'  + \sum_{l=1}^L \sum _ { t = l+1 } ^ { T } w_l e_t e _ { t-l } \left( x_t x_{t-l}' +  x_{t-l} x_{t}'  \right)\\
+\widehat { \boldsymbol{\Omega} } _ { n,L }^{HAC} &= \sum _ { t = 1 } ^ { T }  e _ { t }^2 {\bf x}_t {\bf x}_t'  + \sum_{l=1}^L \sum _ { t = l+1 } ^ { T } w_l e_t e _ { t-l } \left( {\bf x}_t {\bf x}_{t-l}' +  {\bf x}_{t-l} {\bf x}_{t}'  \right)\\
 w_l &= 1 - \frac{l}{L+1}
 \end{align*}
 You will see these constantly in accounting and finance, where serially correlated
@@ -543,11 +545,11 @@ outcomes are the norm.
 \end{frame}
 
 
-\begin{frame}{What about $\beta$?}
+\begin{frame}{What about $\boldsymbol{\beta}$?}
 \begin{itemize}
 \item All of the estimates above should produce \alert{identical} point estimates
 \item We have just been talking about adjusting \alert{standard errors}
-\item Should the presence of heteroskedasticity change our estimates of $\widehat{\beta}$ as well?
+\item Should the presence of heteroskedasticity change our estimates ${\bf b}_{OLS}$ as well?
 \end{itemize}
 \end{frame}
 
@@ -556,12 +558,13 @@ outcomes are the norm.
 \begin{itemize}
 	\item In principle, if you \emph{knew} the error variances you could reweight
 	observations ($w_i \propto 1/\sigma_i^2$) and beat OLS on efficiency:\[
-	\widehat{\beta}_{WLS} = (X' W X)^{-1} X' W y
-	\qquad \text{(GLS: let $W$ be non-diagonal)}
+	{\bf b}_{WLS} = ({\bf X}' {\bf W} {\bf X})^{-1} {\bf X}' {\bf W} {\bf y},
+	\quad {\bf W} = \operatorname{diag}(w_1,\ldots,w_n)
+	\qquad \text{(GLS: ${\bf W} = \boldsymbol{\Omega}^{-1}$, not necessarily diagonal)}
 	\]
 
 	\item In practice $\sigma_i^2$ is unknown; estimating it (FGLS/IRLS) imports a
-	model of the variance into your estimate of $\beta$, and misspecifying that model
+	model of the variance into your estimate of $\boldsymbol{\beta}$, and misspecifying that model
 	can do real damage.
 
 	\item The modern division of labor: \alert{OLS for the point estimate,

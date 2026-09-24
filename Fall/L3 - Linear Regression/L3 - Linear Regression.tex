@@ -16,7 +16,7 @@
 \begin{itemize}
 	\item A typical example of a linear regression model:
 	\begin{equation*}
-		y_i = \beta_0 + \beta_1 x_{1,i} +  \beta_2 x_{2,i} + \dots +  \beta_K x_{K,i} + \varepsilon_i,
+		y_i = \beta_1 x_{1,i} +  \beta_2 x_{2,i} + \dots +  \beta_K x_{K,i} + \varepsilon_i,
 	\end{equation*}
 	where 
 	\begin{itemize}
@@ -28,7 +28,7 @@
 		 or {\bf independent variable} (independent of what?), or  {\bf regressor}
 		\smallskip
 		\item<4-> The $\beta_{k}$ terms represent the {\bf  parameters}. \\
-		There are $K$ parameters, one	for each regressor.
+		There are $K$ parameters, one	for each regressor. Usually $x_{1,i}=1$ (a constant), so $\beta_1$ is the intercept.
 
 		\smallskip
 		\item<5-> $\varepsilon_{i}$ is the {\bf disturbance} or {\bf error term}
@@ -43,13 +43,13 @@
 \begin{itemize}
 	\item A typical example of a linear regression model:
 	\begin{equation*}
-		y_i = \beta_0 + \beta_1 x_{1,i} +  \beta_2 x_{2,i} + \dots +  \beta_K x_{K,i} + \varepsilon_i,
+		y_i = \beta_1 x_{1,i} +  \beta_2 x_{2,i} + \dots +  \beta_K x_{K,i} + \varepsilon_i,
 	\end{equation*}
 	\item Today's questions: 
 	\begin{itemize}
 		\item Where does it come from? 
-		\item What assumptions do we need to estimate $\beta$?
-		\item How do we estimate $\beta$?
+		\item What assumptions do we need to estimate $\boldsymbol{\beta}$?
+		\item How do we estimate $\boldsymbol{\beta}$?
 		\item How to interpret estimates? 
 		\item What are the estimator's finite sample and asymptotic properties? 
 	\end{itemize}
@@ -64,16 +64,16 @@
 	\end{equation*}
 	where 
 	\begin{itemize}
-		\item ${\bf y}$ is a $n\times 1$ vector of observations of the dependent variable
-		\item ${\bf X}$ is a $n\times K$ vector of observations of the dependent variables
+		\item ${\bf y}$ is an $n\times 1$ vector of observations of the dependent variable
+		\item ${\bf X}$ is an $n\times K$ matrix of observations of the regressors
 		\item $\boldsymbol{\beta} $ is a $K\times 1$ vector of parameters
-		\item $\boldsymbol{\varepsilon}$ is a $n\times 1$ vector of error terms
+		\item $\boldsymbol{\varepsilon}$ is an $n\times 1$ vector of error terms
 	\end{itemize}
 
 	\item Note that each row of this equation corresponds to the previous equation for
-	a single observation $i$:\[
-	y_i = {\bf x}_{i}'\boldsymbol{\beta} + \varepsilon_i,
-	\]
+	a single observation $i$:
+	$y_i = {\bf x}_{i}'\boldsymbol{\beta} + \varepsilon_i$,
+	where ${\bf x}_i = \left(x_{1,i},\dots,x_{K,i}\right)'$ is $K\times 1$, so ${\bf x}_i'$ is the $i$th row of ${\bf X}$.
 
 	\item Conventions: Roman symbols are observed, Greek are not, bold means vector notation, 
 	bold capitals means matrices.
@@ -86,29 +86,29 @@
 	(known as Mincerian regression or Mincer earnings function for Jacob Mincer).
 
 	\medskip
-	\item $y_{i}$ could be worker $i$'s wages, and ${\bf x}_i' = \left(1,edu_i,exp_i \right)$, 
+	\item $y_{i}$ could be worker $i$'s wages, and ${\bf x}_i' = \left(1,\text{edu}_i,\text{exp}_i \right)$, 
 	where 
 	\begin{itemize}
-		\item $edu_i$ is worker $i$'s education (in years)
-		\item $exp_i$ is worker $i$'s work experience (in years)
+		\item $\text{edu}_i$ is worker $i$'s education (in years)
+		\item $\text{exp}_i$ is worker $i$'s work experience (in years)
 		\item Note that the regressors include a constant 
 	\end{itemize}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Example: Mincerian Regression I}
+\begin{frame}{Example: Mincerian Regression II}
 \begin{itemize}
-	\item $y_{i}$ is $i$'s wages, and ${\bf x}_i' = \left(1,edu_i,exp_i \right)$
+	\item $y_{i}$ is $i$'s wages, and ${\bf x}_i' = \left(1,\text{edu}_i,\text{exp}_i \right)$
 
 	\medskip
 	\item The data matrices for the Mincerian regression might look like this:
 \[
-\boldsymbol{y}=\left(\begin{array}{c}
+{\bf y}=\left(\begin{array}{c}
 12\\
 35\\
 20\\
 \vdots
-\end{array}\right)\qquad\qquad\boldsymbol{X}=\left(\begin{array}{ccc}
+\end{array}\right)\qquad\qquad{\bf X}=\left(\begin{array}{ccc}
 1 & 12 & 2\\
 1 & 16 & 5\\
 1 & 12 & 21\\
@@ -126,39 +126,39 @@
 	\item This equation doesn't mean much until we say something about the error term $\boldsymbol{\varepsilon}$.
 
 	\item The first (and strongest) assumption on error terms we will consider is {\bf strict exogeneity}:\[
-		E\left[\boldsymbol{\varepsilon} | {\bf X} \right] = {\bf 0}
+		\E\left[\boldsymbol{\varepsilon} | {\bf X} \right] = {\bf 0}
 	\]
 
 	\item Note that the law of iterated expectations implies\[
-		E\left[\varepsilon_i\right] = E_{{\bf X}} \left[E\left[\varepsilon_i | {\bf X}\right] \right] = 0.
+		\E\left[\varepsilon_i\right] = \E_{{\bf X}} \left[\E\left[\varepsilon_i | {\bf X}\right] \right] = 0.
 	\]
-	It also implies that the error terms are uncorrelated with the regressors: $Cov\left[\varepsilon_{i},{\bf X}\right]=0$ 
-	and $Cov\left[\varepsilon_{i}, {\bf x}_{i}\right]=0$.
+	It also implies that each error term is uncorrelated with every regressor for every observation: $\Cov\left[\varepsilon_{i},x_{k,j}\right]=0$ 
+	for all $i,j,k$ (in particular, $\Cov\left[\varepsilon_{i}, {\bf x}_{i}\right]={\bf 0}$).
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}{Strict Exogeneity and Conditional Means}
 \begin{align*}
-\boldsymbol{y} & =  \boldsymbol{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}	& (1)\\
-E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
+{\bf y} & =  {\bf X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}	& (1)\\
+\E\left[\boldsymbol{\varepsilon}|{\bf X}\right] & =  {\bf 0}						& (2)
 \end{align*}
 \begin{itemize}
 	\item Now, we have a meaningful model. 
 	\item Note that
 \begin{align*}
-\E\left[\boldsymbol{y}|\boldsymbol{X}\right] & =  \E\left[\boldsymbol{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}|\boldsymbol{X}\right]\\
- & =  \boldsymbol{X}\boldsymbol{\beta}+E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right]\\
- &  = \boldsymbol{X}\boldsymbol{\beta},
+\E\left[{\bf y}|{\bf X}\right] & =  \E\left[{\bf X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}|{\bf X}\right]\\
+ & =  {\bf X}\boldsymbol{\beta}+\E\left[\boldsymbol{\varepsilon}|{\bf X}\right]\\
+ &  = {\bf X}\boldsymbol{\beta},
 \end{align*}
-so equations (1) and (2) already imply that the conditional mean is a linear function of $\boldsymbol{X}$.
+so equations (1) and (2) already imply that the conditional mean is a linear function of ${\bf X}$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Strict Exogeneity Interpretation}
 \begin{align*}
-\boldsymbol{y} & =  \boldsymbol{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}	& (1)\\
-E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
+{\bf y} & =  {\bf X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}	& (1)\\
+\E\left[\boldsymbol{\varepsilon}|{\bf X}\right] & =  {\bf 0}						& (2)
 \end{align*}
 \begin{itemize}
 	\item Strict exogeneity captures the idea that $x$ is varied in the data without changing the mean
@@ -178,20 +178,20 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 \begin{frame}{Omitted Variables and Endogeneity}
 \begin{itemize}
 	\item Suppose we estimate the following Mincerian regression:\[
-\ln \left(wage_{i}\right)=\beta_{0}+\beta_{1}edu_{i}+\beta_{2}exp_{i}+\beta_{3}exp_{i}^{2}+\varepsilon_{i}.
+\ln \left(\text{wage}_{i}\right)=\beta_{0}+\beta_{1}\text{edu}_{i}+\beta_{2}\text{exp}_{i}+\beta_{3}\text{exp}_{i}^{2}+\varepsilon_{i}.
 \]
 
 	\item Furthermore suppose the true model is:\[
-\ln \left(wage_{i}\right)=\beta_{0}+\beta_{1}edu_{i}+\beta_{2}exp_{i}+\beta_{3}exp_{i}^{2}+ \textcolor{red}{\beta_4 ability_{i}} + \varepsilon_{i}
+\ln \left(\text{wage}_{i}\right)=\beta_{0}+\beta_{1}\text{edu}_{i}+\beta_{2}\text{exp}_{i}+\beta_{3}\text{exp}_{i}^{2}+ \textcolor{red}{\beta_4 \text{ability}_{i}} + \varepsilon_{i}
 \]
 
 	\item Then, when estimating the first equation (because ability is unobserved), the error term is effectively:\[
-	\widetilde{\varepsilon}_{i} = \beta_4 ability_{i} + \varepsilon_{i}
+	\widetilde{\varepsilon}_{i} = \beta_4 \text{ability}_{i} + \varepsilon_{i}
 \]
 
 
 \item Note that even if $\varepsilon_{i}$ satisfies strict exogeneity, $\widetilde{\varepsilon}_{i}$ will not
- 	if, for instance, ability is correlated with education. We say $x$ is {\bf endogenous} if $E\left[\varepsilon|x\right]\ne 0$.
+ 	if, for instance, ability is correlated with education. We say $x$ is {\bf endogenous} if $\E\left[\varepsilon|x\right]\ne 0$.
 
 
 \end{itemize}
@@ -201,11 +201,11 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 
 \begin{frame}{Wherefore Linearity?}
 \begin{itemize}
-	\item When would $E\left[y_i|\boldsymbol{x_i}\right] = \boldsymbol{x}_i'\boldsymbol{\beta}$ be true?
+	\item When would $\E\left[y_i|{\bf x}_i\right] = {\bf x}_i'\boldsymbol{\beta}$ be true?
 
 	\medskip
-	\item We might start with the conditional mean as a general function of $x$\[
-	 y_{i} = f\left(\boldsymbol{x}_{i}\right)+\varepsilon_{i},
+	\item We might start with the conditional mean as a general function of ${\bf x}_i$\[
+	 y_{i} = f\left({\bf x}_{i}\right)+\varepsilon_{i},
 	\]
 	and then what we've done is impose that $f$ is a linear function. 
 
@@ -229,7 +229,7 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 	a variable $x$
 
 	\medskip
-	\item For example, ${\bf x}_i' = \left(1,edu_i,exp_i,exp_i^2\right)$ in the Mincerian regression would allow
+	\item For example, ${\bf x}_i' = \left(1,\text{edu}_i,\text{exp}_i,\text{exp}_i^2\right)$ in the Mincerian regression would allow
 	declining (or increasing) returns to work experience. 
 
 	\medskip
@@ -244,7 +244,7 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 
 	\smallskip	
 	\item For example, $y_{i}$ in the Mincerian regression is typically the natural log of worker $i$'s wage:\[
-\ln \left(wage_{i}\right)=\beta_{0}+\beta_{1}edu_{i}+\beta_{2}exp_{i}+\beta_{3}exp_{i}^{2}+\varepsilon_{i}.
+\ln \left(\text{wage}_{i}\right)=\beta_{0}+\beta_{1}\text{edu}_{i}+\beta_{2}\text{exp}_{i}+\beta_{3}\text{exp}_{i}^{2}+\varepsilon_{i}.
 \]
 
 	\smallskip
@@ -269,11 +269,11 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 	\item Another way to motivate the linear regression function is from the multivariate normal distribution.
 
 	\smallskip
-	\item Suppose $\left(y,x\right)' \sim \mathcal{N}\left(\mu,\Sigma\right)$, where\[
-\mu=\left(\begin{array}{c}
+	\item Suppose $\left(y,x\right)' \sim \mathcal{N}\left(\boldsymbol{\mu},\boldsymbol{\Sigma}\right)$, where\[
+\boldsymbol{\mu}=\left(\begin{array}{c}
 \mu_{y}\\
 \mu_{x}
-\end{array}\right)\qquad\qquad\Sigma=\left(\begin{array}{cc}
+\end{array}\right)\qquad\qquad\boldsymbol{\Sigma}=\left(\begin{array}{cc}
 \sigma_{y}^{2} & \rho\sigma_{y}\sigma_{x}\\
 \rho\sigma_{y}\sigma_{x} & \sigma_{x}^{2}
 \end{array}\right)
@@ -290,14 +290,14 @@ E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2)
 \begin{columns}
 \begin{column}{0.4\textwidth}
 \[
-\mu=\left(\begin{array}{c}
+\boldsymbol{\mu}=\left(\begin{array}{c}
 0\\
 0
 \end{array}\right)
 \]
 
 \[
-\Sigma=\left(\begin{array}{cc}
+\boldsymbol{\Sigma}=\left(\begin{array}{cc}
 4 & -1\\
 -1 & 1
 \end{array}\right)
@@ -361,11 +361,11 @@ ggplot(xy.selected, aes(y)) + geom_density(alpha = 0.2)
 \begin{frame}{Multivariate Normal and Regression Equation}
 \begin{itemize}
 
-	\item Suppose $\left(y,x\right)' \sim \mathcal{N}\left(\mu,\Sigma\right)$, where \[
-\mu=\left(\begin{array}{c}
+	\item Suppose $\left(y,x\right)' \sim \mathcal{N}\left(\boldsymbol{\mu},\boldsymbol{\Sigma}\right)$, where \[
+\boldsymbol{\mu}=\left(\begin{array}{c}
 \mu_{y}\\
 \mu_{x}
-\end{array}\right)\qquad\qquad\Sigma=\left(\begin{array}{cc}
+\end{array}\right)\qquad\qquad\boldsymbol{\Sigma}=\left(\begin{array}{cc}
 \sigma_{y}^{2} & \rho\sigma_{y}\sigma_{x}\\
 \rho\sigma_{y}\sigma_{x} & \sigma_{x}^{2}
 \end{array}\right)
@@ -373,12 +373,11 @@ ggplot(xy.selected, aes(y)) + geom_density(alpha = 0.2)
 
 	\smallskip
 	\item It's also the case that \[
-		E\left(y|x\right) = \mu_y + \rho\frac{\sigma_y}{\sigma_x}\left(x-\mu_x\right)
+		\E\left[y|x\right] = \mu_y + \rho\frac{\sigma_y}{\sigma_x}\left(x-\mu_x\right)
 	\]
 	and \[
-		y = E\left(y|x\right) + \varepsilon
+		y = \E\left[y|x\right] + \varepsilon, \qquad \varepsilon \sim \mathcal{N}\left(0,\sigma_y^2\left(1-\rho^2\right)\right) \text{ independent of } x.
 	\]
-	with $\varepsilon$ normally distributed.
 
 	\smallskip
 	\item Normally distributed error terms: the first case we will consider (and easiest to analyze)
@@ -401,7 +400,7 @@ ggplot(xy.selected, aes(y)) + geom_density(alpha = 0.2)
 	\]
 
 	\medskip
-	\item<3-> Conditional on total income, any increase in salary must be met by a proportional decrease
+	\item<3-> Conditional on total income, any increase in salary must be met by an equal decrease
 	in nonsalary income
 
 %	\medskip
@@ -422,14 +421,14 @@ ggplot(xy.selected, aes(y)) + geom_density(alpha = 0.2)
 	\]
 	so\[
 \begin{array}{ccl}
-C & = & \beta_{1}+\left(\beta_{2}+\beta_{4}\right)\text{Salary}+\left(\beta_{3}+\beta_{4}\right)\text{Nonsalary Income}+\varepsilon\\
-C & = & \beta_{1}+\widetilde{\beta}_{2}\text{Salary}+\widetilde{\beta}_{3}\text{Nonsalary Income}+0\cdot\text{Total Income}+\varepsilon
+C & = & \beta_{1}+\left(\beta_{2}+\beta_{4}\right)\text{Salary}+\left(\beta_{3}+\beta_{4}\right)\text{Nonsalary income}+\varepsilon\\
+C & = & \beta_{1}+\widetilde{\beta}_{2}\text{Salary}+\widetilde{\beta}_{3}\text{Nonsalary income}+0\cdot\text{Total income}+\varepsilon
 \end{array}
 \]
 
 	\smallskip
 	\item Assuming $\beta_{4}\ne 0$ in the original equation, we have constructed an empirically equivalent equation with different parameters.
-         That is, for this model, we have different values for ${\bold \beta }$ that are {\bf observationally equivalent}. 
+         That is, for this model, we have different values for $\boldsymbol{\beta}$ that are {\bf observationally equivalent}. 
 
 \end{itemize}
 \end{frame}
@@ -459,7 +458,7 @@ C & = & \beta_{1}+\widetilde{\beta}_{2}\text{Salary}+\widetilde{\beta}_{3}\text{
 \begin{frame}{Linear Independence}
 \begin{itemize}
 
-	\item Another term for the full rank assumption ($Rank\left({\bf X}\right)=K$) is {\bf linear independence}.
+	\item Another term for the full rank assumption ($\operatorname{rank}\left({\bf X}\right)=K$) is {\bf linear independence}.
 	 {\bf Multicollinearity} refers to a lack of linear independence. When a model has multicollinearity, we 
   	say it is {\bf not identified}. 
 
@@ -483,9 +482,9 @@ C & = & \beta_{1}+\widetilde{\beta}_{2}\text{Salary}+\widetilde{\beta}_{3}\text{
 \end{itemize}
 
 \begin{align*}
-\boldsymbol{y} & =  \boldsymbol{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}	& (1)\\
-E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] & =  0						& (2) \\
-Rank({\bf X}) & = K 	& (3)
+{\bf y} & =  {\bf X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}	& (1)\\
+\E\left[\boldsymbol{\varepsilon}|{\bf X}\right] & =  {\bf 0}						& (2) \\
+\operatorname{rank}({\bf X}) & = K 	& (3)
 \end{align*}
 
 \begin{itemize}
@@ -502,17 +501,17 @@ Rank({\bf X}) & = K 	& (3)
 \begin{frame}{Homoscedasticity}
 \begin{itemize}
 	\item Another important assumption is {\bf homoscedasticity}:\[
-		E\left[\boldsymbol{\varepsilon} \boldsymbol{\varepsilon}' | {\bf X} \right] = \sigma^{2} {\bf I}
+		\E\left[\boldsymbol{\varepsilon} \boldsymbol{\varepsilon}' | {\bf X} \right] = \sigma^{2} {\bf I}
 	\]
-	where ${\bf I}$ is a  $n \times n$ identity matrix.
+	where ${\bf I}$ is the $n \times n$ identity matrix.
 
 	\medskip
-	\item Given that $E\left[\boldsymbol{\varepsilon}|\boldsymbol{X}\right] =  0$, this means that\[
-	Var\left[\boldsymbol{\varepsilon} | {\bf X} \right] = \sigma^{2} {\bf I}
+	\item Given that $\E\left[\boldsymbol{\varepsilon}|{\bf X}\right] =  {\bf 0}$, this means that\[
+	\Var\left[\boldsymbol{\varepsilon} | {\bf X} \right] = \sigma^{2} {\bf I}
 	\]
 
 	\item In words, homoscedasticity says that each error term has the same variance; i.e.,   
-	the variance of $\varepsilon_i$ is not related to ${\bf x}_i$. {\bf Heteroscedastcity}
+	the variance of $\varepsilon_i$ is not related to ${\bf x}_i$. {\bf Heteroscedasticity}
 	is the alternative. Can you think of some cases of heteroscedasticity? 
 
 	\item The assumption also rules out correlation between the error terms for different observations.
@@ -526,7 +525,7 @@ Rank({\bf X}) & = K 	& (3)
 \begin{itemize}
 	\item A convenient assumption 
 	 is that error terms are {\bf normally distributed}:\[
-		\boldsymbol{\varepsilon} | {\bf X} \sim \mathcal{N}\left(0,\sigma^2 {\bf I}\right)
+		\boldsymbol{\varepsilon} | {\bf X} \sim \mathcal{N}\left({\bf 0},\sigma^2 {\bf I}\right)
 	\]
 
 	\medskip
@@ -549,12 +548,12 @@ Rank({\bf X}) & = K 	& (3)
 	\item We used $\boldsymbol{\beta}$ to denote the true vector of parameters; let's use
 	${\bf b}$ to denote estimates of or candidates for $\boldsymbol{\beta}$.
 
-	\item A residual is the fitted value given a particular potential parameter vector:\[
+	\item A residual is the gap between $y_i$ and its fitted value under a candidate parameter vector ${\bf b}$:\[
 		e_i \left({\bf b}\right) = y_i - {\bf x}_i' {\bf b}
 	\]
 
-	\item A residual captures the degree to which the linear prediction ${\bf x}_i' {\bf b}$
-	explains the dependent variable $y_{i}$.
+	\item A residual captures the part of the dependent variable $y_{i}$ that the linear prediction ${\bf x}_i' {\bf b}$
+	fails to explain.
 	
 
 	\item Formally, we should think of residuals as being a function of candidate parameter
@@ -579,7 +578,7 @@ Rank({\bf X}) & = K 	& (3)
 
 	\smallskip
 	\item The {\bf least squares estimator} minimizes the sum of squared residuals:\[
-		\hat{{\bf b}}_{LS} \equiv \arg \min_{{\bf b}} SSR\left({\bf b}\right) 
+		{\bf b}_{LS} \equiv \argmin_{{\bf b}} SSR\left({\bf b}\right) 
 	\]
 
 	\smallskip
@@ -638,11 +637,11 @@ Rank({\bf X}) & = K 	& (3)
 	\begin{itemize}
 \item The OLS estimates are:
 \begin{align*}
-\hat{b}_1 &=\frac{\sum\limits_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum\limits_{i=1}^n(x_i-\bar{x})^2}=\frac{s_{x,y}}{s_{x}^{2}} \\
+\hat{b}_1 &=\frac{\sum\limits_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum\limits_{i=1}^n(x_i-\bar{x})^2}=\frac{s_{xy}}{s_{x}^{2}} \\
 \\
 \hat{b}_0 & = \bar{y} - \hat{b}_1 \bar{x}
 \end{align*}
-where the $s_{x}^{2}$ refers to the sample variance of $x$ and $s_{x,y}$ refers to the sample covariance of $x$ and $y$.
+where $s_{x}^{2}$ refers to the sample variance of $x$ and $s_{xy}$ refers to the sample covariance of $x$ and $y$.
 
 	\end{itemize}
 \end{frame}
@@ -671,7 +670,7 @@ where the $s_{x}^{2}$ refers to the sample variance of $x$ and $s_{x,y}$ refers 
 
 \item Formulas:
 \begin{align*}
-\hat{b}_1 &=\frac{\sum\limits_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum\limits_{i=1}^n(x_i-\bar{x})^2}=\frac{cov\left(x,y\right)}{var\left(x\right)} \\
+\hat{b}_1 &=\frac{\sum\limits_{i=1}^n(x_i-\bar{x})(y_i-\bar{y})}{\sum\limits_{i=1}^n(x_i-\bar{x})^2}=\frac{s_{xy}}{s_{x}^{2}} \\
 \hat{b}_0 & = \bar{y} - \hat{b}_1 \bar{x}
 \end{align*}
 
@@ -690,16 +689,16 @@ which we now turn to.
 	\end{equation*}
 
 	\item We can write the sum of squared residuals as follows:\[
-	SSR\left({\bf b}\right) = {\bf e}_i \left({\bf b}\right) '  {\bf e}_i \left({\bf b}\right) = {\bf y}'{\bf y} - 2{\bf y}'{\bf X}{\bf b} + {\bf b}' {\bf X}'{\bf X}{\bf b} 
+	SSR\left({\bf b}\right) = {\bf e} \left({\bf b}\right) '  {\bf e} \left({\bf b}\right) = \left({\bf y} - {\bf X}{\bf b}\right)'\left({\bf y} - {\bf X}{\bf b}\right) = {\bf y}'{\bf y} - 2{\bf y}'{\bf X}{\bf b} + {\bf b}' {\bf X}'{\bf X}{\bf b} 
 \]
 
 
 	\item The necessary condition for a minimum:\[
-	\frac{\partial SSR\left({\bf b}\right)}{\partial {\bf b}} = - 2 {\bf X}' {\bf y} + 2 {\bf X}'{\bf X} {\bf b} = 0 
+	\frac{\partial SSR\left({\bf b}\right)}{\partial {\bf b}} = - 2 {\bf X}' {\bf y} + 2 {\bf X}'{\bf X} {\bf b} = {\bf 0} 
 	\]
 
-	\item Recalling the rules:\[
-\frac{\partial\boldsymbol{u}'\boldsymbol{v}}{\partial\boldsymbol{v}}=\boldsymbol{u}\qquad\qquad\frac{\partial\boldsymbol{v}'\boldsymbol{A}\boldsymbol{v}}{\partial\boldsymbol{v}}=2\boldsymbol{A}\boldsymbol{v}
+	\item Recalling the rules (the second for symmetric ${\bf A}$, such as ${\bf X}'{\bf X}$):\[
+\frac{\partial{\bf u}'{\bf v}}{\partial{\bf v}}={\bf u}\qquad\qquad\frac{\partial{\bf v}'{\bf A}{\bf v}}{\partial{\bf v}}=2{\bf A}{\bf v}
 \]
 
 \end{itemize}
@@ -709,7 +708,7 @@ which we now turn to.
 \begin{frame}{The OLS Formula}
 \begin{itemize}
 	\item The necessary condition for a minimum:\[
-	\frac{\partial SSR\left({\bf b}\right)}{\partial {\bf b}} = - 2 {\bf X}' {\bf y} + 2 {\bf X}'{\bf X} {\bf b} = 0 
+	\frac{\partial SSR\left({\bf b}\right)}{\partial {\bf b}} = - 2 {\bf X}' {\bf y} + 2 {\bf X}'{\bf X} {\bf b} = {\bf 0} 
 	\]
 
 	\item Thus, ${\bf b}$ must satisfy\[
@@ -718,7 +717,7 @@ which we now turn to.
 
 
 	\item Assuming ${\bf X}'{\bf X}$ is invertible (be careful!), we have\[
-	\widehat{{\bf b}}_{OLS} \equiv  \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} 
+	{\bf b}_{OLS} \equiv  \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} 
 	\]
 
 	\item Note the similarity to the bivariate least squares estimator. 
@@ -730,7 +729,7 @@ which we now turn to.
 \begin{frame}{Full Rank and Identification}
 \begin{itemize}
 	\item The invertibility of ${\bf X}'{\bf X}$ is not guaranteed in general, but
-	it is implied by the full rank condition: $Rank\left({\bf X}\right) = K$.
+	it is implied by the full rank condition: $\operatorname{rank}\left({\bf X}\right) = K$.
 
 	\item When ${\bf X}$ does not have full rank, neither does ${\bf X}'{\bf X}$, and \[
 	{\bf X}'{\bf X} {\bf b} =  {\bf X}' {\bf y} 
@@ -739,7 +738,7 @@ which we now turn to.
 
 	\item Linear algebra review: when a square matrix ${\bf A}$ is not invertible, 
 	it has a non-trivial nullspace. This means that \[
-	{\bf A} \boldsymbol{b} =  {\bf 0}
+	{\bf A} {\bf b} =  {\bf 0}
 	\]
 	can be solved by multiple vectors ${\bf b}$. This implies that, for any ${\bf c} $,
 	\[
@@ -755,20 +754,20 @@ which we now turn to.
 \begin{frame}{Properties of Residuals}
 \begin{itemize}
 	\item Let ${\bf e} $ denote the vector of OLS residuals, and consider \[
-		{\bf X}' {\bf e} = {\bf X}' \left({\bf X} {\bf b}_{OLS} - {\bf y} \right) 
+		{\bf X}' {\bf e} = {\bf X}' \left({\bf y} - {\bf X} {\bf b}_{OLS} \right) 
 	\]
 	\item Substituting in the OLS formula, 
  \[
-		{\bf X}' {\bf e} = {\bf X}' \left({\bf X} \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} - {\bf y} \right) 
+		{\bf X}' {\bf e} = {\bf X}' \left({\bf y} - {\bf X} \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} \right) 
 	\]
 
 \item This simplifies to 
  \[
-		{\bf X}' {\bf e} = {\bf X}' {\bf y} -  {\bf X}' {\bf y}  = 0
+		{\bf X}' {\bf e} = {\bf X}' {\bf y} -  {\bf X}'{\bf X}\left({\bf X}'{\bf X}\right)^{-1}{\bf X}' {\bf y}  = {\bf X}' {\bf y} -  {\bf X}' {\bf y}  = {\bf 0}
 	\]
 
 	\item This implies that (1) the OLS residuals sum to zero, given that one of the regressors is a constant, and
-	(2) the OLS residuals are uncorrelated with the regressors. Intuitively: there is no variation left in ${\bf e} $
+	(2) the OLS residuals are orthogonal to (and, given the constant, uncorrelated with) every regressor. Intuitively: there is no variation left in ${\bf e} $
 	 that can be explained by ${\bf X}$.
 	
 \end{itemize}
@@ -777,9 +776,9 @@ which we now turn to.
 
 \begin{frame}{Method of moments preview}
 \begin{itemize}
-	\item Exercise: show that ${\bf b}_{OLS}$ is the unique value of $\boldsymbol{\beta}$ satisfying 
+	\item Exercise: show that ${\bf b}_{OLS}$ is the unique value of ${\bf b}$ satisfying 
 	\[
-		{\bf X}' \left({\bf y} - {\bf X} \boldsymbol{\beta}  \right) =0
+		{\bf X}' \left({\bf y} - {\bf X} {\bf b}  \right) ={\bf 0}
 	\]
 	given that ${\bf X}$ is full rank.
 
@@ -812,13 +811,13 @@ which we now turn to.
 	\begin{itemize}
 \item We saw that for a bivariate regression, the slope on the regressor is given by
 \[
-\hat{b}_1 =\frac{s_{x,y}}{s_{x}^{2}} 
+\hat{b}_1 =\frac{s_{xy}}{s_{x}^{2}} 
 \]
 
 \medskip
 \item Does it follow that, with multiple regressors, the coefficient on the $k$th regressor is
 \[
-\hat{b}_k =\frac{s_{x_{k},y}}{s_{x_{k}}^{2}} ?
+\hat{b}_k =\frac{s_{x_{k}y}}{s_{x_{k}}^{2}} ?
 \]
 
 \medskip
@@ -836,7 +835,7 @@ which we now turn to.
 	where 
 	\begin{itemize}
 		\item $W_{i}$ is the painting $i$'s width
-		\item $H_{i}$ is the painting $i$'s width
+		\item $H_{i}$ is the painting $i$'s height
 		\item $A_{i}$ is the painting $i$'s area, $A_{i} =W_{i} \cdot H_{i} $
 		\item $\varepsilon_i$ is measurement error in painting $i$'s area
 	\end{itemize}
@@ -854,25 +853,25 @@ which we now turn to.
 \left(\begin{array}{c}
 \ln W_{i}\\
 \ln H_{i}
-\end{array}\right)\sim\mathcal{N\left(\left(\begin{array}{c}
+\end{array}\right)\sim\mathcal{N}\left(\left(\begin{array}{c}
 \mu_w\\
 \mu_h
 \end{array}\right),\left(\begin{array}{cc}
 \sigma_{w}^{2} & \sigma_{wh}\\
 \sigma_{wh} & \sigma_{h}^{2}
-\end{array}\right)\right)}
+\end{array}\right)\right)
 \]
 	\smallskip
-	\item Then, notice that\[
+	\item Then, since $\ln A_{i} = \ln W_{i} + \ln H_{i} + \varepsilon_{i}$ with $\varepsilon_{i}$ independent of $\left(W_{i},H_{i}\right)$,\[
 	\begin{array}{ll}
-	Cov\left( \ln A_{i}, \ln W_{i}\right) & = Cov\left(\ln W_{i} + \ln H_{i}, \ln W_{i}\right) \\
-	& = Var\left( \ln W_{i}\right) + Cov\left(\ln W_{i}, \ln H_{i}\right) 
+	\Cov\left( \ln A_{i}, \ln W_{i}\right) & = \Cov\left(\ln W_{i} + \ln H_{i} + \varepsilon_{i}, \ln W_{i}\right) \\
+	& = \Var\left( \ln W_{i}\right) + \Cov\left(\ln W_{i}, \ln H_{i}\right) 
 	\end{array}
 	\]
 
 	\smallskip
 	\item Finally, \[
-\hspace*{-.5cm}\frac{Cov\left(\ln A,\ln W\right)}{Var\left(\ln W\right)}=\frac{Var\left(\ln W\right)+Cov\left(\ln H,\ln W\right)}{Var\left(\ln W\right)}=1+\frac{Cov\left(\ln H,\ln W\right)}{Var\left(\ln W\right)}
+\hspace*{-.5cm}\frac{\Cov\left(\ln A,\ln W\right)}{\Var\left(\ln W\right)}=\frac{\Var\left(\ln W\right)+\Cov\left(\ln H,\ln W\right)}{\Var\left(\ln W\right)}=1+\frac{\Cov\left(\ln H,\ln W\right)}{\Var\left(\ln W\right)}
 \]
 \end{itemize}
 \end{frame}
@@ -880,10 +879,10 @@ which we now turn to.
 
 \begin{frame}{Silly Example III}
 	\begin{itemize}
-	\item In a bivariate regression of $A$ on $W$ (ommiting $H$), recall the slope would be given by \[
-	\hspace*{-.5cm}\frac{Cov\left(\ln A,\ln W\right)}{Var\left(\ln W\right)}=1+\frac{Cov\left(\ln H,\ln W\right)}{Var\left(\ln W\right)},
+	\item In a bivariate regression of $\ln A$ on $\ln W$ (omitting $\ln H$), recall the slope would be given by \[
+	\hspace*{-.5cm}\frac{\Cov\left(\ln A,\ln W\right)}{\Var\left(\ln W\right)}=1+\frac{\Cov\left(\ln H,\ln W\right)}{\Var\left(\ln W\right)},
 	\]
-	so the term $\frac{Cov\left(\ln H,\ln W\right)}{Var\left(\ln W\right)}$ represents bias. 
+	so the term $\frac{\Cov\left(\ln H,\ln W\right)}{\Var\left(\ln W\right)}$ represents bias. 
 
 	\smallskip
 	\item Implication: if the OLS coefficients in a multiple regression had the same formula 
@@ -916,7 +915,7 @@ coef(lm(logA ~ logW))         # short regression: slope approx 1.6 (biased!)
 coef(lm(logA ~ logW + logH))  # long regression:  both approx 1 (as they should be)
 \end{lstlisting}
 \begin{itemize}
-	\item The short-regression slope is $1 + \frac{Cov(\ln H, \ln W)}{Var(\ln W)} = 1.6$ --- exactly the formula from the previous slide.
+	\item The short-regression slope is $1 + \frac{\Cov(\ln H, \ln W)}{\Var(\ln W)} = 1.6$ --- exactly the formula from the previous slide.
 	\item This is the template for the whole course: \alert{derive} the bias with the operator rules, then \alert{simulate} to confirm.
 \end{itemize}
 \end{frame}
@@ -924,7 +923,7 @@ coef(lm(logA ~ logW + logH))  # long regression:  both approx 1 (as they should 
 \begin{frame}{Silly Example IV}
 
 	\[
-	\widehat{{\bf b}}_{OLS} \equiv  \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} 
+	{\bf b}_{OLS} \equiv  \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} 
 	\]
 
 
@@ -950,16 +949,16 @@ coef(lm(logA ~ logW + logH))  # long regression:  both approx 1 (as they should 
 
 
 	\begin{itemize}
-	\item Suppose that $w_{i}=\ln W_{i}-\mu_{w}$ and $\ln h_{i}=\ln H_{i}-\mu_{h}$
+	\item Suppose that $w_{i}=\ln W_{i}-\mu_{w}$, $h_{i}=\ln H_{i}-\mu_{h}$, and $y_{i}=\ln A_{i}-\mu_{a}$
 
 
-	\item Let $\boldsymbol{X}=\left[\boldsymbol{w}\quad\boldsymbol{h}\right]$
+	\item Let ${\bf X}=\left[{\bf w}\quad{\bf h}\right]$ (an $n\times 2$ matrix, no constant needed since everything is de-meaned)
 
 	\item It follows that 
 \[
-\boldsymbol{X}'\boldsymbol{X}=\left(\begin{array}{cc}
-\sum\left(\ln W_{i}-\mu_{w}\right)^{2} & \sum\left(\ln W_{i}-\mu_{w}\right)\left(\ln H_{i}-\mu_{h}\right)\\
-\sum\left(\ln W_{i}-\mu_{w}\right)\left(\ln H_{i}-\mu_{h}\right) & \sum\left(\ln H_{i}-\mu_{h}\right)^{2}
+{\bf X}'{\bf X}=\left(\begin{array}{cc}
+\sum_{i} w_{i}^{2} & \sum_{i} w_{i}h_{i}\\
+\sum_{i} w_{i}h_{i} & \sum_{i} h_{i}^{2}
 \end{array}\right)
 \]
 Note: if we multiply that by $n^{-1}$, we have the sample analog of the
@@ -973,21 +972,21 @@ covariance matrix.
 	\begin{itemize}
 	\item Similarly,
 \[
-\boldsymbol{X'}\boldsymbol{y}=\left(\begin{array}{c}
-\sum\left(\ln W_{i}-\mu_{w}\right)\left(\ln A_{i}-\mu_{a}\right)\\
-\sum\left(\ln H_{i}-\mu_{h}\right)\left(\ln A_{i}-\mu_{a}\right)
+{\bf X}'{\bf y}=\left(\begin{array}{c}
+\sum_{i} w_{i}y_{i}\\
+\sum_{i} h_{i}y_{i}
 \end{array}\right),
 \]
-is the sample covariance of $\boldsymbol{x}$ and $\boldsymbol{y}$
+is the sample covariance of ${\bf x}_{i}$ and $y_{i}$
 (times $n$). 
 
 \smallskip
 \item Therefore, we have
 \[
-\widehat{\boldsymbol{b}}_{OLS}=\left(\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\boldsymbol{X}'\boldsymbol{y}=\left(n^{-1}\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\left(n^{-1}\boldsymbol{X}'\boldsymbol{y}\right)=S_{xx}^{-1}s_{xy}
+{\bf b}_{OLS}=\left({\bf X}'{\bf X}\right)^{-1}{\bf X}'{\bf y}=\left(n^{-1}{\bf X}'{\bf X}\right)^{-1}\left(n^{-1}{\bf X}'{\bf y}\right)={\bf S}_{xx}^{-1}{\bf s}_{xy}
 \]
-where $S_{xx}$ is the sample covariance matrix for $\boldsymbol{x}$
-and $s_{xy}$ is the sample covariance of $\boldsymbol{x}$ and $y$. 
+where ${\bf S}_{xx}$ is the sample covariance matrix of ${\bf x}_{i}$
+and ${\bf s}_{xy}$ is the vector of sample covariances of ${\bf x}_{i}$ with $y_{i}$. 
 
 \end{itemize}
 \end{frame}
@@ -996,15 +995,15 @@ and $s_{xy}$ is the sample covariance of $\boldsymbol{x}$ and $y$.
 \begin{frame}{Silly Example VII}
 
 \[
-\widehat{\boldsymbol{b}}_{OLS}=S_{xx}^{-1}s_{xy}
+{\bf b}_{OLS}={\bf S}_{xx}^{-1}{\bf s}_{xy}
 \]
 
 \begin{itemize}
 	\item The population moments for the model of painting areas are \[
-Var\left(\boldsymbol{x}\right)=\left(\begin{array}{cc}
+\Var\left({\bf x}_{i}\right)=\left(\begin{array}{cc}
 \sigma_{w}^{2} & \sigma_{wh}\\
 \sigma_{wh} & \sigma_{h}^{2}
-\end{array}\right)\qquad\qquad Cov\left(\boldsymbol{x},y\right)=\left(\begin{array}{c}
+\end{array}\right)\qquad\qquad \Cov\left({\bf x}_{i},y_{i}\right)=\left(\begin{array}{c}
 \sigma_{w}^{2}+\sigma_{wh}\\
 \sigma_{h}^{2}+\sigma_{wh}
 \end{array}\right)
@@ -1012,7 +1011,7 @@ Var\left(\boldsymbol{x}\right)=\left(\begin{array}{cc}
 
 \item Note that 
 \[
-\left(Var\left(\boldsymbol{x}\right)\right)^{-1}=\frac{1}{\sigma_{w}^{2}\sigma_{h}^{2}-\sigma_{wh}^{2}}\left(\begin{array}{cc}
+\Var\left({\bf x}_{i}\right)^{-1}=\frac{1}{\sigma_{w}^{2}\sigma_{h}^{2}-\sigma_{wh}^{2}}\left(\begin{array}{cc}
 \sigma_{h}^{2} & -\sigma_{wh}\\
 -\sigma_{wh} & \sigma_{w}^{2}
 \end{array}\right)
@@ -1020,7 +1019,7 @@ Var\left(\boldsymbol{x}\right)=\left(\begin{array}{cc}
 
 \item With some algebra, the population-moments version of OLS gives us the right coefficients:
 \[
-\left(Var\left(\boldsymbol{x}\right)\right)^{-1}Cov\left(\boldsymbol{x},y\right)=\left(\begin{array}{c}
+\Var\left({\bf x}_{i}\right)^{-1}\Cov\left({\bf x}_{i},y_{i}\right)=\left(\begin{array}{c}
 1\\
 1
 \end{array}\right)
@@ -1045,11 +1044,13 @@ Var\left(\boldsymbol{x}\right)=\left(\begin{array}{cc}
 \end{itemize}
 
 \begin{block}{Frisch-Waugh Theorem}
-The OLS regression of ${\bf y} $ on $\left[{\bf X}_{1},  {\bf X}_2 \right]$
-yields a subvector ${\bf b}_{2}$ of coefficient estimates that is the same as
-the result from a regression of the residuals from a regression
-of ${\bf y} $ on ${\bf X}_{1}$ are regressed on the residuals
-from a regression of ${\bf X}_{2}$ on ${\bf X}_{1}$.
+In the OLS regression of ${\bf y} $ on $\left[{\bf X}_{1},  {\bf X}_2 \right]$,
+the subvector ${\bf b}_{2}$ of coefficients on ${\bf X}_{2}$ equals the coefficients from regressing
+the residuals of ${\bf y}$ on ${\bf X}_{1}$ on the residuals of ${\bf X}_{2}$ on ${\bf X}_{1}$:
+\[
+{\bf b}_{2} = \left({\bf X}_{2}'{\bf M}_{1}{\bf X}_{2}\right)^{-1}{\bf X}_{2}'{\bf M}_{1}{\bf y},
+\qquad {\bf M}_{1} = {\bf I} - {\bf X}_{1}\left({\bf X}_{1}'{\bf X}_{1}\right)^{-1}{\bf X}_{1}'.
+\]
 
 \end{block}
 \end{frame}
@@ -1057,11 +1058,11 @@ from a regression of ${\bf X}_{2}$ on ${\bf X}_{1}$.
 \begin{frame}{The Frisch-Waugh Theorem II}
 \begin{itemize}
 	\item In other words, let's start by regressing ${\bf y} $ on ${\bf X}_{1}$.
-	Let's label the residuals from this regression ${\bf y}^{*} $.
+	Let's label the residuals from this regression ${\bf y}^{*} = {\bf M}_{1}{\bf y}$.
 
 	\item Let's also regress ${\bf X}_{2}$ on ${\bf X}_{1}$ 
 	(think about regressing each column of ${\bf X}_{2}$ on ${\bf X}_{1}$).
-	Let's label the residuals from this regression ${\bf X}^{*}_{2}$.
+	Let's label the residuals from this regression ${\bf X}^{*}_{2} = {\bf M}_{1}{\bf X}_{2}$.
 
 	\item If we regress ${\bf y}^{*}$ on ${\bf X}^{*}_{2}$, we get the same
 	coefficient on ${\bf X}^{*}_{2}$ that we would have had in the full
@@ -1097,10 +1098,10 @@ from a regression of ${\bf X}_{2}$ on ${\bf X}_{1}$.
 
 \begin{frame}{Units and Coefficients}
 \begin{itemize}
-	\item Recalling that $E\left[{\bf y}|{\bf X}\right] = {\bf X} \boldsymbol{\beta}$, a natural interpretation	of
+	\item Recalling that $\E\left[{\bf y}|{\bf X}\right] = {\bf X} \boldsymbol{\beta}$, a natural interpretation	of
 	the coefficients is 
 	is \[
-	\beta_1 = \frac{d }{d X_{1i}}E\left[y_i |{\bf X}\right]
+	\beta_k = \frac{\partial }{\partial x_{k,i}}\E\left[y_i |{\bf X}\right]
 	\]
 	
 	\item In simple linear regression, it's easy to see that re-scaling (changing the units
@@ -1122,14 +1123,15 @@ from a regression of ${\bf X}_{2}$ on ${\bf X}_{1}$.
 \begin{frame}{Goodness of Fit}
 \begin{itemize}
 	\item The {\bf total sum of squares}, or the {\bf total variation} in the dependent variable:\[
-	SST = \left({\bf y} - {\bf i} \overline{y} \right)' \left({\bf y} - {\bf i} \overline{y} \right)
+	SST = \left({\bf y} - {\bf i} \overline{y} \right)' \left({\bf y} - {\bf i} \overline{y} \right) = {\bf y}'{\bf M}_{0}{\bf y}
 	\]
+	where ${\bf i}$ is an $n\times 1$ vector of ones and ${\bf M}_{0} = {\bf I} - n^{-1}{\bf i}{\bf i}'$ de-means a vector.
 
 	\smallskip
 	\item The dependent variable decomposes into a prediction and a residual:\[
-	{\bf y} = {\bf X} {\bf b} + {\bf e} =  \widehat{{\bf y}} + {\bf e}
+	{\bf y} = {\bf X} {\bf b}_{OLS} + {\bf e} =  \widehat{{\bf y}} + {\bf e}
 	\]
-where ${\bf X} {\bf b} =  \widehat{{\bf y}}$ is the prediction or {\bf fitted value} of $y$. 
+where $\widehat{{\bf y}} = {\bf X} {\bf b}_{OLS}$ is the prediction or {\bf fitted value} of ${\bf y}$. 
 
 	\smallskip
 	\item We can think about decomposing the variation in $y$ into variation in $ \widehat{{\bf y}}$ and ${\bf e}$.
@@ -1142,27 +1144,29 @@ where ${\bf X} {\bf b} =  \widehat{{\bf y}}$ is the prediction or {\bf fitted va
 \begin{frame}{Coefficient of Determination}
 \begin{itemize}
 	\item The variation in $y$ splits cleanly into explained and unexplained pieces
+	when ${\bf X}$ includes a constant
 	(this is the \alert{law of total variance} from Lecture 1, in sample form):\[
-	\underbrace{SST}_{\text{total}} = \underbrace{SSR}_{\text{explained}} + \underbrace{SSE}_{\text{residual}}
+	\underbrace{SST}_{\text{total}} = \underbrace{SSE}_{\text{explained}} + \underbrace{SSR}_{\text{residual}},
+	\qquad SSE = \widehat{{\bf y}}'{\bf M}_{0}\widehat{{\bf y}}, \quad SSR = {\bf e}'{\bf e}
 	\]
 	(The matrix version of this decomposition: Hansen 3.13.)
 
 	\smallskip
 	\item The coefficient of determination is the proportion of the variation in the dependent variable
 	explained by the model:\[
-	R^{2} = \frac{SSR}{SST}
-	= 1 -  \frac{{\bf e}'{\bf e}}{\sum_i \left(y_i - \bar{y}\right)^2}
+	R^{2} = \frac{SSE}{SST}
+	= 1 -  \frac{{\bf e}'{\bf e}}{{\bf y}'{\bf M}_{0}{\bf y}}
 \]
 
 	\smallskip
-	\item $R^{2}$ is a measure of goodness of fit that always goes up as we add more regressors. It doesn't 
+	\item $R^{2}$ is a measure of goodness of fit that never goes down as we add more regressors. It doesn't 
 	tell us whether it's ``worth it'' to add a new regressor to the model. (Later we will talk about why overfitting
 	can be bad in finite samples.)
 
 \smallskip
 	\item {\bf Adjusted} $R^{2}$ incorporates a penalty for the number of regressors:
 	\[
-	\overline{R}^{2} 	= 1 -  \frac{{\bf e}'{\bf e}/\left(n-K\right)}{\boldsymbol{y}'\boldsymbol{M}_{0}\boldsymbol{y}/\left(n-1\right)}
+	\overline{R}^{2} 	= 1 -  \frac{{\bf e}'{\bf e}/\left(n-K\right)}{{\bf y}'{\bf M}_{0}{\bf y}/\left(n-1\right)}
 	\]
 \end{itemize}
 \end{frame}
@@ -1244,16 +1248,17 @@ where ${\bf X} {\bf b} =  \widehat{{\bf y}}$ is the prediction or {\bf fitted va
 
 	\medskip
 	\item The {\bf mean squared error} of this predictor is\[
-	MSE = E\left[\left( y - {\bf x}' \boldsymbol{\gamma}\right)^{2}\right]
+	MSE\left(\boldsymbol{\gamma}\right) = \E\left[\left( y - {\bf x}' \boldsymbol{\gamma}\right)^{2}\right]
 	\]
 
 	\item This can be written\[
-	MSE = E\left[ \left(y - E\left[y | {\bf x}\right]\right)^{2}\right] + E\left[  \left(E\left[y | {\bf x}\right]- {\bf x}' \boldsymbol{\gamma}\right)^{2} \right]
+	MSE\left(\boldsymbol{\gamma}\right) = \E\left[ \left(y - \E\left[y | {\bf x}\right]\right)^{2}\right] + \E\left[  \left(\E\left[y | {\bf x}\right]- {\bf x}' \boldsymbol{\gamma}\right)^{2} \right]
 	\]
 	(check this by expanding and applying the law of iterated expectations)
 
-	\item Result: OLS is the value of $\boldsymbol{\gamma}$ that minimizes mean square error. This does not
-	require normality of the error terms. (Good operator practice: expand the square and apply
+	\item Result: the minimizer is $\boldsymbol{\gamma}^{*} = \E\left[{\bf x}{\bf x}'\right]^{-1}\E\left[{\bf x}y\right]$, and OLS is its
+	sample analog. By the decomposition, ${\bf x}'\boldsymbol{\gamma}^{*}$ is also the best linear approximation to $\E\left[y|{\bf x}\right]$.
+	This does not require normality of the error terms. (Good operator practice: expand the square and apply
 	the law of iterated expectations.)
 
 \end{itemize}
@@ -1263,12 +1268,12 @@ where ${\bf X} {\bf b} =  \widehat{{\bf y}}$ is the prediction or {\bf fitted va
 \begin{frame}{Gauss-Markov Theorem}
 
 \begin{block}{Gauss-Markov Theorem}
-In the linear regression model with homoscedastic errors, The OLS estimator 
+In the linear regression model with homoscedastic errors, the OLS estimator 
 is the {\bf best linear unbiased estimator} (BLUE).
 \end{block}
 
 \begin{itemize}
-	\item ``Best'' means estimator with lowest variance -- most precise
+	\item ``Best'' means lowest variance in the matrix sense: $\Var\left[\widetilde{{\bf b}}|{\bf X}\right] - \Var\left[{\bf b}_{OLS}|{\bf X}\right]$ is positive semidefinite for any other linear unbiased $\widetilde{{\bf b}}$
 
 	\item Normally distributed error not assumed here
 
@@ -1291,7 +1296,7 @@ is the {\bf best linear unbiased estimator} (BLUE).
 	\smallskip
 	\item Without homoskedasticity, but maintaining our other assumptions, {\bf Generalized
 		Least Squares} is BLUE. That is, suppose,\[
-	Var\left[\boldsymbol{\varepsilon} | {\bf X} \right] = \boldsymbol{\Omega}
+	\Var\left[\boldsymbol{\varepsilon} | {\bf X} \right] = \boldsymbol{\Omega}
 	\]
 	then the BLUE estimator is \[
 	{\bf b}_{GLS} = \left({\bf X}'\boldsymbol{\Omega}^{-1}{\bf X}\right)^{-1} {\bf X}' \boldsymbol{\Omega}^{-1}{\bf y} .
@@ -1312,9 +1317,9 @@ is the {\bf best linear unbiased estimator} (BLUE).
 	\]
 \begin{itemize}
 		\item Note that our argument for OLS being unbiased involved a step where we argue that \[
-	E\left[\left({\bf X}'{\bf X}\right)^{-1} {\bf X}' \boldsymbol{\varepsilon}\right] =0
+	\E\left[\left({\bf X}'{\bf X}\right)^{-1} {\bf X}' \boldsymbol{\varepsilon} | {\bf X}\right] ={\bf 0}
 	\]
-	thanks to strict endogeneity.
+	thanks to strict exogeneity.
 
 	\medskip
 	\item If one of the regressors is correlated with $\varepsilon$, strict exogeneity is violated, and this term will cause bias. 
@@ -1330,13 +1335,13 @@ is the {\bf best linear unbiased estimator} (BLUE).
 	\]
 
 	\item The OLS estimator will equal\[
-	{\bf b} = \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} = \boldsymbol{\beta}  + \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf z} \gamma + \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' \boldsymbol{\varepsilon}
+	{\bf b}_{OLS} = \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} = \boldsymbol{\beta}  + \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf z} \gamma + \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' \boldsymbol{\varepsilon}
 	\]
 
 	\item The last term is mean zero given the strict exogeneity assumption.
 
-	\item Note that the second term will not be zero if ${\bf X}$ and ${\bf z}$ are correlated;
-	i.e. if $ {\bf X}' {\bf z} \ne 0$.
+	\item The second term is $\gamma$ times the coefficients from regressing ${\bf z}$ on ${\bf X}$, so it is
+	nonzero when ${\bf X}$ and ${\bf z}$ are correlated; i.e., if $ {\bf X}' {\bf z} \ne {\bf 0}$.
 
 	\item Implication:  correlation between omitted variables and the observed regressors makes OLS biased.
 
@@ -1363,7 +1368,7 @@ is the {\bf best linear unbiased estimator} (BLUE).
 		where the $u$'s and $\varepsilon$ are all independently distributed. 
 		
 		\item<1-> We know that OLS will deliver
-		a biased estimate of $\beta_{1}$, but will OLS still be consistent for $\beta_2$?
+		a biased (and inconsistent) estimate of $\beta_{1}$, but will OLS still be consistent for $\beta_2$?
 		
 		\medskip
 		\item<2-> No! The correlation between $x_1$ and $x_2$ leads to bias even
@@ -1429,7 +1434,7 @@ and we now have an endogeneity problem because $x_{2,i} = u_{2,i} + u_{3,i}$ and
 
 	\medskip
 	\item For most estimators, we derive asymptotic properties, i.e., \[
-	\sqrt{n} \left({\bf b}_{OLS} - \boldsymbol{\beta}\right) \Rightarrow_{d} \mathcal{N}\left(0, \Sigma\right)
+	\sqrt{n} \left({\bf b}_{OLS} - \boldsymbol{\beta}\right) \overset{d}{\to} \mathcal{N}\left({\bf 0}, {\bf V}\right)
 	\]
 
 	\item The above statement says that the OLS estimator
@@ -1451,7 +1456,7 @@ and we now have an endogeneity problem because $x_{2,i} = u_{2,i} + u_{3,i}$ and
 	\item To do asymptotic analysis, we specify a {\bf data generating process}. 
 	
 	\item A data generating process describes the distribution of 
-	 a sequence of observations $\left(\boldsymbol{x}_{i},\varepsilon_{i}\right)$ 	for $i=1,2,\dots n$. 
+	 a sequence of observations $\left({\bf x}_{i},\varepsilon_{i}\right)$ 	for $i=1,2,\dots n$. 
 
 
 	\item The simplest case is assuming that observations are {\bf independent and identically distributed}
@@ -1461,7 +1466,7 @@ and we now have an endogeneity problem because $x_{2,i} = u_{2,i} + u_{3,i}$ and
 	that requires the dependence between ``distant'' observations to go to zero -- see {\bf stationarity}
 	and {\bf ergodicity} (e.g., time series, and 	more recently some spatial analysis)
 
-	\item We also need the data to be ``well-behaved'', i.e. $E\left[{\bf x} {\bf x}' \right]$ must have
+	\item We also need the data to be ``well-behaved'', i.e. $\E\left[{\bf x}_{i} {\bf x}_{i}' \right]$ must have
 	full rank and the error terms must have finite variance. 
 
 \end{itemize}
@@ -1472,10 +1477,10 @@ and we now have an endogeneity problem because $x_{2,i} = u_{2,i} + u_{3,i}$ and
 \begin{frame}{OLS Asymptotic Distribution}
 \begin{itemize}
 	\item We can use the central limit theorem to show that OLS is asymptotically
-	normally distributed:\[
-\boldsymbol{b}_{OLS}\sim^{a}\mathcal{N}\left(\boldsymbol{\beta},\frac{\sigma^{2}}{n}E\left[\boldsymbol{x}_{i}\boldsymbol{x}_{i}'\right]^{-1}\right)
+	normally distributed. Under homoskedasticity, ${\bf V} = \sigma^{2}\E\left[{\bf x}_{i}{\bf x}_{i}'\right]^{-1}$, so\[
+{\bf b}_{OLS}\overset{a}{\sim}\mathcal{N}\left(\boldsymbol{\beta},\frac{\sigma^{2}}{n}\E\left[{\bf x}_{i}{\bf x}_{i}'\right]^{-1}\right)
 \]
-	where $ \sim^{a}$ signifies convergence in distribution. 
+	where $\overset{a}{\sim}$ means ``approximately distributed as, in large samples'' (shorthand for the $\sqrt{n}$ statement). 
 
 	\item This is just like the finite-sample distribution
 	we got with normally distributed error terms.

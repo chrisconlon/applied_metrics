@@ -21,7 +21,7 @@
 	the values of certain parameters
 
 	\medskip
-	\item Simplest example: testing whether mean of a variable $\mu_x \equiv E\left[X\right]$ 
+	\item Simplest example: testing whether mean of a variable $\mu_x \equiv \E\left[X\right]$ 
 	is different from a particular value:\[
 \begin{array}{c}
 H_{0}:\qquad\mu_{x}=a\\
@@ -31,7 +31,7 @@ H_{1}:\qquad\mu_{x}\ne a
 
 	\medskip
 	\item A hypothesis test typically involves a {\bf null hypothesis} and {\bf alternative hypothesis}. 
-	The alternative hypothesis could also be about a particular value ($H_{1}:\mu_{x}= b$, or 
+	The alternative hypothesis could also be about a particular value ($H_{1}:\mu_{x}= b$), or 
 	a one-sided rejection of the null ($H_{1}:\mu_{x}>a$).
 
 
@@ -53,8 +53,8 @@ H_{0}:\mu_{x}=a \qquad H_{1}:\mu_{x}\ne a
 using a {\bf z test}.
 
 	\item We construct the test statistic, which under the null hypothesis has the standard normal distribution:
-	\begin{align*}		z = \frac{ \overline{X} - a}{n^{-1/2}\sigma}
-	 \overset{d}{\to} \mathcal{N} \left( 0,1\right)
+	\begin{align*}		z = \frac{ \overline{X} - a}{\sigma/\sqrt{n}}
+	 \sim \mathcal{N} \left( 0,1\right)
 	 \end{align*}
 \end{itemize}
 \end{frame}
@@ -106,7 +106,7 @@ using a {\bf z test}.
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
-	\item $\bar{X}$ is normal with $Var\left(\bar{X}\right)=1$; test $H_{0}: \mu_x = 1$
+	\item $\bar{X}$ is normal with $\Var\left(\bar{X}\right)=1$; test $H_{0}: \mu_x = 1$
 	against $H_{1}: \mu_x = 4$. Blue and red are the PDFs of $\bar{X}$ under the null
 	and alternative.
 
@@ -132,13 +132,13 @@ using a {\bf z test}.
 
 	\smallskip
 	\item Our test statistic instead is\[
-		t = \frac{ \overline{X} - a}{n^{-1/2} s}
+		t = \frac{ \overline{X} - a}{s/\sqrt{n}}
 	\]
 	where \[
-s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
+s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)^2}
 \]
 
-	\item Here, $t$ has a $t$-distribution with $n-1$ degrees of freedom. 
+	\item Under $H_0$, $t$ has a $t$-distribution with $n-1$ degrees of freedom. 
 
 \end{itemize}
 \end{frame}
@@ -167,12 +167,12 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 
 \begin{frame}{Motivating Small Sample $t$-Tests}
 \begin{itemize}
-	\item Last week we learned that if $N$ is large then,
+	\item Last week we learned that if $n$ is large then,
 	\[
-		{\bf b}_{OLS} \stackrel{a}{\sim}\mathcal{N}\left(\beta,Var({\bf b}_{OLS})\right)
+		{\bf b}_{OLS} \stackrel{a}{\sim}\mathcal{N}\left(\boldsymbol{\beta},\Var({\bf b}_{OLS})\right)
 	\]
 	\begin{itemize}
-		\item This hinges on knowing $Var({\bf b}_{OLS})$
+		\item This hinges on knowing $\Var({\bf b}_{OLS})$
 		\item We rarely know this in practice --- we estimate it instead
 		\item Like testing the mean of a normal random variable, estimating the variance
 		of the test statistic puts us in a $t$-test situation.
@@ -183,18 +183,18 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 \begin{frame}{$t$-Statistics for OLS Parameters (homoscedasticity)}
 
 \[
-\frac{{\bf b}_{OLS,k} - \beta_k}{\sqrt{s^2 \left( {\bf X}' {\bf X}\right)^{-1}_{kk}}} \sim t_{n-K}
+\frac{b_{k} - \beta_k}{\sqrt{s^2 \left( {\bf X}' {\bf X}\right)^{-1}_{kk}}} \sim t_{n-K}
 \]
 
 \begin{itemize}
-	\item where $K$ is the number of parameters,  $s^2$ is the estimator of
+	\item where $b_k$ is the $k$th element of ${\bf b}_{OLS}$, $K$ is the number of parameters,  $s^2$ is the estimator of
 	the variance of $\varepsilon$, and \[
 	\left( {\bf X}' {\bf X}\right)^{-1}_{kk}
 	\]
-	refers to the $k$th diagonal element of $\left( {\bf X}' {\bf X}\right)^{-1}$.
+	refers to the $k$th diagonal element of $\left( {\bf X}' {\bf X}\right)^{-1}$. (Exact with normal errors; approximate otherwise.)
 
 	\item Note that the denominator of the above formula is the standard error for the $k$th
-	estimated parameter ${\bf b}_{OLS,k} $.
+	estimated parameter $b_{k}$.
 
 \end{itemize}
 \end{frame}
@@ -233,11 +233,11 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 
 \begin{frame}{An Example (Bivariate Regression)}
 
-\onslide<1->{Suppose I have the following estimated parameters on 30 observations
+\onslide<1->{Suppose I have the following estimated parameters on $n=30$ observations
 \begin{align*}
 	b_1 =& 1.00\\
-	\sum_{i=1}^N(X_i-\bar X)^2 =& 14\\
-	\sum_{i=1}^N e_i^2 =& 100
+	\sum_{i=1}^n(x_i-\bar x)^2 =& 14\\
+	\sum_{i=1}^n e_i^2 =& 100
 \end{align*}}
 
 \only<2>{
@@ -252,14 +252,14 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 
 \only<3>{\begin{enumerate}\item[2.]  Second, calculate $s^2$:
 	\begin{align*}
-		s^2 =& \frac{1}{N-2}\sum_{i=1}^N( e_i)^2 = 3.45
+		s^2 =& \frac{1}{n-2}\sum_{i=1}^n e_i^2 = \frac{100}{28} = 3.57
 	\end{align*}
 \end{enumerate}
 }
 
 \only<4>{\begin{enumerate}\item[3.]  Third, calculate $t$ under $H_0: \beta_1 = 0$:
 	\begin{align*}
-		t=& \frac{\hat\beta_1 - \beta_1(H_0)}{\sqrt{s^2/\sum_{i=1}^N(X_i-\bar X)^2}} = \frac{1.00}{\sqrt{3.45/14}} = 2.015
+		t=& \frac{b_1 - \beta_1(H_0)}{\sqrt{s^2/\sum_{i=1}^n(x_i-\bar x)^2}} = \frac{1.00}{\sqrt{3.57/14}} = 1.98
 	\end{align*} 
 	\end{enumerate}
 }
@@ -267,9 +267,9 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 
 \only<5>{\begin{enumerate}\item[4.]  Compare to a critical value
 \begin{itemize}
-	\item In this case because $df=28$ we DO NOT REJECT the null
+	\item In this case because $df=28$ (critical value 2.05) we DO NOT REJECT the null
 	\item Note: $K=2$ assuming we also have a constant term. 
-	\item If we had used the $\mathcal{N}(0,1)$ we would narrowly reject the null	
+	\item If we had used the $\mathcal{N}(0,1)$ (critical value 1.96) we would narrowly reject the null	
 \end{itemize}
 
 	\end{enumerate}
@@ -278,7 +278,7 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)}^2
 
 \only<6>{\begin{enumerate}\item[5.]  We can also use the critical values to construct a confidence interval
 \[
-	CI = \hat\beta\pm 2.05\times SE(\hat\beta) = 1.00\pm 2.05\times \sqrt{3.45/14} = [-.017,2.017]
+	CI = b_1\pm 2.05\times SE(b_1) = 1.00\pm 2.05\times \sqrt{3.57/14} = [-0.035,2.035]
 \]
 \begin{itemize}
 	\item Note that we use the $t$-distribution critical values!
@@ -316,9 +316,9 @@ It is \alert{not}:
 \begin{itemize}
 	\item Sometimes we want to test multiple parameters:\[
 \begin{array}{c}
-H_{0}:\qquad\beta_{exp}=0\quad\text{AND}\quad\beta_{exp2}=0\\
+H_{0}:\qquad\beta_{\text{exp}}=0\quad\text{AND}\quad\beta_{\text{exp}^2}=0\\
 \\
-H_{1}:\qquad\beta_{exp}\ne0\quad\text{OR}\quad\beta_{exp2}\ne0
+H_{1}:\qquad\beta_{\text{exp}}\ne0\quad\text{OR}\quad\beta_{\text{exp}^2}\ne0
 \end{array}
 \]
 
@@ -346,7 +346,7 @@ Suppose we have a large sample and t-statistics are $-1$ and $-2$. Do we reject 
 If the $t$'s are independent:
 \begin{itemize}
 	\item The circle contains 95\% of the probability for two independent t-statistics;
-	the area outside it is the rejection rejoin for the joint t-test.
+	the area outside it is the rejection region for the joint test.
 	\item The dashed lines are the rejection regions for each of the individual t-tests.  (5\% level)
 	\item Even though naively would reject, in actuality \emph{not significant}
 	\item What happens with correlated normal RVs?
@@ -383,7 +383,7 @@ If the $t$'s are independent:
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
-	\item Now, the area outside the ellipse is the rejection region for the joint t-test (5\% level)
+	\item Now, the area outside the ellipse is the rejection region for the joint test (5\% level)
 	\item The dashed lines are the rejection regions for each of the individual t-tests.  (5\% level)
 	\item Now, notice that even with $t_1 = -2$, $t_2=-2$, which would be a rejection according
 	to each of the individual tests, is not a rejection of the joint test. 
@@ -401,7 +401,7 @@ If the $t$'s are independent:
 The issues we have are:
 \begin{enumerate}
 	\item Testing a joint hypothesis with independent tests will not give the correct type 1 error
-	\item Correlated $\hat\beta$'s make things very messy	
+	\item Correlated $b$'s make things very messy	
 \end{enumerate}
 
  How can we solve this?
@@ -419,7 +419,7 @@ The issues we have are:
 	\begin{itemize}
 		\item Always positive and only big when $t$'s are big
 		\item If $t_1$ and $t_2$ are independent normals, then $F\sim \chi^2_2$
-		\item If we divide by 2 we have $F_2$ distribution
+		\item If we divide by 2 we have an $F_{2,\infty}$ distribution
 	\end{itemize}
 \end{itemize}	
 \end{frame}
@@ -436,15 +436,15 @@ Our candidate test:
 	\begin{itemize}
 		\item Non-matrix formula (for 2 parameters):
 		\[
-			F = \frac{1}{2}\times\frac{t_1^2 + t_2^2 - 2\rho_{t_1,t_2}t_1t_2}{1-\rho_{t_1,t_2}}
+			F = \frac{1}{2}\times\frac{t_1^2 + t_2^2 - 2\rho_{t_1,t_2}t_1t_2}{1-\rho_{t_1,t_2}^2}
 		\]
-		\item Matrix version (for $k$ parameters):
+		\item Matrix version (for $J$ parameters):
 		\[
-			\hat\beta-\beta\sim\mathcal{N}\left(0,\Sigma_{\hat\beta}\right)\Rightarrow \Sigma_{\hat\beta}^{-1/2}\times\left(\hat\beta-\beta\right)\sim\mathcal{N}(0,I)
+			{\bf b}-\boldsymbol{\beta}\sim\mathcal{N}\left({\bf 0},\boldsymbol{\Sigma}\right)\Rightarrow \boldsymbol{\Sigma}^{-1/2}\left({\bf b}-\boldsymbol{\beta}\right)\sim\mathcal{N}({\bf 0},{\bf I})
 		\]
 		This implies,
 		\[
-		(\hat\beta-\beta)'\Sigma^{-1}(\hat\beta-\beta)/k\sim\chi^2_k/k = F_k
+		({\bf b}-\boldsymbol{\beta})'\boldsymbol{\Sigma}^{-1}({\bf b}-\boldsymbol{\beta})/J\sim\chi^2_J/J = F_{J,\infty}
 		\]
 		
 		
@@ -455,14 +455,14 @@ Our candidate test:
 \begin{frame}{What is the F Distribution?}
 New test statistic:
 		\[
-			F = \frac{1}{2}\times\frac{t_1^2 + t_2^2 - 2\rho_{t_1,t_2}t_1t_2}{1-\rho_{t_1,t_2}}
+			F = \frac{1}{2}\times\frac{t_1^2 + t_2^2 - 2\rho_{t_1,t_2}t_1t_2}{1-\rho_{t_1,t_2}^2}
 		\]
 
 \begin{itemize}
 	\item Almost always requires a computer
 	\item Ugly formula that follows a simple distribution
-	\item In general, for $q$ restrictions, we will calculate the $F$ statistic and it will be distributed $F_q$ ($F_{q,\infty}$ sometimes)
-	\item Related to take the sum of squared normal random variables
+	\item In general, for $J$ restrictions, we will calculate the $F$ statistic and it will be distributed $F_{J,n-K}$ (or $F_{J,\infty}$ in large samples)
+	\item Related to the sum of squared normal random variables
 	\item Critical values will depend on the number of restrictions
 	\item Fun fact: for 1 restriction $F = t^2$
 \end{itemize}
@@ -483,9 +483,9 @@ New test statistic:
 	\item The distribution looks different than the $t$
 	\item But the testing procedure is the same!
 	\begin{itemize}
-		\item Find a critical value so that $P(F>cv)=.05$
-		\item If $F$ is large \emph{given the null} then null is unlikely to be true
-		\item Critical value depends on number of restrictions, $q$
+			\item Find a critical value so that $\Pr(F>cv)=.05$
+			\item If $F$ is large \emph{given the null} then null is unlikely to be true
+			\item Critical value depends on number of restrictions, $J$
 	\end{itemize}	
 \end{itemize}
 
@@ -504,22 +504,22 @@ New test statistic:
 	\item What would ${\bf R}$ and ${\bf q}$ be if we were testing whether two slopes were equal?
 
 	\item The F statistic (or feasible Wald statistic):\[
-F=\frac{\left(\boldsymbol{R}\boldsymbol{b}_{OLS}-\boldsymbol{q}\right)'\left\{ \boldsymbol{R}\left[s^{2}\left(\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\right]\boldsymbol{R}'\right\} ^{-1}\left(\boldsymbol{R}\boldsymbol{b}_{OLS}-\boldsymbol{q}\right)}{J},
+F=\frac{\left({\bf R}{\bf b}_{OLS}-{\bf q}\right)'\left\{ {\bf R}\left[s^{2}\left({\bf X}'{\bf X}\right)^{-1}\right]{\bf R}'\right\} ^{-1}\left({\bf R}{\bf b}_{OLS}-{\bf q}\right)}{J},
 \]
-which has a $F\left[J,n-K\right]$ distribution, where $J$ is the number of rows of ${\bf R}$ (the number of restrictions).
+which, under $H_0$ with normal errors, has an $F\left[J,n-K\right]$ distribution, where $J$ is the number of rows of ${\bf R}$ (the number of restrictions).
 
 \end{itemize}
 \end{frame}
 
 \begin{frame}{F-tests: equivalent definitions}
 \[
-F=\frac{\left(\boldsymbol{R}\boldsymbol{b}_{OLS}-\boldsymbol{q}\right)'\left\{ \boldsymbol{R}\left[s^{2}\left(\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\right]\boldsymbol{R}'\right\} ^{-1}\left(\boldsymbol{R}\boldsymbol{b}_{OLS}-\boldsymbol{q}\right)}{J},
+F=\frac{\left({\bf R}{\bf b}_{OLS}-{\bf q}\right)'\left\{ {\bf R}\left[s^{2}\left({\bf X}'{\bf X}\right)^{-1}\right]{\bf R}'\right\} ^{-1}\left({\bf R}{\bf b}_{OLS}-{\bf q}\right)}{J},
 \]
 \begin{itemize}
 	\item We could also write:\[
-		F = \frac{SSE_{CLS} - SSE_{OLS}}{Js^2},
+		F = \frac{SSR_{CLS} - SSR_{OLS}}{Js^2},
 	\]
-	where $SSE_{OLS}$ is the sum of squared residuals for the (unrestricted) OLS estimator, $SSE_{CLS}$
+	where $SSR_{OLS}$ is the sum of squared residuals for the (unrestricted) OLS estimator, $SSR_{CLS}$
 	is the sum of squared residuals under the {\bf constrained least squares} estimator with constraints ${\bf R} \boldsymbol{\beta} = {\bf q}$.
 
 	\item We are not going to delve into constrained least squares, but the point here is that there are two equivalent ways to think about
@@ -616,15 +616,15 @@ $\Pr(\text{at least one rejection})$ & 5\% & 23\% & \alert{64\%} & 99.4\% \\
 \begin{frame}{Confidence Intervals I}
 \begin{itemize}
 	\item Note that if 	\[
-		{\bf b} \sim\mathcal{N}\left(\boldsymbol{\beta},\Sigma\right),
+		{\bf b} \sim\mathcal{N}\left(\boldsymbol{\beta},\boldsymbol{\Sigma}\right),
 	\]
 	then \[
 		b_{k} \sim\mathcal{N}\left(\beta_k,\Sigma_{kk}\right),	
 	\]
 	and \[
-	\Pr\left[ b_{k} - \alert{\underbrace{z_{\left(1-\alpha/2\right)}}_{1.96}} \sqrt{\Sigma_{kk}} \le \beta_k \le b_k +  \alert{\underbrace{z_{\left(1-\alpha/2\right)}}_{1.96}}  \sqrt{\Sigma_{kk}}  \right] =\alpha 
+	\Pr\left[ b_{k} - \alert{\underbrace{z_{\left(1-\alpha/2\right)}}_{1.96}} \sqrt{\Sigma_{kk}} \le \beta_k \le b_k +  \alert{\underbrace{z_{\left(1-\alpha/2\right)}}_{1.96}}  \sqrt{\Sigma_{kk}}  \right] =1-\alpha 
 	\]
-	where $ z_{\left(1-\alpha/2\right)} $ is the value such that the CDF of the standard normal distribution is $1-\alpha/2$. 	
+	where $ z_{\left(1-\alpha/2\right)} $ is the value such that the CDF of the standard normal distribution is $1-\alpha/2$ (1.96 for $\alpha=.05$). 	
 
 \end{itemize}
 \end{frame}
@@ -640,7 +640,7 @@ $\Pr(\text{at least one rejection})$ & 5\% & 23\% & \alert{64\%} & 99.4\% \\
 	because the variance $\Sigma_{kk}$ has to be estimated, then
  \[
 	\hspace*{-1cm} \Pr\left[ b_{k} - \alert{t_{\left(1-\alpha/2\right),n-K}} \sqrt{\hat{\Sigma}_{kk}} \le \beta_k
-	 \le b_k +  \alert{t_{\left(1-\alpha/2\right),n-K}}  \sqrt{\hat{\Sigma}_{kk}}  \right] =\alpha 
+	 \le b_k +  \alert{t_{\left(1-\alpha/2\right),n-K}}  \sqrt{\hat{\Sigma}_{kk}}  \right] =1-\alpha 
 	\]
 	where $ t_{\left(1-\alpha/2\right),n-K} $ is the value such that the CDF of the t-distribution with $n-K$ degrees of freedom is $1-\alpha/2$. 	
 
@@ -651,7 +651,7 @@ $\Pr(\text{at least one rejection})$ & 5\% & 23\% & \alert{64\%} & 99.4\% \\
 
 \begin{frame}{Confidence Intervals III}
 \begin{itemize}
-	\item We define the $1-\alpha$ {\bf confidence interval} for $b_{k}$ as \[
+	\item We define the $1-\alpha$ {\bf confidence interval} for $\beta_{k}$ as \[
 	\left(b_{k} - t_{\left(1-\alpha/2\right),n-K} \sqrt{\hat{\Sigma}_{kk}} , b_k +  t_{\left(1-\alpha/2\right),n-K}  \sqrt{\hat{\Sigma}_{kk}} \right)
 	\]
 
@@ -709,17 +709,17 @@ Stars measure \alert{precision}. Decisions run on \alert{magnitudes}.
 \item Our data $((X_1,Y_1),\ldots,(X_n,Y_n)) \sim P$ are drawn from some measure $P$
 \begin{itemize}
 \item We can form a \alert{nonparametric estimate} $\hat{P}$ by just assuming that each $(X_i,Y_i)$ has weight $\frac{1}{n}$.
-\item We can then simulate a new sample $(X^{*},Y^{*}) = ((X_1^{*},Y_1^{*}),\ldots, (Y_n^{*}, X_n^{*})) \sim \hat{P}$.
+\item We can then simulate a new sample $(X^{*},Y^{*}) = ((X_1^{*},Y_1^{*}),\ldots, (X_n^{*}, Y_n^{*})) \sim \hat{P}$.
 \begin{itemize}
 \item Easy: we take our data and construct $n$ observations by \alert{sampling with replacement} 
 \end{itemize}
-\item Compute whatever statistic of $S(X^*,Y^*)$ we would like.
+\item Compute whatever statistic $S(X^*,Y^*)$ we would like.
 \begin{itemize}
-\item Could be the OLS coefficients $\beta_1^{*},\ldots, \beta_k^{*}$.
-\item Or some function $\beta_1^{*}/\beta_2^{*}$.
-\item Or something really complicated: estimate parameters of a game $\hat{\theta}^*$ and now find Nash Equilibrium of the game $S(X^{*},Y^{*},\hat{\theta^*})$ changes.
+\item Could be the OLS coefficients $b_1^{*},\ldots, b_K^{*}$.
+\item Or some function $b_1^{*}/b_2^{*}$.
+\item Or something really complicated: estimate parameters of a game $\hat{\theta}^*$ and now find how the Nash Equilibrium of the game $S(X^{*},Y^{*},\hat{\theta}^*)$ changes.
 \end{itemize}
-\item Do this $B$ times and calculate at $Var(S_b)$ or $CI(S_1,\ldots, S_b)$.
+\item Do this $B$ times and calculate $\Var(S_1,\ldots,S_B)$ or $CI(S_1,\ldots, S_B)$.
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -727,13 +727,13 @@ Stars measure \alert{precision}. Decisions run on \alert{magnitudes}.
 
 \begin{frame}{Bootstrap: Bias Correction}
 \small
-The main idea is that $\hat{\theta}^{1*},\ldots, \hat{\theta}^{B*}$ approximates the \alert{sampling distribution} of $\hat{\theta}$. There are lots of things we can do now:
+The main idea is that $\hat{\theta}^{*}_{(1)},\ldots, \hat{\theta}^{*}_{(B)}$ approximates the \alert{sampling distribution} of $\hat{\theta}$. There are lots of things we can do now:
 \begin{itemize}
-\item We already saw how to calculate $Var(\hat{\theta}^{1*},\ldots, \hat{\theta}^{B*})$.
+\item We already saw how to calculate $\Var(\hat{\theta}^{*}_{(1)},\ldots, \hat{\theta}^{*}_{(B)})$:
 \begin{eqnarray*}
 \frac{1}{B-1} \sum_{b=1}^B (\hat{\theta}_{(b)}^* - \overline{\theta^{*}})^2
 \end{eqnarray*}
-\item Calculate $\E(\hat{\theta}^{*}_{(1)},\ldots, \hat{\theta}^{*}_{(B)}) = \overline{\theta^{*}} = \frac{1}{B} \sum_{b=1}^B \hat{\theta}_{(b)}^*$.
+\item Calculate the bootstrap mean $\overline{\theta^{*}} = \frac{1}{B} \sum_{b=1}^B \hat{\theta}_{(b)}^*$.
 \end{itemize}
 \end{frame}
 
@@ -759,7 +759,7 @@ There are actually three ways to construct bootstrap CI's:
 \begin{enumerate}
 \item Obvious way: sort  $\hat{\theta}^{*}$ then take $CI: [\hat{\theta}^{*}_{\alpha/2},\hat{\theta}^{*}_{1-\alpha/2}]$.
 \item Asymptotic Normal:  $CI: \hat{\theta} \pm 1.96 \sqrt{V(\hat{\theta}^{*})}$. (CLT).
-\item Better Way: let $W= \hat{\theta} -\theta$. If we knew the distribution of $W$ then: $Pr(w_{1-\alpha/2} \leq W \leq w_{\alpha/2})$:
+\item Better Way: let $W= \hat{\theta} -\theta$, with quantiles $w_{q}$. If we knew the distribution of $W$ then $\Pr(w_{\alpha/2} \leq W \leq w_{1-\alpha/2}) = 1-\alpha$, so:
 \begin{eqnarray*}
 CI: [\hat{\theta} -w_{1-\alpha/2}, \hat{\theta} -w_{\alpha/2}]
 \end{eqnarray*}
@@ -775,12 +775,12 @@ Why is this preferred? Bias Correction!
 
 \begin{frame}{Bootstrap: Why do people like it?}
 \begin{itemize}
-\item Econometricians like the bootstrap because under certain conditions it is \alert{higher order efficient} for the confidence interval construction (but not the standard errors).
+\item Econometricians like the bootstrap because under certain conditions (asymptotically pivotal statistics, such as $t$) it is \alert{higher-order accurate} for confidence interval construction (but not the standard errors).
 \begin{itemize}
 \item Intuition: because it is non-parametric it is able to deal with more than just the first term in the Taylor Expansion (actually an \alert{Edgeworth Expansion}).
 \item Higher-order asymptotic theory is best left for real econometricians!
 \end{itemize}
-\item Practitioner's like the bootstrap because it is easy.
+\item Practitioners like the bootstrap because it is easy.
 \begin{itemize}
 \item If you can estimate your model once in a reasonable amount of time, then you can construct confidence intervals for most parameters and model predictions.
 \end{itemize}
@@ -798,9 +798,9 @@ Why is this preferred? Bias Correction!
 \begin{frame}{Bootstrap: Variants}
 The bootstrap I have presented is sometimes known as the \alert{nonparametric bootstrap} and is the most common one.
 \begin{description}
-\item[Parametric Bootstrap] ex: if $Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$ then we can estimate $(\hat{\beta}_0,\hat{\beta}_1)$ via OLS.\\
- Now we can generate a bootstrap sample by drawing an $x_i$ at random with replacement $\hat{\beta}_0 + \hat{\beta}_1$ and then drawing \alert{independently} from the distribution of estimated residuals $\hat{\epsilon}_i$.
- \item[Wild Bootstrap] Similar to parametric bootstrap but we rescale $\epsilon_i$ to allow for \alert{heteroskedasticity}
+\item[Residual Bootstrap] ex: if $y_i = \beta_0 + \beta_1 x_i + \varepsilon_i$ then we can estimate $(b_0,b_1)$ via OLS.\\
+ Now we can generate a bootstrap sample $y_i^{*} = b_0 + b_1 x_i + e_i^{*}$, drawing $e_i^{*}$ \alert{independently} of $x_i$, with replacement, from the OLS residuals. (\alert{Parametric}: draw $e_i^{*}$ from a fitted distribution, e.g.\ $\mathcal{N}(0,s^2)$.)
+ \item[Wild Bootstrap] Similar, but set $e_i^{*} = v_i e_i$ with a random weight $v_i$ (e.g.\ $\pm 1$), keeping each residual with its own $x_i$ to allow for \alert{heteroskedasticity}
 \item[Block Bootstrap] For correlated data (e.g.: time series). Blocks can be overlapping or not.  
 \end{description}
 \end{frame}
@@ -808,14 +808,14 @@ The bootstrap I have presented is sometimes known as the \alert{nonparametric bo
 
 \begin{frame}{Summary}
 \begin{itemize}
-	\item Linear regression theory gives us formulas for estimating $Var\left({\bf b}_{OLS}\right)$
+	\item Linear regression theory gives us formulas for estimating $\Var\left({\bf b}_{OLS}\right)$
 
-	\item We can use that variance estimator to test hypotheses about parameters (using t-Tests
-	and f-Tests) as well as construct confidence intervals. 
+	\item We can use that variance estimator to test hypotheses about parameters (using t-tests
+	and F-tests) as well as construct confidence intervals. 
 
 	\item When the baseline assumptions of the linear regression model are violated (due to
 	correlation or heteroscedasticity), we need to use somewhat more complex formulas
-	to estimate  $Var\left({\bf b}_{OLS}\right)$.
+	to estimate  $\Var\left({\bf b}_{OLS}\right)$.
 
 \end{itemize}
 \end{frame}

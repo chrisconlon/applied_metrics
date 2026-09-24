@@ -133,7 +133,11 @@
     }
 
     % Optional better unicode math support when present (Xe/Lua only)
-    \IfFileExists{unicode-math.sty}{\RequirePackage{unicode-math}}{}
+    \IfFileExists{unicode-math.sty}{%
+        \RequirePackage{unicode-math}%
+        % amsmath's \boldsymbol silently renders non-bold under unicode-math; route it to \symbf
+        \AtBeginDocument{\let\boldsymbol\symbf}%
+    }{}
 }{}
 
 % Redefine \mathcal to use script fonts
