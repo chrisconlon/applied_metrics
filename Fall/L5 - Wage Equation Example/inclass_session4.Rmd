@@ -33,6 +33,22 @@ b <- coef(m1)["ED"]
 c(log_points = unname(b), exact_pct = unname(100 * (exp(b) - 1)))
 ```
 
+# Reproduce: these are panel data
+
+The file is 595 workers observed for 7 years, sorted by worker and then year. A worker's
+errors are correlated across years, and `ED` and `FEM` never change within a worker, so
+the IID and heteroskedasticity-robust standard errors above are too small. Cluster by worker:
+
+```{r}
+wages$ID <- rep(1:595, each = 7)
+etable(m1, m1, m1,
+       vcov = list("iid", "hetero", ~ID),
+       headers = c("IID", "HC1", "Clustered by worker"))
+```
+
+Same coefficients, roughly twice the standard errors. (The bootstrap below resamples
+rows, so it ignores this too; resampling whole workers would respect the panel.)
+
 # Reproduce: interactions with `i()` and heterogeneous returns
 
 Do returns to education differ by sex?

@@ -14,14 +14,15 @@ Lecture 5, and leaves you three short problems.
 
 # Reproduce: power and sample size for an A/B test
 
-From the lecture: baseline conversion 2%, and we want to detect a lift to 2.5%
-(a 25% relative lift) at $\alpha = 0.05$ with 80% power.
+From the lecture: baseline conversion 2%, and we want to detect a lift to 2.2%
+(a 10% relative lift) at $\alpha = 0.05$ with 80% power.
 
 ```{r}
-power.prop.test(p1 = 0.02, p2 = 0.025, sig.level = 0.05, power = 0.80)
+power.prop.test(p1 = 0.02, p2 = 0.022, sig.level = 0.05, power = 0.80)
 ```
 
-The required $n$ *per arm*. Now the sample-size/lift curve:
+The required $n$ *per arm* (the slide's formula gives 80,679; `power.prop.test()` uses the
+pooled variance under $H_0$, so it lands slightly higher). Now the sample-size/lift curve:
 
 ```{r}
 lifts <- seq(0.0005, 0.005, by = 0.0005)
@@ -34,7 +35,7 @@ plot(100 * lifts / 0.02, n_req / 1000, type = "b", log = "y",
 Small lifts are *brutally* expensive to detect --- this is the Lewis--Rao point about
 advertising experiments.
 
-# Reproduce: randomization inference in ten lines
+# Reproduce: randomization inference in a few lines
 
 A small experiment with a skewed outcome --- exactly where the t-approximation is
 shakiest. 40 sellers, half treated, revenue is lognormal, true effect is a 30% lift:

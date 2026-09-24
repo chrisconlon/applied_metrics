@@ -388,6 +388,38 @@ c(log_points = unname(b), exact_pct = unname(100 * (exp(b) - 1)))</code></pre>
 <pre><code>## log_points  exact_pct 
 ## 0.07850365 8.16673020</code></pre>
 </div>
+<div id="reproduce-these-are-panel-data" class="section level1">
+<h1>Reproduce: these are panel data</h1>
+<p>The file is 595 workers observed for 7 years, sorted by worker and
+then year. A worker’s errors are correlated across years, and
+<code>ED</code> and <code>FEM</code> never change within a worker, so
+the IID and heteroskedasticity-robust standard errors above are too
+small. Cluster by worker:</p>
+<pre class="r"><code>wages$ID &lt;- rep(1:595, each = 7)
+etable(m1, m1, m1,
+       vcov = list(&quot;iid&quot;, &quot;hetero&quot;, ~ID),
+       headers = c(&quot;IID&quot;, &quot;HC1&quot;, &quot;Clustered by worker&quot;))</code></pre>
+<pre><code>##                                   m1                 m1.1                m1.2
+##                                  IID                  HC1 Clustered by worker
+## Dependent Var.:                LWAGE                LWAGE               LWAGE
+##                                                                              
+## Constant           5.201*** (0.0379)    5.201*** (0.0404)   5.201*** (0.0851)
+## ED                0.0785*** (0.0022)   0.0785*** (0.0022)  0.0785*** (0.0048)
+## EXP               0.0423*** (0.0022)   0.0423*** (0.0023)  0.0423*** (0.0047)
+## EXP2            -0.0007*** (4.94e-5) -0.0007*** (5.28e-5) -0.0007*** (0.0001)
+## FEM              -0.4169*** (0.0181)  -0.4169*** (0.0164) -0.4169*** (0.0341)
+## UNION             0.0788*** (0.0123)   0.0788*** (0.0114)  0.0788*** (0.0236)
+## _______________ ____________________ ____________________ ___________________
+## S.E. type                        IID Heteroskedasti.-rob.              by: ID
+## Observations                   4,165                4,165               4,165
+## R2                           0.37171              0.37171             0.37171
+## Adj. R2                      0.37096              0.37096             0.37096
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Same coefficients, roughly twice the standard errors. (The bootstrap
+below resamples rows, so it ignores this too; resampling whole workers
+would respect the panel.)</p>
+</div>
 <div id="reproduce-interactions-with-i-and-heterogeneous-returns" class="section level1">
 <h1>Reproduce: interactions with <code>i()</code> and heterogeneous
 returns</h1>

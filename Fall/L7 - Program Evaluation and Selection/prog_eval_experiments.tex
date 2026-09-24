@@ -187,13 +187,15 @@ Y_i = \alpha + \beta_i D_i + u_i
 \end{align*}
 
 \begin{itemize}
-\item People often choose $D_i$ with $\beta_i$ in mind.
+\item People often choose $D_i$ with $Y_i(0)$ or $\beta_i$ in mind.
 \item The problem: $D_i \perp u_i$ and/or $D_i \perp \beta_i$ are likely violated.
-\item We can get positive or negative selection bias:
+\item Selection on baseline outcomes ($u_i$) can go either way:
 \begin{itemize}
-\item e.g., who goes to college? Those likely to benefit more than most!
-\item e.g., who gets risky surgeries/drugs? people who are very sick.
+\item \alert{Positive}: who joins the loyalty program? Your best customers, who would have bought a lot anyway.
+\item \alert{Negative}: which accounts get a retention offer? The ones about to churn.
 \end{itemize}
+\item Selection on gains ($\beta_i$): which sellers buy paid promotion? Those who expect the biggest lift,
+so the comparison recovers (at best) the ATT, not the ATE.
 \end{itemize}
 \end{frame}
 

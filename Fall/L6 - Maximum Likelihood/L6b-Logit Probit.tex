@@ -290,7 +290,7 @@ Has some nice properties:
 \begin{column}{0.52\textwidth}
 \begin{itemize}
     \item We cannot compare parameter estimates across specifications
-    \item Rule of thumb: $\beta_{logit} \approx  1.81 \cdot \beta_{probit}$
+    \item Rule of thumb: $\beta_{logit} \approx  1.81 \cdot \beta_{probit}$ (why? see latent variables below)
     \item It is better to compare marginal effects $\frac{\partial \Pr(Y_i=1 \mid X)}{\partial x_k}$
     \item For LPM these are constant $\beta_k$, for logit/probit they depend on $X_i \beta$.
 \end{itemize}
@@ -334,6 +334,33 @@ $$
 \end{frame}
 
 
+\begin{frame}
+\frametitle{Marginal effects of binary regressors}
+\small
+For a dummy like \texttt{black}, there is no ``small change'': the effect is a \alert{discrete change}
+\begin{align*}
+\Delta_i = F\left(X_i\beta \mid \text{black}_i=1\right) - F\left(X_i\beta \mid \text{black}_i=0\right),
+\qquad \text{AME} = \frac{1}{N}\sum_{i=1}^N \Delta_i
+\end{align*}
+\begin{itemize}
+\item The derivative $f(Z_i)\beta_k$ only approximates this jump, and poorly when $\beta_k$ is large.
+\end{itemize}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ HMDA: \texttt{black} on Pr(deny) & LPM & Probit & Logit \\
+\midrule
+Discrete-change AME & 0.081 & 0.062 & 0.057 \\
+Derivative AME, $\frac{1}{N}\sum_i f(Z_i)\beta_k$ & 0.081 & 0.054 & 0.050 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+\item \texttt{marginaleffects::avg\_slopes()} detects a 0/1 regressor and reports the discrete change; hand-rolled $f(Z_i)\beta_k$ code does not.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Predicted Effects}
 \begin{center}
 \includegraphics[height=0.9\textheight]{resources/predicted_effects.pdf}
@@ -365,7 +392,29 @@ Y_i =
 \begin{itemize}
 \item Instead we only see whether $Y^{*}$ exceeds some threshold (in this case $0$).
 \item We can think about $Y^{*}$ as a \alert{latent variable}.
-\item Sometimes you will see this description in the literature, everything else is the same!
+\item Sometimes you will see this description in the literature. Next: it delivers exactly the models above.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Latent Variables: Where $F$ Comes From}
+\small
+Write the latent variable as a linear index plus an error with a symmetric CDF $F$:
+\begin{align*}
+Y_i^{*} = X_i\beta + \varepsilon_i, \qquad Y_i = 1\left[Y_i^{*} > 0\right]
+\end{align*}
+Then
+\begin{align*}
+\Pr(Y_i = 1 \mid X_i) = \Pr(\varepsilon_i > -X_i\beta) = 1 - F(-X_i\beta) = F(X_i\beta)
+\end{align*}
+\begin{itemize}
+\item $\varepsilon_i \sim \mathcal{N}(0,1)$ gives the \alert{probit}; $\varepsilon_i$ standard logistic gives the \alert{logit}.
+\item \alert{Only the scale of $\beta$ relative to $\varepsilon$ is identified}: $Y^{*}$ and $cY^{*} = X(c\beta) + c\varepsilon$
+produce the same $Y$ for any $c>0$. So we normalize: $\Var(\varepsilon)=1$ (probit), $\pi^2/3$ (logit).
+The threshold $0$ is also a normalization, absorbed by the intercept.
+\item The logit error has SD $\pi/\sqrt{3} \approx 1.81$, so $\beta_{logit} \approx 1.81\,\beta_{probit}$.
+Fatter logistic tails make the ratio vary (HMDA: 1.79--1.95; Amemiya suggested 1.6).
 \end{itemize}
 \end{frame}
 

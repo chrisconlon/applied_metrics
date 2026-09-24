@@ -71,7 +71,34 @@
 	\includegraphics [width=0.8\textwidth]	{table_1}
 \end{figure}
 \end{column}
-\end{columns}	
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Caveat: These Are Panel Data}
+\small
+\begin{itemize}
+	\item Cornwell--Rupert is \alert{595 workers observed for 7 years}, not 4,165 independent draws. A worker's
+	errors are correlated across years (ability, occupation, location), and ED and FEM never change within a
+	worker: the worst case of the Moulton factor from Lecture 3a ($\rho_x = 1$).
+	\item Heteroskedasticity-robust SEs do not fix this. Clustering by worker roughly doubles them:
+\end{itemize}
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+ & ED & FEM & UNION & EXP \\
+\midrule
+Coefficient & 0.0565 & $-$0.3892 & 0.0901 & 0.0404 \\
+SE: IID & 0.0026 & 0.0252 & 0.0129 & 0.0022 \\
+SE: HC1 & 0.0027 & 0.0240 & 0.0125 & 0.0022 \\
+SE: clustered by worker & \alert{0.0056} & \alert{0.0482} & \alert{0.0240} & \alert{0.0042} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+	\item In R: \texttt{cluster = \textasciitilde ID} with \texttt{ID = rep(1:595, each = 7)} (rows are sorted by worker).
+	Conclusions survive, but today's SEs are too small; panel data get their own treatment in Lecture 8a.
+\end{itemize}
 \end{frame}
 
 
