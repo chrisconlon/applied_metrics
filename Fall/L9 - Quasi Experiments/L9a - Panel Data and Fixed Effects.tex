@@ -1,7 +1,7 @@
 \documentclass[aspectratio=169,11pt]{beamer}
 \usepackage{teaching_slides}
 
-\title[L9a - Panel Data]{ Econometrics I}
+\title[L8a - Panel Data]{ Econometrics I}
 \subtitle{Lecture 8a: Panel Data and Fixed Effects}
 \author{Chris Conlon \\NYU Stern}
 \date{Fall 2026}
@@ -93,7 +93,7 @@
 	\begin{align*}
 		y_{it} &= 1 + \alert{0.10}\, x_{it} + \alpha_i + \gamma_t + \varepsilon_{it}, \qquad
 		\alpha_i \sim N(0, 0.5^2),\ \varepsilon_{it} \sim N(0, 0.3^2) \\
-		x_{it} &= 0.7\,\alpha_i + \text{(persistent firm component)} + \text{(year-to-year noise)}
+		x_{it} &= \rho\,\alpha_i + \text{(persistent firm component)} + \text{(year-to-year noise)}, \quad \rho = 0.7
 	\end{align*}
 	$N = 200$ firms, $T = 8$ years. $y$ is log productivity, $x$ the practices score.
 	\medskip
@@ -107,8 +107,8 @@
 \includegraphics[width=.6\textwidth]{fig_mp_pooled_vs_fe.pdf}
 \end{center}
 \vspace{-.3cm}
-{\small Grey: all firm-years. Colored: eight firms, each with its own within-firm fit. The pooled
-line runs through the \emph{between-firm} cloud; the within-firm lines have the true slope.}
+{\small Grey: all firm-years. Colored: eight firms, each drawn with its own intercept and the common within (FE)
+slope, $0.12$ (truth $0.10$). The pooled line runs through the \emph{between-firm} cloud.}
 \end{frame}
 
 
@@ -197,7 +197,7 @@ variation that carried the bias is gone; what is left is the true slope, plus no
 	\item Pooled OLS is off by a factor of two and a half. FE and first differences are within
 	sampling error of $0.10$ (one draw; the next slide shows the distribution).
 	\item Random effects and Mundlak are coming. Note the Mundlak coefficient on $\bar x_i$: it is the
-	part of the pooled bias that FE removed, estimated directly.
+	between-minus-within gap $\hat\beta_B-\hat\beta_{FE}$ that drives the pooled bias, estimated directly.
 \end{itemize}
 \end{frame}
 
@@ -227,9 +227,8 @@ For FE to be unbiased we need
 	\medskip
 	\item What it allows: $\alpha_i$ correlated with $x$ in any way at all. That is the whole appeal.
 	\medskip
-	\item First differences need only $\E[\Delta\varepsilon_{it} \mid \Delta x_{it}] = 0$, which is
-	weaker in one direction and stronger in another; the two estimators differing a lot is itself a
-	diagnostic.
+	\item First differences need exogeneity only for adjacent periods: weaker than strict exogeneity, but
+	one-period feedback still breaks it. FE and FD differing a lot is itself a diagnostic.
 \end{itemize}
 \end{frame}
 
@@ -325,7 +324,7 @@ GLS with $\Omega_i = \sigma^2_\varepsilon I_T + \sigma^2_\alpha\iota\iota'$ turn
 \end{center}
 \vspace{-.3cm}
 {\small For a typical firm panel ($\sigma^2_\alpha \ge \sigma^2_\varepsilon$, $T \approx 10$), $\theta$
-is already above $0.8$. RE and FE will be close in \emph{value} whenever they are both consistent; the
+is already about $0.7$ or more. RE and FE will be close in \emph{value} whenever they are both consistent; the
 question is only whether RE is consistent.}
 \end{frame}
 
@@ -347,7 +346,7 @@ $\theta$ depends on $\sigma^2_\varepsilon$ and $\sigma^2_\alpha$, which we estim
 	\item The within estimator uses only within variation; the between estimator uses only
 	between variation. RE is the precision-weighted combination of the two.
 	\item That sentence is also the diagnosis: if the between variation is contaminated by
-	$\Cov(\bar x_i, \alpha_i) \ne 0$, RE inherits a share $(1 - \theta)$-ish of the pooled bias.
+	$\Cov(\bar x_i, \alpha_i) \ne 0$, RE inherits part of the pooled bias (less than $(1-\theta)$ of it).
 	\item The workbook implements this in a dozen lines of R; \texttt{plm} and \texttt{lme4} do it for you.
 \end{itemize}
 \end{frame}
@@ -358,7 +357,7 @@ $\theta$ depends on $\sigma^2_\varepsilon$ and $\sigma^2_\alpha$, which we estim
 \includegraphics[width=.56\textwidth]{fig_re_bias_rho.pdf}
 \end{center}
 \vspace{-.3cm}
-{\small FE does not care. RE is biased in proportion to the correlation, less than pooled OLS because
+{\small FE does not care. RE's bias grows with the correlation, less than pooled OLS because
 $\theta$ is large here ($T = 8$), but biased. Nothing about ``random'' protects you from this.}
 \end{frame}
 
@@ -442,8 +441,8 @@ Substitute:
 \begin{itemize}
 	\item The classical statistic is \emph{negative}: $\hat V_{FE} - \hat V_{RE}$ is not positive
 	definite in this sample, exactly the fragility from the previous slide. (RE is inconsistent
-	here, so its residual variance is inflated by the bias, and its ``efficient'' standard error is
-	not smaller than FE's.) Software will either report nonsense or refuse.
+	here: the between regression attributes part of $\alpha_i$ to $\bar x_i$, so $\hat\sigma^2_\alpha$ and hence $\hat\theta$
+	are too small, and the leftover $\alpha_i$ inflates RE's residual variance.) Software will either report nonsense or refuse.
 	\item The Mundlak version has no such problem, rejects decisively, and came with clustered
 	standard errors for free.
 	\item Look back at the estimates table: the Mundlak coefficient on $x_{it}$ matched FE to three decimals.
@@ -460,7 +459,7 @@ Substitute:
 	clusters, which is why ``$N$ large, $T$ small'' is the comfortable case.
 	\medskip
 	\item Bertrand, Duflo and Mullainathan (2004): in state-year panels with serially correlated
-	outcomes, unclustered two-way FE regressions reject a true null of \emph{no effect} 45\% of the
+	outcomes, unclustered two-way FE regressions reject a true null of \emph{no effect} up to 45\% of the
 	time at the 5\% level. Cluster.
 	\medskip
 	\item Cluster at the level of the fixed effect \emph{or} the level at which $x$ is assigned,
@@ -485,7 +484,7 @@ Substitute:
 	\alert{by construction}.
 	\medskip
 	\item The bias is $O(1/T)$: it does not vanish as $N \to \infty$. With $T = 8$ and $\rho = 0.5$,
-	$\hat\rho$ is biased down by roughly $0.15$, and $\hat\beta$ picks up some of the damage.
+	$\hat\rho$ is biased down by roughly $0.2$, and $\hat\beta$ picks up some of the damage.
 	\item Fixes (Anderson--Hsiao, Arellano--Bond) instrument $\Delta y_{i,t-1}$ with deeper lags.
 	Rule for this course: no lagged dependent variable in an FE regression unless you know why.
 \end{itemize}
@@ -505,7 +504,7 @@ Three estimates of each store's effect:
 		w_s = \frac{\sigma^2_\alpha}{\sigma^2_\alpha + \sigma^2_\varepsilon / n_s} .
 	\]
 	The random-effects prediction, empirical Bayes, or a hierarchical model with a normal prior:
-	three names, one formula. The weight is the store's signal-to-noise ratio.
+	three names, one formula. The weight is the store's reliability: the signal share of its mean's variance.
 \end{itemize}
 \end{frame}
 
@@ -515,7 +514,7 @@ Three estimates of each store's effect:
 \includegraphics[width=.74\textwidth]{fig_partial_pooling.pdf}
 \end{center}
 \vspace{-.3cm}
-{\small Left: four-week stores (red) are pulled most of the way to the grand mean; sixteen-plus-week stores keep
+{\small Left: four-week stores (red) are pulled most of the way to the grand mean; 64-week stores keep most of
 their own mean. Right: the weight by weeks observed. MSE against the true $\alpha_s$: no pooling $0.082$,
 complete pooling $0.124$, partial pooling $0.053$.}
 \end{frame}
@@ -551,11 +550,11 @@ complete pooling $0.124$, partial pooling $0.053$.}
 	the ones with small $T_i$ and lucky draws.
 	\medskip
 	\item Shrink toward the mean in proportion to noise: the partial-pooling weight from the previous slides.
-	\item Believing $\hat\alpha_i$ causally also needs strict exogeneity of the \emph{assignment}
-	of units to $i$: patients are not randomly assigned to physicians (Chetty--Hendren's movers design
-	is the fix).
+	\item Believing $\hat\alpha_i$ causally also needs as-good-as-random \emph{assignment}
+	of units to $i$: patients are not randomly assigned to physicians (movers designs: Chetty--Hendren for
+	places, Finkelstein--Gentzkow--Williams for physicians).
 	\item Nonlinear models (logit with firm FE) add the \alert{incidental parameters} problem:
-	$\hat\beta$ is inconsistent for fixed $T$. Week 12.
+	$\hat\beta$ is inconsistent for fixed $T$.
 \end{itemize}
 \end{frame}
 
@@ -600,7 +599,7 @@ pf.feols("y ~ x + xbar | year", data=d, vcov={"CRV1": "firm"})
 
 
 \begin{frame}{Workbook time}
-\texttt{inclass\_session8.Rmd} (and the \texttt{pyfixest} twin):
+\texttt{inclass\_session8.Rmd}:
 \begin{enumerate}
 	\item Reproduce the estimates table: pooled, within, FD, hand-rolled RE, Mundlak.
 	\item Turn $\rho$ down to zero and up to $0.9$. Watch RE move and FE stay put.

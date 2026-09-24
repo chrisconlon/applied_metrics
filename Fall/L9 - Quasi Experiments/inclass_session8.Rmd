@@ -12,7 +12,7 @@ set.seed(8)
 ```
 
 This notebook reproduces the simulations behind Lectures 8a and 8b (the slides use
-`panel_sims.R`, which has the same code with more plotting) and leaves you four short
+`panel_sims.R`, which runs essentially the same simulations with more plotting) and leaves you four short
 problems. Everything is simulated, so you always know the right answer.
 
 # Part 1: Panel data and fixed effects
@@ -69,7 +69,7 @@ re <- re_fit(d)
 str(re)
 ```
 
-Compare $\hat\theta$ to the formula: with $T = 8$ and $\sigma^2_\alpha / \sigma^2_\varepsilon \approx$
+Compare $\hat\theta$ to the true $\theta = 1 - \sqrt{0.09/(0.09 + 8 \cdot 0.25)} = 0.79$: with $T = 8$ and $\sigma^2_\alpha / \sigma^2_\varepsilon \approx$
 `r round(re$s2_alpha / re$s2_eps, 2)`, RE is already most of the way to FE. Yet it is biased,
 because $\alpha_i$ is correlated with $x$.
 
@@ -87,7 +87,8 @@ etable(fit_fe, fit_mund, headers = c("within", "Mundlak"))
 ## Reproduce: partial pooling of store effects
 
 Sixty stores with very different amounts of data. The partial-pooling estimate shrinks each
-store's mean toward the grand mean by a weight equal to its signal-to-noise ratio.
+store's mean toward the grand mean; the weight on its own mean is its reliability
+(the signal share of the variance of its mean).
 
 ```{r}
 S <- 60; alpha <- rnorm(S, 0, 0.4); n_s <- sample(c(4, 8, 16, 32, 64), S, replace = TRUE)
@@ -111,7 +112,7 @@ when `rho = 0`.
 
 # In-class problem 2: measurement error
 
-Re-simulate with `rho = 0` and `me_sd = 0.5` (noise added to the observed practices score).
+Re-simulate with `rho = 0` and `me_sd = 1` (noise added to the observed practices score).
 Now pooled OLS has no omitted-variable problem. Compare pooled and within estimates to
 $0.10$. Which is more attenuated, and why does demeaning make measurement error worse?
 (Hint: what does demeaning do to the *signal* variance of $x$ versus the *noise* variance?)
@@ -164,8 +165,9 @@ Re-simulate with `anticipate = 2`: firms start adjusting two quarters before the
    the *post*-period coefficients even though the true post effects have not changed?
 2. Fix it by changing the reference period to `k = -3` (`ref = -3`). Confirm the post-period
    estimates are back on the red line.
-3. Bonus: instead of moving the reference, drop quarters $k = -2, -1$ from the sample. Does it
-   work? What did you give up?
+3. Bonus: instead of moving the reference, drop the *treated* firms' quarters $k = -2, -1$
+   (`es[!(treated == 1 & k %in% c(-2, -1))]`; controls are coded $k = -1$, so keep them).
+   Does it work? What did you give up?
 
 ```{r}
 # your code here

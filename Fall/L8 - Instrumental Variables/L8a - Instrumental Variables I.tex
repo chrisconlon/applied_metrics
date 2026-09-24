@@ -38,7 +38,7 @@
 \begin{itemize}
 	\item Basic Idea of Instrumental Variable (IV):
 		\begin{itemize}
-			\item What if we have a variable that is correlated with $X$ \emph{but not with $Y$}
+			\item What if we have a variable that is correlated with $X$ \emph{but not with $\varepsilon$} (it affects $Y$ only through $X$)
 			\item Then any changes in $Y$ caused by that variable will reflect causal changes by $X$
 		\end{itemize}
 \medskip
@@ -64,7 +64,7 @@
 
 \begin{frame}{Terminology Review}
 
-A ``Good" Regression:
+A ``Good'' Regression:
 
 \begin{figure}[H]
 \begin{center}
@@ -159,7 +159,7 @@ Selection/OVB:
 \end{frame}
 
 
-\begin{frame}{Omitted Variable Bias with Pictures}
+\begin{frame}{Instrumental Variables with Pictures}
 
 Instrumental Variable:
 
@@ -184,7 +184,7 @@ Instrumental Variable:
 \draw[edge1] (a) to (c);
 \draw[edge1] (b) to (c);
 \draw[edge2] (a) to (b);
-\draw[edge1] (d) to (a);                                            v
+\draw[edge1] (d) to (a);
 
 % rectangle
 \draw[rounded corners=15pt]
@@ -199,9 +199,9 @@ Instrumental Variable:
 
 \begin{itemize}{\small
 	\item $Z$ causes $Y$ \emph{only indirectly} through $X$
-	\item We can estimate ``causal effect" of $Z$ on $Y$ and this MUST be the causal effect of $Z$ on $X$ and the causal effect of $X$ on $Y$
+	\item We can estimate ``causal effect'' of $Z$ on $Y$ and this MUST be the product of the causal effect of $Z$ on $X$ and the causal effect of $X$ on $Y$
 	\begin{itemize}
-		\item Mathematically we need to split effect of on $Z$ on $Y$ into effect of $Z$ on $X$ and $X$ on $Y$
+		\item Mathematically we need to split the effect of $Z$ on $Y$ into effect of $Z$ on $X$ and $X$ on $Y$
 		\item Related concept in statistics: Path Analysis
 	\end{itemize}
 	}
@@ -215,7 +215,7 @@ Model:
 \end{align*}
 
 \begin{itemize}
-\item We call a variable $Z$ a a valid {\bf instrumental variable} if the following two conditions hold:
+\item We call a variable $Z$ a valid {\bf instrumental variable} if the following two conditions hold:
 \end{itemize}
 \begin{enumerate}
 	\item {\bf Relevance:} $Cov(X,Z)\ne 0$
@@ -244,7 +244,7 @@ Model:
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Key Assumptions \#2 of Instrumental Variables}
+\begin{frame}{Key Assumption \#2 of Instrumental Variables}
 \begin{itemize}
 	\item {\bf Exogeneity (or validity):} $Cov(\varepsilon,Z)= 0$
 \medskip
@@ -252,12 +252,12 @@ Model:
 \medskip
 \item We do not observe $\varepsilon$, so we \textbf{cannot} test this assumption
 \medskip
-\item In general, we need to ``defend" this assumption by telling a story about why $Z$ and $\varepsilon$ are unlikely to be correlated
+\item In general, we need to ``defend'' this assumption by telling a story about why $Z$ and $\varepsilon$ are unlikely to be correlated
 \medskip
 \item Much like parallel trends or strict exogeneity, these crucial identifying assumptions cannot
 be tested on their own. However, we can test them against each other. That is, the best we can
-do is ask the question "given this exogeneity assumption, does this other exogeneity assumption seem
-true?" But we can never test an exogeneity assumption in a self-contained way. 
+do is ask the question ``given this exogeneity assumption, does this other exogeneity assumption seem
+true?'' But we can never test an exogeneity assumption in a self-contained way. 
 \end{itemize}
 \end{frame}
 
@@ -295,7 +295,7 @@ Idea: There is a path from $Z \rightarrow Y$ but only \alert{through} $X$ (this 
 
 
 
-\begin{frame}{Best Defense of Exogeneity IV Assumption: Randomized Experiment}
+\begin{frame}{Best Defense of the IV Exogeneity Assumption: Randomized Experiment}
 \begin{itemize}
 \item Back to the class size example:
 \begin{align*}
@@ -307,7 +307,7 @@ score_i = \beta_0 + \beta_1 \textit{CS}_i + \varepsilon_i
 \item $CS_i$: Class size of student $i$
 \end{itemize}
 \medskip
-\item Suppose that we use a coin flip that sends kids that get a ``head" to a small class and kids getting a ``tails" to big class
+\item Suppose that we use a coin flip that sends kids that get a ``head'' to a small class and kids getting a ``tails'' to big class
 \begin{itemize}
 \item This is our randomized experiment!
 \end{itemize}
@@ -316,7 +316,7 @@ score_i = \beta_0 + \beta_1 \textit{CS}_i + \varepsilon_i
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Best Defense of Exogeneity IV Assumption: Randomized Experiment}
+\begin{frame}{Best Defense of the IV Exogeneity Assumption: Randomized Experiment}
 \vspace{-0.5em}
 \begin{align*}
 score_i = \beta_0 + \beta_1 \textit{CS}_i + \varepsilon_i
@@ -329,7 +329,7 @@ score_i = \beta_0 + \beta_1 \textit{CS}_i + \varepsilon_i
 \item So the regression $CS_i=\beta_0 + \beta_1 Z_i + \varepsilon_i$ will estimate that $\beta_1<0$
 \end{itemize}
 \medskip
-\item {\bf Exogeneity:} $Cov(\varepsilon,Z)\ne 0$? Untestable -- so need to tell a story
+\item {\bf Exogeneity:} $Cov(\varepsilon,Z)= 0$? Untestable -- so need to tell a story
 \begin{itemize}
 \item Story: Exogeneity holds because coin flip is random and does not depend on any student or parent characteristics that would affect test scores.  Therefore, there is nothing related to $Z$ (besides $X$) that is also related to test scores, so $\varepsilon$ and $Z$ must be uncorrelated.\\
 This is a good story! It's the ``magic'' of randomization.
@@ -343,7 +343,7 @@ This is a good story! It's the ``magic'' of randomization.
 	how we evaluate the assumption for an experimental or non-experimental setting
 \medskip
 \item When running an experiment, the exogeneity assumption is justified if the
-	randomization was implemented in way that was not correlated with anything else that could
+	randomization was implemented in a way that was not correlated with anything else that could
 	influence outcomes. Attrition and manipulation can undermine exogeneity in an experimental context
 	if they create a correlation between treatment status and other factors that might influence outcomes.
 	 Thus, exogeneity amounts to an assumption about how the randomization was implemented.
@@ -359,7 +359,7 @@ This is a good story! It's the ``magic'' of randomization.
 
 Let's begin with the simplest 0/1 model (this time for $Z$):
 \begin{align*}
-	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i\\
+	Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
 \end{align*}
 
 \begin{itemize}
@@ -373,18 +373,18 @@ Let's begin with the simplest 0/1 model (this time for $Z$):
 			\item $Cov(X,Z)\ne 0$
 			\item $Cov(Z,\varepsilon) = 0$
 		\end{itemize}
-	\item The intuition from above: solve for the ``indirect" effect of $Z$ on $Y$
+	\item The intuition from above: solve for the ``indirect'' effect of $Z$ on $Y$
 \end{itemize}
 
 \end{frame}
 
 
 
-\begin{frame}{The Relationship Between $Y$ on $Z$}
+\begin{frame}{The Relationship Between $Y$ and $Z$}
 
 What is the relationship between $Y$ and $Z$, taking expectations?
 \begin{align*}
-		\E(Y|Z) =& E\left(\beta_0 + \beta_1 X + \varepsilon| Z\right)\\
+		\E(Y|Z) =& \E\left(\beta_0 + \beta_1 X + \varepsilon| Z\right)\\
 			   =& \beta_0 + \beta_1 \E(X|Z) + \underbrace{\E(\varepsilon|Z)}_{=0}\\
 			   =&\beta_0 + \beta_1 \E(X|Z)
 \end{align*}
@@ -497,7 +497,7 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \begin{itemize}
 \item To get rid of OVB, we shall use an IV
 \medskip
-\item One possible IV: whether your roommate has a N64 (or playstation/whatever video game console kids use today)
+\item One possible IV: whether your roommate has an N64 (or PlayStation/whatever video game console kids use today)
 \medskip
 \item Important feature: Roommates are randomly assigned in college
 \begin{itemize}
@@ -533,11 +533,11 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \begin{itemize}
 \item Exogeneity: $Cov(Z,\varepsilon)= 0$
 \medskip
-\item ``Storytime" should talk about how two things hold
+\item ``Storytime'' should talk about how two things hold
 \begin{enumerate}
-\item People select into $Z$ in some manner that is likely to be correlated with $Y$
+\item People do \emph{not} select into $Z$ in a way that is correlated with $Y$ (as-good-as-random)
 \begin{itemize}
-\item Concern: People that pick roommates that are ``fun" and have N64s are likely people who do not care too much about grades
+\item Concern: People that pick roommates that are ``fun'' and have N64s are likely people who do not care too much about grades
 \end{itemize}
 \item $Z$ only affects $Y$ through $X$
 \begin{itemize}
@@ -545,7 +545,7 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \end{itemize}
 \end{enumerate}
 \medskip
-\item Either story ``invalidates" the instrument (but in different ways)
+\item Either story ``invalidates'' the instrument (but in different ways)
 \end{itemize}
 \end{frame}
 
@@ -560,11 +560,11 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \begin{itemize}
 \item Possible Story 1: Mario Kart helps me grasp physics, so I ace my physics exam
 \begin{itemize}
-\item so $Z$ directly affects Y \emph{independent} of $X$
+\item so $Z$ directly affects $Y$ \emph{independent} of $X$
 \end{itemize}
 \item Possible Story 2: Other people hang out in our room due to our N64, making it really loud and so I cannot study effectively
 \begin{itemize}
-\item so $Z$ affects Y through \emph{another} $X$
+\item so $Z$ affects $Y$ through \emph{another} $X$
 \end{itemize}
 \end{itemize}
 \end{enumerate}
@@ -589,9 +589,9 @@ Y_i=\pi_0 + \pi_1 Z_i + \varepsilon_i
 \item $Z_i$: is whether roommate has N64
 \end{itemize}
 \medskip
-\item \textbf{Interpretation of $\hat{\beta}_1$:} Having a roommate with a N64 \textbf{causes} a $\hat{\beta}_1$ decrease in GPA
+\item \textbf{Interpretation of $\hat{\pi}_1$:} Having a roommate with an N64 \textbf{causes} a $\hat{\pi}_1$ change in GPA (we expect $\hat{\pi}_1<0$)
 \begin{itemize}
-\item Causal effect because validity of instrument, $cov(Z,\varepsilon)=0$, implies OLS is consistent for above equation.
+\item Causal effect because validity of instrument, $Cov(Z,\varepsilon)=0$, implies OLS is consistent for the above equation.
 Of course we could question the instrument's validity.
 \end{itemize}
 \medskip
@@ -611,7 +611,7 @@ A popular IV estimator is Two Stage Least Squares (2SLS)
 \item We therefore estimate in two steps:
 \begin{enumerate}
 \item Regress $X$ on $Z$ to capture effect of $Z$ on $X$
-\item Regress fitted values of step 1 to capture effect of $X$ on $Y$
+\item Regress $Y$ on the fitted values from step 1 to capture the effect of $X$ on $Y$
 \end{enumerate}
 \smallskip
 \item Under IV assumptions, this gives us \textbf{causal} effect of $X$ on $Y$
@@ -628,14 +628,14 @@ X_i=\pi_0 + \pi_1 Z_i + \eta_i
 \begin{align*}
 Y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i
 \end{align*}
-\item Under IV assumptions, step 1 finds the ``good part" of $X$ (that is not related to $\varepsilon$), and then step 2 takes that ``good part" of $X$ as a regression to find the causal relationship between $X$ and $Y$
+\item Under IV assumptions, step 1 finds the ``good part'' of $X$ (that is not related to $\varepsilon$), and then step 2 takes that ``good part'' of $X$ as a regression to find the causal relationship between $X$ and $Y$
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}{2SLS Estimator}
 \begin{itemize}
-\item Why is $\hat{\beta}_1^{2SLS}=\frac{Cov(Y,Z)}{Cov(X,Z)}$?
+\item Why does 2SLS estimate $\beta_1=\frac{Cov(Y,Z)}{Cov(X,Z)}$?
 \medskip
 \item True model:
 \begin{align*}
@@ -645,7 +645,7 @@ Y_i=\beta_0 + \beta_1 X_i + \varepsilon_i
 \begin{align*}
 Cov(Y_i, Z_i)&=Cov(\beta_0 + \beta_1 X_i + \varepsilon_i, Z_i) \\
 Cov(Y_i, Z_i)& = Cov(\beta_0, Z_i) + Cov(\beta_1 X_i, Z_i) + Cov(\varepsilon_i, Z_i)\\
-Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilon_i, Z_i)$ by assumption} \\
+Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilon_i, Z_i)=0$ by assumption} \\
 \implies & \beta_1 =\frac{Cov(Y,Z)}{Cov(X,Z)}
 \end{align*}
 \end{itemize}
@@ -658,7 +658,7 @@ Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilo
 \begin{itemize}
 \item $Y_i$: is GPA
 \item $X_i$: is study time (hours per day)
-\item $Z_i$: is indicator for roomate having N64
+\item $Z_i$: is indicator for roommate having N64
 \end{itemize}
 \medskip
 \item Running 2SLS by doing both steps manually:
@@ -667,12 +667,12 @@ Cov(Y_i, Z_i)& = 0 + \beta_1Cov( X_i, Z_i) +0 \;\; \textit{since $Cov(\varepsilo
 \begin{itemize}
 \item \texttt{Data\$xHat = predict(feols(X$\sim$Z, data=Data))}
 \end{itemize}
-\item Step 2: Regress $y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i$
+\item Step 2: Regress $Y_i=\gamma_0 + \gamma_1 \hat{X}_i + \varepsilon_i$
 \begin{itemize}
 \item \texttt{m3 = feols(Y$\sim$xHat, data=Data)}
-\item \texttt{summary(m3, vcov= "HC1"))}
+\item \texttt{summary(m3, vcov = "HC1")}
 \begin{itemize}
-\item Note: Standard errors will be wrong!
+\item Note: Standard errors will be wrong! (Second-stage residuals use $\hat{X}$; the correct residuals use $X$.)
 \end{itemize}
 \end{itemize}
 	\begin{itemize}{\small
@@ -700,13 +700,13 @@ This is basically why we use \texttt{feols} whenever we can.
 \begin{itemize}
 \item Consider a multiple regression equation
 \begin{align*}
-\boldsymbol{y}=\boldsymbol{\beta}\boldsymbol{X}+\boldsymbol{\varepsilon}
+{\bf y}={\bf X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}
 \end{align*}
 The IV assumptions are now that
 \begin{itemize}
-\item $Cov\left(\boldsymbol{z}_{i},\varepsilon_{i}\right)=\boldsymbol{0}$
-\item $Cov\left(\boldsymbol{z}_{i},\boldsymbol{x}_{i}\right)$ has \emph{full rank}, i.e., rank $K$, where $K$ is
-	the number of regressors in $\bf{x}$
+\item $\E\left[{\bf z}_{i}\varepsilon_{i}\right]={\bf 0}$
+\item $\E\left[{\bf z}_{i}{\bf x}_{i}'\right]$ has \emph{full column rank} $K$, where $K$ is
+	the number of regressors in ${\bf x}$
 \end{itemize}
 \item We can have multiple regressors as well as instruments. Some regressors can also be instruments; if $\boldsymbol{z}_{i}=\boldsymbol{x}_{i}$
 then we can just use OLS.
@@ -726,9 +726,9 @@ endogenous regressor.
 	\text{with }\hat{\boldsymbol{X}}=\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}
 \end{align*}
 \smallskip
-\item With homoscedasticity, the asymptotic variance of the estimator is
+\item With homoskedasticity, the estimated asymptotic variance of the estimator is
 \begin{align*}
-Var\left(\boldsymbol{b}_{2SLS}\right)=\frac{s^{2}}{n}\left[\boldsymbol{Z}'\boldsymbol{X}\left(\boldsymbol{X}'\boldsymbol{X}\right)^{-1}\boldsymbol{X}'\boldsymbol{Z}\right]^{-1}
+\widehat{Var}\left(\boldsymbol{b}_{2SLS}\right)=s^{2}\left[\boldsymbol{X}'\boldsymbol{Z}\left(\boldsymbol{Z}'\boldsymbol{Z}\right)^{-1}\boldsymbol{Z}'\boldsymbol{X}\right]^{-1}, \quad s^2 = \frac{1}{n-K}\sum_i \left(y_i - {\bf x}_i'{\bf b}_{2SLS}\right)^2
 \end{align*}
 \smallskip
 	\item Note: this  (asymptotically correct) estimate of the variance is not equal to the (incorrect) formula we would get
@@ -759,8 +759,8 @@ babydata <- data.frame(AE98) %>%
   mutate(BoyBoy = 1* (boy1st ==1 & boy2nd==1),
          GirlGirl = 1* (boy1st ==0 & boy2nd==0))
 
-m5 = feols(workedm | morekids + boy1st + boy2nd + black + hispan + othrace + agem1 + agefstm | samesex ~ boy1st + boy2nd, 
-     data=babyData)
+m5 = feols(worked ~ boy1st + boy2nd + black + hisp + othrace + age + agefst | morekids ~ samesex,
+     data=babydata)
 \end{lstlisting}
 \end{column}
 \end{columns}
@@ -770,17 +770,16 @@ m5 = feols(workedm | morekids + boy1st + boy2nd + black + hispan + othrace + age
 
 
 
-\begin{frame}{Comparing 2SLS Variance to OLS Variance}{under Homoscedasticity}
+\begin{frame}{Comparing 2SLS Variance to OLS Variance}{under Homoskedasticity}
 
 For the single-variable case, we can show that
 \begin{align*}
-	Var(\hat\beta_{2SLS}) = \frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X R^2_{XZ}}
-\mathbf{X}'\mathbf{e}_{OLS}=\mathbf{0}
+	Var(\hat\beta_{2SLS}) = \frac{1}{n}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X R^2_{XZ}}
 \end{align*}
 	\smallskip
-	OLS variance under homoscedasticity: $Var(\hat\beta^{OLS})=\frac{1}{N}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X}$
+	OLS variance under homoskedasticity: $Var(\hat\beta^{OLS})=\frac{1}{n}\frac{\sigma_{\varepsilon}^2}{\sigma^2_X}$
 		\begin{itemize}
-			\item Since $R^2_{XZ}\leq 1$, IV variance is larger
+			\item Since $R^2_{XZ}\leq 1$, IV variance is at least as large
 			\item The higher first stage $R^2_{XZ}$, the lower the variance. If $X$ and $Z$ are collinear, variance is equivalent to OLS.
 			\item If $R^2_{XZ}\approx 0$ then variance blows up!
 		\end{itemize}
@@ -790,8 +789,9 @@ For the single-variable case, we can show that
 \begin{frame}{Unbiasedness ``Proof''}
 \begin{align*}
 \E[\hat{\beta}_1^{2SLS}]&=\E\left[\frac{\sum\limits_{i=1}^N(z_i-\bar{z})(y_i-\bar{y})}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] \\
-&=\beta_1 + \E\left[ \frac{\sum\limits_{i=1}^N(z_i-\bar{z})\varepsilon_i}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] =\beta_1 + 0
+&=\beta_1 + \E\left[ \frac{\sum\limits_{i=1}^N(z_i-\bar{z})\varepsilon_i}{\sum\limits_{i=1}^N(x_i-\bar{x})(z_i-\bar{z})} \right] \overset{?}{=}\beta_1 + 0
 \end{align*}
+{\small The last step fails: the denominator contains $x$, which is correlated with $\varepsilon$. 2SLS is \alert{consistent but biased} toward OLS; just-identified IV has no finite mean.}
 \end{frame}
 
 
@@ -806,8 +806,8 @@ New Model:
 \end{align*}
 
 \begin{itemize}
-	\item In many economic environments, variables both determine each other ``in equilibrium" or are determined together ``jointly"
-	\item A model where $X$ and $Y$ ``cause" each other	is called a {\bf simultaneous equations model}
+	\item In many economic environments, variables both determine each other ``in equilibrium'' or are determined together ``jointly''
+	\item A model where $X$ and $Y$ ``cause'' each other	is called a {\bf simultaneous equations model}
 	\item Examples:
 		\begin{itemize}
 			\item Angrist \& Evans is an example of this: labor supply and fertility decisions are determined jointly, there is no one-way channel
@@ -905,7 +905,7 @@ Cov(P_t,U_t) = - \frac{Var(U_t)}{\alpha_1 -\beta_1} \\
 Cov(P_t,V_t) =  \frac{Var(V_t)}{\alpha_1 -\beta_1} 
 \end{eqnarray*}
 \begin{itemize}
-\item When demand slopes down ($\alpha_1 < 0)$ and supply slopes up $(\beta_1 > 0)$ then price is positively correlated with demand shifter $U_t$ and negatively correlated with supply shifter $V_t$.
+\item When demand slopes down ($\alpha_1 < 0$) and supply slopes up $(\beta_1 > 0)$ then price is positively correlated with demand shifter $U_t$ and negatively correlated with supply shifter $V_t$.
 \end{itemize}
 \end{frame}
 
@@ -946,7 +946,7 @@ New Model:
 	\item If we have data on $Z$, we can potentially use $Z$ as an instrument!
 	\item What conditions would $Z$ have to fulfill?
 		\begin{enumerate}
-			\item Instrument Relevance: $\alpha_1>0$
+			\item Instrument Relevance: $\alpha_1\neq 0$
 			\item Instrument Exogeneity: $Cov(Z_i,\varepsilon_i)=0$
 		\end{enumerate}
 
@@ -1016,11 +1016,6 @@ where
 \\
 	\text{supply:} & \log P_{t} &=&  \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
 \end{align*}
-\begin{align*}
-	\text{demand:} & \log Q_{t} & = & \alpha_{0}+\alpha_{1}\log P_{t}+\alpha_{2}L_{t}+U_{1t}\\
-\\
-	\text{supply:} & \log P_{t} & = & \beta_{0}+\beta_{1}\log Q_{t}+\beta_{2}S_{t}+\beta_{3}I_{t}+U_{2t}
-\end{align*}
 \end{frame}
 % \begin{align*}
 % 	ext{demand:} & \log Q_{dt} & = & \alpha_{0}+\alpha_{1}\log P_{dt}+\varepsilon_{dt}\\
@@ -1083,7 +1078,7 @@ From \href{https://www.iaee.org/en/publications/ejarticle.aspx?id=2243}{Hughes, 
 
 
 
-\begin{frame}{Simultaneity more examples}
+\begin{frame}{More Simultaneity Examples}
 \begin{itemize}
 	\item \href{https://www.ptscott.com/papers/telecom_infrastructure.pdf}{Download speeds and mobile data consumption}:
 		Consumers use their smart phones more when download speeds are fast, but high usage leads to congestion, which slows
@@ -1091,7 +1086,7 @@ From \href{https://www.iaee.org/en/publications/ejarticle.aspx?id=2243}{Hughes, 
 
 	\bigskip
 	\item Road investment and travel demand: better roads are more appealing to travelers, and highly-used routes are likely
-		to receive more funding .
+		to receive more funding.
 
 	\bigskip
 	\item Public opinion influences policy, and policy influences public opinion (cigarettes, parental leave, same-sex marriage). 
@@ -1139,7 +1134,7 @@ Survey question: What is your income in thousands?
 	
 	\begin{itemize}{\scriptsize
 		\item The lumps occur at 5s and 0s
-		\item E.g., people making 41k might say ``40" or ``45" instead of 41
+		\item E.g., people making 41k might say ``40'' or ``45'' instead of 41
 			
 		}
 	\end{itemize}
@@ -1153,7 +1148,7 @@ Survey question: What is your income in thousands?
 	\item Consider adding and subtracting noise to the truth:
 		\begin{align*}
 			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
-				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
+				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New'' Error Term:} V_i}\\
 				=& \beta_0 + \beta_1 X_i^* + V_i
 		\end{align*}
 	\item $X_i^*$ and $V_i$ likely to be correlated because $X^*$ is part of $V$
@@ -1161,8 +1156,7 @@ Survey question: What is your income in thousands?
 		\begin{itemize}
 			\item {\bf Classical Errors-in-Variables:}
 				\begin{align*}
-				X_i = X_i^* + u_i
-				n^{-1} \sum_{i=1}^n \boldsymbol{m}\left(y_i,\mathbf{x}_i;\boldsymbol{\theta}\right)
+				X_i^* = X_i + u_i,\quad \E[u_i]=0,\ \Cov(u_i,X_i)=\Cov(u_i,\varepsilon_i)=0
 				\end{align*}
 		\end{itemize}
 
@@ -1174,7 +1168,7 @@ Survey question: What is your income in thousands?
 
 Under classical measurement error:
 	\begin{align*}
-		Y_i = \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1u_i + \varepsilon_i}_{V_i}
+		Y_i = \beta_0 + \beta_1 X_i^* + \underbrace{\varepsilon_i - \beta_1u_i}_{V_i}
 	\end{align*}
 \begin{itemize}
 	\item Using the population definition of $\hat\beta^{OLS}$:{\small
@@ -1204,7 +1198,7 @@ Under classical measurement error:
 			\begin{itemize}
 			\item {\bf NB:} It does \emph{not} make the term more negative---it dampens the coefficient and preserves the sign
 			\end{itemize}
-			\item This ``attenuates" the effect of $X$ on $Y$. Hence the name: {\bf attenuation bias}
+			\item This ``attenuates'' the effect of $X$ on $Y$. Hence the name: {\bf attenuation bias}
 		\end{itemize}
 		
 \end{itemize}
@@ -1216,7 +1210,7 @@ Under classical measurement error:
 	\begin{itemize}
 		\item Why does measurement error attenuate the estimated effect of $X$ on $Y$?
 		\begin{itemize}
-			\item Noise in measured $X$ makes it more likely to see high $X$ and low $X$ with some $Y$ because of randomness
+			\item Noise in measured $X$ makes it more likely to see high $X$ and low $X$ with the same $Y$ because of randomness
 			\item Extreme example: fix $X$ and keep adding noise---eventually $X^*$ will look like noise itself
 		\end{itemize}	
 		\item Notice the following rearranging of the attenuation term:
@@ -1226,7 +1220,7 @@ Under classical measurement error:
 			\begin{itemize}
 				\item $\sigma^2_X/\sigma^2_u$ is called the {\bf signal-to-noise ratio}
 				\item Larger signal to noise ratio $\Rightarrow$ smaller bias
-				\item What matter is the \emph{relative} variance of $X$ to $u$
+				\item What matters is the \emph{relative} variance of $X$ to $u$
 				\item If $\sigma^2_u$ is small \emph{relative} to $\sigma^2_X$ then attenuation bias isn't too large
 			\end{itemize}
 	\end{itemize}
@@ -1261,7 +1255,7 @@ Under classical measurement error:
 \begin{frame}{Measurement Error and IVs}
 		\begin{align*}
 			Y_i =& \beta_0 + \beta_1 X_i + \varepsilon_i\\
-				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New" Error Term:} V_i}\\
+				=& \beta_0 + \beta_1 X_i^* + \underbrace{\beta_1(X_i - X_i^*) + \varepsilon_i}_{\text{``New'' Error Term:} V_i}\\
 				=& \beta_0 + \beta_1 X_i^* + V_i
 		\end{align*}
 \begin{itemize}
@@ -1279,7 +1273,7 @@ Under classical measurement error:
 \begin{align*}
 \begin{array}{ccl}
 Y_{i} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}\\
-Y_{i}+Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+Y_{i}^{*}\\
+Y_{i}+(Y_{i}^{*}-Y_{i}) & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+(Y_{i}^{*}-Y_{i})\\
 Y_{i}^{*} & = & \beta_{0}+\beta_{1}X_{i}+\varepsilon_{i}+\left(Y_{i}^{*}-Y_{i}\right)
 \end{array}
 \end{align*}

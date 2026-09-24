@@ -89,8 +89,8 @@
 	quarters and stays there. Nothing happens before adoption.
 	\medskip
 	\item Also in the data: firm effects $\alpha_i$, a common macro path $\gamma_t$ (random walk with
-	drift), and noise. Treated firms are not a random half --- but they are, in this first
-	version, on the same trend as the others.
+	drift), and noise. Treated firms could differ in levels (the firm effects absorb that); in this first
+	version they are on the same trend as the others.
 	\medskip
 	\item Estimate the event-study regression with \texttt{fixest}'s \texttt{i()}, cluster by firm,
 	and plot.
@@ -103,7 +103,7 @@
 \includegraphics[width=.6\textwidth]{fig_es_single.pdf}
 \end{center}
 \vspace{-.3cm}
-{\small Flat and near zero before, ramping after, sitting on the truth. The dashed orange line is the
+{\small Flat and near zero before, ramping after, sitting on the truth. The dot-dashed orange line is the
 \emph{single} post-period coefficient from a two-way FE regression with one treatment dummy.}
 \end{frame}
 
@@ -118,12 +118,12 @@
 	\item The post-period dots are $\hat\tau_k$: the effect $k$ quarters after adoption, relative to
 	$k = -1$.
 	\medskip
-	\item The static two-way FE coefficient is a weighted average of the $\hat\tau_k$, $k \ge 0$,
-	with weights proportional to how many observations sit at each $k$. With a ramp, it understates
+	\item The static two-way FE coefficient is the average post-period $\hat\tau_k$ minus the average pre-period
+	$\hat\tau_k$ (with $\hat\tau_{-1}=0$); absent pre-trends, an equally weighted average of the $\tau_k$, $k \ge 0$. With a ramp, it understates
 	the long-run effect. With effects that fade, it overstates it. It is never the number you
 	would have asked for.
 	\medskip
-	\item Confidence bands are pointwise. Twelve pre-period coefficients at $95\%$ each is not a
+	\item Confidence bands are pointwise. Eleven pre-period coefficients at $95\%$ each is not a
 	$95\%$ test of ``all flat.'' Use a joint (Wald) test, or a uniform band.
 \end{itemize}
 \end{frame}
@@ -147,7 +147,7 @@
 	\item Only the \emph{implication} ($\hat\tau_k \approx 0$ for $k < -1$) is testable. Parallel
 	trends in the post-period is an assumption about a counterfactual you never see.
 	\medskip
-	\item Both are assumptions about \emph{levels of $Y(0)$ differences}, not about levels of $Y$.
+	\item Parallel trends is an assumption about \emph{changes} in $Y(0)$, not about levels of $Y$.
 	Treated firms can be bigger, older, richer. They cannot be on a different trajectory.
 \end{itemize}
 \end{frame}
@@ -190,14 +190,14 @@ post-period estimates are biased upward, and the bias grows with $k$.}
 	to be as large as (some multiple of) the largest pre-period violation, and report the range of
 	$\tau_k$ consistent with that. \texttt{HonestDiD} does it in a few lines.
 	\medskip
-	\item \alert{Longer pre-periods} help detect trends; they do not help if the trend is real.
+	\item \alert{Longer pre-periods} help detect trends; they do not remove the bias once you find one.
 	\medskip
 	\item \alert{Detrend only with care.} Fitting a treated-group trend on the pre-period and
 	extrapolating it assumes the trend would have continued --- a strong claim about a
 	counterfactual, and it eats precision.
 	\medskip
 	\item \alert{A better control group} is worth more than any of the above. Firms in the same
-	segment, matched on pre-period trajectory, or --- next week --- a synthetic control.
+	segment, matched on pre-period trajectory, or --- in Week 11 --- a synthetic control.
 \end{itemize}
 \end{frame}
 
@@ -208,7 +208,7 @@ post-period estimates are biased upward, and the bias grows with $k$.}
 \end{center}
 \vspace{-.3cm}
 {\small Firms start adjusting two quarters before the tool goes live (pilot programs, contract
-renegotiation). The pre-period now shows a bump; and since $k = -1$ is the reference, every
+renegotiation). The pre-period now steps up at $k=-2$; since $k = -1$ is the reference, every
 \emph{post}-period estimate is shifted down by the anticipation effect. Fix: set the reference to
 $k = -3$, or redefine the event date as the announcement.}
 \end{frame}
@@ -282,7 +282,7 @@ fit.iplot()
 	even when there is no pre-trend; post-period coefficients that mix cohorts' dynamics.
 	\medskip
 	\item Fixes (next week): estimate cohort-by-event-time effects and aggregate them yourself
-	(Callaway--Sant'Anna, Sun--Abraham, Borusyak--Jaravel--Spiess imputation).
+	(Callaway--Sant'Anna, Sun--Abraham).
 	\medskip
 	\item The single-timing case is the one where two-way FE is exactly right. Know what
 	``right'' looks like before we break it.
@@ -316,7 +316,7 @@ fit.iplot()
 \begin{frame}{Setup}
 \begin{itemize}
 	\item Event day $0$ for firm $i$. \alert{Estimation window} $[-250, -11]$; \alert{event window}
-	$[-10, +10]$. The gap keeps the event out of the estimation sample.
+	$[-10, +10]$. Ending the estimation window before the event window keeps the event out of the estimation sample.
 	\medskip
 	\item \alert{Market model}, estimated on the estimation window by OLS, one firm at a time:
 	\begin{align*}
@@ -362,8 +362,9 @@ fit.iplot()
 \end{center}
 \vspace{-.3cm}
 {\small The firm with the largest positive surprise. Grey bars are actual daily returns; blue dots the
-market-model prediction. The abnormal return is the gap, and on day $0$ it is hard to miss. On most
-other days it is noise of $\pm 2\%$: one firm tells you little.}
+market-model prediction. The abnormal return is the gap. Even for the largest surprise, a true $5.9\%$
+jump shows up as a $2.6\%$ abnormal return after a bad noise draw, smaller than the move on day $+5$.
+One firm tells you little.}
 \end{frame}
 
 
@@ -388,7 +389,7 @@ Nothing happens before day $0$: the analog of a flat pre-period.}
 	\begin{itemize}
 		\item \alert{Cross-sectional $t$}: treat the $N$ CARs as an i.i.d.\ sample. Robust to
 		event-induced variance changes; needs $N$ moderately large.
-		\item \alert{Standardized} (Patell 1976; Boehmer et al.\ 1991): scale each firm's CAR by its own
+		\item \alert{Standardized} (Patell 1976): scale each firm's CAR by its own
 		$\hat\sigma_{e,i}\sqrt{L}$ first, then average. Better power when volatility differs across firms.
 	\end{itemize}
 	\medskip
@@ -424,7 +425,7 @@ The quantity accounting cares about is the \alert{earnings response coefficient}
 \end{center}
 \medskip
 {\small Regress $\widehat{CAR}_i(0, 10)$ on $S_i$ with heteroskedasticity-robust standard errors. The
-slope recovers the truth. This is the CAR analog of putting a covariate in the event-study regression.}
+slope is within sampling error of the truth: the CAR analog of interacting event-time dummies with a covariate.}
 \end{column}
 \begin{column}{0.5\textwidth}
 \includegraphics[width=\textwidth]{fig_car_erc.pdf}
@@ -479,7 +480,7 @@ slope recovers the truth. This is the CAR analog of putting a covariate in the e
 \begin{enumerate}
 	\item Reproduce the event-study plot and the joint pre-trend test. Then add anticipation and fix
 	it by changing the reference period.
-	\item Reproduce the CAR table. Then move every firm's announcement to the same calendar day and
+	\item Reproduce the CAR windows. Then move every firm's announcement to the same calendar day and
 	add a common market shock on that day. What happens to the $t$-statistics, and why?
 \end{enumerate}
 \end{frame}

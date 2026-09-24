@@ -70,7 +70,7 @@
 \end{enumerate}
 \smallskip
 \item First, let's talk about the relevance assumption.
-	\item It's easy to check that the sample analog to $Cov(X,Z)\ne 0$, or the analogous
+	\item It's easy to check whether the sample analog of $Cov(X,Z)$ is nonzero, or the analogous
 	matrix condition.
 	 \item The more practically relevant concern is that the covariance will be \emph{close}
 	 to zero. This is called {\bf weak instruments}.
@@ -99,7 +99,7 @@
 
 \begin{frame}{Weak Instruments II}
 \begin{itemize}
-\item There is \textbf{big} problem with IV estimation: 2SLS performs \textbf{terribly} in small samples
+\item There is a \textbf{big} problem with IV estimation: 2SLS performs \textbf{terribly} in small samples
 \medskip
 	\item Intuition: Instrumental variables relies on $Corr(X,Z)\ne 0$
 		\begin{itemize}
@@ -108,7 +108,7 @@
 \medskip
 	\item In practice, very rarely will $Cov(X,Z)=0$ in data (just randomness)
 		\begin{itemize}
-			\item Hence, IV will usually ``work" with any choice of $X$ and $Z$
+			\item Hence, IV will usually ``work'' with any choice of $X$ and $Z$
 			\item Realistically, sometimes  $Cov(X,Z)$ is small if $Z$ only explains a small portion of $X$
 		\end{itemize}
 \medskip
@@ -121,16 +121,16 @@
 
 \begin{frame}{Weak Instruments and Small Sample Bias}
 
-Suppose that $Z$ is \emph{a bad instrument} in that $Cov(Z,\varepsilon)$ are correlated
+Suppose that $Z$ is \emph{a bad instrument} in that $Z$ and $\varepsilon$ are correlated
 
 \begin{itemize}
 	\item Similar to OVB
 		\begin{align*}
-			\hat\beta_1^{IV}  \to \beta_1 + \frac{Cov(Z,\varepsilon)}{Cov(Z,X)}\times\frac{\sigma_\varepsilon}{\sigma_X}
+			\hat\beta_1^{IV}  \to \beta_1 + \frac{Corr(Z,\varepsilon)}{Corr(Z,X)}\times\frac{\sigma_\varepsilon}{\sigma_X}
 		\end{align*}
 	\item Compare to OLS case (biased because of OVB):
 		\begin{align*}
-			\hat\beta_1^{OLS} \to \beta_1 + Cov(X,\varepsilon)\times\frac{\sigma_\varepsilon}{\sigma_X}
+			\hat\beta_1^{OLS} \to \beta_1 + Corr(X,\varepsilon)\times\frac{\sigma_\varepsilon}{\sigma_X}
 		\end{align*}
 
 	\item Which estimator is better here?
@@ -163,7 +163,7 @@ To do inference we rely on the CLT:
 \medskip
 	\item Second issue: even if the normal approximation works the variance explodes!
 		\begin{itemize}
-			\item Intuition from homoscedastic case: $Var(\hat\beta^{IV})) = \sigma^2/(N\sigma^2_XR^2_{XZ})$
+			\item Intuition from homoskedastic case: $Var(\hat\beta^{IV}) = \sigma^2/(N\sigma^2_XR^2_{XZ})$
 			\item If the $R^2$ of $X$ on $Z$ is very small, then variance is very large
 		\end{itemize}
 \end{itemize}
@@ -175,12 +175,12 @@ To do inference we rely on the CLT:
 What are we to do if instruments are weak?
 
 \begin{itemize}
-		\item Easiest: get more instruments or better instruments
+		\item Easiest: get stronger instruments
 \medskip
 		\item Harder: adjust how to do inference
 			\begin{itemize}
 				\item Turns out that if instruments are weak, asymptotic distribution of $\hat\beta$ will be the \emph{ratio} of two \emph{correlated} normal random variables
-				\item We will not pursue this (uses LIML)
+				\item We return to this below (Anderson--Rubin)
 			\end{itemize}
 \medskip
 		\item The good news: We can test $Cov(X,Z)$ by regressing $x_i=\pi_0 + \pi_1 Z_i + \eta_i$
@@ -188,7 +188,7 @@ What are we to do if instruments are weak?
 				\item Since $Z$ and $X$ are data, we can just see if $\hat{\pi}_1$ is far from zero
 			\end{itemize}
 \medskip
-\item \textbf{Rule of Thumb:} Only use instrument if t-stat of null hypothesis that $\pi_1=0$ is $\geq 10$ (much bigger than stat significance of 1.96!)
+\item \textbf{Rule of Thumb:} Only use instrument if the first-stage $F$-statistic for $\pi_1=0$ is $\geq 10$ (with one instrument, $|t|\geq 3.16$; well above 1.96!)
 
 \end{itemize}
 \end{frame}
@@ -210,7 +210,7 @@ Some clarification:
 		be wary if \emph{any} of them suggests a weak instrument problem.
 		\medskip
 		\item Many have argued that the $F>10$ cutoff is not stringent enough. See, for example, 
-		\url{https://arxiv.org/abs/2010.05058}{Lee, McCrary, Moreira, and Porter} 
+		\href{https://arxiv.org/abs/2010.05058}{Lee, McCrary, Moreira, and Porter} 
 
 \end{itemize}
 \end{frame}
@@ -225,12 +225,12 @@ The model:
 
 	\begin{itemize}
 		\item $\pi\approx 0$ $\Rightarrow$ because of \emph{sampling error}, there is a good chance that $\hat\pi<0$ even if $\pi>0$
-		\item If $\hat X$ is the wrong \emph{sign} or close to \emph{zero} then it is very likely that $\hat\beta^{IV}$ will behave poorly
-		\item {\bf NB:} As $N\to\infty$, $\hat\pi\to\pi$, so weak instruments are a \emph{small sample problem}.
+		\item If $\hat\pi$ is the wrong \emph{sign} or close to \emph{zero} then it is very likely that $\hat\beta^{IV}$ will behave poorly
+		\item {\bf NB:} As $N\to\infty$, $\hat\pi\to\pi$, but what matters is the \emph{concentration parameter} ($N\pi^2$ relative to noise): a small $\pi$ needs a very large $N$.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{The Sampling Distribution of $\hat\beta$}
+\begin{frame}{The Sampling Distribution of $\hat\beta$ ($N=100$)}
 \begin{align*}
 	Y = 1 + 2 X + \varepsilon
 \end{align*}
@@ -243,7 +243,7 @@ The model:
 \begin{itemize}{\footnotesize
 \item OLS is biased with $\mu=2.27$ and $\sigma^2=.008$
 \item Strong IV is unbiased (asymptotically) with $\mu=1.99$ and $\sigma^2 = .024$
-\item Weak IV is unbiased (asymptotically) with $\mu=2.05$ but $\symbf{\sigma^2 = 1653.11}$
+\item Weak IV has heavy tails (just-identified IV has no finite mean): $\mu=2.05$ but $\boldsymbol{\sigma^2 = 1653.11}$
 }
 \end{itemize}
 
@@ -251,7 +251,7 @@ The model:
 
 
 
-\begin{frame}{The Sampling Distribution of $\hat\beta$}
+\begin{frame}{The Sampling Distribution of $\hat\beta$ ($N=10{,}000$)}
 \begin{align*}
 	Y = 1 + 2 X + \varepsilon
 \end{align*}
@@ -281,7 +281,7 @@ The model:
 		\item Remember that for testing we want to reject the null hypothesis incorrectly 5\% of the time
 			\begin{itemize}
 				\item When the CLT fails, our trusty 1.96 critical value is way off base
-				\item Example rejection probabilities for test that $\hat\beta=2$
+				\item Example rejection probabilities for the test of $H_0\colon \beta=2$
 				\begin{table}[H]
 				\centering
 				\begin{tabular}{rr}
@@ -292,7 +292,7 @@ The model:
 						Strong IV, $N=10000$ & 5.1\% \\
 				\end{tabular}
 				\end{table}
-				\item Goal should be 5\% but for weak IV with $N$ small, almost never reject; still only 3\% even for $N$ large---this is a bad test!
+				\item Goal should be 5\% but for weak IV with $N$ small, almost never reject; still only 3\% even for $N$ large---this is a bad test! (With strong endogeneity it over-rejects instead; see below.)
 
 			\end{itemize}
 	\end{itemize}
@@ -301,22 +301,21 @@ The model:
 
 
 \begin{frame}[fragile]\frametitle{Example in \texttt{R}: Checking Angrist \& Evans Validity}
-\begin{lstlisting}[frame=single]  % Start your code-block
-		gross
- # First Stage Test in Angrist & Evans
-flm1 = feols(morekids ~ samesex + black + hispan, data=babyData)
+\begin{lstlisting}[frame=single]
+# First Stage Test in Angrist & Evans
+flm1 = feols(morekids ~ samesex + black + hisp + othrace, data=babydata)
 lh1 = linearHypothesis(flm1,"samesex = 0", test="F")
 
 # First Stage Test in AE w/ Multiple Instruments
-flm2 = feols(morekids ~ boyBoy + girlGirl + black + hispan, data=babyData)
+flm2 = feols(morekids ~ BoyBoy + GirlGirl + black + hisp + othrace, data=babydata)
 lh2 = linearHypothesis(flm2,c("BoyBoy","GirlGirl"), test="F")
 \end{lstlisting}
 
 \vspace{3mm}
 	Results:
 \begin{itemize}
-	\item With ``Same Sex": $F = 25.874$
-	\item With ``BoyBoy" and ``GirlGirl": $F = 12.94$
+	\item With ``Same Sex'': $F = 25.874$
+	\item With ``BoyBoy'' and ``GirlGirl'': $F = 12.94$
 \end{itemize}
 \end{frame}
 
@@ -339,10 +338,10 @@ lh2 = linearHypothesis(flm2,c("BoyBoy","GirlGirl"), test="F")
 	some unobserved variables might be correlated with the instrument.
 	\item Two popular tests:
 	\begin{enumerate}
-		\item Hausman-Wu Test: Are $\widehat{\beta}_{IV}$ and $\widehat{\beta}_{OLS}$ the same?
+		\item Hausman--Wu Test: Are $\widehat{\beta}_{IV}$ and $\widehat{\beta}_{OLS}$ the same?
 		\item Sargan $J$ Test: If we leave out $z_{i}^{*}$ from our regression does $\E[(Y_i -  X_i \widehat{\beta}_{2SLS})\, z_i^*]=0$?
 	\end{enumerate}
-	\item These have fallen out of favor because they don't make sense if we have \alert{heterogeneous treatment effects} (ie: $\beta_i$).
+	\item These have fallen out of favor because they don't make sense if we have \alert{heterogeneous treatment effects} (i.e., $\beta_i$).
 	\item Why? \alert{different instruments} identify \alert{different complier} groups.
 	% \item With extra instruments, we can test the IVs against each other.
 	% Similarly, one IV allows us to test the validity of OLS.
@@ -379,7 +378,7 @@ lh2 = linearHypothesis(flm2,c("BoyBoy","GirlGirl"), test="F")
 \end{align*}
 	\item Similarly, for the IV estimator,
 \begin{align*}
-	\mathbf{X}'\mathbf{e}_{IV}&=\mathbf{0}, \text{ with }
+	\mathbf{Z}'\mathbf{e}_{IV}&=\mathbf{0}, \text{ with }
 	\mathbf{e}_{IV}=\left(\mathbf{y}-\mathbf{X}\mathbf{b}_{IV}\right)
 \end{align*}
 \item A consequence of this is that we can't
@@ -397,8 +396,8 @@ lh2 = linearHypothesis(flm2,c("BoyBoy","GirlGirl"), test="F")
 
 
 
-\begin{frame}{Tests of Exogeneity?}
-One possibility is the \alert{Durbin-Wu-Hausman Test} which compares $\Delta = \widehat{\beta}_{OLS} - \widehat{\beta}_{2SLS}$ under the null that $X$ is \alert{exogenous} ($Z$ is assumed exogenous).
+\begin{frame}{Tests of Exogeneity? Hausman}
+One possibility is the \alert{Durbin--Wu--Hausman Test} which compares $\Delta = \widehat{\beta}_{OLS} - \widehat{\beta}_{2SLS}$ under the null that $X$ is \alert{exogenous} ($Z$ is assumed exogenous).
 \begin{align*}
 H_0: & \beta_{OLS}, \beta_{2SLS} \text{ are consistent, }\quad \beta_{OLS} \text{ is efficient }\\
 H_1: & \beta_{2SLS} \text{ is consistent, } \beta_{OLS} \text{ is not }.
@@ -413,13 +412,13 @@ Idea: Reject $H_0$ if $\norm{\Delta} \gg 0$ (2SLS and OLS disagree).
 \end{frame}
 
 
-\begin{frame}{Tests of Exogeneity?}
-The other possibility is the \alert{Sargan J-Test} which exploits \textbf{overidentification} (more instruments that endogenous regressors)
+\begin{frame}{Tests of Exogeneity? Sargan $J$}
+The other possibility is the \alert{Sargan J-Test} which exploits \textbf{overidentification} (more instruments than endogenous regressors)
 \begin{enumerate}
-	\item Pick an instrument(s) $z_{i}^* \in \mathbb{R}^{N \times L}$ to drop.
-	\item Run 2SLS using remainder except $z_{i}^*$ to get $\widehat{\beta}_{2SLS}^{*}$ with $K$ restrictions.
-	\item Evaluate the \alert{moment condition}: $g_n(\widehat{\beta}_{2SLS}^*) = \E[(Y_i - X_i \widehat{\beta}_{2SLS}^{*})\, z_i^*]$.
-	\item Construct the quadratic form: $J = g_n(\widehat{\beta}_{2SLS}^*)^T\, W\, g_n(\widehat{\beta}_{2SLS}^*) \sim \Chi^2_{L-K}$ where $L-K$ are the number of extra moments (dimension of $z_i^{*}$).
+	\item Pick instrument(s) $z_{i}^* \in \mathbb{R}^{L-K}$ to drop.
+	\item Run 2SLS using the remaining $K$ instruments (just identified) to get $\widehat{\beta}_{2SLS}^{*}$.
+	\item Evaluate the \alert{moment condition}: $g_n(\widehat{\beta}_{2SLS}^*) = \frac{1}{n}\sum_i (Y_i - X_i \widehat{\beta}_{2SLS}^{*})\, z_i^*$.
+	\item Construct the quadratic form: $J = n\, g_n(\widehat{\beta}_{2SLS}^*)'\, \widehat{S}^{-1} g_n(\widehat{\beta}_{2SLS}^*) \sim \chi^2_{L-K}$, where $\widehat{S}$ estimates the variance of $\sqrt{n}\,g_n$ (accounting for $\widehat{\beta}^*$ being estimated) and $L-K$ is the number of extra moments.
 \end{enumerate}
 \end{frame}
 
@@ -441,7 +440,7 @@ The other possibility is the \alert{Sargan J-Test} which exploits \textbf{overid
 	\item We really want \alert{strong instruments} that are good predictors of the \alert{endogenous} $X$'s.
 	\item Everyone expects us to show the \alert{first-stage F-statistic} telling us whether \alert{excluded instruments} predict endogenous $X$ \alert{beyond the exogenous regressors}.
 	\begin{itemize}
-		\item With appropriate clustering/standard errors we want to see $F>10$. This is \alert{large enough in practice} but probably \alert{not in theory}!
+		\item With appropriate clustering/standard errors we want to see $F>10$. That was the old standard; see the post-2020 slide below.
 		\item Ideally we'd have a much stronger $F$-stat but good IV are hard to come by
 	\end{itemize}
 	\item We can't really test \alert{exclusion} or \alert{exogeneity} of your instruments. 
@@ -449,7 +448,7 @@ The other possibility is the \alert{Sargan J-Test} which exploits \textbf{overid
 		\item This is largely a story that comes from some economic theory or understanding of the world. 
 	\item There are tests but they don't show what we really care about
 	\begin{itemize}
-		\item Wu-Hausman shows us if $\beta_{IV} = \beta_{OLS}$ (not if instruments are valid)
+		\item Wu--Hausman shows us if $\beta_{IV} = \beta_{OLS}$ (not if instruments are valid)
 		\item Sargan shows us if different instruments give the same $\widehat{\beta}_{2SLS}$ (which might be because of \alert{heterogeneous treatment effects}).
 	\end{itemize}
 	\end{itemize}
@@ -467,7 +466,7 @@ The other possibility is the \alert{Sargan J-Test} which exploits \textbf{overid
 
 \begin{frame}{Weak instruments after 2020: $F > 10$ was never enough}
 \begin{itemize}
-	\item Staiger--Stock's $F > 10$ keeps the \emph{bias} of 2SLS under $10\%$ of the OLS bias. It says
+	\item Staiger--Stock's $F > 10$ keeps the \emph{bias} of 2SLS under $10\%$ of the OLS bias (with several instruments). It says
 	nothing about the size of the $t$-test.
 	\item Lee, McCrary, Moreira and Porter (2022): with one instrument, the $5\%$ 2SLS $t$-test can reject a
 	true null up to $15\%$ of the time at $F \approx 10$. Guaranteeing $5\%$ size with the usual critical
@@ -497,7 +496,7 @@ The $t$-test over-rejects at $F \approx 10$ and is fine at $F \approx 100$; Ande
 	each, a dozen lines of code (workbook).
 	\medskip
 	\item Practical rule for this course: report the first-stage $F$; if it is below $\approx 100$, also report
-	the AR interval. \texttt{ivDiag} and \texttt{ivmodel} in R do it; \texttt{linearmodels} in Python.
+	the AR interval. \texttt{ivDiag} and \texttt{ivmodel} in R do it; \texttt{ivmodels} in Python.
 \end{itemize}
 \end{frame}
 
@@ -505,7 +504,7 @@ The $t$-test over-rejects at $F \approx 10$ and is fine at $F \approx 100$; Ande
 
 \begin{frame}{When effects differ across people, what does IV estimate?}
 \begin{itemize}
-	\item Session 6 wrote $y_i = \beta_0 + \beta_1 D_i + \varepsilon_i$ with \emph{one} $\beta_1$. In business data the
+	\item Session 6 wrote $Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i$ with \emph{one} $\beta_1$. In business data the
 	effect of a loan, an app, a refund, a training program differs across customers, and the ones who take it
 	up are not a random draw.
 	\medskip
@@ -538,7 +537,7 @@ $D_i(1) = 1$ & \alert{complier} & \alert{always-taker} \\
 	\item We observe $(Z_i, D_i)$, never the pair $(D_i(0), D_i(1))$. A customer with $Z_i = 1, D_i = 1$ is an
 	always-taker or a complier; we cannot tell which. That is the whole difficulty.
 	\medskip
-	\item Three assumptions:
+	\item Three assumptions (plus a first stage):
 	\begin{enumerate}
 		\item \alert{Independence}: $Z_i \perp \big(Y_i(1), Y_i(0), D_i(1), D_i(0)\big)$. The email is randomized.
 		\item \alert{Exclusion}: $Z_i$ affects $Y_i$ only through $D_i$. The email itself does not change spending.
@@ -621,14 +620,14 @@ compliers (effect $0.8$), $40\%$ never-takers (effect $0.5$ if they ever install
 	\item \alert{Encouragement that backfires.} A reminder that annoys some customers into uninstalling: defiers.
 	\medskip
 	\item \alert{Angrist and Evans (1998).} Two same-sex children as an instrument for a third child: parents who
-	want two boys become defiers when they get two girls.
+	want two boys have a third child after a boy and a girl but stop after two boys: defiers.
 	\medskip
 	\item \alert{Judges and examiners}, next section: a judge who is strict on drug cases and lenient on
 	property cases is lenient for some defendants and strict for others. Monotonicity across judges is the
 	live question in that literature.
 	\medskip
 	\item De Chaisemartin (2017): with ``a few'' defiers, 2SLS still estimates a LATE for a
-	subpopulation of compliers, provided compliers outnumber defiers with the same effects. The theorem is
+	subpopulation of compliers, provided some subgroup of compliers matches the defiers in size and average effect. The theorem is
 	tolerant, not fragile.
 	\medskip
 	\item Exclusion failing is the more common problem in practice, and it is not testable. Ask what else the
@@ -711,8 +710,8 @@ to be granted. This picture is the first thing every judge-design paper shows.}
 	are also friendlier, faster, or offer store credit. Random routing buys independence, not exclusion.
 	\item \alert{Monotonicity.} Any request a strict agent grants, a lenient one would too. Fails if agents rank
 	claims differently (generous on shipping, strict on damage, or the reverse): then ``lenient'' is not one dimension.
-	\item Testing it (Frandsen, Lefgren and Leslie 2023): first stage positive in every subgroup (claim type,
-	size, channel); reduced form monotone in leniency. Our table passes for small, medium, and large claims.
+	\item Testing it: first stage positive in every subgroup (claim type, size, channel; Dobbie, Goldin and Yang 2018);
+	Frandsen, Lefgren and Leslie (2023) also test the reduced form. Our table passes for small, medium, and large claims.
 	Necessary, not sufficient.
 	\item With many agents, 2SLS on continuous leniency is a weighted average of pairwise LATEs
 	(Imbens and Angrist 1994).
@@ -781,8 +780,7 @@ Why would $B_m$ be uncorrelated with $\eta_m$? Two different arguments, and they
 \vspace{-.2cm}
 {\small Goldsmith-Pinkham, Sorkin and Swift: the shift-share 2SLS estimate is a weighted average of the
 just-identified estimates you would get using each sector's exposure $s_{mk} g_k$ alone, with weights
-$\alpha_k \propto g_k \sum_m s_{mk}\tilde x_m$. Weights can be negative. Here one sector carries most of the
-estimate; that is the sector whose share-exogeneity claim needs defending, and its own estimate is what
+$\alpha_k \propto g_k \sum_m s_{mk}\tilde x_m$. Weights can be negative. Here one sector carries almost 40\% of the weight; that is the sector whose share-exogeneity claim needs defending, and its own estimate is what
 to compare against the pooled one.}
 \end{frame}
 
@@ -813,14 +811,14 @@ feols(y ~ 1 | D ~ Z, d)                              # 2SLS = Wald ratio
 feols(y ~ Z, d); feols(D ~ Z, d)                    # reduced form, first stage (complier share)
 (mean(x[Z==1] * D[Z==1]) - mean(x[Z==0] * D[Z==0])) / (mean(D[Z==1]) - mean(D[Z==0]))   # E[x | complier]
 # Judges: leave-one-out leniency, cluster by agent
-tot <- tapply(R, agent, sum); n_j <- tapply(R, agent, length); len <- (tot[agent] - R) / (n_j[agent] - 1)
+tot <- tapply(R, agent, sum); n_j <- tapply(R, agent, length); d$len <- (tot[agent] - R) / (n_j[agent] - 1)
 feols(spend ~ 1 | R ~ len, d, cluster = ~agent)
 # Shift-share: build B and instrument
-B <- as.vector(shares %*% g); feols(y ~ 1 | x ~ B, d, vcov = "hetero")
+d$B <- as.vector(shares %*% g); feols(y ~ 1 | x ~ B, d, vcov = "hetero")
 \end{lstlisting}
 \begin{itemize}
 	\item Shock-level standard errors: \texttt{ssaggregate} (Borusyak--Hull--Jaravel) or the AKM code; Rotemberg
-	weights: \texttt{bartik\_weight} (GPSS). Both are Stata-first; the R ports are on GitHub. The workbook computes
+	weights: \texttt{bartik\_weight} (GPSS). These are Stata-first (the R ports are on GitHub); AKM's is in R (\texttt{ShiftShareSE}). The workbook computes
 	Rotemberg weights by hand in five lines.
 \end{itemize}
 \end{frame}

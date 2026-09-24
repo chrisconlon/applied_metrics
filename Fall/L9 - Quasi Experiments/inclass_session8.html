@@ -357,9 +357,9 @@ Effects, and Event Studies</h1>
 
 
 <p>This notebook reproduces the simulations behind Lectures 8a and 8b
-(the slides use <code>panel_sims.R</code>, which has the same code with
-more plotting) and leaves you four short problems. Everything is
-simulated, so you always know the right answer.</p>
+(the slides use <code>panel_sims.R</code>, which runs essentially the
+same simulations with more plotting) and leaves you four short problems.
+Everything is simulated, so you always know the right answer.</p>
 <div id="part-1-panel-data-and-fixed-effects" class="section level1">
 <h1>Part 1: Panel data and fixed effects</h1>
 <div id="reproduce-the-management-practices-panel" class="section level2">
@@ -429,8 +429,10 @@ str(re)</code></pre>
 ##  $ theta   : num 0.751
 ##  $ s2_eps  : num 0.103
 ##  $ s2_alpha: num 0.195</code></pre>
-<p>Compare <span class="math inline">\(\hat\theta\)</span> to the
-formula: with <span class="math inline">\(T = 8\)</span> and <span class="math inline">\(\sigma^2_\alpha / \sigma^2_\varepsilon
+<p>Compare <span class="math inline">\(\hat\theta\)</span> to the true
+<span class="math inline">\(\theta = 1 - \sqrt{0.09/(0.09 + 8 \cdot
+0.25)} = 0.79\)</span>: with <span class="math inline">\(T = 8\)</span>
+and <span class="math inline">\(\sigma^2_\alpha / \sigma^2_\varepsilon
 \approx\)</span> 1.89, RE is already most of the way to FE. Yet it is
 biased, because <span class="math inline">\(\alpha_i\)</span> is
 correlated with <span class="math inline">\(x\)</span>.</p>
@@ -464,8 +466,9 @@ etable(fit_fe, fit_mund, headers = c(&quot;within&quot;, &quot;Mundlak&quot;))</
 <div id="reproduce-partial-pooling-of-store-effects" class="section level2">
 <h2>Reproduce: partial pooling of store effects</h2>
 <p>Sixty stores with very different amounts of data. The partial-pooling
-estimate shrinks each store’s mean toward the grand mean by a weight
-equal to its signal-to-noise ratio.</p>
+estimate shrinks each store’s mean toward the grand mean; the weight on
+its own mean is its reliability (the signal share of the variance of its
+mean).</p>
 <pre class="r"><code>S &lt;- 60; alpha &lt;- rnorm(S, 0, 0.4); n_s &lt;- sample(c(4, 8, 16, 32, 64), S, replace = TRUE)
 ybar &lt;- alpha + rnorm(S, 0, 1 / sqrt(n_s)); grand &lt;- mean(ybar)
 s2_alpha &lt;- max(0, var(ybar) - mean(1 / n_s))                     # method of moments, sigma_eps^2 = 1 known
@@ -490,7 +493,7 @@ Then explain in one sentence what the RE assumption is buying you when
 </div>
 <div id="in-class-problem-2-measurement-error" class="section level1">
 <h1>In-class problem 2: measurement error</h1>
-<p>Re-simulate with <code>rho = 0</code> and <code>me_sd = 0.5</code>
+<p>Re-simulate with <code>rho = 0</code> and <code>me_sd = 1</code>
 (noise added to the observed practices score). Now pooled OLS has no
 omitted-variable problem. Compare pooled and within estimates to <span class="math inline">\(0.10\)</span>. Which is more attenuated, and why
 does demeaning make measurement error worse? (Hint: what does demeaning
@@ -547,8 +550,11 @@ the true post effects have not changed?</li>
 <li>Fix it by changing the reference period to <code>k = -3</code>
 (<code>ref = -3</code>). Confirm the post-period estimates are back on
 the red line.</li>
-<li>Bonus: instead of moving the reference, drop quarters <span class="math inline">\(k = -2, -1\)</span> from the sample. Does it work?
-What did you give up?</li>
+<li>Bonus: instead of moving the reference, drop the <em>treated</em>
+firms’ quarters <span class="math inline">\(k = -2, -1\)</span>
+(<code>es[!(treated == 1 &amp; k %in% c(-2, -1))]</code>; controls are
+coded <span class="math inline">\(k = -1\)</span>, so keep them). Does
+it work? What did you give up?</li>
 </ol>
 <pre class="r"><code># your code here</code></pre>
 </div>

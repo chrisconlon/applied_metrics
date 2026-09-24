@@ -1,5 +1,5 @@
-# Simulations and figures for Session 8 (Lecture 9a: Panel Data and Fixed Effects;
-# Lecture 9b: Event Studies). All data are simulated with known ground truth.
+# Simulations and figures for Session 8 (Lecture 8a: Panel Data and Fixed Effects;
+# Lecture 8b: Event Studies). All data are simulated with known ground truth.
 #
 # Run from this directory:  Rscript panel_sims.R
 # Produces fig_*.pdf and tab_*.tex, which the decks \includegraphics / \input.

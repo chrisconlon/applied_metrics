@@ -46,7 +46,7 @@ Fundamental Problem of Causal Inference
 \end{itemize}
 \end{column}%
 \hfill%
-\begin{column}{.38\textwidth}
+\begin{column}{.33\textwidth}
 
   \vspace{20pt}
   
@@ -68,12 +68,12 @@ Fundamental Problem of Causal Inference
 
 
 \begin{frame}{How do we construct the counterfactual?}
-We observe $Y_i(D_i)$ but not $Y_i(1-D_i)$, how do we estimate it?\\
+We observe $Y_i(D_i)$ but not $Y_i(1-D_i)$; how do we estimate it?\\
 
 \begin{description}
   \item [Event Study:] Compare $Y_{t+k}(1)$ to $Y_{t-j}(0)$ before and after an event at $t$.
   \item [Matching:] Compare $Y_i(1)$ to $Y_j(0)$ for $i \neq j$ but where $X_i = X_j$.
-  \item [\alert{Difference in Difference:}] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $Y_{j,t}(0)-Y_{i,t-1}(0)$  for some $j \neq i$.
+  \item [\alert{Difference in Difference:}] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $Y_{j,t}(0)-Y_{j,t-1}(0)$  for some $j \neq i$.
   \item [Synthetic Control:] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $\overline{Y}_{-i,t}(0)-\overline{Y}_{-i,t-1}(0)$ for some average over $j \neq i$ so that $X_{i,t} \approx \overline{X}_{-i,t}$.
 
 \end{description}
@@ -82,19 +82,19 @@ We observe $Y_i(D_i)$ but not $Y_i(1-D_i)$, how do we estimate it?\\
 
 \section{Difference in Differences}
 
-\begin{frame}{Motivation: Recap Matching}
-Matching estimators had some advantages:
+\begin{frame}{Motivation: Selection on Observables}
+Regression and matching on observables (matching: Session 11) have some advantages:
 \begin{itemize}
 \item Limited assumptions on \alert{functional forms}
 \item We could do nearest neighbor matching and use kernels to compute treatment effects
 \end{itemize}
-Matching estimators had some drawbacks:
+They also have drawbacks:
 \begin{itemize}
-\item Treated patients were ``matched'' to control patients based only on \alert{observable characteristics}
+\item Treated patients are ``matched'' to control patients based only on \alert{observable characteristics}
 \begin{itemize}
 \item Ignored \alert{selection on unobservables}.
 \end{itemize}
-\item Relied on \alert{cross sectional} variation to construct a control group.
+\item Rely on \alert{cross sectional} variation to construct a control group.
 \end{itemize}
 \end{frame}
 
@@ -133,7 +133,7 @@ IV estimators resolve some of those issues but
   \hat{b}_1 = \bar{Y}_{1} - \bar{Y}_{0}
   \end{align*}
   where $\bar{Y}_{1}$ is the sample mean of $Y_i$ conditional on
-  $D_i = 1$, and similarly $\bar{Y}_{1}$ is the sample mean conditional on $D_i = 0$.
+  $D_i = 1$, and similarly $\bar{Y}_{0}$ is the sample mean conditional on $D_i = 0$.
 
   \medskip
   \item Note: this loops us back to the treatment effects setup, where
@@ -147,7 +147,7 @@ IV estimators resolve some of those issues but
 \begin{frame}{Differences-in-Differences I}
 \begin{itemize}
   \item {\bf Differences-in-differences} is a {\bf quasi-experimental} design
-  that attempts to deal with selection by focusing how treatment and control
+  that attempts to deal with selection by focusing on how treatment and control
   groups change between two periods
 
   \smallskip
@@ -234,7 +234,7 @@ mean of $\Delta Y_{i}$ for the control group.
 \begin{frame}{The Appeal of DID}
 \begin{itemize}
   \item The DID strategy is robust to a form of selection bias
-  (when, the selection is related to persistent characteristics).
+  (when the selection is related to persistent characteristics).
   Simple differences across treatment and control groups would not be.
 
   \medskip
@@ -259,7 +259,7 @@ mean of $\Delta Y_{i}$ for the control group.
 \item Focus on starting wage (avoid tenure, high turnover)
 \end{itemize}
 \item Survey 410 restaurants in NJ (treated group) and eastern PA (control group).
-\item Idea: Compare \alert{change} in wages in $NJ$ to $PA$:  $\Delta_{DD} = \Delta_{NJ}- \Delta_{PA}$
+\item Idea: Compare \alert{change} in employment (FTE) in $NJ$ to $PA$:  $\Delta_{DD} = \Delta_{NJ}- \Delta_{PA}$
 \begin{itemize}
 \item Wave 1: February 15-March 4, 1992
 \item Wave 2: November 5 - December 31, 1992
@@ -285,7 +285,7 @@ mean of $\Delta Y_{i}$ for the control group.
 \end{frame}
 
 
-\begin{frame}{Differences in Wages : 2 x 2 Table}
+\begin{frame}{Differences in Employment: 2 x 2 Table}
 \begin{center}
 \includegraphics[width=4.25in]{./resources/ck_tab3.png}
 \end{center}
@@ -295,20 +295,20 @@ mean of $\Delta Y_{i}$ for the control group.
 \begin{itemize}
 \item Differences lack any covariates (different fast food chains).
 \item Also $\Delta_{PA}<0$ and $\Delta_{NJ} > 0$ (!)
-\item Recall $i$ denotes stores, $t \in {1,2}$. Run the following regression:
+\item Recall $i$ denotes stores, $t \in \{1,2\}$. Run the following regression:
 \begin{align*}
-Y_{it}&=\beta X_{it} +\alpha \cdot [i \in \text{NJ}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot NJ_i \times After_{t} +u_{i}\\
-Y_{it}&=\beta X_{it} +\alpha \cdot [\text{wage gap}_{i}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot \text{wage gap}_{i} \times After_{t} +u_{i}
+Y_{it}&=\beta X_{it} +\alpha \cdot [i \in \text{NJ}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot NJ_i \times After_{t} +u_{it}\\
+Y_{it}&=\beta X_{it} +\alpha \cdot [\text{wage gap}_{i}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot \text{wage gap}_{i} \times After_{t} +u_{it}
 \end{align*}
-\item $\alpha$ is mean difference between $NJ$ and $PA$
-\item $\gamma$ is mean difference between period $1$ and $2$
+\item $\alpha$ is the $NJ - PA$ difference in period $1$
+\item $\gamma$ is the change from period $1$ to $2$ in $PA$ (control)
 \item $\delta$ is the parameter of interest, the \alert{difference in difference}
-\item $\text{wage gap}_{i} = [\text{min wage}_{i,2}-w_{i1} ]_{+} =\max\{0, \text{min wage}_{i,2}-w_{i1}\} $.\\
- (How much do you need to raise $t=1$ wages to achieve minimum wage in $t=2$?)
+\item $\text{wage gap}_{i} = \max\{0, 5.05-w_{i1}\}/w_{i1}$ for NJ stores, $0$ for PA.\\
+ (By what proportion must the $t=1$ wage rise to reach the new minimum?)
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Differences in Wages}
+\begin{frame}{Differences in Employment}
 \begin{center}
 \includegraphics[width=4in]{./resources/ck_tab4.png}
 \end{center}
@@ -375,7 +375,7 @@ Consider the NJ minimum wage study. Here's a concern that would not be assuaged 
 
   \medskip
   \item Similarly, they can be estimated using differences-in-differences
-  rather than simple differences. They don't need to be, as with
+  rather than simple differences. They don't need to be: with
   randomized treatment, the treatment and control groups should have
   similar baselines.
 
@@ -389,7 +389,7 @@ Consider the NJ minimum wage study. Here's a concern that would not be assuaged 
 
   \medskip
   \item Card and Krueger update their conclusion
-  in a 2000 follow up:
+  in a 2000 follow-up:
   \begin{quotation}
 The increase in New Jersey's minimum wage probably
 had no effect on total employment in New Jersey's
@@ -414,10 +414,10 @@ effect.
 
 
 
-\begin{frame}{Difference in Difference: General Approach}
+\begin{frame}{Difference in Difference: Setup}
 \begin{align*}
-\text{Potential outcome in period } 1&=Y_{i 1}(0)\\
-\text{Potential outcome in period } 2&=\left\{ \begin{array}{ll}
+\text{Observed outcome in period } 1&=Y_{i 1}(0)\\
+\text{Observed outcome in period } 2&=\left\{ \begin{array}{ll}
 Y_{i 2}(1) & \text { if } D_{i 2}=1 \\ 
 Y_{i 2}(0) & \text { if } D_{i 2}=0
 \end{array}\right\}\\
@@ -436,7 +436,7 @@ Y_{i t}=D_{i t} \cdot Y_{i t}(1)+\left(1-D_{i t}\right) \cdot Y_{i t}(0)=D_{i t}
 \end{align*}
 \end{frame}
 
-\begin{frame}{Difference in Difference: General Approach}
+\begin{frame}{Difference in Difference: Decomposition}
 \small
 Consider the first difference $\Delta Y_{it} = Y_{i2} - Y_{i1}$:
 \begin{align*}
@@ -444,7 +444,7 @@ Consider the first difference $\Delta Y_{it} = Y_{i2} - Y_{i1}$:
 \end{align*}
 For treated group (first difference):
 \begin{align*}
-\E[\Delta Y_{it} \mid D_{i2}=1]  = \overbrace{\E\left[Y_{i2}(1) - Y_{i2}(0) \mid T_{i2}=1 \right]}^{\alert{ATT}} +  \overbrace{\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=1 \right]}^{\alert{\gamma(1)}}
+\E[\Delta Y_{it} \mid D_{i2}=1]  = \overbrace{\E\left[Y_{i2}(1) - Y_{i2}(0) \mid D_{i2}=1 \right]}^{\alert{ATT}} +  \overbrace{\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=1 \right]}^{\alert{\gamma(1)}}
 \end{align*}
 For control group (second difference):
 \begin{align*}
@@ -461,7 +461,7 @@ The DiD (difference in difference) estimator
 \begin{frame}{Difference in Difference: Parallel Trends}
 \small
 \begin{itemize}
-\item If $\gamma(1) = \gamma(0)$ then the DiD estimator cancels and we are left with the $\Delta_{DD} = \text{ATT}$.
+\item If $\gamma(1) = \gamma(0)$ then the trend terms cancel and we are left with $\Delta_{DD} = \text{ATT}$.
 \item This is the \alert{parallel trends assumption}
 \begin{align*}
 \E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=0 \right] = \E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=1 \right]
@@ -469,7 +469,7 @@ The DiD (difference in difference) estimator
 \item Absent the treatment effect, both treatment and control would evolve identically over time.
 \item But, treatment and control groups can start from very different places...
 \begin{align*}
-\E\left[Y_{i t}(0) \mid D_{i 2}=1\right] \neq E\left[Y_{i t}(0) \mid D_{i 2}=0\right], t=1,2
+\E\left[Y_{i t}(0) \mid D_{i 2}=1\right] \neq \E\left[Y_{i t}(0) \mid D_{i 2}=0\right], t=1,2
 \end{align*}
 \item And have selection on treatment effects...
 \begin{align*}
@@ -492,8 +492,8 @@ The DiD (difference in difference) estimator
 \begin{enumerate}
 \item Functional form restrictions
 \begin{itemize}
-\item \alert{Parallel trends} assumes that absent treatment that we add $\gamma_2 - \gamma_1$ to each unit
-\item Because this is \alert{additive} it is not invariant to transformations $f(Y_{it})$ (ie: taking logs)
+\item \alert{Parallel trends} assumes that, absent treatment, we add $\gamma_2 - \gamma_1$ to each unit
+\item Because this is \alert{additive} it is not invariant to transformations $f(Y_{it})$ (e.g., taking logs)
 \end{itemize}
 \item Parallel Trend Assumption is \alert{not testable}
 \begin{itemize}
@@ -514,7 +514,7 @@ The DiD (difference in difference) estimator
 
 \end{frame}
 
-\begin{frame}{Checking Pre-Trend: Card Krueger (2000)}
+\begin{frame}{Checking Pre-Trend: Card and Krueger (2000)}
 \begin{figure}
 \centering
 \includegraphics[width=4.5in]{./resources/card_krueger_2000.png}
@@ -523,8 +523,8 @@ The DiD (difference in difference) estimator
 
 
 
-\begin{frame}{Difference in Differences}
-Just like in Card and Kruger, we can write as a regression equation:
+\begin{frame}{Difference in Differences: Regression Form}
+Just like in Card and Krueger, we can write as a regression equation:
 \begin{align*}
  Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i D_{it}  + u_{it}
  \end{align*}
@@ -542,23 +542,23 @@ training, forming the treatment group.
 \end{itemize}
 \end{frame} 
 
-\begin{frame}{The ``Ashenfelter Dip'' (Heckman and Smith 2000)}
+\begin{frame}{The ``Ashenfelter Dip'' (Heckman and Smith 1999)}
 \begin{figure}
 \centering
 \includegraphics[width=4.25in]{./resources/ashenfelter_dip.png}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Difference in Differences}
+\begin{frame}{Ashenfelter Dip: Algebra}
 \small
 \begin{itemize}
 \item  \#2 above violates the assumption {\small $\E[Y_{i2}(0) - Y_{i1}(0) \mid D] = \E[Y_{i2}(0) - Y_{i1}(0)]$}. 
-\item To see why note that those participating into the program are such
-that {\small $Y_{i0}(0) < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - \gamma_1$}. 
+\item To see why note that those participating in the program are such
+that {\small $Y_{i1}(0) < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - \gamma_1$}. 
 This implies: 
-{\small $$\E[Y_{i2}(0)- Y_{i1}(0) \mid D=1] = \gamma_2 = \gamma_1 - \E[u_{i1} \mid u_{i1} <  B-\alpha_i - \gamma_1]$$}
+{\small $$\E[Y_{i2}(0)- Y_{i1}(0) \mid D=1] = \gamma_2 - \gamma_1 - \E[u_{i1} \mid u_{i1} <  B-\alpha_i - \gamma_1]$$}
 For the control group:
-{\small $$\E[Y_{i2}(0) - Y_{i1}(0) \mid D=1] = \gamma_2 = \gamma_1 - \E[u_{i1} \mid u_{i1} >  B-\alpha_i - \gamma_1]$$}
+{\small $$\E[Y_{i2}(0) - Y_{i1}(0) \mid D=0] = \gamma_2 - \gamma_1 - \E[u_{i1} \mid u_{i1} >  B-\alpha_i - \gamma_1]$$}
 So that:
 \begin{align*}
 & \E[Y_{i2}(0) - Y_{i1}(0) \mid D=1] - \E[Y_{i2}(0) - Y_{i1}(0) \mid D=0] =\\
@@ -581,18 +581,18 @@ So that:
 % \end{figure}
 % \end{frame}
 
-\begin{frame}{Difference in Differences}
+\begin{frame}{Conditional Parallel Trends}
 \begin{itemize}
 \item The assumption on growth of the non-treatment outcome being independent of assignment to treatment may be violated, but it may still be true conditional on $X$.
 \item Consider the assumption
 \begin{align*}
 \E[Y_{i2}(0)- Y_{i1}(0) \mid X,D] = \E[Y_{i2}(0)- Y_{i1}(0) \mid X]
 \end{align*}
-\item This is just matching assumption on a redefined variable, namely the growth in the outcomes. In its simplest form the approach is implemented by running the regression
+\item This is just the matching assumption on a redefined variable, namely the growth in the outcomes. In its simplest form the approach is implemented by running the regression
 \begin{align*}
 Y_{it} = \alpha_i + \gamma_t + \delta_i D_{it} + \beta_t' X_i + u_{it}
 \end{align*}
-which allows for differential trends in the non-treatment growth depending on $X_i$. More generally one can implement propensity score matching on the growth of outcome variable when panel data is available.
+which allows for differential trends in the non-treatment growth depending on $X_i$. More generally one can implement propensity score matching on the growth of the outcome variable when panel data is available.
 \end{itemize}
 \end{frame}
 
@@ -601,9 +601,9 @@ which allows for differential trends in the non-treatment growth depending on $X
 \begin{frame}{Difference in Difference in Difference}
 The triple difference is also a thing:
 \begin{itemize}
-\item Suppose that we have: before/after, treated-state/untreated-state, treated-group (men)/ untreated-group women.
-\item We can compute two D-i-D here: $\Delta_{DDD} = \Delta_{DD,state} - \Delta_{DD,gender}$ 
-\item Literally difference, the difference in differences estimators.
+\item Suppose that we have: before/after, treated-state/untreated-state, treated-group (men)/untreated-group (women).
+\item We can compute two D-i-D here: $\Delta_{DDD} = \Delta_{DD}^{\text{men}} - \Delta_{DD}^{\text{women}}$, where each is the treated-vs-untreated-state DiD within that group.
+\item Literally the difference of two difference-in-differences estimators.
 \item As a regression: interpret the triple-interaction term (make sure to control for ALL double interactions).
 \end{itemize}
 \end{frame}
@@ -620,7 +620,7 @@ The triple difference is also a thing:
 
   \item We can still estimate $\beta_{1}$ with a differenced linear regression,
   \begin{align*}
-  \Delta Y_{i}=\beta_{1} \cdot \Delta D_{i}+\boldsymbol{\beta}_2' \Delta {\bf X}_{it} + \Delta \varepsilon_{i}
+  \Delta Y_{i}=\beta_{1} \cdot \Delta D_{i}+\boldsymbol{\beta}_2' \Delta {\bf X}_{i} + \Delta \varepsilon_{i}
   \end{align*}
   noting that the exogeneity assumption becomes
   \begin{align*}
@@ -644,13 +644,13 @@ The triple difference is also a thing:
   \item A {\bf staggered diff-in-diff} involves different groups being
     treated at different points in time. Typically, these models are
     estimated with a linear regression with two-way fixed effects. (More
-    on this when we get to panel data.) 
+    on this in Lecture 9b.) 
 
   \medskip
-  \item See \href{https://www.sciencedirect.com/science/article/pii/S0304407620303948}{Callaway and Sant'Anna}, 
+  \item See \href{https://www.sciencedirect.com/science/article/pii/S0304407620303948}{Callaway and Sant'Anna (2021)}, 
     \href{https://academic.oup.com/ectj/article/26/3/C1/6604378}{de Chaisemartin and D'Haultfoeuille (2023)}
     on why this is not a valid strategy in the presence of heterogeneous
-    treatment effects and for alternative estimators. (More on this in Econometrics II)
+    treatment effects and for alternative estimators. (More on this in Lecture 9b.)
 
 \end{itemize}
 \end{frame}
