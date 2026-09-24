@@ -315,6 +315,26 @@ Y_{it}&=\beta X_{it} +\alpha \cdot [\text{wage gap}_{i}] +  \gamma \cdot \text{A
 \end{frame}
 
 
+\begin{frame}{Inference with Few Treated Clusters}
+\small
+\begin{itemize}
+\item Card and Krueger's SEs treat 410 stores as independent, but the policy varies by \emph{state}: NJ vs.\ PA.
+\item Stores in a state share shocks (local demand, weather). Cluster-robust SEs need many clusters, and
+many \emph{treated} clusters; with $G = 2$ you cannot cluster by state at all.
+\item The wild cluster bootstrap (Cameron, Gelbach and Miller 2008) fixes \emph{few clusters}, not \emph{few treated
+clusters}: with one or two treated clusters it still over-rejects (MacKinnon and Webb 2018).
+\item With one treated group and \emph{many} control groups:
+\begin{itemize}
+\item Conley and Taber (2011): control groups' residuals estimate the distribution of the treated group's error.
+\item Randomization inference: assign the policy to each control group in turn (the placebo logic of Session 11).
+\item Aggregate to group $\times$ period and use $G-1$ degrees of freedom (Donald and Lang 2007).
+\end{itemize}
+\item With one control group, as in Card and Krueger, none of these can deliver policy-level inference. Count your
+treated (and control) clusters before you report a standard error.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Parallel trends vs pre-trends}
 \begin{itemize}
   \item When the data is available, researchers typically check {\bf pre-trends}

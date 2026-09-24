@@ -439,11 +439,11 @@ Substitute:
 \end{center}
 \medskip
 \begin{itemize}
-	\item The classical statistic is \emph{negative}: $\hat V_{FE} - \hat V_{RE}$ is not positive
-	definite in this sample, exactly the fragility from the previous slide. (RE is inconsistent
-	here: the between regression attributes part of $\alpha_i$ to $\bar x_i$, so $\hat\sigma^2_\alpha$ and hence $\hat\theta$
-	are too small, and the leftover $\alpha_i$ inflates RE's residual variance.) Software will either report nonsense or refuse.
-	\item The Mundlak version has no such problem, rejects decisively, and came with clustered
+	\item The classical test works here because FE and RE are the \emph{same model} (both with year effects)
+	and the errors are homoskedastic by design. It rejects.
+	\item Get the specification wrong --- one-way RE against two-way FE --- and $\hat V_{FE} - \hat V_{RE}$
+	turns negative in this very sample: the fragility from the previous slide.
+	\item The Mundlak version agrees, rejects decisively, and came with clustered
 	standard errors for free.
 	\item Look back at the estimates table: the Mundlak coefficient on $x_{it}$ matched FE to three decimals.
 \end{itemize}

@@ -95,6 +95,23 @@ Suppose you ran a drug-trial experiment
 \end{frame}
 
 
+\begin{frame}{Checking Balance: Standardized Differences}
+For each covariate $k$, compare the treated and control means in units of its standard deviation:
+\begin{align*}
+d_k=\frac{\bar x_{k,1}-\bar x_{k,0}}{\sqrt{\left(s^2_{k,1}+s^2_{k,0}\right)/2}}
+\end{align*}
+\begin{itemize}
+\item \alert{Not a $t$-test.} A $t$-statistic grows with $\sqrt{n}$: trivial imbalance is ``significant'' in a big sample,
+and matching or trimming can raise $p$-values just by dropping observations.
+\item Rules of thumb: $|d_k| < 0.1$ is well balanced (Austin 2009); Imbens and Rubin (2015) worry above $0.25$.
+Also check variance ratios $s^2_{k,1}/s^2_{k,0}$: outside $[0.5, 2]$ is a warning.
+\item Report $d_k$ before and after matching or weighting, for every covariate (and key squares and interactions).
+The left panel on the previous slide is exactly this: \texttt{cobalt::love.plot()}.
+\item Balance on observables is necessary, not sufficient: it says nothing about unobservables.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}
 \frametitle{Matching}
 \begin{itemize}
@@ -274,6 +291,25 @@ ATE = \frac{1}{n}\sum_{t \in \text{Treatment}} \frac{y_t}{\pi(x_t)} - \frac{1}{n
 \widehat{ATE}=\frac{\sum_i D_iY_i/\pi(x_i)}{\sum_i D_i/\pi(x_i)}-\frac{\sum_i (1-D_i)Y_i/(1-\pi(x_i))}{\sum_i (1-D_i)/(1-\pi(x_i))}
 \end{align*}
 \item Helps with very large weights; also consider trimming to $0.1\le\pi(x)\le0.9$ (Crump et al.\ 2009).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Doubly Robust: Augmented IPW (AIPW)}
+\small
+Combine an outcome model $\widehat\mu_d(x)=\widehat{\E}[Y\mid D=d,X=x]$ with the propensity score:
+\begin{align*}
+\widehat{ATE}_{AIPW}=\frac{1}{n}\sum_{i=1}^n\left[\widehat\mu_1(X_i)-\widehat\mu_0(X_i)
++\frac{D_i\left(Y_i-\widehat\mu_1(X_i)\right)}{\widehat\pi(X_i)}
+-\frac{(1-D_i)\left(Y_i-\widehat\mu_0(X_i)\right)}{1-\widehat\pi(X_i)}\right]
+\end{align*}
+\begin{itemize}
+\item A regression estimate plus an IPW correction built from its residuals.
+\item \alert{Doubly robust}: consistent if \emph{either} $\widehat\pi$ \emph{or} $\widehat\mu_d$ is correctly specified. If $\widehat\mu_d$ is
+right, the correction has mean zero; if $\widehat\pi$ is right, the correction removes $\widehat\mu_d$'s bias.
+\item With both right, it attains the semiparametric efficiency bound (Robins, Rotnitzky and Zhao 1994; Hahn 1998).
+\item Still needs CIA and overlap: it does not fix unobserved confounding, and small $\widehat\pi$ still means big weights.
+\item The building block of double/debiased ML (Chernozhukov et al.\ 2018): flexible $\pi$, $\mu_d$ with cross-fitting. In R: \texttt{grf::average\_treatment\_effect()}, \texttt{DoubleML}.
 \end{itemize}
 \end{frame}
 

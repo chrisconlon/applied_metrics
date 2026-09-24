@@ -37,10 +37,10 @@ y_{it} = x_{it} \beta + \tau\cdot  D_{it} + \eta_i + \lambda_t + \varepsilon_{it
 \frametitle{Literature}
 This is part of a rapidly growing literature
 \begin{itemize}
-\item \href{https://www.sciencedirect.com/science/article/pii/S0304407620303948}{Callaway and Sant'Anna (2020)}
+\item \href{https://www.sciencedirect.com/science/article/pii/S0304407620303948}{Callaway and Sant'Anna (2021)}
 \item \href{http://goodman-bacon.com/pdfs/ddtiming.pdf}{Goodman-Bacon (2021)}
-\item \href{https://www.aeaweb.org/articles?id=10.1257/aer.20181169}{de Chaisemartin and D'Haultfoeulle (2020}
-\item \href{https://arxiv.org/abs/1804.05785}{Sun and Abraham (2020)}
+\item \href{https://www.aeaweb.org/articles?id=10.1257/aer.20181169}{de Chaisemartin and D'Haultf{\oe}uille (2020)}
+\item \href{https://arxiv.org/abs/1804.05785}{Sun and Abraham (2021)}
 \item \href{https://bcallaway11.github.io/did/}{R Vignette}
 \end{itemize}
 \end{frame}
@@ -84,13 +84,13 @@ How $\tau_{it}$ varies over time for different \alert{cohorts} will now affect a
 \end{frame}
 
 
-\begin{frame}{What do we get? (Goodman-Bacon 2020)}
+\begin{frame}{What do we get? (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_fig1.png}
 \end{frame}
 
 
-\begin{frame}{What do we get? (Goodman-Bacon 2020)}
+\begin{frame}{What do we get? (Goodman-Bacon 2021)}
 One thing we might want to know is whether our TWFE estimate of $\widehat{\tau}$ is at all useful.\\
 AKA what did we just estimate?
 \begin{itemize}
@@ -106,12 +106,12 @@ AKA what did we just estimate?
 \end{frame}
 
 
-\begin{frame}{What do we get? (Goodman-Bacon 2020)}
+\begin{frame}{What do we get? (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_fig2.png}
 \end{frame}
 
-\begin{frame}{What do we get? (Goodman-Bacon 2020)}
+\begin{frame}{What do we get? (Goodman-Bacon 2021)}
 \begin{align*}
 \widehat{\tau}^{D D}&=\sum_{k \neq U} s_{k U} \widehat{\tau}_{k U}+\sum_{k \neq U} \sum_{\ell>k}\left[s_{k \ell}^{k} \widehat{\tau}_{k \ell}^{ k}+s_{k \ell}^{\ell} \widehat{\tau}_{k \ell}^{\ell}\right]\\
 \widehat{\tau}_{k U}^{2 x 2} &\equiv\left(\bar{y}_{k}^{P O S T(k)}-\bar{y}_{k}^{P R E(k)}\right)-\left(\bar{y}_{U}^{P O S T(k)}-\bar{y}_{U}^{P R E(k)}\right) \\
@@ -122,35 +122,35 @@ Corresponding set of weights $s_{k,\ell}$ which depend on size and variance of e
 Variance is largely about how concentrated $D_{it}$ is within each group.
 \end{frame}
 
-\begin{frame}{Assuming Equal Groups (Goodman-Bacon 2020)}
+\begin{frame}{Assuming Equal Groups (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_fig4.png}
 \end{frame}
 
 
-\begin{frame}{Time varying TE $\tau_{it}$ (Goodman-Bacon 2020)}
+\begin{frame}{Time varying TE $\tau_{it}$ (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_fig3.png}
 \end{frame}
 
 
-\begin{frame}{Application: (Goodman-Bacon 2020)}
+\begin{frame}{Application: (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_tab1.png}
 \end{frame}
 
 
-\begin{frame}{Event Study Plot (Goodman-Bacon 2020)}
+\begin{frame}{Event Study Plot (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_fig5.png}
 \end{frame}
 
-\begin{frame}{Decomposition Plot (Goodman-Bacon 2020)}
+\begin{frame}{Decomposition Plot (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_fig6.png}
 \end{frame}
 
-\begin{frame}{Application: Estimates (Goodman-Bacon 2020)}
+\begin{frame}{Application: Estimates (Goodman-Bacon 2021)}
 \centering
 \includegraphics[height=0.9\textheight]{resources/gb_tab2.png}
 \end{frame}
@@ -158,7 +158,7 @@ Variance is largely about how concentrated $D_{it}$ is within each group.
 
 \begin{frame}{Recap}
 \begin{itemize}
-\item The Goodman-Bacon (2020) paper tells us what we \alert{are} measuring with TWFE.
+\item The Goodman-Bacon (2021) paper tells us what we \alert{are} measuring with TWFE.
 \item Weird things can happen like \alert{negative weights}.
 \item But it doesn't really tell us what we \alert{should do}.
 \item Other than be careful and plot the \alert{event study} plot always.
@@ -168,7 +168,7 @@ Variance is largely about how concentrated $D_{it}$ is within each group.
 
 
 
-\section*{Callaway and Sant'Anna (2020)}
+\section*{Callaway and Sant'Anna (2021)}
 \begin{frame}{Some Theory}
 Definitions
 \begin{itemize}

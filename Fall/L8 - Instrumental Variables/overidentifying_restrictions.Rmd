@@ -56,13 +56,13 @@ u <- 0.5 * v + rnorm(n, sd = 1)
 
 # Homogeneous effect
 beta_hom <- 2
-y_hom <- beta_hom * x + rnorm(n)
+y_hom <- beta_hom * x + u
 
 # Heterogeneous effect: different beta by subgroup
 beta0 <- 1.0
 beta1 <- 3.0
 # Here beta differs by w
-y_het <- x * (beta0 * (1 - w) + beta1 * w) + rnorm(n)
+y_het <- x * (beta0 * (1 - w) + beta1 * w) + u
 
 # Put into data.frame
 df <- data.frame(y_hom, y_het, x, w, z1, z2)
@@ -73,14 +73,14 @@ head(df)
   
   ## 2. OLS and IV estimates
   
-  We estimate OLS with `fixest::feols` and IV with `AER::ivreg`. For IV we use both instruments `z1` and `z2` together.
+  We estimate both OLS and IV with `fixest::feols`. For IV we use both instruments `z1` and `z2` together.
 
 ```{r ols-iv}
 # OLS (fixest)
 ols_hom <- feols(y_hom ~ x, data = df)
 ols_het <- feols(y_het ~ x, data = df)
 
-# IV (AER::ivreg) — instrument x by z1 + z2
+# IV (fixest) — instrument x by z1 + z2
 iv_hom <- feols(y_hom ~ 1 | x~ z1 + z2, data = df)
 iv_het <- feols(y_het ~ 1 | x~z1 + z2, data = df)
 
@@ -108,9 +108,9 @@ Take note: in the homogeneous case OLS and IV should be closer (depending on end
 beta_ols_hom <- coef(ols_hom)["x"]
 beta_iv_hom  <- coef(iv_hom)["fit_x"]
 
-# Variances: use sandwich robust cov for IV and OLS
-vcov_ols_hom <- vcov(ols_hom, vcov = sandwich)
-vcov_iv_hom  <- sandwich::vcovHC(iv_hom, type = "HC0")
+# Variances: classical (iid). The V_IV - V_OLS shortcut needs OLS efficient under H0
+vcov_ols_hom <- vcov(ols_hom, vcov = "iid")
+vcov_iv_hom  <- vcov(iv_hom, vcov = "iid")
 
 # For single-parameter x case, forms simplify to scalar
 delta_hom <- beta_iv_hom - beta_ols_hom
@@ -121,8 +121,8 @@ pval_hom <- 1 - pchisq(H_hom, df = 1)
 # Repeat for heterogeneous outcome
 beta_ols_het <- coef(ols_het)["x"]
 beta_iv_het  <- coef(iv_het)["fit_x"]
-vcov_ols_het <- vcov(ols_het, vcov = sandwich)
-vcov_iv_het  <- sandwich::vcovHC(iv_het, type = "HC0")
+vcov_ols_het <- vcov(ols_het, vcov = "iid")
+vcov_iv_het  <- vcov(iv_het, vcov = "iid")
 delta_het <- beta_iv_het - beta_ols_het
 var_diff_het <- as.numeric(vcov_iv_het["fit_x","fit_x"] - vcov_ols_het["x","x"])
 H_het <- (delta_het^2) / var_diff_het
@@ -137,7 +137,9 @@ data.frame(
 )
 ```
 
-> Note: we used heteroskedasticity-robust variances for both estimators when forming the difference.
+> Note: this uses classical variances on purpose. The shortcut $Var(\hat\beta_{IV}) - Var(\hat\beta_{OLS})$ is only
+> valid when OLS is efficient under the null; with heteroskedasticity or clustering, use the regression-based
+> version in the next section with robust standard errors.
 
 ---
 
@@ -246,7 +248,7 @@ Interpretation:
   
   ## 6. Wrap-up / notes
   
-  * The notebook used `fixest` for OLS and first-stage regressions; IV was computed with `AER::ivreg` for convenience.
+  * The notebook used `fixest` for OLS, first-stage, and IV regressions.
 * We computed both the matrix Hausman statistic and the regression-based Wu test — both are valid ways to probe endogeneity under homogeneous-effect assumptions.
 * We computed both the classical Sargan (homoskedastic) statistic and a heteroskedasticity-robust Hansen J using a GMM moment approach.
 

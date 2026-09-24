@@ -408,32 +408,34 @@ etable(fit_pooled, fit_fe, fit_fd, headers = c(&quot;pooled&quot;, &quot;within&
 <em>quasi</em>-demeaning with weight <span class="math inline">\(\theta
 = 1 - \sqrt{\sigma^2_\varepsilon / (\sigma^2_\varepsilon +
 T\sigma^2_\alpha)}\)</span>. Estimate the two variances from the within
-and between regressions (Swamy–Arora), then transform.</p>
+and between regressions (Swamy–Arora), then transform. Year effects stay
+in, as in <code>fit_fe</code>, so the comparison with FE is
+like-for-like.</p>
 <pre class="r"><code>re_fit &lt;- function(d) {
-  within &lt;- feols(y ~ x | firm, d)
-  s2_eps &lt;- sum(resid(within)^2) / (nrow(d) - uniqueN(d$firm) - 1)
+  within &lt;- feols(y ~ x | firm + year, d)       # two-way, like fit_fe
+  s2_eps &lt;- sum(resid(within)^2) / (nrow(d) - uniqueN(d$firm) - uniqueN(d$year))
   b &lt;- d[, .(ybar = mean(y), xbar = mean(x), T_i = .N), by = firm]
   between &lt;- lm(ybar ~ xbar, b)
   s2_alpha &lt;- max(0, sum(resid(between)^2) / between$df.residual - s2_eps / mean(b$T_i))
   d &lt;- merge(d, b, by = &quot;firm&quot;)
   d[, theta := 1 - sqrt(s2_eps / (s2_eps + T_i * s2_alpha))]
-  fit &lt;- lm(I(y - theta * ybar) ~ I(x - theta * xbar), d)
+  fit &lt;- lm(I(y - theta * ybar) ~ I(x - theta * xbar) + factor(year), d)
   list(beta = unname(coef(fit)[2]), se = unname(sqrt(diag(vcov(fit)))[2]),
        theta = mean(d$theta), s2_eps = s2_eps, s2_alpha = s2_alpha)
 }
 re &lt;- re_fit(d)
 str(re)</code></pre>
 <pre><code>## List of 5
-##  $ beta    : num 0.107
-##  $ se      : num 0.0105
-##  $ theta   : num 0.751
-##  $ s2_eps  : num 0.103
-##  $ s2_alpha: num 0.195</code></pre>
+##  $ beta    : num 0.11
+##  $ se      : num 0.0101
+##  $ theta   : num 0.762
+##  $ s2_eps  : num 0.0946
+##  $ s2_alpha: num 0.196</code></pre>
 <p>Compare <span class="math inline">\(\hat\theta\)</span> to the true
 <span class="math inline">\(\theta = 1 - \sqrt{0.09/(0.09 + 8 \cdot
 0.25)} = 0.79\)</span>: with <span class="math inline">\(T = 8\)</span>
 and <span class="math inline">\(\sigma^2_\alpha / \sigma^2_\varepsilon
-\approx\)</span> 1.89, RE is already most of the way to FE. Yet it is
+\approx\)</span> 2.08, RE is already most of the way to FE. Yet it is
 biased, because <span class="math inline">\(\alpha_i\)</span> is
 correlated with <span class="math inline">\(x\)</span>.</p>
 </div>

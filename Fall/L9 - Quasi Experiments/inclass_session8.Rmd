@@ -51,17 +51,18 @@ etable(fit_pooled, fit_fe, fit_fd, headers = c("pooled", "within", "first diff")
 Random effects is GLS with equicorrelated errors, which is OLS after *quasi*-demeaning
 with weight $\theta = 1 - \sqrt{\sigma^2_\varepsilon / (\sigma^2_\varepsilon + T\sigma^2_\alpha)}$.
 Estimate the two variances from the within and between regressions (Swamy--Arora), then transform.
+Year effects stay in, as in `fit_fe`, so the comparison with FE is like-for-like.
 
 ```{r}
 re_fit <- function(d) {
-  within <- feols(y ~ x | firm, d)
-  s2_eps <- sum(resid(within)^2) / (nrow(d) - uniqueN(d$firm) - 1)
+  within <- feols(y ~ x | firm + year, d)       # two-way, like fit_fe
+  s2_eps <- sum(resid(within)^2) / (nrow(d) - uniqueN(d$firm) - uniqueN(d$year))
   b <- d[, .(ybar = mean(y), xbar = mean(x), T_i = .N), by = firm]
   between <- lm(ybar ~ xbar, b)
   s2_alpha <- max(0, sum(resid(between)^2) / between$df.residual - s2_eps / mean(b$T_i))
   d <- merge(d, b, by = "firm")
   d[, theta := 1 - sqrt(s2_eps / (s2_eps + T_i * s2_alpha))]
-  fit <- lm(I(y - theta * ybar) ~ I(x - theta * xbar), d)
+  fit <- lm(I(y - theta * ybar) ~ I(x - theta * xbar) + factor(year), d)
   list(beta = unname(coef(fit)[2]), se = unname(sqrt(diag(vcov(fit)))[2]),
        theta = mean(d$theta), s2_eps = s2_eps, s2_alpha = s2_alpha)
 }

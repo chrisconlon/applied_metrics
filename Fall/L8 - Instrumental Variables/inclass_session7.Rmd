@@ -64,7 +64,7 @@ sim_refund <- function(N = 20000, J = 50, typed = FALSE) {
   gen <- rnorm(J, -0.5, 0.5)
   if (typed) { gen2 <- -0.5 - (gen + 0.5)                # agents lenient on shipping are strict on damage
     cutoff <- ifelse(ctype == "shipping", gen[agent], gen2[agent]) } else cutoff <- gen[agent]
-  R <- as.integer(q + cutoff + rnorm(N, 0, 0.5) > 0)
+  R <- as.integer(q + cutoff + rnorm(N, 0, 0.5) > 0)   # 'cutoff' is generosity: higher = more lenient
   tau <- 20 - 15 * q
   d <- data.frame(spend = 100 + tau * R + 30 * q + rnorm(N, 0, 20), R, agent, q, tau, ctype)
   tot <- tapply(R, agent, sum); n_j <- tapply(R, agent, length)
@@ -117,8 +117,8 @@ etable(feols(y ~ x, d), feols(y ~ 1 | x ~ B, d, vcov = "hetero"), headers = c("O
 # Rotemberg weights: alpha_k proportional to g_k * sum_m s_mk * (x_m - mean x)
 xt <- d$x - mean(d$x)
 alpha <- sapply(1:6, function(k) s$g[k] * sum(s$sh[, k] * xt)); alpha <- alpha / sum(alpha)
-beta_k <- sapply(1:6, function(k) coef(feols(y ~ 1 | x ~ z, data.frame(d, z = s$sh[, k] * s$g[k])))[2])
-round(cbind(shock = s$g, weight = alpha, beta_k = beta_k), 2); sum(alpha * beta_k)
+beta_k <- sapply(1:6, function(k) unname(coef(feols(y ~ 1 | x ~ z, data.frame(d, z = s$sh[, k] * s$g[k])))[2]))
+round(cbind(sector = 1:6, shock = s$g, weight = alpha, beta_k = beta_k), 2); sum(alpha * beta_k)
 ```
 
 # In-class problem 3: drop the sector that carries the estimate

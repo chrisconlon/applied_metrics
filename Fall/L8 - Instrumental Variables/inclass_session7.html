@@ -433,7 +433,7 @@ agent, not by us; refunds build the most goodwill for weak claims.</p>
   gen &lt;- rnorm(J, -0.5, 0.5)
   if (typed) { gen2 &lt;- -0.5 - (gen + 0.5)                # agents lenient on shipping are strict on damage
     cutoff &lt;- ifelse(ctype == &quot;shipping&quot;, gen[agent], gen2[agent]) } else cutoff &lt;- gen[agent]
-  R &lt;- as.integer(q + cutoff + rnorm(N, 0, 0.5) &gt; 0)
+  R &lt;- as.integer(q + cutoff + rnorm(N, 0, 0.5) &gt; 0)   # &#39;cutoff&#39; is generosity: higher = more lenient
   tau &lt;- 20 - 15 * q
   d &lt;- data.frame(spend = 100 + tau * R + 30 * q + rnorm(N, 0, 20), R, agent, q, tau, ctype)
   tot &lt;- tapply(R, agent, sum); n_j &lt;- tapply(R, agent, length)
@@ -514,15 +514,15 @@ etable(feols(y ~ x, d), feols(y ~ 1 | x ~ B, d, vcov = &quot;hetero&quot;), head
 <pre class="r"><code># Rotemberg weights: alpha_k proportional to g_k * sum_m s_mk * (x_m - mean x)
 xt &lt;- d$x - mean(d$x)
 alpha &lt;- sapply(1:6, function(k) s$g[k] * sum(s$sh[, k] * xt)); alpha &lt;- alpha / sum(alpha)
-beta_k &lt;- sapply(1:6, function(k) coef(feols(y ~ 1 | x ~ z, data.frame(d, z = s$sh[, k] * s$g[k])))[2])
-round(cbind(shock = s$g, weight = alpha, beta_k = beta_k), 2); sum(alpha * beta_k)</code></pre>
-<pre><code>##       shock weight beta_k
-## fit_x -0.90   0.10   0.43
-## fit_x  2.12   0.34   0.32
-## fit_x -0.06   0.00   0.72
-## fit_x -0.79   0.06   0.31
-## fit_x -1.32   0.16   0.38
-## fit_x  2.00   0.33   0.48</code></pre>
+beta_k &lt;- sapply(1:6, function(k) unname(coef(feols(y ~ 1 | x ~ z, data.frame(d, z = s$sh[, k] * s$g[k])))[2]))
+round(cbind(sector = 1:6, shock = s$g, weight = alpha, beta_k = beta_k), 2); sum(alpha * beta_k)</code></pre>
+<pre><code>##      sector shock weight beta_k
+## [1,]      1 -0.90   0.10   0.43
+## [2,]      2  2.12   0.34   0.32
+## [3,]      3 -0.06   0.00   0.72
+## [4,]      4 -0.79   0.06   0.31
+## [5,]      5 -1.32   0.16   0.38
+## [6,]      6  2.00   0.33   0.48</code></pre>
 <pre><code>## [1] 0.3948588</code></pre>
 </div>
 <div id="in-class-problem-3-drop-the-sector-that-carries-the-estimate" class="section level1">

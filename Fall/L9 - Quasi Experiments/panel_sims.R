@@ -46,19 +46,22 @@ sim_panel <- function(N = 200, T = 8, rho = 0.7, sd_alpha = 0.5, sd_eps = 0.3,
 d <- sim_panel()
 
 # Random effects by FGLS (Swamy-Arora), written out so the mechanics are visible.
+# Two-way: year effects enter the within regression and the quasi-demeaned regression, so RE is
+# compared like-for-like with the two-way FE fit.
 re_fit <- function(d, yvar = "y", xvar = "x", id = "firm", time = "year") {
-  y <- d[[yvar]]; x <- d[[xvar]]; g <- d[[id]]
+  y <- d[[yvar]]; x <- d[[xvar]]; g <- d[[id]]; tt <- d[[time]]
   T_i <- ave(rep(1, nrow(d)), g, FUN = sum)
-  within <- feols(as.formula(sprintf("%s ~ %s | %s", yvar, xvar, id)), d)
-  s2_eps <- sum(resid(within)^2) / (nrow(d) - length(unique(g)) - 1)
+  within <- feols(as.formula(sprintf("%s ~ %s | %s + %s", yvar, xvar, id, time)), d)
+  s2_eps <- sum(resid(within)^2) / (nrow(d) - length(unique(g)) - length(unique(tt)))
   ybar <- ave(y, g); xbar <- ave(x, g)
   between <- lm(ybar ~ xbar, subset = !duplicated(g))
   Tbar <- mean(unique(T_i))
   s2_alpha <- max(0, sum(resid(between)^2) / (between$df.residual) - s2_eps / Tbar)
   theta <- 1 - sqrt(s2_eps / (s2_eps + T_i * s2_alpha))
   yq <- y - theta * ybar; xq <- x - theta * xbar
-  fit <- lm(yq ~ xq)
+  fit <- lm(yq ~ xq + factor(tt))
   list(coef = unname(coef(fit)[2]), se = unname(sqrt(diag(vcov(fit)))[2]),
+       se_cl = unname(sqrt(diag(sandwich::vcovCL(fit, cluster = g)))[2]),   # for the table
        s2_eps = s2_eps, s2_alpha = s2_alpha, theta = mean(theta), fit = fit)
 }
 
@@ -87,7 +90,7 @@ write_tab("tab_mp_estimators.tex",
             fmt(fit_re$coef), fmt(coef(fit_mund)["x"])),
     sprintf("SE (cluster firm) & %s & %s & %s & %s & %s",
             fmt_se(se(fit_pooled)["x"]), fmt_se(se(fit_fd)[["d(x)"]]), fmt_se(se(fit_fe)["x"]),
-            fmt_se(fit_re$se), fmt_se(se(fit_mund)["x"])),
+            fmt_se(fit_re$se_cl), fmt_se(se(fit_mund)["x"])),
     sprintf("Coef.\\ on $\\bar x_i$ & & & & & %s %s", fmt(coef(fit_mund)["xbar"]), fmt_se(se(fit_mund)["xbar"])),
     sprintf("Firm FE & no & (differenced) & yes & quasi ($\\hat\\theta=%.2f$) & no", fit_re$theta),
     sprintf("$N \\times T$ & %d & %d & %d & %d & %d", nobs(fit_pooled), nobs(fit_fd), nobs(fit_fe), nobs(fit_pooled), nobs(fit_mund))),

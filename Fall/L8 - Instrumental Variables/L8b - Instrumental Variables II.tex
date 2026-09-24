@@ -230,76 +230,6 @@ The model:
 	\end{itemize}
 \end{frame}
 
-\begin{frame}{The Sampling Distribution of $\hat\beta$ ($N=100$)}
-\begin{align*}
-	Y = 1 + 2 X + \varepsilon
-\end{align*}
-
-\begin{figure}
-\centering \caption{\small Distribution of $\hat\beta$ for OLS, strong IV, weak IV with $N=100$}
-	\includegraphics[width=.3\textwidth]{ols_smallN.pdf}\includegraphics[width=.3\textwidth]{strongIV_smallN.pdf}\includegraphics[width=.3\textwidth]{weakIV_smallN.pdf}
-\end{figure}
-
-\begin{itemize}{\footnotesize
-\item OLS is biased with $\mu=2.27$ and $\sigma^2=.008$
-\item Strong IV is unbiased (asymptotically) with $\mu=1.99$ and $\sigma^2 = .024$
-\item Weak IV has heavy tails (just-identified IV has no finite mean): $\mu=2.05$ but $\boldsymbol{\sigma^2 = 1653.11}$
-}
-\end{itemize}
-
-\end{frame}
-
-
-
-\begin{frame}{The Sampling Distribution of $\hat\beta$ ($N=10{,}000$)}
-\begin{align*}
-	Y = 1 + 2 X + \varepsilon
-\end{align*}
-
-\begin{figure}
-\centering \caption{\small Distribution of $\hat\beta$ for OLS, weak IV, strong IV with $N=10000$}
-	\includegraphics[width=.3\textwidth]{ols_largeN.pdf}\includegraphics[width=.3\textwidth]{weakIV_largeN.pdf}\includegraphics[width=.3\textwidth]{strongIV_largeN.pdf}
-\end{figure}
-
-\begin{itemize}{\footnotesize
-\item OLS remains biased with $\mu=2.28$ and $\sigma^2=.000085$
-\item Strong IV is consistent with $\mu=1.99$ and $\sigma^2 =.00021$
-\item Weak IV is consistent with $\mu=2.05$ and even with $N=10k$, $\sigma^2 = .05$
-	\begin{itemize}{\scriptsize
-		\item Still over 100x larger variance than strong instruments!
-	}
-	\end{itemize}
-}
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{What is the Danger of the CLT Failing?}
-
-	\begin{itemize}
-		\item With weak IV, CLT fails and behaves poorly even if $N$ is large
-		\item Remember that for testing we want to reject the null hypothesis incorrectly 5\% of the time
-			\begin{itemize}
-				\item When the CLT fails, our trusty 1.96 critical value is way off base
-				\item Example rejection probabilities for the test of $H_0\colon \beta=2$
-				\begin{table}[H]
-				\centering
-				\begin{tabular}{rr}
-						{\bf Hypothetical Situation} & $P(|t|>1.96)$ \\
-						Weak IV, $N=100$ &  0.3\% \\
-						Strong IV, $N=100$ & 4.2\% \\
-						Weak IV, $N=10000$ & 3.2\% \\
-						Strong IV, $N=10000$ & 5.1\% \\
-				\end{tabular}
-				\end{table}
-				\item Goal should be 5\% but for weak IV with $N$ small, almost never reject; still only 3\% even for $N$ large---this is a bad test! (With strong endogeneity it over-rejects instead; see below.)
-
-			\end{itemize}
-	\end{itemize}
-\end{frame}
-
-
-
 \begin{frame}[fragile]\frametitle{Example in \texttt{R}: Checking Angrist \& Evans Validity}
 \begin{lstlisting}[frame=single]
 # First Stage Test in Angrist & Evans
@@ -767,7 +697,7 @@ Why would $B_m$ be uncorrelated with $\eta_m$? Two different arguments, and they
 	shocks $g_k$ are as good as random across many categories. Evidence: many independent shocks, balance at the
 	shock level.
 	\item Same instrument, same number, different justifications and failure modes. Say which one you rely on.
-	Assignment 4 breaks the first and shows the second surviving.
+	Assignment 4 breaks the share story and asks whether a balance check catches it.
 \end{itemize}
 \end{frame}
 
