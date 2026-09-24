@@ -74,9 +74,31 @@
 	a single observation $i$:
 	$y_i = {\bf x}_{i}'\boldsymbol{\beta} + \varepsilon_i$,
 	where ${\bf x}_i = \left(x_{1,i},\dots,x_{K,i}\right)'$ is $K\times 1$, so ${\bf x}_i'$ is the $i$th row of ${\bf X}$.
+\end{itemize}
+\end{frame}
 
-	\item Conventions: Roman symbols are observed, Greek are not, bold means vector notation, 
-	bold capitals means matrices.
+\begin{frame}{Notation: Read This Once, Use It All Semester}
+\begin{itemize}
+	\item Roman symbols are observed, Greek symbols are not.
+	\item {\bf Bold lowercase} is a vector, {\bf bold uppercase} is a matrix, plain italic is a scalar.
+	\medskip
+	\item Subscripts pick out a \emph{piece} of an object, so a subscript never appears on the
+	full-sample object itself:
+	\begin{center}
+	\begin{tabular}{lll}
+	\hline
+	Symbol & Size & What it is \\
+	\hline
+	${\bf y}$ & $n\times 1$ & all $n$ outcomes \\
+	$y_{i}$ & scalar & outcome for observation $i$ \\
+	${\bf X}$ & $n\times K$ & all the data on all $K$ regressors (column 1 is usually ones) \\
+	${\bf x}_{i}$ & $K\times 1$ & all $K$ regressors for observation $i$ (row $i$ of ${\bf X}$, transposed) \\
+	$x_{k,i}$ & scalar & regressor $k$ for observation $i$ \\
+	\hline
+	\end{tabular}
+	\end{center}
+	\medskip
+	\item So ${\bf X}_{i}$ and ${\bf e}_{i}$ are never things. Watch for this in your own work.
 \end{itemize}
 \end{frame}
 
@@ -1162,12 +1184,28 @@ where $\widehat{{\bf y}} = {\bf X} {\bf b}_{OLS}$ is the prediction or {\bf fitt
 	\item $R^{2}$ is a measure of goodness of fit that never goes down as we add more regressors. It doesn't 
 	tell us whether it's ``worth it'' to add a new regressor to the model. (Later we will talk about why overfitting
 	can be bad in finite samples.)
+\end{itemize}
+\end{frame}
 
-\smallskip
-	\item {\bf Adjusted} $R^{2}$ incorporates a penalty for the number of regressors:
-	\[
+
+\begin{frame}{Adjusted $R^{2}$}
+\begin{itemize}
+	\item Adding a regressor can only lower ${\bf e}'{\bf e}$, so $R^{2}$ can only rise (weakly).
+	It is useless for deciding whether the regressor belongs in the model.
+
+	\medskip
+	\item {\bf Adjusted} $R^{2}$ charges a price for each parameter by comparing
+	variances rather than sums of squares:\[
 	\overline{R}^{2} 	= 1 -  \frac{{\bf e}'{\bf e}/\left(n-K\right)}{{\bf y}'{\bf M}_{0}{\bf y}/\left(n-1\right)}
 	\]
+
+	\medskip
+	\item Each new regressor shrinks ${\bf e}'{\bf e}$ in the numerator but also shrinks its
+	degrees of freedom $n-K$, so $\overline{R}^{2}$ can fall.
+
+	\medskip
+	\item It can even go negative. Treat it as a rule of thumb, not a model selection
+	criterion.
 \end{itemize}
 \end{frame}
 
