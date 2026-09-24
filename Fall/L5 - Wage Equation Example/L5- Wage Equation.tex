@@ -24,7 +24,7 @@
 	\end{align*}
 
 	\smallskip
-	\item Let's revisit estimating this with the Cornwell and Rupert (NLSY) data. 
+	\item Let's revisit estimating this with the Cornwell and Rupert (PSID) data. 
 \end{itemize}
 \end{frame}
 
@@ -51,17 +51,17 @@
 	Notice I've used the $\texttt{i}(\cdot)$ command to make categorical variables into dummies and $\texttt{I}(\cdot)$ to do polynomial terms.
 }
 \only<2>{
-	Note on interpreting effects with $\log(y_i)\approx 1+\beta$:
+	Note on interpreting effects with $\log(y_i)$: a dummy multiplies $y$ by $\exp(\beta)$, and $\exp(\beta)\approx 1+\beta$ only for small $\beta$:
 \begin{itemize}
-	\item $\exp \left( -.3892\right) = .6826$
-		\item $\exp \left( .05654\right) = 1.057$
+	\item $\exp \left( -.3892\right) = .6776$
+		\item $\exp \left( .05654\right) = 1.058$
 \end{itemize}
 }
 \only<3>{
 	\begin{itemize}
-	\item In Regression \#1, what does the coeffcient $\beta_{ED}$ mean?
+	\item In Regression \#1, what does the coefficient $\beta_{ED}$ mean?
 	\item What about in Regression \#2? What is the interpretation of $\beta_{somecol}$?
-	\item How about in Regression \#3? and \#4?
+	\item How about in Regression \#3 and \#4?
 \end{itemize}
 }
 \end{column}
@@ -125,7 +125,7 @@ Notice that $t$-stats are not significant but $F$-test is huge, why?
 \begin{frame}{Marginal Effects}
 Our regression specification contained both linear terms and quadratic terms for experience
 \begin{align*}
-\ln wage_i = \beta_0 + \beta_{exp} Experience_i + \beta_{exp^2} Experience^2_i + \beta X_i + \varepsilon_i
+\ln wage_i = \beta_0 + \beta_{exp} Experience_i + \beta_{exp^2} Experience^2_i + X_i'\boldsymbol{\beta} + \varepsilon_i
 \end{align*}
 We can compute the marginal effect of an additional year of experience as:
 \begin{align*}
@@ -139,7 +139,7 @@ We can compute the marginal effect of an additional year of experience as:
 \end{frame}
 
 
-\begin{frame}{Delta Method II}
+\begin{frame}{Delta Method}
 	\small
 \begin{itemize}
 \item Suppose we have an asymptotic distribution for an estimator: 
@@ -189,15 +189,15 @@ Here we get the answer \alert{wrong}
 What is the exercise we perform in each case?
 \end{frame}
 
-\begin{frame}{Bootstrap/ Simulated Asymptotic Distribution}
+\begin{frame}{Simulating the Asymptotic Distribution}
 \begin{itemize}
-\item Given the the asymptotic distribution of a parameter estimate
+\item Given the asymptotic distribution of a parameter estimate
 \begin{align*}
-\boldsymbol{b}\sim_{d}\mathcal{N}\left(\boldsymbol{\beta},\boldsymbol{\Sigma}\right),
+\boldsymbol{b}\overset{a}{\sim}\mathcal{N}\left(\boldsymbol{\beta},\boldsymbol{\Sigma}/n\right),
 \end{align*}
 we have an estimated density function $\hat{f}$. Let $\hat{f}$ be
-the multivariate normal density with mean $\boldsymbol{\beta}$ and
-variance $\boldsymbol{\Sigma}$.
+the multivariate normal density with mean $\boldsymbol{b}$ and
+variance $\widehat{\boldsymbol{\Sigma}}/n$.
 \item We can simulate the asymptotic distribution of $g\left(\boldsymbol{b}\right)$
 by
 \begin{itemize}
@@ -207,8 +207,8 @@ by
 will be a simulated asymptotic distribution for $g\left(\boldsymbol{b}\right)$
 \end{itemize}
 \item This can be useful when you have code to compute $g\left(\cdot\right)$,
-but computing the derivative $g\left(\cdot\right)$ would be difficult.
-For example, when $g\left(\cdot\right)$ represents an complex behavioral
+but computing the derivative of $g\left(\cdot\right)$ would be difficult.
+For example, when $g\left(\cdot\right)$ represents a complex behavioral
 (or equilibrium) model.
 \item Also if you are too lazy to load \texttt{marginaleffects}
 \end{itemize}
@@ -216,7 +216,7 @@ For example, when $g\left(\cdot\right)$ represents an complex behavioral
 
 
 
-\begin{frame}{Boostrap Marginal Effects in R}
+\begin{frame}{Bootstrap Marginal Effects in R}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{figure}
@@ -261,14 +261,14 @@ Y_{i}=\beta_{0}+\beta_{0F}D_{Fi}+\beta_{1}X_{1i}+\beta_{2}X_{1i}D_{Fi}+\varepsil
 
 
 
-\begin{frame}{Mincerian Regression: Measurement Error }
+\begin{frame}{Mincerian Regression: Measurement Error}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 {\small
 \begin{itemize}
 	\item What happens if one of the variables of interest is measured with error?
 
-	\item Let's say the the recorded education might be one year more or less than the
+	\item Let's say the recorded education might be one year more or less than the
 	person's actual education.
 
 	\item Note: this may already be happening in the data, but let's make it happen more.
@@ -283,7 +283,7 @@ Y_{i}=\beta_{0}+\beta_{0F}D_{Fi}+\beta_{1}X_{1i}+\beta_{2}X_{1i}D_{Fi}+\varepsil
 \begin{column}{0.5\textwidth}
 \begin{figure}
 \flushleft
-	\includegraphics [width=.6\textwidth]	{table_noise}
+	\includegraphics [height=.8\textheight]	{table_noise}
 \end{figure}
 \end{column}
 \end{columns}	
@@ -364,10 +364,10 @@ Y_{i}=\beta_{0}+\beta_{0F}D_{Fi}+\beta_{1}X_{1i}+\beta_{2}X_{1i}D_{Fi}+\varepsil
 	{\bf b} = \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf y} = \boldsymbol{\beta}  + \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' {\bf z} \gamma + \left({\bf X}'{\bf X}\right)^{-1} {\bf X}' \boldsymbol{\varepsilon}
 	\]
 
-	\item The last term is mean zero given the strict exogeneity assumption.
+	\item The last term is mean zero given strict exogeneity, $\E\left[\boldsymbol{\varepsilon} \mid {\bf X},{\bf z}\right]={\bf 0}$.
 
-	\item Note that the second term will not be zero if ${\bf X}$ and ${\bf z}$ are correlated;
-	i.e. if $ {\bf X}' {\bf z} \ne 0$.
+	\item Note that the second term will not be zero if $\gamma \ne 0$ and ${\bf z}$ is correlated
+	with the (non-constant) columns of ${\bf X}$.
 
 	\item Implication:  correlation between omitted variables and the observed regressors makes OLS biased.
 \end{itemize}
@@ -378,9 +378,10 @@ Y_{i}=\beta_{0}+\beta_{0F}D_{Fi}+\beta_{1}X_{1i}+\beta_{2}X_{1i}D_{Fi}+\varepsil
 	\item Using the Frisch-Waugh theorem, we can show that 
 
 	\begin{align*}
-	\E\left[b_{OLS,k} \mid \symbf{X},\symbf{z}\right]=\beta_{k}+\gamma\left(\frac{Cov\left(z,x_{k} \mid \symbf{X}_{-k}\right)}{Var\left(x_{k} \mid \symbf{X}_{-k}\right)}\right)
+	\E\left[b_{OLS,k} \mid {\bf X},{\bf z}\right]=\beta_{k}+\gamma\left(\frac{\widetilde{{\bf x}}_{k}'{\bf z}}{\widetilde{{\bf x}}_{k}'\widetilde{{\bf x}}_{k}}\right)
 \end{align*}
-where $\boldsymbol{X}_{-k}$ refers to all the regressors besides $x_k$.
+where $\widetilde{{\bf x}}_{k}$ is the residual from regressing $x_k$ on ${\bf X}_{-k}$, all the regressors besides $x_k$.
+The ratio is the slope from regressing ${\bf z}$ on $\widetilde{{\bf x}}_{k}$: the partial covariance of $z$ and $x_k$ over the partial variance of $x_k$.
 
 	\item Suppose positive correlation between regressor $x_k$ and omitted variable $z$.
 	\item Also suppose $\beta_k>0$ and $\gamma>0$ so both variables have positive effects.

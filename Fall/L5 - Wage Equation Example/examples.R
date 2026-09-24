@@ -9,7 +9,7 @@ data <- read.csv('./cornwell-rupert.csv') %>%
         right=TRUE))
 
 # check that we did it correctly
-table(data$ED,data2$ED_LEVEL)
+table(data$ED,data$ED_LEVEL)
 
 reg_1 <- feols(LWAGE ~ ED + EXP + I(EXP^2) + WKS + OCC + SOUTH + SMSA
   + MS + UNION + FEM, data = data)
@@ -32,7 +32,7 @@ suppressMessages(library(car))
 suppressMessages(library(sandwich))
 
 # separate male and female categories
-data3 <- data2 %>% mutate(MALE = ifelse(FEM == 1, 0, 1))
+data3 <- data %>% mutate(MALE = ifelse(FEM == 1, 0, 1))
 reg_5 <- feols(LWAGE ~ -1 + ED + EXP + I(EXP^2) + WKS + OCC + SOUTH + SMSA
 + MS + UNION + FEM + MALE, data = data3)
 
@@ -42,7 +42,7 @@ reg_6 <- feols(LWAGE ~ 1 + ED + EXP + I(EXP^2)  + WKS + OCC + SOUTH + SMSA
 
 
 print(linearHypothesis(reg_5, c("FEM = MALE"), 
-      vcoev = vcovHC(reg_5, type = "HC1")))
+      vcov = vcovHC(reg_5, type = "HC1")))
 print(linearHypothesis(reg_6, c("FEM = 0"), 
       vcov = vcovHC(reg_6, type = "HC1")))
 
@@ -93,10 +93,11 @@ low_wage_data <- subset(data, LWAGE<6)
 table(low_wage_data$ED)
 
 
+set.seed(93)
 noise <- sample(-1:1,dim(data)[1],replace=T)
 
 reg_8 <- feols(LWAGE ~ ED_NOISY + EXP + I(EXP^2) + WKS + OCC + SOUTH + SMSA
-+ MS + FEM + UNION, data = data %>% mutate(ED_NOISY = + noise))
++ MS + FEM + UNION, data = data %>% mutate(ED_NOISY = ED + noise))
 summary(reg_8)
 
 etable(list(reg_1,reg_8), export='./table_noise.png')

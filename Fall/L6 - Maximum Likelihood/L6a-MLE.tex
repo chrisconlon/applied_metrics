@@ -17,7 +17,7 @@
 \begin{frame}{Introduction}
 Consider a linear regression with $\varepsilon_i \mid X_i \sim \mathcal{N}(0,\sigma^2)$
 \begin{align*}
-Y_{it} &= X_{i}\, \beta + \varepsilon_{i}
+Y_{i} &= X_{i}\, \beta + \varepsilon_{i}
 \end{align*}
 We've discussed the \alert{least squares estimator}:
 \begin{align*}
@@ -36,6 +36,7 @@ If  $(y_i,x_i)$ are I.I.D then we can write this as:
 \begin{align*}
  \Pr(y_1,\ldots,y_n, x_1,\ldots,x_n \mid \theta) = \prod_{i=1}^N \Pr(y_i, x_i \mid \theta) \propto \prod_{i=1}^N \Pr(y_i \mid x_i , \theta)=\mathbb{L}( \mathbf{y} \mid \mathbf{x} ,\theta )
 \end{align*}
+(the $\propto$ step requires that the distribution of $x_i$ does not depend on $\theta$).
 We call this $\mathbb{L}( \mathbf{y}\mid \mathbf{x} ,\theta )$ the \alert{likelihood} of the observed data.
 \end{frame}
 
@@ -45,13 +46,13 @@ We call this $\mathbb{L}( \mathbf{y}\mid \mathbf{x} ,\theta )$ the \alert{likeli
 \begin{frame}{MLE: Example}
 If we know the distribution of $\varepsilon_i$ we can construct a \alert{maximum likelihood estimator}
 \begin{align*}
-(\widehat{\beta}_{MLE},\widehat{\sigma}^2_{MLE}) &= \arg \min_{\beta,\sigma^2} \mathbb{L}(\beta,\sigma^2)
+(\widehat{\beta}_{MLE},\widehat{\sigma}^2_{MLE}) &= \arg \max_{\beta,\sigma^2} \mathbb{L}(\beta,\sigma^2)
 \end{align*}
 Where 
 \begin{align*} 
 \mathbb{L}(\beta,\sigma^2) &= \prod_{i=1}^N \Pr(y_i \mid x_i,\beta,\sigma^2) \\
                   &= \prod_{i=1}^N \frac{1}{\sqrt{2 \pi \sigma^2}} \exp \left[-\frac{1}{2\sigma^2}(Y_i - X_i \beta)^2 \right]\\
-\ell(\beta,\sigma^2) &= \sum_{i=1}^N -\frac{1}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i=1}^N(Y_i - X_i \beta)^2
+\ell(\beta,\sigma^2) &= -\frac{N}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2} \sum_{i=1}^N(Y_i - X_i \beta)^2
 \end{align*}
 \end{frame}
 
@@ -61,16 +62,16 @@ $\ell(\beta,\sigma^2) = -\frac{N}{2} \ln (2 \pi \sigma^2) - \frac{1}{2 \sigma^2}
 $:
 \begin{align*} 
 \frac{ \partial \ell(\beta,\sigma^2) }{\partial \beta}&= \frac{1}{ \sigma^2}\sum_{i=1}^N X_i'(Y_i - X_i \beta) = 0 \rightarrow \widehat{\beta}_{MLE}= \widehat{\beta}_{OLS}\\ 
-\frac{ \partial \ell(\beta,\sigma^2) }{\partial \sigma^2}&= -N \frac{1}{2 \sigma^2}  -  \frac{1}{2 \sigma^4} \sum_{i=1}^N(Y_i - X_i \beta)^2 = 0 \\
-\sigma^2_{MLE} &= \frac{1}{N} \sum_{i=1}^N (Y_i - X_i \beta)^2
+\frac{ \partial \ell(\beta,\sigma^2) }{\partial \sigma^2}&= -\frac{N}{2 \sigma^2}  +  \frac{1}{2 \sigma^4} \sum_{i=1}^N(Y_i - X_i \beta)^2 = 0 \\
+\widehat{\sigma}^2_{MLE} &= \frac{1}{N} \sum_{i=1}^N (Y_i - X_i \widehat{\beta}_{MLE})^2
 \end{align*}
-Note: the unbiased estimator uses $\frac{1}{N-K-1}$.
+Note: the unbiased estimator uses $\frac{1}{N-K}$ ($K$ parameters, including the intercept).
 \end{frame}
 
 \begin{frame}{MLE: General Case}
 \begin{enumerate}
 \item Start with the \alert{joint density of the data} $Z_1,\ldots,Z_N$ with density $f_Z(z,\theta)$
-\item Construct the likelhood function of the sample $z_1,\ldots,z_n$
+\item Construct the likelihood function of the sample $z_1,\ldots,z_n$
 \begin{align*}
 \mathbb{L}(\mathbf{z} \mid  \theta) = \prod_{i=1}^N f_Z(z_i,\theta)
 \end{align*}
@@ -86,21 +87,21 @@ Note: the unbiased estimator uses $\frac{1}{N-K-1}$.
 \end{frame}
 
 \begin{frame}{MLE in Detail}
-Basic Setup: we know $F(z \mid \theta_0)$ but not $\theta_0$. We know $\theta_0 \in \Theta \subset \mathbb{R}^K$.
+Basic Setup: we know the form of $F(z \mid \theta)$ but not $\theta_0$. We know $\theta_0 \in \Theta \subset \mathbb{R}^K$.
 \begin{itemize}
 \item Begin with a sample of $z_i$ from $i=1,\ldots,N$ which are I.I.D. with CDF $F(z|\theta_0)$.
 \item The MLE chooses
 \begin{align*}
 \widehat{\theta}_{MLE} = \arg \max_{\theta} \ell(\theta) = \arg \max_{\theta} \sum_{i=1}^N \ln f_Z(z_i,\theta)
 \end{align*}
-\item In practice the computer always \alert{minimizes negative log-likelihood} so that $\widehat{\theta}_{MLE} = \arg \min_{\theta} - \ell(\theta)$.
+\item In practice the computer typically \alert{minimizes negative log-likelihood} so that $\widehat{\theta}_{MLE} = \arg \min_{\theta} - \ell(\theta)$.
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}{MLE: Technical Details}
 \begin{enumerate}
-\item Consistency. When is it true that for $\epsilon>0$?
+\item Consistency. When is it true that, for every $\varepsilon>0$,
 \begin{align*}
 \lim _ { N \rightarrow \infty } \Pr \left( \left\| \hat { \theta } _ { MLE } - \theta _ { 0 } \right\| > \varepsilon \right) = 0
 \end{align*}
@@ -108,7 +109,7 @@ Basic Setup: we know $F(z \mid \theta_0)$ but not $\theta_0$. We know $\theta_0 
 \begin{align*}
 \sqrt { N } \left( \hat { \theta } _ { MLE } - \theta _ { 0 } \right) \stackrel { d } { \longrightarrow } \mathcal { N } \left( 0 , - \E \left[  \frac { \partial ^ { 2 }\log f(Z _ { i } , \theta _ { 0 } ) } { \partial \theta \partial \theta ^ { \prime } }   \right] ^ { - 1 } \right)
 \end{align*}
-\item Optimization. How to we obtain $\widehat{\theta}_{MLE}$ anyway?
+\item Optimization. How do we obtain $\widehat{\theta}_{MLE}$ anyway?
 \end{enumerate}
 \end{frame}
 
@@ -117,7 +118,7 @@ Basic Setup: we know $F(z \mid \theta_0)$ but not $\theta_0$. We know $\theta_0 
 \begin{itemize}
 \item $Z_i \sim \mathcal{N}(\theta_0,1)$ and $\Theta = (-\infty,\infty)$. In this case:
 \begin{align*}
-\ell ( \theta ) = - N \cdot \ln ( 2 \pi ) - \sum _ { i = 1 } ^ { N } \left( z _ { i } - \theta \right) ^ { 2 } / 2
+\ell ( \theta ) = - \frac{N}{2} \ln ( 2 \pi ) - \sum _ { i = 1 } ^ { N } \left( z _ { i } - \theta \right) ^ { 2 } / 2
 \end{align*}
 \item MLE is $\widehat{\theta}_{MLE}=\overline{z}$ which is consistent for $\theta_0 = \E[Z_i]$
 \item Asymptotic distribution is $\sqrt{N} ( \overline{z}-\theta_0) \sim \mathcal{N}(0,1)$.
@@ -155,7 +156,7 @@ Basic Setup: we know $F(z \mid \theta_0)$ but not $\theta_0$. We know $\theta_0 
 \begin{column}{.4\textwidth}
 Let $\phi(z)$ be a convex function.\\ 
 \vspace{2cm}
-Then $\E[\phi(Z)] \geq \phi(\E [Z])$, with equality only in the case of a linear function.
+Then $\E[\phi(Z)] \geq \phi(\E [Z])$, with strict inequality if $\phi$ is strictly convex and $Z$ is non-degenerate.
 \end{column}
 \hfill
 \begin{column}{.6\textwidth}
@@ -210,13 +211,13 @@ Therefore
 \begin{frame}{Information Matrix Equality}
 We can relate the \alert{Fisher Information} to the Hessian of the log-likelihood
 \begin{align*}
-\mathcal { I } \left( \theta _ { 0 } \right) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta } \left( z ; \theta _ { 0 } \right) \right] 
+\mathcal { I } \left( \theta _ { 0 } \right) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta ^ { \prime } } \left( z ; \theta _ { 0 } \right) \right] 
 = \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \times \frac { \partial \ln f } { \partial \theta  } \left( z ; \theta _ { 0 } \right)' \right]
 \end{align*}
 \begin{itemize}
     \item This is sometimes known as the \alert{outer product of scores}.
-    \item This matrix is \alert{negative definite}
-    \item Recall that $ \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \right]\approx 0$ at the maximum
+    \item This matrix is \alert{positive semi-definite} (positive definite under identification)
+    \item Recall that $ \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( z ; \theta _ { 0 } \right) \right] = 0$ at the true $\theta_0$ (and the sample mean score is $0$ at $\widehat{\theta}_{MLE}$)
 \end{itemize}
 \end{frame}
 
@@ -227,33 +228,33 @@ We can relate the \alert{Fisher Information} to the Hessian of the log-likelihoo
 \end{align*}
 With some regularity conditions
 \begin{align*}
-0 = \int _ { z } \frac { \partial f _ { Z } } { \partial \theta } ( z ; \theta ) d z = \underbrace{\int _ { z } \frac { \partial \ln f _ { Z } } { \partial \theta } ( z ; \theta ) \cdot f _ { Z } ( z ; \theta ) d z}_{\mathbb { E } \left[ \frac { \partial \ln f _ { Z } } { \partial \theta } \left( z ; \theta _ { 0 } \right) \right]}
+0 = \int _ { z } \frac { \partial f _ { Z } } { \partial \theta } ( z ; \theta ) d z = \underbrace{\int _ { z } \frac { \partial \ln f _ { Z } } { \partial \theta } ( z ; \theta ) \cdot f _ { Z } ( z ; \theta ) d z}_{\mathbb { E }_{\theta} \left[ \frac { \partial \ln f _ { Z } } { \partial \theta } \left( Z ; \theta \right) \right]}
 \end{align*}
 
 \begin{itemize}
-    \item This gives us the FOC we needed.
+    \item At $\theta=\theta_0$: the score has mean zero, which is the population version of the FOC.
     \item Can get information identity with another set of derivatives.
     \end{itemize}
 \end{frame}
 
 
-\begin{frame}{The Cramer-Rao Bound}
+\begin{frame}{The Cram\'er--Rao Bound}
 We can relate the \alert{Fisher Information} to the Hessian of the log-likelihood
 \begin{align*}
 \mathcal { I } ( \theta ) = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta ^ { \prime } } ( Z | \theta ) \right]
 \end{align*}
-It turns out this provides a bound on the variance
+It turns out this provides a bound on the variance of any \alert{unbiased} estimator from $N$ observations:
 \begin{align*}
-\operatorname { Var } ( \hat { \theta } ( Z ) ) \geq \mathcal { I } \left( \theta _ { 0 } \right) ^ { - 1 }
+\operatorname { Var } ( \hat { \theta } ) \geq \left[ N \, \mathcal { I } \left( \theta _ { 0 } \right) \right] ^ { - 1 }
 \end{align*}
-Because we can't do better than Fisher Information we know that MLE is most efficient estimator!
+Since $\sqrt{N}(\widehat{\theta}_{MLE}-\theta_0) \stackrel{d}{\longrightarrow} \mathcal{N}(0,\mathcal{I}(\theta_0)^{-1})$, the MLE attains the bound asymptotically: it is \alert{asymptotically efficient} (if the model is correctly specified).
 \end{frame}
 
 \begin{frame}{MLE: Discussion}
 Tradeoffs
 \begin{itemize}
 \item How does this compare to GM Theorem?
-\item If MLE is most efficient estimate, why ever use something else?
+\item If MLE is the most efficient estimator, why ever use something else?
 \end{itemize}
 \end{frame}
 
@@ -264,10 +265,10 @@ We are going to practice writing down the:
 \begin{itemize}
 \item Likelihood $L(\theta)= \Pr(z_1,\ldots,z_n ; \theta) = \prod_{i=1}^N f(z_i ; \theta)$.
 \item log likelihood $\ell(\theta)= \sum_{i=1}^N \ln f(z_i ; \theta) = \sum_{i=1}^N \ell_i(z_i ; \theta)$.
-\item Scores $\mathcal{S}_i(z_i, \theta) =-\frac{\partial \ln f(z_i ; \theta)}{\partial \theta}=\frac{\partial \ell_i(z_i ; \theta)}{\partial \theta}$.
+\item Scores $\mathcal{S}_i(z_i, \theta) =\frac{\partial \ln f(z_i ; \theta)}{\partial \theta}=\frac{\partial \ell_i(z_i ; \theta)}{\partial \theta}$.
 \item Hessian contribution $\mathcal{H}_i(z_i, \theta) =\frac{\partial^2 \ell_i(z_i ; \theta)}{\partial \theta \partial \theta'}$.
-\item Information Matrix $\mathcal{I}(z_i, \theta) = \mathbb{E}_z[-\mathcal{H}_i(z_i,\theta)]=\mathbb{E}_z[\mathcal{S}_i(z_i,\theta) \mathcal{S}_i(z_i,\theta)^T]$
-\item Variance $V(\theta) \geq [\mathcal{I}(z_i, \theta)]^{-1} $ (Cramer-Rao Lower Bound).
+\item Information Matrix $\mathcal{I}(\theta) = \mathbb{E}_z[-\mathcal{H}_i(z_i,\theta)]=\mathbb{E}_z[\mathcal{S}_i(z_i,\theta) \mathcal{S}_i(z_i,\theta)^T]$
+\item Variance of any unbiased estimator $\geq [N\,\mathcal{I}(\theta)]^{-1} $ (Cram\'er--Rao Lower Bound).
 \end{itemize}
 
 \end{frame}
@@ -276,7 +277,7 @@ We are going to practice writing down the:
 \begin{frame}{Exponential Example}
 \begin{itemize}
 \item Suppose we have data that are exponentially distributed $Y_i \sim \text{Exp}(\lambda)$. The goal is to estimate the parameter $\lambda$ via MLE and $f(y_i | \lambda) = \lambda e^{-\lambda y_i}$ so that $\E[y_i]=\frac{1}{\lambda}$.
-\item Sometimes we want to parameterize the rate  $\lambda_i = x_i' \beta$ with covariates.
+\item Sometimes we want to parameterize the rate  $\lambda_i = x_i' \beta$ with covariates (this requires $x_i'\beta>0$; $\lambda_i=\exp(x_i'\beta)$ is the usual choice).
 \item Example: Time until next customer arrives varies with time of day, day of week, etc. Time until default might depend on credit score, debt-to-income, market conditions, etc.
 \end{itemize}
 \end{frame}
@@ -293,8 +294,8 @@ With log likelihood
 \end{align*}
 And Score, Hessian, and Information Matrix:
 \begin{align*}
-\frac{\partial\, \ell_i}{\partial\, \theta} = \mathcal { S }_i ( y_i, x_i , \beta ) &=  x_i ^ { \prime } \left( \frac{1}{x_i\, \beta} - y_i \right)\\
-\frac{\partial^2\, \ell_i}{\partial\, \theta^2} = \mathcal { H }_i ( y_i , x_i , \beta ) &= - \frac{x_i'\, x_i}{(x_i'\, \beta)^2}\\
+\frac{\partial\, \ell_i}{\partial\, \beta} = \mathcal { S }_i ( y_i, x_i , \beta ) &=  x_i ^ { \prime } \left( \frac{1}{x_i\, \beta} - y_i \right)\\
+\frac{\partial^2\, \ell_i}{\partial\, \beta \partial\, \beta'} = \mathcal { H }_i ( y_i , x_i , \beta ) &= - \frac{x_i'\, x_i}{(x_i'\, \beta)^2}\\
 \mathcal { I } \left( \beta _ { 0 } \right) &= \sum_i \frac{x_i' x_i}{(x_i\, \beta)^2}
 \end{align*}
 \end{frame}
@@ -303,9 +304,9 @@ And Score, Hessian, and Information Matrix:
 \section*{Computing Maximum Likelihood Estimators}
 
 \begin{frame}{Newton's Method for Root Finding}
-Consider the Taylor series for $f(x)$ approximated around $f(x_0)$:
+Consider the Taylor series for $f(x)$ approximated around $x_0$:
 \begin{align*}
-f(x) \approx f(x_0) + f'(x_0) \cdot (x-x_0) + f''(x_0) \cdot (x-x_0)^2 + o_p(3)
+f(x) \approx f(x_0) + f'(x_0) \cdot (x-x_0) + \tfrac{1}{2} f''(x_0) \cdot (x-x_0)^2 + O\big((x-x_0)^3\big)
 \end{align*}
 Suppose we wanted to find a \alert{root} of the equation where $f(x^{*})=0$ and solve for $x$:
 \begin{align*}
@@ -314,23 +315,23 @@ x_1 &= x_0-\frac{f(x_0)}{f'(x_0)}
 \end{align*}
 This gives us an \alert{iterative} scheme to find $x^{*}$:
 \begin{enumerate}
-\item Start with some $x_k$. Calculate $f(x_k),f'(x_k)$
+\item Start with some $x_0$. Calculate $f(x_k),f'(x_k)$
 \item Update using $x_{k+1} = x_k - \frac{f(x_k)}{f'(x_k)} $
 \item Stop when $|x_{k+1}-x_{k}| < \epsilon_{tol}$.
 \end{enumerate}
 \end{frame}
 
-\begin{frame}{Newton-Raphson for Minimization}
-We can re-write \alert{optimization} as \alert{root finding};
+\begin{frame}{Newton-Raphson for Optimization}
+We can re-write \alert{optimization} as \alert{root finding}:
 \begin{itemize}
 \item We want to know $\hat{\theta} = \arg \max_{\theta} \ell(\theta)$.
-\item Construct the FOCs $\frac{\partial \ell}{\partial \theta}=0 \rightarrow$  and find the zeros.
+\item Construct the FOCs $\frac{\partial \ell}{\partial \theta}=0$ and find the zeros.
 \item How? using Newton's method! Set $f(\theta) = \frac{\partial \ell}{\partial \theta}$
 \end{itemize}
 \begin{align*}
 \theta_{k+1} &= \theta_k -  \left[ \frac{\partial^2 \ell}{\partial \theta^2}(\theta_k) \right]^{-1} \cdot \frac{\partial \ell}{\partial \theta}(\theta_k)
 \end{align*}
-The SOC is that $ \frac{\partial^2 \ell}{\partial \theta^2} >0$. Ideally at all $\theta_k$.\\
+The SOC (for a maximum) is that $ \frac{\partial^2 \ell}{\partial \theta^2} <0$. Ideally at all $\theta_k$.\\
 This is all for a \alert{single variable} but the \alert{multivariate} version is basically the same.
 \end{frame}
 
@@ -338,14 +339,14 @@ This is all for a \alert{single variable} but the \alert{multivariate} version i
 \begin{frame}{Newton's Method: Multivariate}
 Start with the objective $Q(\theta) = - \ell(\theta)$:
 \begin{itemize}
-\item Approximate $Q(\theta)$ around some initial guess $\theta_0$ with a quadratic function
-\item Minimize the quadratic function (because that is easy) call that $\theta_1$
+\item Approximate $Q(\theta)$ around some initial guess $\theta^{(0)}$ with a quadratic function
+\item Minimize the quadratic function (because that is easy) call that $\theta^{(1)}$
 \item Update the approximation and repeat.
 \begin{align*}
-\theta_{k+1} = \theta_k - \left[ \frac{\partial^2 Q}{\partial \theta \partial \theta'} \right]^{-1}\frac{\partial Q}{\partial \theta}(\theta_k)
+\theta_{k+1} = \theta_k - \left[ \frac{\partial^2 Q}{\partial \theta \partial \theta'}(\theta_k) \right]^{-1}\frac{\partial Q}{\partial \theta}(\theta_k)
 \end{align*}
-\item The equivalent SOC is that the {Hessian Matrix} is \alert{positive semi-definite}  (ideally at all $\theta$).
-\item In that case the problem is \alert{globally convex} and has a \alert{unique maximum} that is easy to find.
+\item The equivalent SOC is that the {Hessian Matrix} of $Q$ is \alert{positive definite}  (ideally at all $\theta$).
+\item In that case $Q$ is \alert{strictly convex}, so any stationary point is its \alert{unique global minimum} (the maximum of $\ell$) and is easy to find.
 \end{itemize}
 \end{frame}
 
@@ -371,12 +372,11 @@ Choices for $A_k$
 \item BHHH. Specific to MLE. Exploits the \alert{Fisher Information}.
 \begin{align*}
 A _ { k } 
-&= \left[ \frac { 1 } { N } \sum _ { i = 1 } ^ { N } \frac { \partial \ln f } { \partial \theta } \left( \theta _ { k } \right) \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( \theta _ { k } \right) \right] ^ { - 1 }\\
-&=- \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta ^ { \prime } } \left( Z , \theta ^ { * } \right) \right] 
-= \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( Z , \theta ^ { * } \right) \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( Z , \theta ^ { * } \right) \right]
+&= \left[ \sum _ { i = 1 } ^ { N } \frac { \partial \ln f } { \partial \theta } \left( z_i, \theta _ { k } \right) \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( z_i, \theta _ { k } \right) \right] ^ { - 1 }, \quad \text{because}\\
+\frac{1}{N}\sum_{i=1}^N \frac { \partial \ln f } { \partial \theta } \frac { \partial \ln f } { \partial \theta ^ { \prime } } &\stackrel{p}{\longrightarrow} \mathbb { E } \left[ \frac { \partial \ln f } { \partial \theta } \left( Z , \theta _0 \right) \frac { \partial \ln f } { \partial \theta ^ { \prime } } \left( Z , \theta _0 \right) \right] = - \mathbb { E } \left[ \frac { \partial ^ { 2 } \ln f } { \partial \theta \partial \theta ^ { \prime } } \left( Z , \theta _0 \right) \right]
 \end{align*}
-\item Alternatives \alert{SR1} and \alert{DFP} rely on an initial estimate of the Hessian matrix and then approximate an update to $A_k$.
-\item Usually updating the Hessian is the costly step.
+\item Quasi-Newton alternatives \alert{BFGS} (the usual default), \alert{SR1}, and \alert{DFP} start from an initial estimate of the Hessian matrix and then cheaply update $A_k$.
+\item Usually computing (and inverting) the Hessian is the costly step.
 \item Non invertible Hessians are bad news.
 \end{itemize}
 \end{frame}

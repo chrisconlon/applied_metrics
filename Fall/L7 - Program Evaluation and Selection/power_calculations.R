@@ -58,7 +58,8 @@ ggplot(df, aes(x = lift*100, y = n)) +
     x = "Relative Lift (%)",
     y = "Required Sample Size per Arm (log scale)",
     title = "Sample Size vs. Lift (Baseline p0 = 2%)",
-    subtitle = "α = 0.05, Power = 0.80"
+    subtitle = "alpha = 0.05, Power = 0.80"
   ) +
   theme_minimal(base_size = 14)
+ggsave("power_plot.pdf", width = 426/72, height = 286/72)
 

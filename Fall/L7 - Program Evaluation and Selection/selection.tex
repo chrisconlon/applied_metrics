@@ -15,11 +15,11 @@
 
 \begin{frame}{Motivation: Sample Selection Bias}
 \begin{itemize}
-    \item Ordinary Least Squares (OLS) assumes the sample is randomly drawn from the population.
+    \item OLS on a selected sample is fine if selection depends only on $x_i$; not if it depends on unobservables.
     \item In many cases, we only observe the outcome variable $y_i$ for a selected subset of individuals.
     \item Example: Wages are only observed for those who work.
     \begin{align*}
-    y_i = w_i \text{ observed only if } s_i = 1
+    y_i \text{ (the wage) observed only if } s_i = 1
     \end{align*}
     \item If the decision to work is correlated with unobservables affecting wages, OLS is biased.
 \end{itemize}
@@ -54,7 +54,7 @@ s_i &= 1[s_i^* > 0]\\
 \begin{frame}{Conditional Expectation and Bias}
 We only observe $y_i$ when $s_i = 1$. Then:
 \begin{align*}
-\E[y_i \mid x_i, s_i=1]
+\E[y_i \mid x_i, z_i, s_i=1]
     &= x_i'\beta + \E[\varepsilon_i \mid u_i > -z_i'\gamma] \\
     &= x_i'\beta + \rho \sigma \lambda(z_i'\gamma)
 \end{align*}
@@ -64,11 +64,7 @@ where
     &= \frac{\phi(z_i'\gamma)}{\Phi(z_i'\gamma)}.
 \end{align*}
 
-Thus:
-\begin{align*}
-\E[y_i \mid x_i, s_i=1]
-    &= x_i'\beta + \rho\sigma \lambda(z_i'\gamma)
-\end{align*}
+So OLS of $y_i$ on $x_i$ in the selected sample omits the regressor $\lambda(z_i'\gamma)$.
 \end{frame}
 %------------------------------------------------
 
@@ -82,7 +78,7 @@ Thus:
     \begin{align*}
     \hat{\lambda}_i &= \frac{\phi(z_i'\hat{\gamma})}{\Phi(z_i'\hat{\gamma})}.
     \end{align*}
-    \item \textbf{Step 2: Outcome Equation (Corrected OLS)}
+    \item \textbf{Step 2: Outcome Equation (Corrected OLS)}, using only observations with $s_i=1$
     \begin{align*}
     y_i &= x_i'\beta + \rho\sigma \hat{\lambda}_i + \nu_i.
     \end{align*}
@@ -90,7 +86,7 @@ Thus:
 
 If $\rho \neq 0$, selection bias exists.\\
 \vspace{0.2cm}
-Note: standard errors must be corrected for the generated regressor $\hat{\lambda}_i$.
+Note: standard errors must be corrected for the generated regressor $\hat{\lambda}_i$ and the built-in heteroskedasticity.
 \end{frame}
 
 
@@ -101,7 +97,7 @@ Note: standard errors must be corrected for the generated regressor $\hat{\lambd
         \item If $\rho \neq 0$, selection bias exists.
         \item If $\rho = 0$, OLS on observed $y_i$ is consistent.
     \end{itemize}
-    \item Identification relies on nonlinearity of $\lambda(z_i'\gamma)$, but it’s better to have an \textbf{exclusion restriction}:
+    \item Identification relies on nonlinearity of $\lambda(z_i'\gamma)$, but it's better to have an \textbf{exclusion restriction}:
     \[
     \text{Some variables in } z_i \text{ not in } x_i.
     \]
@@ -185,7 +181,7 @@ exper       0.057020   0.005744   9.927  < 2e-16 ***
 sigma  1.01697    0.01851  54.935  < 2e-16 ***
 rho    0.54797    0.09150   5.989  2.5e-09 ***
 ---
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{lstlisting}
 \end{frame}
 
@@ -205,11 +201,11 @@ heck_B <- selection(select_B ~ educ + exper + kids, wage_B ~ educ + exper, metho
 \end{frame}
 
 
-\begin{frame}{OLS vs. Heckman Selection Model (with exclusion restriction)}
+\begin{frame}{OLS vs. Heckman Selection Model}
 \begin{center}
 \begin{tabular}{@{\extracolsep{5pt}}lccc} 
 \toprule
- & OLS (observed) & Heckman (MLE) & Heckman (Exclusion) \\ 
+ & OLS (sample B) & Heckman, no excl.\ (A) & Heckman, excl.\ (B) \\ 
 \midrule
  educ & 0.071$^{***}$ (0.012) & 0.096$^{***}$ (0.013) & 0.100$^{***}$ (0.013) \\ 
   exper & 0.078$^{***}$ (0.005) & 0.057$^{***}$ (0.006) & 0.057$^{***}$ (0.006) \\ 
@@ -221,7 +217,7 @@ Adjusted R$^{2}$ & 0.137 &  &  \\
 Log Likelihood &  & $-$2,940.355 & $-$2,903.073 \\ 
 $\rho$ &  & 0.548$^{***}$  (0.091) & 0.647$^{***}$  (0.068) \\ 
 \bottomrule 
-\textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
+\textit{Note:}  & \multicolumn{3}{r}{A: selection on educ, exper; B: adds kids. $^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\
 \end{tabular} 
 \end{center}
 \end{frame}
@@ -254,7 +250,7 @@ $\rho$ &  & 0.548$^{***}$  (0.091) & 0.647$^{***}$  (0.068) \\
 \ln w_0 &= \alpha_0 + u_0 \quad \mbox{ with } u_0 \sim N(0,\sigma_0^2) \mbox{ source country}\\
 \ln w_1 &= \alpha_1 + u_1 \quad \mbox{ with } u_1 \sim N(0,\sigma_1^2) \mbox{ host country}
 \end{align*}
-\item Now we allow for migration cost of $C$ which he writes in hours: $\pi = \frac{C}{w_0}$.
+\item Now we allow for migration cost of $C$, expressed in time-equivalent units: $\pi = \frac{C}{w_0}$.
 \item Assume workers know everything; you only see $u_0$ \alert{OR} $u_1$ depending on country.
 \item Correlation in earnings is $\rho=\frac{\sigma_{01}}{\sigma_{0} \sigma_{1}}$.
 \end{itemize}
@@ -301,7 +297,7 @@ Construct \alert{counterfactual wages} for workers in \alert{source} country for
 \begin{itemize}
 \item If everything is normal, we just run univariate regression $\mathbb{E}\left(u_{0} | \nu\right)=\frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \nu$:
 \begin{align*}
-\mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}\right) &= \frac{1}{\sigma_{0}}\cdot \frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \cdot \frac{\sigma_{\nu}^{2}}{\sigma_{\nu}^{2}} \cdot \nu  
+\mathbb{E}\left(\frac{u_{0}}{\sigma_{0}} | \frac{\nu}{\sigma_{\nu}}\right) &= \frac{1}{\sigma_{0}}\cdot \frac{\sigma_{0 \nu}}{\sigma_{\nu}^{2}} \cdot \nu  
 =\frac{\sigma_{0 \nu}}{\sigma_{0} \sigma_{\nu}} \frac{\nu}{\sigma_{\nu}}  =\rho_{0 \nu} \frac{\nu}{\sigma_{\nu}} 
 \end{align*}
 \begin{align*}
@@ -318,7 +314,7 @@ Construct \alert{counterfactual wages} for workers in \alert{source} country for
 \begin{frame}
 \frametitle{Example: Borjas (1987): How does selection work?}
 \begin{itemize}
-\item A similar expression for those who do immigrate:
+\item The analogous expression for immigrants' host-country wages:
 \begin{align*}
 \mathbb{E}\left(w_{1} | \text { Immigrate }\right) &=\alpha_{1}+\mathbb{E}\left(u_{1} | \frac{\nu}{\sigma_{\nu}}>z\right) \\
 &=\alpha_{1}+\rho_{1 \nu} \sigma_{1}\left(\frac{\phi(z)}{\Phi(-z)}\right)
@@ -340,12 +336,12 @@ Where $\rho=\sigma_{01} / \sigma_{0} \sigma_{1}$.
 
 
 \begin{frame}{Positive Hierarchical Sorting}
-Let $Q_{0}=\E\left(u_{0} | I=1\right), Q_{1}=\E\left(u_{1} | I=1\right)$ (expected \alert{skill} of immigrants).
+Let $Q_{0}=\E\left(u_{0} | I=1\right), Q_{1}=\E\left(u_{1} | I=1\right)$ (expected \alert{skill} of immigrants; $I=1$: migrate).
 \begin{itemize}
 \item Immigrants are positively selected and above average $(Q_0,Q_1) > 0$ and $\frac{\sigma_{1}}{\sigma_{0}}>1 \text { and } \rho>\frac{\sigma_{0}}{\sigma_{1}}$
 \begin{itemize}
 \item $\frac{\sigma_{1}}{\sigma_{0}}>1$ returns to ``skill'' are higher in host country.
-\item $\rho>\frac{\sigma_{0}}{\sigma_{1}}$ correlation between valued skills in both counties is high (similar skills valued in both countries).
+\item $\rho>\frac{\sigma_{0}}{\sigma_{1}}$ correlation between valued skills in both countries is high (similar skills valued in both countries).
 \end{itemize}
 \item Best and brightest leave because returns to skill are too low in home country.
 \end{itemize}
@@ -354,10 +350,10 @@ Let $Q_{0}=\E\left(u_{0} | I=1\right), Q_{1}=\E\left(u_{1} | I=1\right)$ (expect
 \begin{frame}{Negative Hierarchical Sorting}
 We swap the standard deviations:
 \begin{itemize}
-\item Immigrants are negatively selected and below average $(Q_0,Q_1) < 0$ and $\frac{\sigma_{1}}{\sigma_{0}}>1 \text { and } \rho>\frac{\sigma_{0}}{\sigma_{1}}$
+\item Immigrants are negatively selected and below average $(Q_0,Q_1) < 0$ and $\frac{\sigma_{0}}{\sigma_{1}}>1 \text { and } \rho>\frac{\sigma_{1}}{\sigma_{0}}$
 \begin{itemize}
 \item $\frac{\sigma_{0}}{\sigma_{1}}>1$ returns to ``skill'' are lower in host country.
-\item $\rho>\frac{\sigma_{1}}{\sigma_{0}}$ correlation between valued skills in both counties is high (similar skills valued in both countries).
+\item $\rho>\frac{\sigma_{1}}{\sigma_{0}}$ correlation between valued skills in both countries is high (similar skills valued in both countries).
 \end{itemize}
 \item Compressed wage structure attracts the low skill types because it provides ``insurance'' or ``subsidizes'' low wage workers.
 \end{itemize}
@@ -365,7 +361,7 @@ We swap the standard deviations:
 
 \begin{frame}{Refugee/Superman Sorting?}
 \begin{itemize}
-\item Immigrants are below average at home and above average in host $(Q_0<0 ,Q_1>1)$ and $\frac{\sigma_{1}}{\sigma_{0}}>1$:
+\item Immigrants are below average at home and above average in host $(Q_0<0 ,Q_1>0)$ iff:
 \begin{itemize}
 \item $\rho<\min \left(\frac{\sigma_{1}}{\sigma_{0}}, \frac{\sigma_{0}}{\sigma_{1}}\right)$ being below average in source country makes you above average in host country.
 \end{itemize}
@@ -382,7 +378,7 @@ The missing (fourth) case:
 What can we learn here?
 \begin{itemize}
 \item Heckman won a Nobel Prize for his work on selection...
-\item You need to know what an \alert{inverse Mills ratio is}
+\item You need to know what an \alert{inverse Mills ratio} is
 \item But today it is hard to get away with strong parametric assumptions (bivariate normal) on error terms.
 \item Doing MLE with a fully normal model is not a terrible place to start sometimes
 \begin{itemize}

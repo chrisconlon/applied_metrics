@@ -36,7 +36,7 @@ This set of lectures will cover (roughly) the following papers:\\
 Theory:
 \begin{itemize}
 \item Angrist and Imbens (1994)
-\item Heckman Vytlacil (2005/2007)
+\item Heckman and Vytlacil (2005/2007)
 \item Abadie and Imbens (2006)
 \end{itemize}
 And draw heavily upon notes by 
@@ -85,7 +85,7 @@ And draw heavily upon notes by
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Some Challenges}
+\begin{frame}{Some Challenges: SUTVA}
 Stable unit treatment value assumption (SUTVA)
 \begin{itemize}
 \item We assume a \textit{ceteris paribus} version of treatment effects
@@ -93,7 +93,7 @@ Stable unit treatment value assumption (SUTVA)
 \item Your $\beta_i$ doesn't respond to whether or not another individual is treated.
 \item Two common limitations:
 \begin{itemize}
-\item Peer effects: Whether you respond to job training program depends on whether your spouse is also treated.
+\item Peer effects: Whether you respond to a job training program depends on whether your spouse is also treated.
 \item Equilibrium effects: if we sent everyone to college, returns to college would be quite different.
 \end{itemize}
 \end{itemize}
@@ -101,12 +101,12 @@ Stable unit treatment value assumption (SUTVA)
 
 
 
-\begin{frame}{Some Challenges}
+\begin{frame}{Some Challenges: The Fundamental Problem}
 \begin{columns}[T] % align columns
 \begin{column}{.65\textwidth}
 Fundamental Problem of Causal Inference
 \begin{itemize}
-\item We don't observe the \alert{counterfactual} $Y_i(D_i)$.
+\item We don't observe the \alert{counterfactual} $Y_i(1-D_i)$.
 \item For a single individual we either observe $Y_i(1)$ \alert{or} $Y_i(0)$ but never both!
 \begin{itemize}
 \item ex: We don't see what your wage would have been if you didn't attend college.
@@ -115,7 +115,7 @@ Fundamental Problem of Causal Inference
 \end{itemize}
 \end{column}%
 \hfill%
-\begin{column}{.38\textwidth}
+\begin{column}{.33\textwidth}
 
   \vspace{20pt}
   
@@ -123,13 +123,14 @@ Fundamental Problem of Causal Inference
   \vspace{20pt}
   \begin{tabular}{ccccc}
     \toprule
-    i & $Y_{i}(1)$ &  $Y_{i}(0)$ & $D_{i}$ & $D_{i}$ \\
+    i & $Y_{i}(1)$ &  $Y_{i}(0)$ & $D_{i}$ & $Y_{i}$ \\
     \midrule
     1 &     1      &     \alert{?}      &   1   & 1 \\
     2 &     0      &     \alert{?}      &   1   & 0 \\
     3 &     \alert{?}      &     0      &   0   & 0 \\
      & &  $\vdots$ & & \\
     $n$ &     \alert{?}      &     1      &   0   & 1 \\    
+    \bottomrule
   \end{tabular}
 \end{column}%
 \end{columns}
@@ -140,8 +141,8 @@ Fundamental Problem of Causal Inference
 \frametitle{Structural vs. Reduced Form}
 \begin{itemize}
 \item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
-\item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
-\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,\varepsilon_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
+\item Most program evaluation approaches seek to identify one effect or the other effect. These are therefore described as \alert{reduced form} or \alert{quasi-experimental}.
+\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,\varepsilon_i)$ distribution; it generally requires more assumptions, but then we can calculate whatever we need.
 \end{itemize}
 \end{frame}
 
@@ -174,7 +175,7 @@ Y_i = \alpha + \beta_i \cdot D_i + \varepsilon_i
 &=& \underbrace{\E[\beta_i \mid  D_i =1]}_{\mbox{ATT}} + \left(\underbrace{\E[\varepsilon_i \mid D_i =1 ] - \E[\varepsilon_i \mid D_i=0] }_{\mbox{selection bias}}  \right)
 \end{eqnarray*}
 \item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
-\item $Y_i^0 = \alpha + \varepsilon_i$ may vary within the population (this is quite common).
+\item $Y_i(0) = \alpha + \varepsilon_i$ may vary within the population (this is quite common).
 \end{itemize}
 \end{frame}
 
@@ -190,8 +191,8 @@ Y_i = \alpha + \beta_i D_i + u_i
 \item The problem: $D_i \perp u_i$ and/or $D_i \perp \beta_i$ are likely violated.
 \item We can get positive or negative selection bias:
 \begin{itemize}
-\item e.g. Who goes to college? those likely to benefit more than most!
-\item e.g. who gets risky surgeries/drugs? people who are very sick.
+\item e.g., who goes to college? Those likely to benefit more than most!
+\item e.g., who gets risky surgeries/drugs? people who are very sick.
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -206,7 +207,7 @@ Y_i = \alpha + \beta_i D_i + u_i
 \end{array}
 \end{align*}
 \begin{itemize}
-  \item If treatment is assigned randomly, then $Y_{i}(0)$ and $T_{i}$ should be independent. Consequently,
+  \item If treatment is assigned randomly, then $Y_{i}(0)$ and $D_{i}$ should be independent. Consequently,
   \begin{align*}
     \E\left[Y_{i}(0)\mid D_{i}=1\right]=\E\left[Y_{i}(0) \mid D_{i}=0\right],
   \end{align*}
@@ -260,7 +261,7 @@ recalling that if $Y_{i}(0)$ and $D_{i}$ are independent, $\E\left[Y_{i}(0) \mid
 
 \begin{frame}{Randomization and Endogeneity II}
 \begin{itemize}
-  \item Simplifying the situation by assuming $\beta=Y_{i}(1)-Y_{i}(1)$ for all
+  \item Simplifying the situation by assuming $\beta_1=Y_{i}(1)-Y_{i}(0)$ for all
 $i$, we can put this back in the regression equation framework,
 \begin{align*}
 Y_{i}=\beta_{0}+\beta_{1}\, D_{i}+\varepsilon_{i}
@@ -269,8 +270,8 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
 
   \medskip
   \item If heterogeneity in baseline outcomes  $Y_{i}(0)$  is correlated with treatment status $D_i$,
-  then the error term $\varepsilon_{i}$ is correlated with the regressor $\varepsilon_i$,
-  violating the strict exogeneity assumption, and leading to biased estimates of $\beta$.
+  then the error term $\varepsilon_{i}$ is correlated with the regressor $D_i$,
+  violating the strict exogeneity assumption, and leading to biased estimates of $\beta_1$.
 
   \medskip
   \item In theory, randomization of regressors is a way of ensuring that the strict exogeneity assumption holds:
@@ -290,7 +291,7 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
     
 \medskip
   \item This requires more notation to discuss within the potential outcome framework -- we need to distinguish
-  between whether subject \emph{believes} they are being treated or not, as well as whether they are \emph{actually}
+  between whether the subject \emph{believes} they are being treated or not, as well as whether they are \emph{actually}
   being treated or not -- but it is easier to talk about in the regression framework. 
 \end{itemize}
 \end{frame}
@@ -311,7 +312,7 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
     \item With placebo effect, we could understand this as treatment influencing the
     disturbance term, but maybe we're happy to enjoy the placebo effect. On the other hand,
     what if we're considering whether to add a nutrient to a pill or not, rather than deciding
-    whether or not to give the subjects a pill or not? Perhaps we won't get the placebo effect twice. 
+    whether to give the subjects a pill or not? Perhaps we won't get the placebo effect twice. 
     
     \item If treatment influences error term because of manipulation on the part of the researcher
     implementing the study, then the relationship between treatment and outcomes we see
@@ -326,7 +327,7 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
 
 \begin{frame}{Randomization and Heterogeneity}
 \begin{itemize}
-  \item The fact that ATE$\ne$ ATT is a separate issue having to do with \emph{heterogeneity} of treatment effects.
+  \item The fact that ATE $\ne$ ATT is a separate issue having to do with \emph{heterogeneity} of treatment effects.
   This issue is also ``solved'' by randomization in a way, but is this an issue we want to solve?
 
   \medskip
@@ -355,13 +356,13 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
 
   \medskip
   \item Does controlling for ${\bf X}$ matter in the experimental context? Note that
-  even if ${\bf X}$  is omitted from the regression model, there is {\bf no problem of
+  even if (pre-treatment) ${\bf X}$  is omitted from the regression model, there is {\bf no problem of
   omitted variables bias} because $D$ and ${\bf X}$ are uncorrelated.
 
   \medskip
-  \item However, controlling for covariates may improve precision of the estimates,
-  especially in small sample sizes where ${\bf X}$ may not be balanced across the treatment
-  and control groups.
+  \item However, controlling for covariates that predict $Y$ may improve precision of the estimates
+  by reducing residual variance. In small samples it also adjusts for chance imbalance in ${\bf X}$
+  across the treatment and control groups.
 
 \end{itemize}
 \end{frame}
@@ -388,7 +389,7 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
     \item Student (1938), the t-test guy, argued against randomization in agricultural trials.
     Simple random sampling vs. systematic sampling.
     \item Stratified sampling, clustered sampling, sampling theory.
-    \item Chassang et al (2012) explore the idea of {\bf selective trials}.
+    \item Chassang et al.\ (2012) explore the idea of {\bf selective trials}.
   \end{itemize}
 
 \end{itemize}
@@ -407,12 +408,13 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
 	the \alert{only} randomness in your data is the coin flips that assigned treatment.
 
 	\medskip
-	\item So every other way the coin flips could have landed is an equally likely
+	\item So every other assignment the design could have produced is an equally likely
 	world where the treatment labels moved but the outcomes did not.
 
 	\medskip
 	\item That means we can compute the \emph{exact} distribution of any test
-	statistic under the null --- by re-randomizing the labels ourselves.
+	statistic under the null --- by re-randomizing the labels ourselves
+	(up to simulation error, if we draw shuffles rather than list every assignment).
 \end{itemize}
 \end{frame}
 
@@ -440,7 +442,7 @@ where $\beta_{0}=\E\left[Y_{i}(0)\right]$ and $\varepsilon_{i}=Y_{i}(0)-\beta_{0
 \end{frame}
 
 
-\begin{frame}[fragile]{Randomization Inference in ten lines}
+\begin{frame}[fragile]{Randomization Inference in a few lines}
 \begin{lstlisting}
 observed <- mean(y[d == 1]) - mean(y[d == 0])
 perm <- replicate(10000, {
@@ -461,10 +463,10 @@ except we built it from the design instead of assuming it.
 	\item \alert{It respects the actual design.} Cluster-randomized experiment
 	(markets, stores, classrooms)? Permute \emph{clusters}, and correct
 	cluster-level inference falls out automatically --- no formulas, no ``how many
-	clusters is enough?'' anxiety.
+	clusters is enough?'' anxiety (few clusters just means coarse p-values).
 
 	\medskip
-	\item \alert{You have already seen it.} The synthetic-control placebo test
+	\item \alert{You will see it again.} The synthetic-control placebo test
 	(Session 11) --- ``how unusual is California's gap compared to reassigning the
 	policy to every other state?'' --- is randomization inference by another name.
 	So is Fisher's exact test in your A/B dashboard.
@@ -482,7 +484,7 @@ except we built it from the design instead of assuming it.
 \end{frame}
 
 
-\begin{frame}{Experiments in the Social Science}
+\begin{frame}{Experiments in the Social Sciences}
 \begin{itemize}
   \item Randomized Controlled Trials have long been the gold standard for research
   in the natural sciences.
@@ -492,9 +494,9 @@ except we built it from the design instead of assuming it.
   to randomization.
   \begin{itemize}
     \item Macroeconomic policy, other large-scale policy issues, especially
-    when there are spillovers across markets/countries. E.g., what is global
-    impact of EU's decision to implement carbon pricing?
-    \item Mergers and antitrust, other situations where regulatory questions highly
+    when there are spillovers across markets/countries. E.g., what is the global
+    impact of the EU's decision to implement carbon pricing?
+    \item Mergers and antitrust, other situations where regulatory questions are highly
      context-specific.
   \end{itemize}
 
@@ -510,7 +512,7 @@ except we built it from the design instead of assuming it.
 
 
 
-\begin{frame}{Example: Banerjee et al (2007)}
+\begin{frame}{Example: Banerjee et al.\ (2007)}
 \begin{itemize}
   \item Background: getting kids into schools in India seemingly had
   unimpressive impacts on educational attainment. School quality
@@ -534,7 +536,7 @@ except we built it from the design instead of assuming it.
 \end{frame}
 
 
-\begin{frame}{Example: Banerjee et al (2007)}
+\begin{frame}{Example: Banerjee et al.\ (2007), cont.}
 \begin{center}
 \includegraphics[width=.9\textwidth]{banerjee-t2}
 \end{center}
@@ -585,20 +587,20 @@ except we built it from the design instead of assuming it.
 
 \begin{frame}{Difference in Binary Outcomes (Wald Test)}
 
-Let $\hat{p}_1$ and $\hat{p}_0$ be the sample proportions of succesfful sales in treatment and control.
+Let $\hat{p}_1$ and $\hat{p}_0$ be the sample proportions of successful sales in treatment and control.
 
 Under random assignment and large $n_1, n_0$:
 \begin{align*}
-\hat{p}_j &\sim \mathcal{N}\!\left(p_j,\; \frac{p_j(1-p_j)}{n_j}\right), \quad j\in\{0,1\}
+\hat{p}_j &\overset{a}{\sim} \mathcal{N}\!\left(p_j,\; \frac{p_j(1-p_j)}{n_j}\right), \quad j\in\{0,1\}
 \end{align*}
 For large $n$, the difference-in-means is approximately normal:
 \begin{align*}
 \hat{p}_1 - \hat{p}_0 
-\sim \mathcal{N}\!\left(p_1 - p_0,\;
+\overset{a}{\sim} \mathcal{N}\!\left(p_1 - p_0,\;
 \frac{p_1(1-p_1)}{n_1} + \frac{p_0(1-p_0)}{n_0}\right).
 \end{align*}
 
-The Wald test statistic divides by the estimated standard error under $H_0: p_1 = p_0$:
+The Wald statistic divides by the (unpooled) estimated standard error; under $H_0: p_1 = p_0$,
 \begin{align*}
 Z = \frac{\hat{p}_1 - \hat{p}_0}
          {\sqrt{\hat{p}_1(1-\hat{p}_1)/n_1 + \hat{p}_0(1-\hat{p}_0)/n_0}}
@@ -611,7 +613,7 @@ This large-sample approximation underpins both the \alert{power} and \alert{samp
 \begin{frame}{Large-sample approx.: two-sample difference-in-proportions}
   Test statistic (Wald) for two independent samples (equal $n$ per arm):
   \begin{align*}
-    \hat{p}_1 - \hat{p}_0 \sim \mathcal{N}\!\left(p_1-p_0,\; \frac{p_1(1-p_1)}{n} + \frac{p_0(1-p_0)}{n}\right).
+    \hat{p}_1 - \hat{p}_0 \overset{a}{\sim} \mathcal{N}\!\left(p_1-p_0,\; \frac{p_1(1-p_1)}{n} + \frac{p_0(1-p_0)}{n}\right).
   \end{align*}
   Solving for $n$ to achieve power $1-\beta$ at two-sided significance $\alpha$ gives:
   \begin{align*}
@@ -652,7 +654,7 @@ This large-sample approximation underpins both the \alert{power} and \alert{samp
   \end{align*}
   Numerically this gives
   \begin{align*}
-    n \approx 80{,}681 \quad\text{(per arm)}.
+    n \approx 80{,}679 \quad\text{(per arm)}.
   \end{align*}
   \vspace{4pt}
   \textbf{Interpretation:} To detect a 10\% relative increase from a very small base rate (2\%) requires a huge sample because the absolute change is very small (0.2 percentage points).
@@ -724,7 +726,7 @@ ggplot(df, aes(x = lift*100, y = n)) +
     x = "Relative Lift (%)",
     y = "Required Sample Size per Arm (log scale)",
     title = "Sample Size vs. Lift (Baseline p0 = 2%)",
-    subtitle = "α = 0.05, Power = 0.80"
+    subtitle = "alpha = 0.05, Power = 0.80"
   ) +
   theme_minimal(base_size = 14)
 \end{lstlisting}
@@ -760,7 +762,7 @@ power.t.test(delta = delta, sd = sigma, power = power,
   \begin{align*}
     \Delta = (z_{1-\alpha/2} + z_{1-\beta}) \sqrt{\frac{p_1(1-p_1)+p_0(1-p_0)}{n}}.
   \end{align*}
-  For planning you can use the conservative plug-in $p_1\approx p_0$, giving
+  For planning you can use the simple plug-in $p_1\approx p_0$ (slightly anti-conservative for positive lifts when $p_0<0.5$), giving
   \begin{align*}
     \Delta_{\text{approx}} \approx (z_{1-\alpha/2} + z_{1-\beta}) \sqrt{\frac{2 p_0(1-p_0)}{n}}.
   \end{align*}
@@ -769,12 +771,12 @@ power.t.test(delta = delta, sd = sigma, power = power,
 
 \begin{frame}{Practical considerations}
   \begin{itemize}
-    \item \textbf{Equal vs unequal allocation:} If treatment fraction $\pi \ne 0.5$, replace $1/n+1/n$ by $1/(n\pi)+1/(n(1-\pi))$ or solve for each arm separately.
-    \item \textbf{Clustering / interference:} If randomization is by cluster (e.g., by geography), inflate $n$ by the design effect: $DE = 1 + (m-1)\rho$, where $m$ is cluster size, $\rho$ ICC.
+    \item \textbf{Equal vs unequal allocation:} If treatment fraction $\pi \ne 0.5$, replace $2/n$ ($n$ per arm) by $1/(N\pi)+1/(N(1-\pi))$, where $N$ is the total sample size, or solve for each arm separately.
+    \item \textbf{Clustering:} If randomization is by cluster (e.g., by geography), inflate $n$ by the design effect: $DE = 1 + (m-1)\rho$, where $m$ is cluster size, $\rho$ ICC.
     \item \textbf{Multiple testing / sequential peeking:} Correct $\alpha$ (Bonferroni, group sequential, alpha-spending).
-    \item \textbf{Non-compliance / attrition:} Adjust expected treated proportion and effective sample size.
-    \item \textbf{Heterogeneous treatment effects:} If variance differs by arm, use $p_1(1-p_1)$ and $p_0(1-p_0)$ explicitly.
-    \item \textbf{Pre-launch A/B to estimate $p_0$ and $\sigma$:} Accurate estimates of baseline rate and SD drastically change required $n$.
+    \item \textbf{Non-compliance / attrition:} Adjust expected treated proportion and effective sample size (with compliance rate $c$, the ITT shrinks by $c$, so $n$ grows by $1/c^2$).
+    \item \textbf{Unequal variances:} If variance differs by arm, use $p_1(1-p_1)$ and $p_0(1-p_0)$ explicitly.
+    \item \textbf{Pre-launch A/A test to estimate $p_0$ and $\sigma$:} Required $n$ is very sensitive to the baseline rate and SD.
   \end{itemize}
 \end{frame}
 
@@ -795,7 +797,7 @@ power.t.test(delta = delta, sd = sigma, power = power,
   \begin{itemize}
     \item For low baseline rates, even modest relative lifts require large sample sizes because absolute differences are tiny.
     \item Use the formula for difference-in-proportions for binary outcomes; for continuous outcomes the two-sample t formula is natural.
-    \item R functions `power.prop.test()` and `power.t.test()` provide convenient built-in calculations.
+    \item R functions \texttt{power.prop.test()} and \texttt{power.t.test()} provide convenient built-in calculations.
     \item Adjust for clustering, attrition, etc. before launching the experiment.
   \end{itemize}
 \end{frame}
