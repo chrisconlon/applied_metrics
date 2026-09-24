@@ -87,7 +87,7 @@ Recall the three basic OLS assumptions
 	They can be due to errors in the data.  There is no standard formal definition. 
 
 	\medskip
-	\item What to do? Greene:``\emph{It is difficult to draw firm general conclusions... It remains likely that in very
+	\item What to do? Greene: ``\emph{It is difficult to draw firm general conclusions... It remains likely that in very
 	small samples, some caution and close scrutiny of the data are called for.}'' I'd say that's true even in large samples,
 	but there isn't a generally accepted way of quantifying what counts as appropriate ``caution and close scrutiny.''
 
@@ -99,7 +99,7 @@ Recall the three basic OLS assumptions
 \begin{frame}{Removing Outliers?}
 \begin{itemize}
 \item Removing extreme outliers (in $x$) from datasets is often considered good practice. But we should be mindful
-		about why as dropping observations creates the potential for manipulation. 
+		about why, as dropping observations creates the potential for manipulation. 
 
 	\medskip
 	\item Sometimes extreme outliers are just errors, in which case they should almost certainly be dropped.
@@ -297,7 +297,7 @@ Could use leave-one-out residuals $\tilde{e}_i = (1-h_{ii})^{-1}e_i$:
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{itemize}
-	\item If we plotted total food expenditure (rather than the expenditure share), the heteroscedasticity would go in the other direction.
+	\item If we plotted total food expenditure (rather than the expenditure share), the heteroskedasticity would go in the other direction.
 \end{itemize}
 \end{column}
 \end{columns}
@@ -305,9 +305,9 @@ Could use leave-one-out residuals $\tilde{e}_i = (1-h_{ii})^{-1}e_i$:
 
 
 
-\begin{frame}{Heteroscedasticity vs. Correlation}
+\begin{frame}{Heteroskedasticity vs. Correlation}
 \begin{itemize}
-	\item Recall that we defined the homoscedasticity assumption as:\[
+	\item Recall that we defined the homoskedasticity assumption as:\[
 	\Var\left(\boldsymbol{\varepsilon} | {\bf X}\right) =\sigma^2 {\bf I}
 	\]
 	this assumption has two aspects:
@@ -316,7 +316,7 @@ Could use leave-one-out residuals $\tilde{e}_i = (1-h_{ii})^{-1}e_i$:
 		\item Imposing zero correlation between disturbances for different observations
 	\end{enumerate}
 
-	\item The terminology can be misleading here, because what people refer to as ``heteroscedasticity-robust''
+	\item The terminology can be misleading here, because what people refer to as ``heteroskedasticity-robust''
 	standard errors (the HC0--HC3 estimators above) are robust to violations of 1 but not 2. 
 
 	\item We need to do a bit more to estimate standard errors in a way that is robust to correlated data. 
@@ -410,10 +410,11 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 		\widehat{\Var}\left[{\bf x}_i \varepsilon_i \right] = n^{-1} \sum_{i} {\bf x}_i {\bf x}_i'  e_i^2
 		\end{align*}
 
-	% \item With clustering, it will be \[
-	% {\symbf V}_{clu} = n^{-1} \sum_{i=1}^{n}\sum_{j=1}^{n} {\symbf x}_i\,  {\symbf x}'_j \, e_i\, e_j \cdot {\mathbb{I}}\left[(i,j) \in \text{Group}_g \right]
-	% \]
-	% where the ${\symbf I}$ function is 1 when $i,j$ come from the same group and zero otherwise.
+	\item With clustering, the middle term also picks up within-group cross products:\[
+	\widehat{\Var}_{clu} = n^{-1} \sum_{i=1}^{n}\sum_{j=1}^{n} {\bf x}_i\,  {\bf x}'_j \, e_i\, e_j \cdot \mathbb{I}\left[g\left(i\right)=g\left(j\right)\right]
+	\]
+	where the indicator is 1 when $i$ and $j$ are in the same group and 0 otherwise.
+	The $i=j$ terms are exactly the heteroskedasticity-robust sum above.
 
 \end{itemize}
 \end{frame}
@@ -421,15 +422,22 @@ The groups (villages, classrooms, states) are independent of one another, but wi
 
 
 \begin{frame}{Clustering III}
+\small
 \begin{itemize}
 	\item The cluster-robust estimate of standard errors will be consistent as the number of groups 
 	gets large.
 
-	\item Note that this estimator adds extra terms (covariance terms) to the estimate of variance,
-	so this is going to make standard errors larger as long as covariances $\E\left[\varepsilon_i \varepsilon_j\right]$ are positive. 
+	\item Note that this estimator adds extra terms ${\bf x}_i {\bf x}_j' e_i e_j$ (covariance terms) to the estimate of variance,
+	so it makes standard errors larger when ${\bf x}_i \varepsilon_i$ is positively correlated within groups
+	--- typically because \emph{both} the regressor and the error are.
 
-	\item Thus, if standard formulas are used in the presence of cluster-correlated disturbances, 
-	standard errors will be too small.
+	\item Rough guide (Moulton): the variance is inflated by about $1 + \left(n_g - 1\right)\rho_x \rho_\varepsilon$,
+	where $\rho_x$ and $\rho_\varepsilon$ are the within-group correlations of the regressor and the error.
+	A regressor that varies only at the group level ($\rho_x = 1$) is the worst case; one that is independent
+	within groups ($\rho_x \approx 0$) barely changes.
+
+	\item Thus, if standard formulas are used in the presence of cluster-correlated disturbances
+	and regressors, standard errors will be too small.
 
 	\item Statistical software packages typically make it easy to compute cluster-robust errors.
 	
@@ -560,7 +568,7 @@ outcomes are the norm.
 	observations ($w_i \propto 1/\sigma_i^2$) and beat OLS on efficiency:\[
 	{\bf b}_{WLS} = ({\bf X}' {\bf W} {\bf X})^{-1} {\bf X}' {\bf W} {\bf y},
 	\quad {\bf W} = \operatorname{diag}(w_1,\ldots,w_n)
-	\qquad \text{(GLS: ${\bf W} = \boldsymbol{\Omega}^{-1}$, not necessarily diagonal)}
+	\qquad \text{(GLS: ${\bf W} = \Var\left(\boldsymbol{\varepsilon}|{\bf X}\right)^{-1}$, not necessarily diagonal)}
 	\]
 
 	\item In practice $\sigma_i^2$ is unknown; estimating it (FGLS/IRLS) imports a

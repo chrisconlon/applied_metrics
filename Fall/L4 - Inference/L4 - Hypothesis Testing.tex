@@ -180,7 +180,7 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}\left(X_{i}-\overline{X}\right)^2}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{$t$-Statistics for OLS Parameters (homoscedasticity)}
+\begin{frame}{$t$-Statistics for OLS Parameters (homoskedasticity)}
 
 \[
 \frac{b_{k} - \beta_k}{\sqrt{s^2 \left( {\bf X}' {\bf X}\right)^{-1}_{kk}}} \sim t_{n-K}
@@ -348,7 +348,7 @@ If the $t$'s are independent:
 	\item The circle contains 95\% of the probability for two independent t-statistics;
 	the area outside it is the rejection region for the joint test.
 	\item The dashed lines are the rejection regions for each of the individual t-tests.  (5\% level)
-	\item Even though naively would reject, in actuality \emph{not significant}
+	\item Even though we would naively reject, in actuality \emph{not significant}
 	\item What happens with correlated normal RVs?
 \end{itemize}
 }
@@ -385,8 +385,8 @@ If the $t$'s are independent:
 \begin{itemize}
 	\item Now, the area outside the ellipse is the rejection region for the joint test (5\% level)
 	\item The dashed lines are the rejection regions for each of the individual t-tests.  (5\% level)
-	\item Now, notice that even with $t_1 = -2$, $t_2=-2$, which would be a rejection according
-	to each of the individual tests, is not a rejection of the joint test. 
+	\item Now, notice that $t_1 = -2$, $t_2=-2$ would be a rejection according
+	to each of the individual tests, but it is not a rejection of the joint test.
 \end{itemize}
 \end{column}
 \end{columns}
@@ -409,7 +409,7 @@ The issues we have are:
 \begin{itemize}
 	\item First get a statistic that combines both hypotheses
 		\begin{itemize}
-			\item Should be ``big" when either $t_1$ or $t_2$ or both are big
+			\item Should be ``big'' when either $t_1$ or $t_2$ or both are big
 			\item Should include both $t$'s
 		\end{itemize}
 	\item Natural candidate:
@@ -545,7 +545,8 @@ $\Pr(\text{at least one rejection})$ & 5\% & 23\% & \alert{64\%} & 99.4\% \\
 \bigskip
 \begin{itemize}
 	\item The business version: slice a campaign's results by 20 customer segments
-	and one segment will ``respond significantly'' \alert{by construction}, effect or no effect.
+	and you should \alert{expect} one segment ($20 \times 0.05 = 1$) to ``respond significantly,''
+	effect or no effect.
 
 	\item Subtler version (the ``garden of forking paths''): the count includes tests
 	you \emph{would have} run had the data looked different --- trying specifications
@@ -661,9 +662,10 @@ $\Pr(\text{at least one rejection})$ & 5\% & 23\% & \alert{64\%} & 99.4\% \\
 
 	\smallskip
 	\item Defining the confidence interval in this way, the probability that the confidence interval contains
-	the true parameter (\alert{coverage}) is $1-\alpha$ (if the asymptotic distribution of the estimator is taken as the true distribution).
+	the true parameter (\alert{coverage}) is $1-\alpha$: exactly with normal errors, approximately
+	(as $n$ grows) otherwise.
 	That is, if $\alpha=.05$, this is called a 95\% confidence interval, and there
-	is a 95\% chance it will contain the true parameter (assuming that the asymptotic approximation holds).
+	is a 95\% chance it will contain the true parameter.
 
 \end{itemize}
 \end{frame}
@@ -725,7 +727,7 @@ Stars measure \alert{precision}. Decisions run on \alert{magnitudes}.
 \end{frame}
 
 
-\begin{frame}{Bootstrap: Bias Correction}
+\begin{frame}{Bootstrap: Using the Draws}
 \small
 The main idea is that $\hat{\theta}^{*}_{(1)},\ldots, \hat{\theta}^{*}_{(B)}$ approximates the \alert{sampling distribution} of $\hat{\theta}$. There are lots of things we can do now:
 \begin{itemize}
@@ -755,11 +757,11 @@ Recall $\theta = \E[\hat{\theta}] - Bias[\hat{\theta}]$:
 \end{frame}
 
 \begin{frame}{Bootstrap: Confidence Intervals}
-There are actually three ways to construct bootstrap CI's:
+Three common ways to construct bootstrap CI's (a fourth, better one on the next slide):
 \begin{enumerate}
-\item Obvious way: sort  $\hat{\theta}^{*}$ then take $CI: [\hat{\theta}^{*}_{\alpha/2},\hat{\theta}^{*}_{1-\alpha/2}]$.
+\item Percentile: sort  $\hat{\theta}^{*}$ then take $CI: [\hat{\theta}^{*}_{\alpha/2},\hat{\theta}^{*}_{1-\alpha/2}]$.
 \item Asymptotic Normal:  $CI: \hat{\theta} \pm 1.96 \sqrt{V(\hat{\theta}^{*})}$. (CLT).
-\item Better Way: let $W= \hat{\theta} -\theta$, with quantiles $w_{q}$. If we knew the distribution of $W$ then $\Pr(w_{\alpha/2} \leq W \leq w_{1-\alpha/2}) = 1-\alpha$, so:
+\item Basic: let $W= \hat{\theta} -\theta$, with quantiles $w_{q}$. If we knew the distribution of $W$ then $\Pr(w_{\alpha/2} \leq W \leq w_{1-\alpha/2}) = 1-\alpha$, so:
 \begin{eqnarray*}
 CI: [\hat{\theta} -w_{1-\alpha/2}, \hat{\theta} -w_{\alpha/2}]
 \end{eqnarray*}
@@ -767,15 +769,41 @@ We can estimate with $W^{*} = \hat{\theta}^{*} - \hat{\theta}$.
 \begin{eqnarray*}
 CI: [\hat{\theta} -w^*_{1-\alpha/2}, \hat{\theta} -w^*_{\alpha/2}] = [2 \hat{\theta} -\theta^*_{1-\alpha/2}, 2 \hat{\theta} -\theta^*_{\alpha/2}]
 \end{eqnarray*}
-Why is this preferred? Bias Correction!
+Unlike the percentile interval, this shifts \emph{against} the estimated bias.
 \end{enumerate}
 
 \end{frame}
 
 
+\begin{frame}{Bootstrap: Confidence Intervals (Bootstrap-$t$)}
+\small
+\small
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item Bootstrap-$t$ (percentile-$t$): bootstrap the \alert{$t$-statistic} instead of $\hat{\theta}$ itself.
+\begin{itemize}
+\item In each bootstrap sample $b$, compute $\hat{\theta}^{*}_{(b)}$ \emph{and} its standard error $se^{*}_{(b)}$ (e.g., robust SE), and form
+\begin{eqnarray*}
+T^{*}_{(b)} = \frac{\hat{\theta}^{*}_{(b)} - \hat{\theta}}{se^{*}_{(b)}}
+\end{eqnarray*}
+\item With quantiles $T^{*}_{q}$ and $se(\hat{\theta})$ from the original sample:
+\begin{eqnarray*}
+CI: [\hat{\theta} - se(\hat{\theta})\, T^{*}_{1-\alpha/2},\ \hat{\theta} - se(\hat{\theta})\, T^{*}_{\alpha/2}]
+\end{eqnarray*}
+\end{itemize}
+\end{enumerate}
+\begin{itemize}
+\item Same logic as the basic interval, but $T = (\hat{\theta}-\theta)/se(\hat{\theta})$ is \alert{asymptotically pivotal}
+(its limit distribution is free of unknown parameters); $W = \hat{\theta}-\theta$ is not.
+\item That buys the higher-order accuracy on the next slide. Percentile and basic intervals are only first-order accurate.
+\item Cost: you need a standard error inside every bootstrap draw.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{Bootstrap: Why do people like it?}
 \begin{itemize}
-\item Econometricians like the bootstrap because under certain conditions (asymptotically pivotal statistics, such as $t$) it is \alert{higher-order accurate} for confidence interval construction (but not the standard errors).
+\item Econometricians like the bootstrap because, applied to asymptotically pivotal statistics (the bootstrap-$t$), it is \alert{higher-order accurate} for confidence interval construction (but not the standard errors).
 \begin{itemize}
 \item Intuition: because it is non-parametric it is able to deal with more than just the first term in the Taylor Expansion (actually an \alert{Edgeworth Expansion}).
 \item Higher-order asymptotic theory is best left for real econometricians!
@@ -814,7 +842,7 @@ The bootstrap I have presented is sometimes known as the \alert{nonparametric bo
 	and F-tests) as well as construct confidence intervals. 
 
 	\item When the baseline assumptions of the linear regression model are violated (due to
-	correlation or heteroscedasticity), we need to use somewhat more complex formulas
+	correlation or heteroskedasticity), we need to use somewhat more complex formulas
 	to estimate  $\Var\left({\bf b}_{OLS}\right)$.
 
 \end{itemize}
