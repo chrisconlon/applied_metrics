@@ -1,8 +1,10 @@
 \begin{tabular}{lccc}\toprule
- & OLS, spend on refund & First stage, refund on leniency & 2SLS \\ \midrule
+ & OLS & First stage & 2SLS \\
+ & spend on refund & refund on leniency & spend on refund \\ \midrule
 Coefficient & 47.9 & 0.97 & 15.3 \\
  & (0.6) & (0.004) & (1.7) \\
-Truth & ATE $= 19.9$; effect on refunded $= 7.2$ & --- & LATE (marginal claims) $\approx 13.7$ \\
 First-stage $F$ & & 1773 &  \\
-First stage by claim size & \multicolumn{3}{c}{small 0.86, medium 0.95, large 1.10 (all positive: no sign of defiers)} \\
+\midrule Truth & ATE $= 19.9$ & & weighted LATE $= 14.7$ \\
+ & on refunded $= 7.2$ & & (marginal claims) \\
+\midrule First stage by claim size & \multicolumn{3}{c}{small 0.86, medium 0.95, large 1.10: all positive, no sign of defiers} \\
 \bottomrule\end{tabular}

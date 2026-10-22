@@ -606,6 +606,37 @@ compliers (effect $0.8$), $40\%$ never-takers (effect $0.5$ if they ever install
 \end{frame}
 
 
+\begin{frame}{Who are the compliers when the instrument is an agent?}
+Two agents, one lenient (cutoff $c_L$) and one strict (cutoff $c_S > c_L$). Every request has a merit $q_i$.
+\begin{center}
+\begin{tikzpicture}[x=0.95cm,y=0.8cm,font=\small]
+	\fill[gray!15] (0,0) rectangle (4,0.8);
+	\fill[orange!25] (4,0) rectangle (8,0.8);
+	\fill[gray!15] (8,0) rectangle (12,0.8);
+	\draw[->] (0,0) -- (12.4,0) node[right] {$q_i$};
+	\draw[-] (4,-0.1) -- (4,1.0) node[above] {$c_L$ (lenient)};
+	\draw[-] (8,-0.1) -- (8,1.0) node[above] {$c_S$ (strict)};
+	\node at (2,0.4) {never-takers};
+	\node at (6,0.4) {\alert{compliers}};
+	\node at (10,0.4) {always-takers};
+	\node[below] at (2,-0.05) {\footnotesize denied by both};
+	\node[below] at (6,-0.05) {\footnotesize granted only by the lenient agent};
+	\node[below] at (10,-0.05) {\footnotesize granted by both};
+\end{tikzpicture}
+\end{center}
+\begin{itemize}
+	\item Same three types as the email example; no defiers if both agents rank claims the same way.
+	\item Random routing makes the two agents' caseloads comparable, so the Wald ratio for the pair is
+	\[
+		\frac{\E[Y_i \mid L] - \E[Y_i \mid S]}{\Pr(R_i = 1 \mid L) - \Pr(R_i = 1 \mid S)} = \E[\tau_i \mid c_L < q_i \le c_S].
+	\]
+	\item With $50$ agents, 2SLS on leniency is a \alert{weighted average of these pairwise LATEs} (Imbens and
+	Angrist 1994), with positive weights under monotonicity. ``Marginal claims'' means merit inside the
+	range of agents' cutoffs.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}{The first stage is the whole design}
 \begin{center}
 \includegraphics[width=.6\textwidth]{fig_judge_fs.pdf}
@@ -622,7 +653,6 @@ to be granted. This picture is the first thing every judge-design paper shows.}
 \small
 \input{tab_judge.tex}
 \end{center}
-\medskip
 \begin{itemize}
 	\item OLS is off by a factor of three: refunded customers had better claims and spend more anyway.
 	\item 2SLS gives the effect for \alert{marginal} claims: those whose outcome depends on which agent they
@@ -643,8 +673,6 @@ to be granted. This picture is the first thing every judge-design paper shows.}
 	\item Testing it: first stage positive in every subgroup (claim type, size, channel; Dobbie, Goldin and Yang 2018);
 	Frandsen, Lefgren and Leslie (2023) also test the reduced form. Our table passes for small, medium, and large claims.
 	Necessary, not sufficient.
-	\item With many agents, 2SLS on continuous leniency is a weighted average of pairwise LATEs
-	(Imbens and Angrist 1994).
 \end{itemize}
 \end{frame}
 
@@ -660,6 +688,41 @@ to be granted. This picture is the first thing every judge-design paper shows.}
 	refunds under \$50''), wrong for one that changes what always-granted cases receive.
 	\item \alert{Business uses.} Any process with random routing and human discretion is an experiment you
 	did not have to run: refunds, credit lines, moderation, fraud holds, rep-offered discounts.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The canonical design: Dobbie, Goldin and Yang (2018)}
+\begin{itemize}
+	\item \alert{Question.} What does being detained before trial do to conviction, future crime, and
+	employment? Detained defendants differ from released ones, so comparing them confounds the two.
+	\item \alert{Setting.} Over $420{,}000$ defendants in Philadelphia and Miami-Dade, linked to court and IRS
+	records. Hearings last minutes, soon after arrest, and the bail judge does not try the case.
+	\item \alert{Assignment.} Rotation, not a lottery. Philadelphia magistrates rotate through eight-hour shifts;
+	Miami-Dade judges rotate through weekend bail shifts. Assignment is random only \emph{within} a court and
+	time cell: DUI arrests, for example, cluster at night.
+	\item \alert{Instrument.} Residualize release on court-by-time fixed effects, then take the assigned judge's
+	leave-out mean of residualized release (Dahl, Kost\o{}l and Mogstad 2014). Treatment: release.
+	\item \alert{Mapping.} Judge $=$ agent, release $=$ refund, the defendant's risk as the judge reads it
+	$=$ merit. Compliers are defendants whom some judges would release and others would detain.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Dobbie, Goldin and Yang: the checks, then the answer}
+\begin{itemize}
+	\item \alert{First stage.} Release rises with leniency, close to linearly; the slope is below one because
+	leniency is noisy.
+	\item \alert{Balance.} Defendant characteristics strongly predict release but do not jointly predict the
+	assigned judge's leniency: the experiment's randomization check.
+	\item \alert{Monotonicity.} The first stage is positive in every subgroup, and a judge's leniency measured on
+	one group (by race, offense, prior record) predicts their leniency on others.
+	\item \alert{Exclusion.} Bail judges only set bail; other judges try and sentence. The remaining worry is
+	bail conditions themselves, such as the amount for those who post it.
+	\item \alert{Results, for marginal defendants.} Release lowers the probability of being found guilty by
+	$14$ points, mostly through $10.8$ points fewer guilty pleas. No detectable net effect on future crime.
+	Formal employment three to four years later is $9.4$ points higher.
+	\item Mechanism: detention weakens the defendant's hand in plea bargaining; the conviction follows.
 \end{itemize}
 \end{frame}
 

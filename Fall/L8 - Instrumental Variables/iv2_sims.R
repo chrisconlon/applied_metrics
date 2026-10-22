@@ -56,21 +56,23 @@ dr <- data.frame(spend, R, agent, q, tau_r)
 tot <- tapply(R, agent, sum); n_j <- tapply(R, agent, length); dr$len <- (tot[agent] - R) / (n_j[agent] - 1)
 ols_r <- feols(spend ~ R, dr, cluster = ~agent); fs_r <- feols(R ~ len, dr, cluster = ~agent); iv_r <- feols(spend ~ 1 | R ~ len, dr, cluster = ~agent)
 band <- dr$q + max(gen) + 1 > 0 & dr$q + min(gen) - 1 < 0   # rough complier band (q within reach of some agent's cutoff)
-cat(sprintf("B: refund rate %.2f | OLS %.1f | FS %.2f (F=%.0f) | 2SLS %.1f (se %.1f) | ATE %.1f | E[tau | q in [%.1f,%.1f]] %.1f\n",
-            mean(R), coef(ols_r)[2], coef(fs_r)[2], fitstat(iv_r, "ivf")[[1]]$stat, coef(iv_r)[2], se(iv_r)[2], mean(tau_r), -max(gen), -min(gen),
-            mean(tau_r[dr$q > -max(gen) & dr$q < -min(gen)])))
+# exact in-sample 2SLS estimand: the IV ratio with the noise-free outcome tau_i * R_i, i.e. the
+# Imbens-Angrist weighted average of pairwise LATEs across agents
+late_r <- cov(dr$len, tau_r * R) / cov(dr$len, R)
+cat(sprintf("B: refund rate %.2f | OLS %.1f | FS %.2f (F=%.0f) | 2SLS %.1f (se %.1f) | ATE %.1f | 2SLS estimand (weighted LATE) %.1f\n",
+            mean(R), coef(ols_r)[2], coef(fs_r)[2], fitstat(iv_r, "ivf")[[1]]$stat, coef(iv_r)[2], se(iv_r)[2], mean(tau_r), late_r))
 # monotonicity check (Frandsen-Lefgren-Leslie flavor): first stage should be positive in every subgroup of the claim
 dr$size <- cut(rnorm(Nr) + 0.3 * q, breaks = c(-Inf, -0.5, 0.5, Inf), labels = c("small", "medium", "large"))
 fs_sub <- sapply(levels(dr$size), function(s) coef(feols(R ~ len, dr[dr$size == s, ]))[2])
 cat(sprintf("   first stage by claim size: %s\n", paste(sprintf("%s %.2f", names(fs_sub), fs_sub), collapse = ", ")))
 write_tab("tab_judge.tex",
-  " & OLS, spend on refund & First stage, refund on leniency & 2SLS",
+  " & OLS & First stage & 2SLS \\\\\n & spend on refund & refund on leniency & spend on refund",
   c(sprintf("Coefficient & %s & %s & %s", fmt(coef(ols_r)[2], 1), fmt(coef(fs_r)[2]), fmt(coef(iv_r)[2], 1)),
     sprintf(" & %s & %s & %s", pse(se(ols_r)[2], 1), pse(se(fs_r)[2], 3), pse(se(iv_r)[2], 1)),
-    sprintf("Truth & ATE $= %s$; effect on refunded $= %s$ & --- & LATE (marginal claims) $\\approx %s$", fmt(mean(tau_r), 1), fmt(mean(tau_r[R == 1]), 1),
-            fmt(mean(tau_r[dr$q > -max(gen) & dr$q < -min(gen)]), 1)),
     sprintf("First-stage $F$ & & %s & ", fmt(fitstat(iv_r, "ivf")[[1]]$stat, 0)),
-    sprintf("First stage by claim size & \\multicolumn{3}{c}{small %s, medium %s, large %s (all positive: no sign of defiers)}", fmt(fs_sub[1]), fmt(fs_sub[2]), fmt(fs_sub[3]))),
+    sprintf("\\midrule Truth & ATE $= %s$ & & weighted LATE $= %s$", fmt(mean(tau_r), 1), fmt(late_r, 1)),
+    sprintf(" & on refunded $= %s$ & & (marginal claims)", fmt(mean(tau_r[R == 1]), 1)),
+    sprintf("\\midrule First stage by claim size & \\multicolumn{3}{c}{small %s, medium %s, large %s: all positive, no sign of defiers}", fmt(fs_sub[1]), fmt(fs_sub[2]), fmt(fs_sub[3]))),
   "lccc")
 # the canonical judge-IV picture: binned first stage
 pdf_open("fig_judge_fs.pdf", w = 6.5, h = 4)
