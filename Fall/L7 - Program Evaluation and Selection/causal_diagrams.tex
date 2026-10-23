@@ -327,19 +327,19 @@ Instrument (affects $D$ only) & No & \alert{amplifies} any remaining bias \\
 \begin{column}{0.45\textwidth}
 \begin{center}
 \begin{tikzpicture}[every node/.style={draw, circle, minimum size=9mm, inner sep=1pt}, node distance=16mm]
-	\node (T) {$T$};
-	\node[right=of T] (P) {$p$};
+	\node (D) {$D$};
+	\node[right=of D] (P) {$p$};
 	\node[right=of P] (Q) {$q$};
 	\node[above=10mm of $(P)!0.5!(Q)$] (Xi) {$\xi$};
-	\draw[->, thick] (T) -- (P);
+	\draw[->, thick] (D) -- (P);
 	\draw[->, thick] (P) -- (Q);
-	\draw[->, thick] (T) to[bend right=28] (Q);
+	\draw[->, thick] (D) to[bend right=28] (Q);
 	\draw[->, thick] (Xi) -- (Q);
 	\draw[->, thick] (Xi) -- (P);
 \end{tikzpicture}
 \end{center}
 \smallskip
-{\small $T$ = randomized ad/feature, $p$ = price, $q$ = quantity, $\xi$ = demand shock (unobserved)}
+{\small $D$ = randomized ad/feature, $p$ = price, $q$ = quantity, $\xi$ = demand shock (unobserved)}
 \end{column}
 \begin{column}{0.55\textwidth}
 \begin{itemize}
@@ -350,7 +350,7 @@ Instrument (affects $D$ only) & No & \alert{amplifies} any remaining bias \\
 	\emph{holding price constant}.
 
 	\item So this time we \emph{want} to hold the mediator fixed --- but $p$ is a
-	\alert{doubly bad control}: post-treatment ($T \rightarrow p$) \emph{and}
+	\alert{doubly bad control}: post-treatment ($D \rightarrow p$) \emph{and}
 	correlated with the demand shock ($\xi \rightarrow p$: sellers reprice when
 	demand is hot).
 \end{itemize}
@@ -360,13 +360,13 @@ Instrument (affects $D$ only) & No & \alert{amplifies} any remaining bias \\
 
 
 \begin{frame}{Three regressions, one instrument}
-With randomized $T$, positive direct effect, and prices that respond
+With randomized $D$, positive direct effect, and prices that respond
 (Jeziorski, Leng \& Seiler 2025, working paper):
 \begin{enumerate}
-	\item $q$ on $T$: the \alert{total} effect --- demand shift \emph{minus} the price
+	\item $q$ on $D$: the \alert{total} effect --- demand shift \emph{minus} the price
 	offset. A fine estimand, but it is not the demand shift.
 
-	\item $q$ on $T$ and $p$: \alert{biased for the direct effect even though $T$ is
+	\item $q$ on $D$ and $p$: \alert{biased for the direct effect even though $D$ is
 	randomized} --- $p$ drags $\xi$ into the regression. Typically the bias shrinks
 	but does not vanish, and it has the same sign as omitting $p$. The middle answer
 	is still a wrong answer.
@@ -377,7 +377,7 @@ With randomized $T$, positive direct effect, and prices that respond
 \end{enumerate}
 \medskip
 \begin{itemize}
-	\item Built-in diagnostic: regress $p$ on $T$. If price responds to your
+	\item Built-in diagnostic: regress $p$ on $D$. If price responds to your
 	randomized treatment, regressions (1) and (2) answer different questions than
 	you think.
 	\item Stakes: in supermarket scanner data, not instrumenting price overstates
