@@ -1,0 +1,237 @@
+---
+title: "In-Class Session 9 (Python): Difference-in-Differences and Staggered Adoption"
+author: "Econometrics I"
+format:
+  html:
+    embed-resources: true
+jupyter: python3
+---
+
+This is the Python twin of `inclass_session9.Rmd`: the same simulations and problems, written with `numpy`,
+`pandas` and `pyfixest`. Everything is simulated, so you always know the right answer.
+
+Setup (one time): `uv pip install pyfixest` (or `pip install pyfixest`).
+
+```{python}
+import numpy as np
+import pandas as pd
+import pyfixest as pf
+
+rng = np.random.default_rng(9)
+```
+
+# Part 1: The two-by-two (Lecture 9a)
+
+## Reproduce: a SOX-404-style mandate
+
+Firms with public float of at least \$75M ("accelerated filers") must comply from fiscal 2004; smaller firms are
+exempt. The outcome is log audit fees. The true effect is $+0.35$ in 2004, decaying to $+0.20$ by 2007. Larger
+firms are on a steeper audit-fee trend (`kappa` per year per standard deviation of size).
+
+```{python}
+years = np.arange(2000, 2008)
+tau_sox = {2004: 0.35, 2005: 0.28, 2006: 0.22, 2007: 0.20}
+
+def sim_sox(N=2000, kappa=0.06, sd_eps=0.12):
+    lfloat = rng.normal(np.log(75), 1.2, N)
+    size = (lfloat - lfloat.mean()) / lfloat.std(ddof=1)
+    acc = (lfloat >= np.log(75)).astype(int)
+    alpha = 11 + 0.5 * size + rng.normal(0, 0.4, N)
+    gam = np.cumsum(np.r_[0, rng.normal(0.03, 0.02, len(years) - 1)])
+    d = pd.DataFrame({"firm": np.repeat(np.arange(N), len(years)), "year": np.tile(years, N)})
+    d["size"] = size[d.firm]; d["acc"] = acc[d.firm]
+    d["post"] = (d.year >= 2004).astype(int)
+    d["tau"] = np.where((d.acc == 1) & (d.post == 1), d.year.map(tau_sox).fillna(0), 0.0)
+    d["y"] = (alpha[d.firm] + gam[d.year - 2000] + kappa * d["size"] * (d.year - 2003)
+              + d.tau + rng.normal(0, sd_eps, len(d)))
+    d["D"] = d.acc * d.post
+    return d
+
+sox = sim_sox()
+```
+
+The four routes to the $2\times2$ (fiscal 2003 vs. 2004):
+
+```{python}
+two = sox[sox.year.isin([2003, 2004])]
+cm = two.groupby(["acc", "year"]).y.mean()
+dd_means = (cm[1, 2004] - cm[1, 2003]) - (cm[0, 2004] - cm[0, 2003])
+
+w = two.pivot(index=["firm", "acc", "size"], columns="year", values="y").reset_index()
+w["dy"] = w[2004] - w[2003]
+fit_fd = pf.feols("dy ~ acc", data=w, vcov="hetero")
+fit_int = pf.feols("y ~ acc + post + acc:post", data=two, vcov={"CRV1": "firm"})
+fit_twfe = pf.feols("y ~ D | firm + year", data=two, vcov={"CRV1": "firm"})
+pd.Series({"means": dd_means, "fd": fit_fd.coef()["acc"],
+           "interaction": fit_int.coef()["acc:post"], "twfe": fit_twfe.coef()["D"]})
+```
+
+They agree, and they all miss the truth of 0.35. Conditioning on size:
+
+```{python}
+pf.feols("dy ~ acc + size", data=w, vcov="hetero").tidy().loc["acc"]
+```
+
+The event study, with and without size-specific year effects:
+
+```{python}
+fit_es = pf.feols("y ~ i(year, acc, ref=2003) | firm + year", data=sox, vcov={"CRV1": "firm"})
+fit_es_c = pf.feols("y ~ i(year, acc, ref=2003) + i(year, size, ref=2003) | firm + year",
+                    data=sox, vcov={"CRV1": "firm"})
+pf.etable([fit_es, fit_es_c], keep="acc")
+```
+
+### Problem 1
+
+Re-simulate with `kappa=0` (no size trend). How far is the plain DiD from 0.35 now? Does adding size still change
+the estimate? What happens to its standard error, and why? (Hint: how correlated are `acc` and `size`?)
+
+```{python}
+# your code here
+```
+
+### Problem 2
+
+Replace the linear size control with size-decile fixed effects (`w["dec"] = pd.qcut(w["size"], 10, labels=False)`,
+then `pf.feols("dy ~ acc | dec", data=w)`). Which deciles contain both accelerated and exempt firms? What happens to
+the estimate and its standard error? Connect your answer to "conditioning needs overlap" and to regression discontinuity.
+
+```{python}
+# your code here
+```
+
+## Reproduce: placebo laws (Bertrand, Duflo and Mullainathan 2004)
+
+A state-by-year panel with AR(1) errors. Half the states "pass a law" in a random year between 6 and 15. The law does
+nothing. How often does a 5% test reject?
+
+```{python}
+def bdm_once(S=50, T=20, rho=0.8):
+    e = np.zeros((S, T)); e[:, 0] = rng.normal(0, 1 / np.sqrt(1 - rho**2), S)
+    for t in range(1, T):
+        e[:, t] = rho * e[:, t - 1] + rng.normal(size=S)
+    start = np.full(S, np.inf)
+    tr = rng.choice(S, S // 2, replace=False)
+    start[tr] = rng.integers(6, 16, len(tr))
+    d = pd.DataFrame({"state": np.repeat(np.arange(S), T), "t": np.tile(np.arange(1, T + 1), S)})
+    d["y"] = rng.normal(size=S)[d.state] + 0.1 * d.t + e[d.state, d.t - 1]
+    d["D"] = (d.t >= start[d.state]).astype(int)
+    out = {}
+    for name, v in {"iid": "iid", "hetero": "hetero", "cluster": {"CRV1": "state"}}.items():
+        out[name] = pf.feols("y ~ D | state + t", data=d, vcov=v).pvalue()["D"] < 0.05
+    return out
+
+pd.DataFrame([bdm_once() for _ in range(200)]).mean()
+```
+
+### Problem 3
+
+Vary `rho` (0, 0.5, 0.9) and the number of states `S` (6, 10, 50). Make a small table of rejection rates for
+clustered standard errors. Where does clustering stop working? Now give the law to only *one* state: what happens?
+
+```{python}
+# your code here
+```
+
+# Part 2: Staggered adoption (Lecture 9b)
+
+## Reproduce: an algorithm rolled out city by city
+
+300 cities, 20 months, four launch waves (months 6, 9, 12, 15) and a never-treated group, 60 cities each. The effect
+ramps in over eight months and is larger for earlier waves. Never-treated cities have cohort `g = 0` (the convention
+`pyfixest`'s DiD functions use).
+
+```{python}
+T_, waves = 20, [6, 9, 12, 15]
+
+def sim_rollout(theta={6: 0.12, 9: 0.09, 12: 0.06, 15: 0.04}, ramp=8, n_per=60, groups=(6, 9, 12, 15, 0)):
+    G = np.repeat(groups, n_per); N = len(G)
+    d = pd.DataFrame({"id": np.repeat(np.arange(N), T_), "t": np.tile(np.arange(1, T_ + 1), N)})
+    d["g"] = G[d.id]
+    gam = np.cumsum(rng.normal(0.01, 0.02, T_))
+    d["D"] = ((d.g > 0) & (d.t >= d.g)).astype(int)
+    d["e"] = np.where(d.g > 0, d.t - d.g, -1000)
+    d["tau"] = np.where(d.D == 1, d.g.map(theta).fillna(0) * np.minimum(d.e + 1, ramp) / ramp, 0.0)
+    d["y"] = rng.normal(0, 0.3, N)[d.id] + gam[d.t - 1] + d.tau + rng.normal(0, 0.05, len(d))
+    return d
+
+d = sim_rollout()
+att_true = d.loc[d.D == 1, "tau"].mean()
+att_true
+```
+
+Static two-way FE, and the weights it puts on each treated city-month. In a balanced panel the residualized
+treatment is $\tilde D_{it} = D_{it} - \bar D_{i\cdot} - \bar D_{\cdot t} + \bar D$:
+
+```{python}
+fit_static = pf.feols("y ~ D | id + t", data=d, vcov={"CRV1": "id"})
+d["Dt"] = d.D - d.groupby("id").D.transform("mean") - d.groupby("t").D.transform("mean") + d.D.mean()
+tr = d.D == 1
+d.loc[tr, "w"] = d.loc[tr, "Dt"] / d.loc[tr, "Dt"].sum()
+pd.Series({"twfe": fit_static.coef()["D"], "truth": att_true,
+           "share_negative_rows": (d.loc[tr, "w"] < 0).mean(),
+           "estimand_from_weights": (d.loc[tr, "w"] * d.loc[tr, "tau"]).sum()})
+```
+
+## Reproduce: three clean estimators
+
+Callaway and Sant'Anna by hand: each $\text{ATT}(g,t)$ is a $2\times2$ against a clean comparison group, relative to
+month $g-1$, averaged with cohort-size weights.
+
+```{python}
+def cs_att(d, control="never"):
+    Y = d.pivot(index="id", columns="t", values="y"); G = d.groupby("id").g.first()
+    rows = []
+    for g in waves:
+        ig = G.index[G == g]
+        for t in range(g, T_ + 1):
+            if control == "never":
+                ic = G.index[G == 0]
+            else:
+                ic = G.index[((G > t) | (G == 0)) & (G != g)]
+            if len(ic) == 0:
+                continue
+            att = (Y.loc[ig, t] - Y.loc[ig, g - 1]).mean() - (Y.loc[ic, t] - Y.loc[ic, g - 1]).mean()
+            rows.append((g, t, len(ig), att))
+    a = pd.DataFrame(rows, columns=["g", "t", "n", "att"])
+    return np.average(a.att, weights=a.n)
+
+pd.Series({"cs_never": cs_att(d, "never"), "cs_notyet": cs_att(d, "notyet"), "truth": att_true})
+```
+
+Imputation, as Gardner's two-stage DiD: stage one fits city and month effects on untreated observations; stage two
+regresses the residualized outcome on treatment.
+
+```{python}
+fit_did2s = pf.did2s(d, yname="y", first_stage="~ 0 | id + t", second_stage="~ D",
+                     treatment="D", cluster="id")
+fit_did2s.tidy()
+```
+
+The same estimator as an event study, plotted:
+
+```{python}
+d["rel"] = np.where(d.g > 0, d.t - d.g, -1.0).astype(float)
+fit_es2s = pf.did2s(d, yname="y", first_stage="~ 0 | id + t", second_stage="~ i(rel, ref=-1.0)",
+                    treatment="D", cluster="id")
+fit_es2s.iplot(coord_flip=False)
+```
+
+### Problem 4
+
+Re-simulate with a constant effect: `sim_rollout(theta={6: 0.06, 9: 0.06, 12: 0.06, 15: 0.06}, ramp=1)`. Re-run static
+two-way FE and the clean estimators. Which ones change, and why? Are any weights still negative? Why doesn't that
+matter now?
+
+```{python}
+# your code here
+```
+
+### Problem 5
+
+Drop the never-treated cities (`d[d.g > 0]`). Run `cs_att()` with `control="notyet"` and explain which
+$\text{ATT}(g,t)$ cells are missing and why. What can you still estimate for wave 6, and what can't you?
+
+```{python}
+# your code here
+```

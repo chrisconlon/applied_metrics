@@ -17,315 +17,473 @@
   breaklines=true
 }
 
-
 \usepackage{inconsolata} % nice monospace font
-
 
 \title[L9a - DiD]{ Econometrics I}
 \subtitle{Lecture 9a: Difference-in-Differences}
 \author{Chris Conlon \\NYU Stern}
 \date{Fall 2026}
 
+% Rebuilt November 2026. Simulation-first: the running example is a simulated
+% SOX-404-style mandate (accelerated filers comply from fiscal 2004) with known truth;
+% Card-Krueger survives as the historical anchor. Staggered timing is Lecture 9b
+% (L10c - TWFE designs.tex). Readings: Goff Ch. 6; Mixtape (Remix) Ch. 8a-8b;
+% Roth, Sant'Anna, Bilinski and Poe (2023, JoE). Figures/tables: did_sims.R.
+% Workbook: inclass_session9.Rmd (Python: inclass_session9_py.qmd).
+
 \begin{document}
 \frame{\titlepage}
 
 
-
-
-\begin{frame}{Recall: Fundamental Problem of Causal Inference}
-\begin{columns}[T] % align columns
-\begin{column}{.65\textwidth}
-Fundamental Problem of Causal Inference
+\begin{frame}{Where we are}
 \begin{itemize}
-\item We don't observe the \alert{counterfactual} $Y_i(1-D_i)$.
-\item For a single individual we either observe $Y_i(1)$ \alert{or} $Y_i(0)$ but never both!
-\begin{itemize}
-\item ex: We don't see what your wage would have been if you didn't attend college.
-\item ex: We might know your cholesterol before you took Lipitor, but we don't know what it would be today if you didn't take Lipitor.
+	\item Last week: the panel event study is a \alert{stack of $2\times2$ comparisons}, one per event time,
+	sharing the period before the event as a baseline.
+	\medskip
+	\item Today, Lecture 9a: the $2\times2$ itself.
+	\begin{itemize}
+		\item What it identifies, and the one assumption that buys it.
+		\item When to believe that assumption, and what breaks it.
+		\item How to do inference when treatment is assigned to groups.
+	\end{itemize}
+	\medskip
+	\item Lecture 9b: what goes wrong when different units are treated at different dates, and the fixes.
+	\medskip
+	\item Running example: a disclosure mandate that hits large firms and exempts small ones.
+	Simulated, so we always know the right answer.
 \end{itemize}
-\end{itemize}
-\end{column}%
-\hfill%
-\begin{column}{.33\textwidth}
-
-  \vspace{20pt}
-  
-  $Y_{i} = D_{i}\cdot Y_{i}(1) + (1-D_{i}) \cdot Y_{i}(0)$\\
-  \vspace{20pt}
-  \begin{tabular}{ccccc}
-    \toprule
-    i & $Y_{i}(1)$ &  $Y_{i}(0)$ & $D_{i}$ & $X_{i}$ \\
-    \midrule
-    1 &     1      &     \alert{?}      &   1   & 3.2 \\
-    2 &     0      &     \alert{?}      &   1   & 1.7 \\
-    3 &     \alert{?}      &     0      &   0   & 2.5 \\
-     & &  $\vdots$ & & \\
-    $n$ &     \alert{?}      &     1      &   0   & -1.5 \\    
-  \end{tabular}
-\end{column}%
-\end{columns}
 \end{frame}
 
 
 \begin{frame}{How do we construct the counterfactual?}
-We observe $Y_i(D_i)$ but not $Y_i(1-D_i)$; how do we estimate it?\\
-
+We observe $Y_{it}(D_{it})$ but never $Y_{it}(1-D_{it})$. Four ways to fill in the missing cell:
 \begin{description}
-  \item [Event Study:] Compare $Y_{t+k}(1)$ to $Y_{t-j}(0)$ before and after an event at $t$.
-  \item [Matching:] Compare $Y_i(1)$ to $Y_j(0)$ for $i \neq j$ but where $X_i = X_j$.
-  \item [\alert{Difference in Difference:}] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $Y_{j,t}(0)-Y_{j,t-1}(0)$  for some $j \neq i$.
-  \item [Synthetic Control:] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $\overline{Y}_{-i,t}(0)-\overline{Y}_{-i,t-1}(0)$ for some average over $j \neq i$ so that $X_{i,t} \approx \overline{X}_{-i,t}$.
-
+	\item [Before--after:] use the treated unit's own past, $Y_{i,t-1}(0)$. Fails if anything else changed over time.
+	\item [Matching:] use a different unit $j$ with $X_j = X_i$ at the same date. Fails if they differ in
+	unobservables.
+	\item [\alert{Difference-in-differences:}] use the \emph{change} in other units,
+	$Y_{jt}(0) - Y_{j,t-1}(0)$, as the counterfactual change for $i$. Levels can differ; trends cannot.
+	\item [Synthetic control:] use a weighted average of other units chosen to track $i$ before
+	treatment (Session 11).
 \end{description}
 \end{frame}
 
 
-\section{Difference in Differences}
+\section{The two-by-two}
 
-\begin{frame}{Motivation: Selection on Observables}
-Regression and matching on observables (matching: Session 11) have some advantages:
+\begin{frame}{Setup}
 \begin{itemize}
-\item Limited assumptions on \alert{functional forms}
-\item We could do nearest neighbor matching and use kernels to compute treatment effects
+	\item Two groups, $D_i \in \{0, 1\}$; two periods, $t \in \{1, 2\}$. The treated group is treated in period 2 only:
+	$D_{it} = D_i \cdot Post_t$.
 \end{itemize}
-They also have drawbacks:
-\begin{itemize}
-\item Treated patients are ``matched'' to control patients based only on \alert{observable characteristics}
-\begin{itemize}
-\item Ignored \alert{selection on unobservables}.
-\end{itemize}
-\item Rely on \alert{cross sectional} variation to construct a control group.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Motivation}
-IV estimators resolve some of those issues but
-\begin{itemize}
-\item Good IV are in short supply!
-\end{itemize}
- Often (in this course at least) we have access to \alert{panel data}.
-\begin{itemize}
-\item What if we could use panel data to control for \alert{unobserved heterogeneity} within a treated individual/group?
-\end{itemize}
-\alert{Difference in Difference} estimators are like the opposite of matching
-\begin{itemize}
-\item \alert{Strong} assumptions on \alert{functional form}
-\item but... allow for \alert{unobservable heterogeneity} in outcomes.
-\end{itemize}
-\end{frame}
-
-
-\section{Intro to Difference in Difference}
-
-
-\begin{frame}{Differences}
-\begin{itemize}
-  \item Consider using OLS to estimate
-  \begin{align*}
-  Y_{i}=\beta_{0}+\beta_{1}\cdot D_{i}+ \varepsilon_{i}
-  \end{align*}
-  when $D_i \in \left\{ 0,1\right\}$ is assigned randomly.
-
-  \medskip
-  \item From the OLS formula and a little algebra, we can show that
-  \begin{align*}
-  \hat{b}_1 = \bar{Y}_{1} - \bar{Y}_{0}
-  \end{align*}
-  where $\bar{Y}_{1}$ is the sample mean of $Y_i$ conditional on
-  $D_i = 1$, and similarly $\bar{Y}_{0}$ is the sample mean conditional on $D_i = 0$.
-
-  \medskip
-  \item Note: this loops us back to the treatment effects setup, where
-  we were comparing conditional means.
-
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}{Differences-in-Differences I}
-\begin{itemize}
-  \item {\bf Differences-in-differences} is a {\bf quasi-experimental} design
-  that attempts to deal with selection by focusing on how treatment and control
-  groups change between two periods
-
-  \smallskip
-  \item Consider the model  
-  \begin{align*}
-  Y_{it}=\beta_{0}+\beta_{1} \cdot D_{it}+\boldsymbol{\beta}_2' {\bf X}_{i}+ \beta_{post}  Post_t  + \varepsilon_{it},
-  \end{align*}
-  and furthermore suppose that
-  \begin{itemize}
-    \item Some variables in ${\bf X}$ may be unobserved
-    \item $D_{it}$ is not random and may be correlated with ${\bf X}_{i}$
-    \item $Post_t$ is a dummy variable for the post-treatment period $t=2$
-    \item Each individual $i$ is observed (at least) twice
-    \item For some individuals, $D_{it}$ changes over time ({\bf natural experiment})
-    \item ${\bf X}_{i}$ does not change over time
-  \end{itemize}
-
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Differences-in-Differences II}
-\begin{align*}
-  Y_{it}=\beta_{0}+\beta_{1}\cdot D_{it}+\boldsymbol{\beta}_2' {\bf X}_{i} + \beta_{post}  Post_t  + \varepsilon_{it},
-\end{align*}
-
-\begin{itemize}
-  \item Let $\Delta Y_{i}$ represent the change in $Y_{it}$ between two time periods:
-  \begin{align*}
-  \Delta Y_{i} = Y_{i2} - Y_{i1},
-  \end{align*}
-  and define $\Delta D_i$ and $\Delta \varepsilon_i$ similarly.
-
-  \medskip
-  \item A differenced regression equation:
-  \begin{align*}
-  \Delta Y_{i}=\beta_{post} + \beta_{1} \Delta D_{i}+ \Delta \varepsilon_{i}
-  \end{align*}
-
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Differences-in-Differences III}
-\begin{align*}
-  \Delta Y_{i}=\beta_{post} + \beta_{1}  \cdot \Delta D_{i}+ \Delta \varepsilon_{i}
-\end{align*}
-
-\begin{itemize}
-  \item Applying OLS to the differenced regression equation will provide unbiased
-  estimates as long as
-  \begin{align*}
-  \E\left[ \Delta \varepsilon_{i} \mid \Delta D_{i} \right] =0.
-  \end{align*}
-  Exogeneity assumptions of this form are known as the {\bf parallel trends
-  assumption}.
-
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Differences-in-Differences IV}
-\begin{align*}
-  \Delta Y_{i}=\beta_{post} + \beta_{1} \cdot \Delta D_{i}+ \Delta \varepsilon_{i}
-\end{align*}
-\begin{itemize}
-  \item From before, recall that the OLS estimator for a simple experiment
-  amounted to the difference in conditional means of the outcome variable.
-
-  \medskip
-  \item The same is true here, but now we start with an outcome variable that
-  is differenced over time. Suppose that for some observations, $\Delta D_{i}=1$
-  (treatment group), and for others $D_{i1}=D_{i2}=0$ (untreated group).
-  \begin{align*}
-\hat{b}_{1,DID}=\overline{\Delta Y}_{T}-\overline{\Delta Y}_{C}
-\end{align*}
-where $\overline{\Delta Y}_{T}$ is the conditional mean of $\Delta Y_{i}$
-for the treatment group, and $\overline{\Delta Y}_{C}$ is the conditional
-mean of $\Delta Y_{i}$ for the control group.
-
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{The Appeal of DID}
-\begin{itemize}
-  \item The DID strategy is robust to a form of selection bias
-  (when the selection is related to persistent characteristics).
-  Simple differences across treatment and control groups would not be.
-
-  \medskip
-  \item DID estimates are also robust to aggregate shocks or time effects. Simple differences
-  over time for the treatment group would not be.
-
-  \medskip
-  \item DID can be used to study many ``natural experiments,'' where something
-  changes for one group but not for an otherwise similar group.
-
-\end{itemize}
-\end{frame}
-
-\section{A Famous Example: Card and Krueger (AER 1994)}
-
-\begin{frame}{A Famous Example: Card and Krueger (AER 1994)}
-\begin{itemize}
-\item On April 1, 1992 NJ raises its minimum wage from $\$4.25\rightarrow \$5.05$ per hour.
-\item Question: Econ 101 predicts this will \alert{reduce demand for low wage workers}
-\begin{itemize}
-\item Focus on fast food restaurants (since they pay min wage)
-\item Focus on starting wage (avoid tenure, high turnover)
-\end{itemize}
-\item Survey 410 restaurants in NJ (treated group) and eastern PA (control group).
-\item Idea: Compare \alert{change} in employment (FTE) in $NJ$ to $PA$:  $\Delta_{DD} = \Delta_{NJ}- \Delta_{PA}$
-\begin{itemize}
-\item Wave 1: February 15-March 4, 1992
-\item Wave 2: November 5 - December 31, 1992
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Balance Table: Covariates}
 \begin{center}
-\includegraphics[width=2.25in]{./resources/ck_tab2b.png}\\
-\includegraphics[width=2.25in]{./resources/ck_tab2c.png}\\
-\includegraphics[width=2.25in]{./resources/ck_tab2a.png}
+\begin{tabular}{lcc}
+\toprule
+ & Treated group ($D_i = 1$) & Control group ($D_i = 0$) \\
+\midrule
+Period 1 (before) & $Y_{i1}(0)$ & $Y_{i1}(0)$ \\
+Period 2 (after) & $Y_{i2}(1)$ & $Y_{i2}(0)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+	\item The target is the effect on the treated in period 2,
+	\begin{align*}
+		\text{ATT} = \E\left[\,Y_{i2}(1) - Y_{i2}(0) \mid D_i = 1\,\right].
+	\end{align*}
+	\item The missing cell is $\E[Y_{i2}(0) \mid D_i = 1]$: what the treated group would have done
+	without treatment.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Two differences}
+\small
+Write the change in the outcome as $\Delta Y_i = Y_{i2} - Y_{i1}$. For the treated group:
+\begin{align*}
+	\E[\Delta Y_i \mid D_i=1] = \overbrace{\E\left[Y_{i2}(1) - Y_{i2}(0) \mid D_i=1 \right]}^{\alert{\text{ATT}}}
+	+ \overbrace{\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_i=1 \right]}^{\alert{\text{trend}(1)}}
+\end{align*}
+For the control group:
+\begin{align*}
+	\E[\Delta Y_i \mid D_i=0] = \overbrace{\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_i=0 \right]}^{\alert{\text{trend}(0)}}
+\end{align*}
+The difference in differences:
+\begin{align*}
+	\Delta_{DD} = \E[\Delta Y_i \mid D_i=1] - \E[\Delta Y_i \mid D_i=0]
+	= \text{ATT} + \big[\text{trend}(1) - \text{trend}(0)\big].
+\end{align*}
+\end{frame}
+
+
+\begin{frame}{Parallel trends}
+\begin{itemize}
+	\item $\Delta_{DD} = \text{ATT}$ exactly when the bracket is zero:
+	\begin{align*}
+		\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_i=1 \right] = \E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_i=0 \right].
+	\end{align*}
+	Absent treatment, both groups would have \alert{changed} by the same amount on average.
+	\medskip
+	\item What it allows:
+	\begin{itemize}
+		\item Different \alert{levels}: $\E[Y_{it}(0) \mid D_i = 1] \neq \E[Y_{it}(0) \mid D_i = 0]$. Selection on
+		anything permanent is fine.
+		\item Selection on \alert{gains}: the treated may benefit more than the controls would. That is why the
+		target is the ATT, not the ATE.
+	\end{itemize}
+	\medskip
+	\item What it rules out: anything that moves the two groups' untreated outcomes \emph{differently} between
+	the periods.
+	\medskip
+	\item It is an assumption about a counterfactual. No data on the post period can test it.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The picture}
+\begin{center}
+\includegraphics[height=0.8\textheight]{fig_did_2x2.pdf}
 \end{center}
 \end{frame}
 
 
+\section{Running example: an internal-control mandate}
 
-\begin{frame}{Distribution of Wages}
-\begin{center}
-\includegraphics[width=2.75in]{./resources/ck_fig1b.png}
-\includegraphics[width=2.5in]{./resources/ck_fig1a.png}
-\end{center}
-\end{frame}
-
-
-\begin{frame}{Differences in Employment: 2 x 2 Table}
-\begin{center}
-\includegraphics[width=4.25in]{./resources/ck_tab3.png}
-\end{center}
-\end{frame}
-
-\begin{frame}{Outcome Equation}
+\begin{frame}{Running example: SOX Section 404}
 \begin{itemize}
-\item Differences lack any covariates (different fast food chains).
-\item Also $\Delta_{PA}<0$ and $\Delta_{NJ} > 0$ (!)
-\item Recall $i$ denotes stores, $t \in \{1,2\}$. Run the following regression:
-\begin{align*}
-Y_{it}&=\beta X_{it} +\alpha \cdot [i \in \text{NJ}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot NJ_i \times After_{t} +u_{it}\\
-Y_{it}&=\beta X_{it} +\alpha \cdot [\text{wage gap}_{i}] +  \gamma \cdot \text{After}_{t}  + \delta \cdot \text{wage gap}_{i} \times After_{t} +u_{it}
-\end{align*}
-\item $\alpha$ is the $NJ - PA$ difference in period $1$
-\item $\gamma$ is the change from period $1$ to $2$ in $PA$ (control)
-\item $\delta$ is the parameter of interest, the \alert{difference in difference}
-\item $\text{wage gap}_{i} = \max\{0, 5.05-w_{i1}\}/w_{i1}$ for NJ stores, $0$ for PA.\\
- (By what proportion must the $t=1$ wage rise to reach the new minimum?)
+	\item The Sarbanes--Oxley Act (July 2002), Section 404: management must report on internal
+	controls and the auditor must attest to that report.
+	\medskip
+	\item \alert{Accelerated filers} (public float $\ge$ \$75M) first complied for fiscal years ending on or
+	after November 15, 2004. Smaller firms were exempt for years.
+	\medskip
+	\item Question: what did compliance do to audit fees? (For real firms near the threshold, Iliev 2010
+	estimates the management report raised audit fees by 98\%.)
+	\medskip
+	\item \alert{Our simulation:} 2,000 firms, fiscal 2000--2007, log audit fees.
+	\begin{itemize}
+		\item Firm effects (big firms pay more) and common year shocks.
+		\item True effect on accelerated filers: $+0.35$ in 2004, decaying to $+0.20$ by 2007 as auditors learn.
+		\item One complication, on purpose: larger firms are on a steeper audit-fee trend.
+	\end{itemize}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Differences in Employment}
+
+\begin{frame}{Four ways to compute the same number}
+\small
+Take fiscal 2003 (before) and 2004 (after). $D_i = 1$ for accelerated filers.
+\begin{enumerate}
+	\item \alert{Cell means}: $(\bar y_{T,04} - \bar y_{T,03}) - (\bar y_{C,04} - \bar y_{C,03})$.
+	\item \alert{First differences}: regress $\Delta y_i = y_{i,04} - y_{i,03}$ on a constant and $D_i$:
+	$\quad \Delta y_i = \beta_{post} + \delta \cdot D_i + \Delta\varepsilon_i$.
+	\item \alert{Interaction regression} on the stacked panel:
+	$\quad y_{it} = \beta_0 + \alpha \cdot D_i + \gamma \cdot Post_t + \delta \cdot D_i \times Post_t + \varepsilon_{it}$.
+	\item \alert{Two-way fixed effects}:
+	$\quad y_{it} = \alpha_i + \gamma_t + \delta \cdot D_{it} + \varepsilon_{it}$.
+\end{enumerate}
+\medskip
+In (3), $\alpha$ is the level gap in 2003, $\gamma$ the control group's change, $\delta$ the DiD.
+\medskip
 \begin{center}
-\includegraphics[width=4in]{./resources/ck_tab4.png}
+\scriptsize
+\input{tab_did_fourways.tex}
 \end{center}
 \end{frame}
 
 
-\begin{frame}{Inference with Few Treated Clusters}
+\begin{frame}{Why four routes?}
+\begin{itemize}
+	\item With two periods and a balanced panel they are \alert{numerically identical}: same point
+	estimate, and the same standard error once you cluster by firm in (3) and (4).
+	\medskip
+	\item Each one is useful for something:
+	\begin{itemize}
+		\item (1) is what you put in a table and explain to a manager.
+		\item (2) makes the identifying assumption visible: $\E[\Delta\varepsilon_i \mid D_i] = 0$ \emph{is}
+		parallel trends.
+		\item (3) gives you the level gap $\alpha$, which is \emph{allowed} to be large.
+		\item (4) extends to many periods, many units and covariates. It is also the version that breaks
+		with staggered timing (Lecture 9b).
+	\end{itemize}
+	\medskip
+	\item But our estimate is $0.436$ and the truth is $0.35$. The arithmetic was fine. The assumption was not.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Every comparison, against the truth}
+\begin{center}
+\small
+\input{tab_did_sox.tex}
+\end{center}
+\medskip
+\begin{itemize}
+	\item \alert{Post-period gap} confounds the effect with the permanent level gap: big firms always paid more.
+	\item \alert{Before--after} confounds it with whatever happened to all audit fees that year.
+	\item \alert{DiD} removes both, but not a \emph{difference} in trends. Accelerated filers are big, and
+	big firms' fees were already growing faster.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{What went wrong: big firms were already pulling away}
+\begin{center}
+\includegraphics[height=0.72\textheight]{fig_did_sox_trends.pdf}
+\end{center}
+\vspace{-0.3cm}
+{\small The red dashed line is the treated group's true counterfactual. The exempt group is not tracking it.}
+\end{frame}
+
+
+\section{Conditional parallel trends}
+
+\begin{frame}{Conditional parallel trends}
+\begin{itemize}
+	\item Parallel trends may fail unconditionally but hold \emph{within} groups of similar firms:
+	\begin{align*}
+		\E\left[Y_{i2}(0) - Y_{i1}(0) \mid X_i, D_i = 1\right] = \E\left[Y_{i2}(0) - Y_{i1}(0) \mid X_i, D_i = 0\right].
+	\end{align*}
+	\item It is the matching assumption applied to the \emph{change} in the outcome.
+	\medskip
+	\item Simplest implementation: let the year effects depend on pre-treatment covariates,
+	\begin{align*}
+		y_{it} = \alpha_i + \gamma_t + \textstyle\sum_s \beta_s \cdot \mathbb{1}\{t = s\} \cdot X_i + \delta \cdot D_{it} + \varepsilon_{it}.
+	\end{align*}
+	\item With two periods this is the first-difference regression with $X_i$ added: $\Delta y_i$ on $D_i$ and $X_i$.
+	\medskip
+	\item In the SOX example, $X_i$ = firm size. Size $\times$ year moves the estimate from 0.436 to 0.328
+	(truth 0.35).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The event study shows the problem and the fix}
+\begin{center}
+\includegraphics[width=0.82\textwidth]{fig_did_sox_es.pdf}
+\end{center}
+\vspace{-0.3cm}
+{\footnotesize Left: the pre-period coefficients trend up into 2003; the post-period ones inherit the trend. Right:
+size-specific year effects flatten the pre-period and put the post-period on the truth.}
+\end{frame}
+
+
+\begin{frame}[fragile]{In practice}
+\begin{lstlisting}
+fit_2x2  <- feols(y ~ D | firm + year, sox[year %in% 2003:2004], vcov = ~firm)       # the 2x2
+fit_es   <- feols(y ~ i(year, acc, ref = 2003) | firm + year, sox, vcov = ~firm)     # event study
+fit_cond <- feols(y ~ i(year, acc, ref = 2003) + i(year, size, ref = 2003) | firm + year,
+                  sox, vcov = ~firm)                                                  # + size x year
+iplot(list(fit_es, fit_cond))
+\end{lstlisting}
+\begin{lstlisting}[language=Python]
+fit_cond = pf.feols("y ~ i(year, acc, ref=2003) + i(year, size, ref=2003) | firm + year",
+                    data=sox, vcov={"CRV1": "firm"})
+fit_cond.iplot()
+\end{lstlisting}
+\begin{itemize}
+	\item \texttt{i(year, size)} interacts each year dummy with a \emph{continuous} variable: one size slope per year.
+	\item Use covariates measured \emph{before} treatment. Here size is fixed at its pre-SOX value.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Conditioning needs overlap}
+\begin{itemize}
+	\item Why not size-decile $\times$ year fixed effects? Because treatment is assigned \emph{by} size.
+	Every decile except the one containing \$75M is all treated or all exempt.
+	\medskip
+	\item Within-cell comparisons then exist only for firms near the cutoff. That is a regression
+	discontinuity (Session 10), and it is what Iliev (2010) estimates.
+	\medskip
+	\item The linear size $\times$ year model works here because the simulated size trend really is linear.
+	It extrapolates the small firms' size--trend relationship to the big ones.
+	\medskip
+	\item General lesson: conditional parallel trends needs treated and control units at the \alert{same}
+	values of $X$. When it fails, you are relying on the functional form.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Covariates done right}
+\begin{itemize}
+	\item \alert{Time-invariant, pre-treatment $X_i$} interacted with time: what we just did. Safe.
+	\medskip
+	\item \alert{Time-varying $X_{it}$ that treatment can move} is a bad control. SOX changes internal-control
+	spending, audit hours and auditor choice. Controlling for any of them blocks part of the effect (mediator)
+	or opens a collider path (Session 5).
+	\medskip
+	\item Rule of thumb: condition on covariates measured \emph{before} treatment, or on ones the treatment
+	cannot plausibly affect.
+	\medskip
+	\item \alert{Doubly robust DiD} (Sant'Anna and Zhao 2020): combine an outcome regression for $\Delta Y$
+	among controls with a propensity score for $D_i$ given $X_i$. It is consistent if either one is right.
+	That is AIPW (Session 11) applied to the change in the outcome.
+	In \texttt{R}: \texttt{DRDID}, or \texttt{did::att\_gt(..., est\_method = "dr")}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The $2 \times 2$ that made DiD famous: Card and Krueger (1994)}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\includegraphics[width=\textwidth]{./resources/ck_tab3.png}
+\end{column}
+\begin{column}{0.5\textwidth}
+\small
+\begin{itemize}
+	\item April 1992: New Jersey raises its minimum wage from \$4.25 to \$5.05. Pennsylvania does not.
+	\item Fast-food restaurants surveyed before and after. Compare the change in employment.
+	\item Employment did not fall in NJ relative to PA, contrary to the textbook prediction.
+	\item A long debate followed over the data source (Neumark and Wascher 2000; Card and Krueger 2000).
+	\item One treated state and one control state. Hold that thought for inference.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\section{What parallel trends is and isn't}
+
+\begin{frame}{Parallel trends depends on the scale}
+\begin{center}
+\includegraphics[width=0.72\textwidth]{fig_did_logs.pdf}
+\end{center}
+\vspace{-0.3cm}
+\footnotesize
+\begin{itemize}
+	\item Both store types grow 4\% a period and the promotion does nothing. Trends are parallel in logs, so they
+	cannot be parallel in levels.
+	\item It can hold in every monotone transformation only if it holds for the whole distribution of $Y(0)$
+	(Roth and Sant'Anna 2023). Decide on substance whether the counterfactual change is additive or proportional.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Flat pre-trends are not parallel trends}
+\begin{itemize}
+	\item From Session 8: a pre-period that looks flat is reassuring, not proof.
+	\begin{itemize}
+		\item Pre-tests have low power against the violations that matter (Roth 2022).
+		\item Report what the pre-period rules out, and how the estimate moves if post-period violations are
+		as large as pre-period ones (Rambachan and Roth 2023; \texttt{HonestDiD}).
+	\end{itemize}
+	\medskip
+	\item \alert{Compound treatments}: parallel trends is about what would have happened \emph{at the date of
+	treatment}. Anything else that changed in 2004 for large firms but not small ones is in the estimate.
+	Examples: other rules phased in by size, exchange listing standards, a change in how large audit firms priced.
+	\medskip
+	\item The question to ask: \emph{why} did the treated group get treated \emph{then}? If the answer involves
+	the outcome, worry.
+\end{itemize}
+\end{frame}
+
+
+\section{Threats to the design}
+
+\begin{frame}{The Ashenfelter dip (Heckman and Smith 1999)}
+\begin{center}
+\includegraphics[height=0.7\textheight]{./resources/ashenfelter_dip.png}
+\end{center}
+{\small Training participants' earnings fall just before they enrol. They enrol \emph{because} of a bad draw.}
+\end{frame}
+
+
+\begin{frame}{Ashenfelter dip: algebra}
+\small
+\begin{itemize}
+	\item Model $Y_{it}(0) = \alpha_i + \gamma_t + u_{it}$, with $u_{it}$ i.i.d.\ over time. Units enter treatment in period 2
+	if $Y_{i1} < B$, so $u_{i1} < B - \alpha_i - \gamma_1$.
+	\medskip
+	\item The permanent part $\alpha_i$ differences out. The \emph{transitory} part does not:
+	\begin{align*}
+		\E[Y_{i2}(0) - Y_{i1}(0) \mid D_i = 1] &= \gamma_2 - \gamma_1 - \E[u_{i1} \mid u_{i1} < B - \alpha_i - \gamma_1], \\
+		\E[Y_{i2}(0) - Y_{i1}(0) \mid D_i = 0] &= \gamma_2 - \gamma_1 - \E[u_{i1} \mid u_{i1} \ge B - \alpha_i - \gamma_1].
+	\end{align*}
+	\item The difference is $\E[u_{i1} \mid u_{i1} \ge c_i] - \E[u_{i1} \mid u_{i1} < c_i] > 0$, writing
+	$c_i = B - \alpha_i - \gamma_1$. DiD overstates the effect.
+	\medskip
+	\item Regression to the mean: the unlucky recover whether or not they are treated.
+	\medskip
+	\item Business versions: firms hire a consultant, replace a CEO, or adopt a new system \emph{after} a bad quarter.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Simulated: a turnaround consultant who does nothing}
+\begin{columns}[c]
+\begin{column}{0.6\textwidth}
+\includegraphics[width=\textwidth]{fig_did_dip.pdf}
+\end{column}
+\begin{column}{0.38\textwidth}
+\small
+Firms in the bottom fifth of year-5 sales hire a consultant. Its true effect is zero. Shocks are AR(1) with $\rho = 0.6$.
+\medskip
+\begin{center}
+\scriptsize
+\input{tab_did_dip.tex}
+\end{center}
+\medskip
+The bias depends on the base year and can change sign. Which base year is right depends on shock dynamics you do
+not observe. Model the selection rule instead.
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{More threats, in SOX terms}
+\small
+\begin{itemize}
+	\item \alert{Composition.} Treatment changes who is in each group.
+	\begin{itemize}
+		\item Some firms went private or deregistered to escape SOX costs (Engel, Hayes and Wang 2007;
+		Leuz, Triantis and Wang 2008).
+		\item Some kept their public float below \$75M to stay exempt (Gao, Wu and Zimmerman 2009).
+		\item Fix: define groups by pre-period characteristics (float in 2002), keep a balanced panel, and report
+		attrition by group.
+	\end{itemize}
+	\item \alert{Anticipation.} The Act passed in 2002 and the rules were set in 2003--04. Firms that start paying
+	for compliance in 2003 contaminate the base year. Use an earlier base period.
+	\item \alert{Spillovers onto controls.} If auditors are capacity-constrained, compliance work for big clients
+	raises fees for small clients too. The control group is then partly treated, and DiD understates the effect
+	(the interference problem from Session 5).
+	\item \alert{Selection on the outcome.} The Ashenfelter dip, again: here the timing is set by law, which is
+	exactly why it is a good design.
+\end{itemize}
+\end{frame}
+
+
+\section{Inference}
+
+\begin{frame}{Serial correlation: placebo laws (Bertrand, Duflo and Mullainathan 2004)}
+\begin{itemize}
+	\item A state-by-year panel of log e-commerce sales, 20 years, AR(1) errors. Half the states ``pass a law'' in a
+	random year. The law does nothing. Rejection rates of a nominal 5\% test, 1,000 simulations:
+\end{itemize}
+\begin{center}
+\small
+\input{tab_did_bdm.tex}
+\end{center}
+\begin{itemize}
+	\item With persistent errors, the treatment dummy is persistent too. Conventional SEs treat 20 correlated
+	years as 20 independent draws.
+	\item \alert{Cluster at the level at which treatment is assigned} (the state), so each state's whole time
+	series counts as one draw. That needs enough clusters, and enough \emph{treated} clusters.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Inference with few treated clusters}
 \small
 \begin{itemize}
 \item Card and Krueger's SEs treat 410 stores as independent, but the policy varies by \emph{state}: NJ vs.\ PA.
 \item Stores in a state share shocks (local demand, weather). Cluster-robust SEs need many clusters, and
-many \emph{treated} clusters; with $G = 2$ you cannot cluster by state at all.
+many \emph{treated} clusters. With $G = 2$ you cannot cluster by state at all.
 \item The wild cluster bootstrap (Cameron, Gelbach and Miller 2008) fixes \emph{few clusters}, not \emph{few treated
-clusters}: with one or two treated clusters it still over-rejects (MacKinnon and Webb 2018).
+clusters}. With one or two treated clusters it still over-rejects (MacKinnon and Webb 2018).
 \item With one treated group and \emph{many} control groups:
 \begin{itemize}
-\item Conley and Taber (2011): control groups' residuals estimate the distribution of the treated group's error.
+\item Conley and Taber (2011): the control groups' residuals estimate the distribution of the treated group's error.
 \item Randomization inference: assign the policy to each control group in turn (the placebo logic of Session 11).
 \item Aggregate to group $\times$ period and use $G-1$ degrees of freedom (Donald and Lang 2007).
 \end{itemize}
@@ -335,347 +493,97 @@ treated (and control) clusters before you report a standard error.
 \end{frame}
 
 
-\begin{frame}{Parallel trends vs pre-trends}
-\begin{itemize}
-  \item When the data is available, researchers typically check {\bf pre-trends}
-  as a way of motivating the parallel trends assumption.
-  \begin{itemize}
-    \item That is, look at how the control and treatment groups evolve in several
-    periods preceding the time of treatment to see if they were changing in similar
-    ways over time.
-  \end{itemize}
-  
-  \smallskip
-  \item This is a worthwhile check, and we should certainly worry about the plausibility
-  of the parallel trends assumption if the pre-trends are not parallel.
-  
-  \smallskip
-  \item However, the parallel trends assumption is about what \emph{would have happened}
-  immediately at the time of treatment in the absence of treatment, not about what
-  happened before treatment. Thus, establishing parallel pre-trends {\bf does not} establish
-  the parallel trends assumption.
-  \begin{itemize}
-  \item  Just as we can't test exogeneity within the OLS framework, we can't test
-  the parallel trends assumption within the DiD framework. 
-  \end{itemize}
-\end{itemize}
-\end{frame}
+\section{Variants and applications}
 
-\begin{frame}{Parallel trends vs pre-trends: example}
-Consider the NJ minimum wage study. Here's a concern that would not be assuaged by seeing parallel pre-trends:
+\begin{frame}{Triple differences}
 \begin{itemize}
-  \item  If the minimum wage changed 
-  because a new administration was elected in NJ and they implemented a portfolio
-  of new policies, then the minimum wage change might have been just one of several
-  ways in which NJ and PA were diverging at the time.  
-  
-  \smallskip
-  \item Some of the other policy changes might have led to greater labor force participation and/or
-  incentivized businesses to hire more.
-  
-  \smallskip 
-  \item Because of these other changes, we would expect NJ's restaurant employment to move
-  differently from PA's in 1992 even if the minimum wage change had not happened.
-
-  \smallskip
-  \item This could all be true even if NJ and PA were evolving similarly before 1992. The point is that
-    the treatment was one thing that diverged in 1992, and if one thing was diverging at that point,
-    perhaps other things were also diverging. 
+	\item Example: a state privacy law restricts ad targeting. Compare in-state vs.\ out-of-state ($S$),
+	before vs.\ after ($P$), and ad-supported vs.\ subscription apps ($G$). Subscription apps should be unaffected.
+	\begin{align*}
+		y = \beta_0 + \beta_1 S + \beta_2 G + \beta_3 P + \beta_4 SG + \beta_5 SP + \beta_6 GP + \alert{\delta}\, SGP + \varepsilon
+	\end{align*}
+	\item $\hat\delta$ is the DiD for ad-supported apps minus the DiD for subscription apps. Include \emph{every}
+	two-way interaction (or the corresponding fixed effects).
+	\medskip
+	\item Identification needs only one parallel-trends assumption: the \emph{gap} between the two app types'
+	trends would have been the same in and out of state. Neither DiD needs to be unbiased on its own
+	(Olden and M{\o}en 2022).
+	\medskip
+	\item It is weaker than parallel trends, not free: a shock that hits only ad-supported apps in the law
+	state still biases it.
 \end{itemize}
 \end{frame}
 
 
-
-
-\begin{frame}{DID Experiments}
-\begin{itemize}
-  \item Recall that before we argued that experimental
-  effects can be estimated with regressions using additional
-  covariates (controls) even though they don't need to be.
-
-  \medskip
-  \item Similarly, they can be estimated using differences-in-differences
-  rather than simple differences. They don't need to be: with
-  randomized treatment, the treatment and control groups should have
-  similar baselines.
-
-\end{itemize}
-\end{frame}
-
-\begin{frame}{NJ Minimum Wage Follow-Up}
-\begin{itemize}
-  \item The study has been controversial, and it has had a
-  big impact on policy discussions.
-
-  \medskip
-  \item Card and Krueger update their conclusion
-  in a 2000 follow-up:
-  \begin{quotation}
-The increase in New Jersey's minimum wage probably
-had no effect on total employment in New Jersey's
-fast-food industry, and possibly had a small positive
-effect.
-  \end{quotation}
-
-  \smallskip
-  \item There have been \emph{many} criticisms of the paper,
-  including studies showing that the result is not robust to the
-  sample of stores and data source used, and concerns about
-  the external validity of the focus on only fast food stores.
-
-  \smallskip
-  \item Also see studies based on Seattle's 2015 minimum wage change. 
-\end{itemize}
-\end{frame}
-
-
-
-\section{A More General Method}
-
-
-
-\begin{frame}{Difference in Difference: Setup}
-\begin{align*}
-\text{Observed outcome in period } 1&=Y_{i 1}(0)\\
-\text{Observed outcome in period } 2&=\left\{ \begin{array}{ll}
-Y_{i 2}(1) & \text { if } D_{i 2}=1 \\ 
-Y_{i 2}(0) & \text { if } D_{i 2}=0
-\end{array}\right\}\\
-\end{align*}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline & Treatment & Control \\
-\hline Before & $Y_{i 1}(0)$ & $Y_{i 1}(0)$ \\
-After & $Y_{i 2}(1)$ & $Y_{i 2}(0)$ \\
-\hline
-\end{tabular}
-\end{center}
-We can write the outcome as:
-\begin{align*}
-Y_{i t}=D_{i t} \cdot Y_{i t}(1)+\left(1-D_{i t}\right) \cdot Y_{i t}(0)=D_{i t} \cdot\left(Y_{i t}(1)-Y_{i t}(0) \right)+Y_{i t}(0)
-\end{align*}
-\end{frame}
-
-\begin{frame}{Difference in Difference: Decomposition}
-\small
-Consider the first difference $\Delta Y_{it} = Y_{i2} - Y_{i1}$:
-\begin{align*}
-\Delta Y_{it}  = D_{i2} \cdot \left(Y_{i2}(1) - Y_{i2}(0) \right) +  Y_{i2}(0) - Y_{i1}(0)
-\end{align*}
-For treated group (first difference):
-\begin{align*}
-\E[\Delta Y_{it} \mid D_{i2}=1]  = \overbrace{\E\left[Y_{i2}(1) - Y_{i2}(0) \mid D_{i2}=1 \right]}^{\alert{ATT}} +  \overbrace{\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=1 \right]}^{\alert{\gamma(1)}}
-\end{align*}
-For control group (second difference):
-\begin{align*}
-\E[\Delta Y_{it} \mid D_{i2}=0]  = \overbrace{\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=0 \right]}^{\alert{\gamma(0)}}
-\end{align*}
-The DiD (difference in difference) estimator
-\begin{align*}
-\Delta_{DD} = \E[\Delta Y_{it} \mid D_{i2}=1]  - \E[\Delta Y_{it} \mid D_{i2}=0]  
-\end{align*}
-\end{frame}
-
-
-
-\begin{frame}{Difference in Difference: Parallel Trends}
+\begin{frame}{DiD in your fields}
 \small
 \begin{itemize}
-\item If $\gamma(1) = \gamma(0)$ then the trend terms cancel and we are left with $\Delta_{DD} = \text{ATT}$.
-\item This is the \alert{parallel trends assumption}
-\begin{align*}
-\E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=0 \right] = \E\left[Y_{i2}(0) - Y_{i1}(0) \mid D_{i2}=1 \right]
-\end{align*}
-\item Absent the treatment effect, both treatment and control would evolve identically over time.
-\item But, treatment and control groups can start from very different places...
-\begin{align*}
-\E\left[Y_{i t}(0) \mid D_{i 2}=1\right] \neq \E\left[Y_{i t}(0) \mid D_{i 2}=0\right], t=1,2
-\end{align*}
-\item And have selection on treatment effects...
-\begin{align*}
-\E\left[Y_{i 2}(1)-Y_{i 2}(0) \mid D_{i 2}=1\right] \neq \E\left[Y_{i 2}(1)-Y_{i 2}(0) \mid D_{i 2}=0\right]
-\end{align*}
+	\item \alert{Accounting.}
+	\begin{itemize}
+		\item Mandatory IFRS adoption around the world and its liquidity and cost-of-capital effects
+		(Daske, Hail, Leuz and Verdi 2008, \emph{JAR}).
+		\item SOX 404 costs and earnings quality at the \$75M threshold (Iliev 2010, \emph{JF}).
+		\item Firms managing their float to stay exempt (Gao, Wu and Zimmerman 2009, \emph{JAR}): the composition
+		threat in action.
+	\end{itemize}
+	\item \alert{Marketing / IS.}
+	\begin{itemize}
+		\item Book reviews on two retailers' sites: the change in a title's relative sales rank against the change in
+		its relative reviews (Chevalier and Mayzlin 2006, \emph{JMR}).
+		\item A city soda tax: prices, cross-border shopping and purchases relative to untaxed comparison areas
+		(Seiler, Tuchman and Yao 2021, \emph{JMR}).
+	\end{itemize}
+	\item Reading one: find the $2\times2$, name the control group, and ask what else changed for the treated group
+	at that date.
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{Parallel Trends}
-\begin{figure}
-\centering
-\includegraphics[width=5in]{./resources/common_trend.png}
-\end{figure}
+\begin{frame}{Toward Lecture 9b: SOX was phased in}
+\begin{itemize}
+	\item Accelerated filers: full Section 404 from fiscal years ending on or after November 15, 2004.
+	\item Smaller firms: the management report from fiscal years ending on or after December 15, 2007.
+	\item The auditor attestation for small firms never arrived. Dodd--Frank (2010) exempted them.
+	\medskip
+	\item That is \alert{staggered adoption}: different cohorts treated at different dates. The natural regression
+	is the same two-way FE model with $D_{it}$ switching on at each cohort's date.
+	\medskip
+	\item It now makes comparisons we never asked for, including \emph{already-treated} firms serving as controls.
+	When effects evolve over time, as they do here (0.35 decaying to 0.20), those comparisons are biased.
+	\medskip
+	\item Lecture 9b: what that regression estimates, and the estimators that fix it.
+\end{itemize}
 \end{frame}
 
 
+\begin{frame}{Recap}
+\begin{itemize}
+	\item DiD replaces ``same level'' with ``same \emph{change}''. Permanent differences are fine; differential
+	changes are not.
+	\medskip
+	\item In a two-period panel, the four routes (means, first differences, interaction, two-way FE) give the
+	same number. That number is right only if parallel trends holds.
+	\medskip
+	\item Parallel trends is scale-dependent and untestable. Pre-periods are diagnostics. Conditioning on
+	pre-treatment $X$ helps when there is overlap.
+	\medskip
+	\item Threats: selection on transitory shocks, composition, anticipation, spillovers, compound treatments.
+	\medskip
+	\item Inference: cluster at the level of assignment, and count the treated clusters.
+\end{itemize}
+\end{frame}
 
-\begin{frame}{Difference in Differences: Limitations}
+
+\begin{frame}{Workbook time}
+\texttt{Fall/L9 - Quasi Experiments/inclass\_session9.Rmd}, Part 1 (Python: \texttt{inclass\_session9\_py.qmd}):
 \begin{enumerate}
-\item Functional form restrictions
-\begin{itemize}
-\item \alert{Parallel trends} assumes that, absent treatment, we add $\gamma_2 - \gamma_1$ to each unit
-\item Because this is \alert{additive} it is not invariant to transformations $f(Y_{it})$ (e.g., taking logs)
-\end{itemize}
-\item Parallel Trend Assumption is \alert{not testable}
-\begin{itemize}
-\item Best we can hope is that it looks similar in the pre-period
-\end{itemize}
-\item Compositional Effects: the treatment may affect who is in each group
-\begin{itemize}
-\item Restaurants could close in NJ and open nearby in PA to avoid minimum wage.
-\item A good job training program may lead to migration, etc.
-\item One approach: redefine the population so that it doesn't endogenously respond to treatment
-\begin{itemize}
-\item Recover something, but probably not ATT anymore...
-\end{itemize}
-
-\end{itemize}
-
+	\item Reproduce the four routes on the SOX simulation. Then turn off the size trend: what happens to the gap
+	between DiD and the truth?
+	\item Add size $\times$ year controls. Replace them with size-decile $\times$ year fixed effects. What happens
+	to the standard error, and why?
+	\item Run the placebo-law simulation. Vary $\rho$ and the number of states, and find where clustering stops
+	working.
 \end{enumerate}
-
 \end{frame}
-
-\begin{frame}{Checking Pre-Trend: Card and Krueger (2000)}
-\begin{figure}
-\centering
-\includegraphics[width=4.5in]{./resources/card_krueger_2000.png}
-\end{figure}
-\end{frame}
-
-
-
-\begin{frame}{Difference in Differences: Regression Form}
-Just like in Card and Krueger, we can write as a regression equation:
-\begin{align*}
- Y_{it} =\alpha_i +\gamma_t +\beta X_{it} + \delta_i D_{it}  + u_{it}
- \end{align*}
-\begin{itemize}
-\item Suppose we wish to evaluate a training program for those with low
-earnings. Let the threshold for eligibility be $B$.
-\item We have a panel of individuals and those with low earnings qualify for
-training, forming the treatment group.
-\item Those with higher earnings form the control group. 
-\item Now the low earning group is low for two reasons
-\begin{enumerate}
-\item They have low permanent earnings ($\alpha_i$ is low) - this is accounted for by diff in diffs.
-\item They have a negative transitory shock ($u_{i1}$ is low) - this is not accounted for by diff in diffs.
-\end{enumerate} 
-\end{itemize}
-\end{frame} 
-
-\begin{frame}{The ``Ashenfelter Dip'' (Heckman and Smith 1999)}
-\begin{figure}
-\centering
-\includegraphics[width=4.25in]{./resources/ashenfelter_dip.png}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Ashenfelter Dip: Algebra}
-\small
-\begin{itemize}
-\item  \#2 above violates the assumption {\small $\E[Y_{i2}(0) - Y_{i1}(0) \mid D] = \E[Y_{i2}(0) - Y_{i1}(0)]$}. 
-\item To see why note that those participating in the program are such
-that {\small $Y_{i1}(0) < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - \gamma_1$}. 
-This implies: 
-{\small $$\E[Y_{i2}(0)- Y_{i1}(0) \mid D=1] = \gamma_2 - \gamma_1 - \E[u_{i1} \mid u_{i1} <  B-\alpha_i - \gamma_1]$$}
-For the control group:
-{\small $$\E[Y_{i2}(0) - Y_{i1}(0) \mid D=0] = \gamma_2 - \gamma_1 - \E[u_{i1} \mid u_{i1} >  B-\alpha_i - \gamma_1]$$}
-So that:
-\begin{align*}
-& \E[Y_{i2}(0) - Y_{i1}(0) \mid D=1] - \E[Y_{i2}(0) - Y_{i1}(0) \mid D=0] =\\
-&  \E[u_{i1} \mid u_{i1} >  B-\alpha_i - \gamma_1] - \E[u_{i1} \mid u_{i1} < B-\alpha_i - \gamma_1]  >0
-  \end{align*}
- \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
-\end{itemize}
-\end{frame} 
-
-% \begin{frame}{Difference in Differences}
-% Ashefelter (1978) was one of the first to consider difference in differences to evaluate training programs.
-% \includegraphics[scale=1]{./resources/ashefelter1.pdf}
-% \end{frame}
-
-% \begin{frame}{Difference in Differences}
-% Ashenfelter (1978) reports the following results.
-% \begin{figure}
-% \centering
-% \includegraphics[scale=.85]{./resources/ashefelter2.pdf}
-% \end{figure}
-% \end{frame}
-
-\begin{frame}{Conditional Parallel Trends}
-\begin{itemize}
-\item The assumption on growth of the non-treatment outcome being independent of assignment to treatment may be violated, but it may still be true conditional on $X$.
-\item Consider the assumption
-\begin{align*}
-\E[Y_{i2}(0)- Y_{i1}(0) \mid X,D] = \E[Y_{i2}(0)- Y_{i1}(0) \mid X]
-\end{align*}
-\item This is just the matching assumption on a redefined variable, namely the growth in the outcomes. In its simplest form the approach is implemented by running the regression
-\begin{align*}
-Y_{it} = \alpha_i + \gamma_t + \delta_i D_{it} + \beta_t' X_i + u_{it}
-\end{align*}
-which allows for differential trends in the non-treatment growth depending on $X_i$. More generally one can implement propensity score matching on the growth of the outcome variable when panel data is available.
-\end{itemize}
-\end{frame}
-
-\section{Variants}
-
-\begin{frame}{Difference in Difference in Difference}
-The triple difference is also a thing:
-\begin{itemize}
-\item Suppose that we have: before/after, treated-state/untreated-state, treated-group (men)/untreated-group (women).
-\item We can compute two D-i-D here: $\Delta_{DDD} = \Delta_{DD}^{\text{men}} - \Delta_{DD}^{\text{women}}$, where each is the treated-vs-untreated-state DiD within that group.
-\item Literally the difference of two difference-in-differences estimators.
-\item As a regression: interpret the triple-interaction term (make sure to control for ALL double interactions).
-\end{itemize}
-\end{frame}
-
-
-
-
-\begin{frame}{DID with Time-Varying Covariates}
-\begin{itemize}
-  \item Suppose individuals have time-varying observable covariates:
-  \begin{align*}
-  Y_{it}=\beta_{0}+\beta_{1}\cdot D_{it}+\boldsymbol{\beta}_2' {\bf X}_{it} + \varepsilon_{it},
-  \end{align*}
-
-  \item We can still estimate $\beta_{1}$ with a differenced linear regression,
-  \begin{align*}
-  \Delta Y_{i}=\beta_{1} \cdot \Delta D_{i}+\boldsymbol{\beta}_2' \Delta {\bf X}_{i} + \Delta \varepsilon_{i}
-  \end{align*}
-  noting that the exogeneity assumption becomes
-  \begin{align*}
-\E\left[\Delta\varepsilon_{i}\left|\left(\begin{array}{c}
-\Delta D_{i}\\
-\Delta\mathbf{X}_{i}
-\end{array}\right)\right.\right]=0
-\end{align*}
-
-  \item The estimate of $\beta_{1}$ here does not correspond to a simple
-  difference in differences,
-  but people still describe this sort of estimation strategy as DID.
-  Given Frisch-Waugh, it's still DID after controlling for ${\bf X}$.
-
-
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Staggered DID}
-\begin{itemize}
-  \item A {\bf staggered diff-in-diff} involves different groups being
-    treated at different points in time. Typically, these models are
-    estimated with a linear regression with two-way fixed effects. (More
-    on this in Lecture 9b.) 
-
-  \medskip
-  \item See \href{https://www.sciencedirect.com/science/article/pii/S0304407620303948}{Callaway and Sant'Anna (2021)}, 
-    \href{https://academic.oup.com/ectj/article/26/3/C1/6604378}{de Chaisemartin and D'Haultfoeuille (2023)}
-    on why this is not a valid strategy in the presence of heterogeneous
-    treatment effects and for alternative estimators. (More on this in Lecture 9b.)
-
-\end{itemize}
-\end{frame}
-
-
-
 
 \end{document}

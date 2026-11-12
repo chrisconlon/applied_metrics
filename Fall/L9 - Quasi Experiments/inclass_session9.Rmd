@@ -1,0 +1,230 @@
+---
+title: "In-Class Session 9: Difference-in-Differences and Staggered Adoption"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 4)
+library(fixest)
+library(data.table)
+set.seed(9)
+```
+
+This notebook reproduces the simulations behind Lectures 9a and 9b and leaves you five short problems. The slides
+use `did_sims.R` (in this folder) and `staggered_sims.R` (in `Fall/L10 - More Quasi Experiments/`), which run
+essentially the same simulations with more plotting. Everything is simulated, so you always know the right answer.
+A Python version of this notebook is `inclass_session9_py.qmd`.
+
+# Part 1: The two-by-two (Lecture 9a)
+
+## Reproduce: a SOX-404-style mandate
+
+Firms with public float of at least \$75M ("accelerated filers") must comply from fiscal 2004; smaller firms are
+exempt. The outcome is log audit fees. The true effect is $+0.35$ in 2004, decaying to $+0.20$ by 2007. Larger
+firms are on a steeper audit-fee trend: `kappa` is the extra growth per year per standard deviation of size.
+
+```{r}
+years <- 2000:2007
+tau_sox <- c(`2004` = 0.35, `2005` = 0.28, `2006` = 0.22, `2007` = 0.20)
+sim_sox <- function(N = 2000, kappa = 0.06, sd_eps = 0.12) {
+  lfloat <- rnorm(N, log(75), 1.2)
+  size <- (lfloat - mean(lfloat)) / sd(lfloat)
+  d <- CJ(firm = 1:N, year = years)
+  d[, `:=`(size = size[firm], acc = as.integer(lfloat[firm] >= log(75)))]
+  d[, alpha := 11 + 0.5 * size + rnorm(N, 0, 0.4)[firm]]
+  gam <- cumsum(c(0, rnorm(length(years) - 1, 0.03, 0.02)))
+  d[, post := as.integer(year >= 2004)]
+  d[, tau := 0]
+  d[acc == 1 & post == 1, tau := tau_sox[as.character(year)]]
+  d[, y := alpha + gam[year - 1999] + kappa * size * (year - 2003) + tau + rnorm(.N, 0, sd_eps)]
+  d[, D := acc * post]
+  d[]
+}
+sox <- sim_sox()
+```
+
+The four routes to the $2\times2$ (fiscal 2003 vs. 2004):
+
+```{r}
+two <- sox[year %in% c(2003, 2004)]
+cm <- two[, .(y = mean(y)), by = .(acc, year)]
+dd_means <- with(cm, (y[acc == 1 & year == 2004] - y[acc == 1 & year == 2003]) -
+                     (y[acc == 0 & year == 2004] - y[acc == 0 & year == 2003]))
+w <- dcast(two, firm + acc + size ~ year, value.var = "y")
+setnames(w, c("2003", "2004"), c("y03", "y04"))
+w[, dy := y04 - y03]
+fits <- list(
+  fd   = feols(dy ~ acc, w, vcov = "hetero"),
+  int  = feols(y ~ acc * post, two, vcov = ~firm),
+  twfe = feols(y ~ D | firm + year, two, vcov = ~firm))
+c(means = dd_means, fd = coef(fits$fd)[["acc"]], int = coef(fits$int)[["acc:post"]], twfe = coef(fits$twfe)[["D"]])
+```
+
+They agree, and they all miss the truth of 0.35. Conditioning on size:
+
+```{r}
+fit_cond <- feols(dy ~ acc + size, w, vcov = "hetero")
+coeftable(fit_cond)["acc", ]
+```
+
+And the event study, with and without size-specific year effects:
+
+```{r}
+fit_es   <- feols(y ~ i(year, acc, ref = 2003) | firm + year, sox, vcov = ~firm)
+fit_es_c <- feols(y ~ i(year, acc, ref = 2003) + i(year, size, ref = 2003) | firm + year, sox, vcov = ~firm)
+iplot(list(fit_es, fit_es_c), main = "Accelerated filers vs. exempt firms (black: unconditional; red: + size x year)")
+points(2004:2007 + 0.1, tau_sox, pch = 4, cex = 1.5)   # truth
+```
+
+### Problem 1
+
+Re-simulate with `kappa = 0` (no size trend). How far is the plain DiD from 0.35 now? Does adding size still change
+the estimate? What happens to its standard error relative to the plain DiD, and why? (Hint: how correlated are `acc`
+and `size`?)
+
+```{r}
+# your code here
+```
+
+### Problem 2
+
+Replace the linear size control with size-decile fixed effects: `w[, dec := cut(size, quantile(size, 0:10/10), include.lowest = TRUE)]`,
+then `feols(dy ~ acc | dec, w)`. Which deciles contain both accelerated and exempt firms? What happens to the
+estimate and its standard error? Connect your answer to "conditioning needs overlap" and to regression discontinuity.
+
+```{r}
+# your code here
+```
+
+## Reproduce: placebo laws (Bertrand, Duflo and Mullainathan 2004)
+
+A state-by-year panel with AR(1) errors. Half the states "pass a law" in a random year between 6 and 15. The law does
+nothing. How often does a 5% test reject?
+
+```{r}
+bdm_once <- function(S = 50, T = 20, rho = 0.8) {
+  e <- matrix(0, S, T); e[, 1] <- rnorm(S, 0, 1 / sqrt(1 - rho^2))
+  for (t in 2:T) e[, t] <- rho * e[, t - 1] + rnorm(S)
+  d <- data.table(state = rep(1:S, T), t = rep(1:T, each = S), e = as.vector(e))
+  start <- rep(Inf, S); tr <- sample(S, S / 2); start[tr] <- sample(6:15, length(tr), replace = TRUE)
+  d[, y := rnorm(S)[state] + 0.1 * t + e]
+  d[, D := as.integer(t >= start[state])]
+  f <- feols(y ~ D | state + t, d)
+  sapply(list(iid = "iid", hetero = "hetero", cluster = ~state),
+         function(v) unname(pvalue(summary(f, vcov = v))["D"]) < 0.05)
+}
+rowMeans(replicate(200, bdm_once(S = 50, rho = 0.8)))
+```
+
+### Problem 3
+
+Vary `rho` (0, 0.5, 0.9) and the number of states `S` (6, 10, 50; keep it even). Make a small table of rejection
+rates for clustered standard errors. Where does clustering stop working? Now give the law to only *one* state
+(edit `bdm_once`): what happens, and which slide tells you why?
+
+```{r}
+# your code here
+```
+
+# Part 2: Staggered adoption (Lecture 9b)
+
+## Reproduce: an algorithm rolled out city by city
+
+300 cities, 20 months, four launch waves (months 6, 9, 12, 15) and a never-treated group, 60 cities each. The
+effect ramps in over eight months and is larger for earlier waves.
+
+```{r}
+T_ <- 20; waves <- c(6, 9, 12, 15)
+sim_rollout <- function(theta = c(`6` = 0.12, `9` = 0.09, `12` = 0.06, `15` = 0.04), ramp = 8, n_per = 60,
+                        groups = c(waves, Inf)) {
+  G <- rep(groups, each = n_per); N <- length(G)
+  d <- CJ(id = 1:N, t = 1:T_)
+  d[, g := G[id]]
+  d[, alpha := rnorm(N, 0, 0.3)[id]]
+  gam <- cumsum(rnorm(T_, 0.01, 0.02))
+  d[, e := t - g]
+  d[, D := as.integer(t >= g)]
+  d[, tau := 0]
+  d[D == 1, tau := theta[as.character(g)] * pmin(e + 1, ramp) / ramp]
+  d[, y := alpha + gam[t] + tau + rnorm(.N, 0, 0.05)]
+  d[, g_sa := ifelse(is.finite(g), g, 10000)]   # sunab's coding for never-treated
+  d[]
+}
+d <- sim_rollout()
+att_true <- d[D == 1, mean(tau)]
+att_true
+```
+
+Static two-way FE, and the weights it puts on each treated city-month (Frisch--Waugh--Lovell):
+
+```{r}
+fit_static <- feols(y ~ D | id + t, d, vcov = ~id)
+d[, Dt := resid(feols(D ~ 1 | id + t, d))]
+d[D == 1, w := Dt / sum(Dt)]
+c(twfe = coef(fit_static)[["D"]], truth = att_true,
+  share_negative_rows = d[D == 1, mean(w < 0)],
+  estimand_from_weights = d[D == 1, sum(w * tau)])
+```
+
+## Reproduce: three clean estimators
+
+Sun and Abraham, via `sunab()`:
+
+```{r}
+fit_sa <- feols(y ~ sunab(g_sa, t) | id + t, d, vcov = ~id)
+summary(fit_sa, agg = "ATT")
+iplot(fit_sa, main = "Sun-Abraham event study")
+```
+
+Callaway and Sant'Anna by hand: each $\text{ATT}(g,t)$ is a $2\times2$ against a clean comparison group, relative to
+month $g-1$; then average with cohort-size weights.
+
+```{r}
+cs_att <- function(d, control = "never") {
+  wd <- dcast(d, id + g ~ t, value.var = "y"); Y <- as.matrix(wd[, -(1:2)]); G <- wd$g
+  out <- list()
+  for (g in waves) {
+    ig <- which(G == g); b <- g - 1
+    for (tt in g:T_) {
+      ic <- if (control == "never") which(!is.finite(G)) else which(G > tt & G != g)
+      if (length(ic) == 0) next
+      out[[length(out) + 1]] <- data.table(g = g, t = tt, n = length(ig),
+        att = mean(Y[ig, tt] - Y[ig, b]) - mean(Y[ic, tt] - Y[ic, b]))
+    }
+  }
+  a <- rbindlist(out)
+  a[, weighted.mean(att, n)]
+}
+c(cs_never = cs_att(d, "never"), cs_notyet = cs_att(d, "notyet"))
+```
+
+Imputation: fit city and month effects on untreated observations only, predict $Y(0)$ for the treated, average the gaps.
+
+```{r}
+f0 <- feols(y ~ 1 | id + t, d[D == 0])
+tr <- d[D == 1]
+tr[, tauhat := y - predict(f0, newdata = tr)]
+c(imputation = tr[, mean(tauhat)], truth = att_true)
+```
+
+### Problem 4
+
+Re-simulate with a constant effect: `sim_rollout(theta = c("6" = 0.06, "9" = 0.06, "12" = 0.06, "15" = 0.06), ramp = 1)`.
+Re-run static two-way FE and the three clean estimators. Which ones change, and why? Are any weights still negative?
+Why doesn't that matter now?
+
+```{r}
+# your code here
+```
+
+### Problem 5
+
+Drop the never-treated cities (`d[is.finite(g)]`). Callaway--Sant'Anna with not-yet-treated controls still works
+until the last wave launches. Run `cs_att()` with `control = "notyet"` and explain which $\text{ATT}(g,t)$ cells are
+missing and why. For Sun--Abraham, use the last wave as the reference cohort,
+`feols(y ~ sunab(g_sa, t, ref.c = 15) | id + t, d_no_never[t < 15])`. Why do you have to drop months 15 to 20?
+
+```{r}
+# your code here
+```
