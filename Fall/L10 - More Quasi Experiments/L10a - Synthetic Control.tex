@@ -73,8 +73,8 @@ We observe $Y_i(D_i)$ but not $Y_i(1-D_i)$, how do we estimate it?\\
 \begin{description}
   \item [Event Study:] Compare $Y_{t+k}(1)$ to $Y_{t-j}(0)$ before and after an event at $t$.
   \item [Matching:] Compare $Y_i(1)$ to $Y_j(0)$ for $i \neq j$ but where $X_i = X_j$.
-  \item [Difference in Difference:] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $Y_{j,t}(0)-Y_{i,t-1}(0)$  for some $j \neq i$.
-  \item [\alert{Synthetic Control:}] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $\overline{Y}_{-i,t}(0)-\overline{Y}_{-i,t-1}(0)$ for some average over $j \neq i$ so that $X_{i,t} \approx \overline{X}_{-i,t}$.
+  \item [Difference in Difference:] Compare $Y_{i,t}(1)-Y_{i,t-1}(0)$ to $Y_{j,t}(0)-Y_{j,t-1}(0)$  for some $j \neq i$.
+  \item [\alert{Synthetic Control:}] Compare $Y_{i,t}(1)$ to $\sum_{j \neq i} w_j Y_{j,t}(0)$, a weighted average of other units with weights chosen so that the pre-period $Y$'s and $X$'s of $i$ are matched.
 
 \end{description}
 \end{frame}
@@ -102,7 +102,7 @@ y_{it} = \beta X_{it} + \delta_i \cdot D_{it} +  \gamma_i + \gamma_t + u_{it}
 \begin{itemize}
 \item It assumes \alert{additivity} of FE $\gamma_i + \gamma_t$ are independent!
 \item States have different baseline levels $\gamma_i$ but evolution over time is common $\gamma_t$.
-\item Turns out it doesn't really generalize the diff-in-diff with $I > 2$ (Imai and Kim 2020).
+\item Turns out it doesn't really generalize the diff-in-diff with $I > 2$ (Imai and Kim 2021).
 \end{itemize}            
 \end{itemize}              
 \end{frame}
@@ -183,12 +183,12 @@ Use a convex combination of other states to construct a \alert{synthetic counter
 \item Can we run a \alert{placebo check}? Do we detect effects where we know there is a null effect?
 \begin{itemize}
 \item Put California in the donor pool.
-\item Pick a state from the donor pool at pretend that receives the treatment after $T_0$
+\item Pick a state from the donor pool and pretend that it receives the treatment after $T_0$
 \item Choose $w_j$ following the synthetic control procedure.
 \item Compute the treatment effects in the same way.
 \item Repeat for all states in donor pool.
-\item Compare \alert{mean-square prediction error} (MSPE) for $(Y_{1,1},\ldots,Y_{1,T_0})$
-\item This doubles as \alert{inference}.
+\item Compare the ratio of post- to pre-period \alert{root mean-square prediction error} (RMSPE) across states.
+\item This doubles as \alert{inference}: $p$-value $=$ rank of California's ratio $/ (J+1)$.
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -235,13 +235,13 @@ Estimate $\mathbf{\boldsymbol{\alpha}_1} =(\alpha_{1, T_0+1},\alpha_{1, T_0+2},\
 \begin{frame}{A Starting Point}
 Consider the model
 \begin{align*}
-Y_{i t}(0)=\gamma_{t}+ \theta_{t} \mathbf{Z}_{i}+\lambda_{t} \mathbf{F}_{i}+u_{i t}
+Y_{i t}(0)=\delta_{t}+ \theta_{t} \mathbf{Z}_{i}+\lambda_{t} \mathbf{F}_{i}+u_{i t}
 \end{align*}
 \begin{itemize}
 \item $\delta_t$ is the time fixed effect
 \item $Z_i$ are the usual covariates (fixed in $i$ over time) with potentially time varying coefficients.
-\item $F_i$ are $i$ specific \alert{unobserved factors}. Estimating these are complicated.
-\item $\lambda_t$ are called \alert{factor loadings}.
+\item $\lambda_t$ are unobserved \alert{common factors}: shocks that hit every unit.
+\item $F_i$ are unobserved $i$-specific \alert{factor loadings}: how hard each factor hits unit $i$. Estimating these is complicated.
 \end{itemize}
 This is a generalization of the usual additive $\gamma_t + \gamma_i$ fixed effects model called \alert{interactive fixed effects} (Bai 2009).
 \end{frame}
@@ -290,7 +290,7 @@ Theory depends on matching:
 \end{itemize}
 \item Instead choose $\mathbf{w}$ in a \alert{minimum distance sense} with some weighting matrix $\Omega$
 \begin{itemize}
-\item Can choose $\Omega$ to minimize variance of the resulting estimator.
+\item ADH choose $\Omega$ (diagonal) so that the resulting synthetic unit minimizes the pre-period MSPE of the \emph{outcome}: a nested optimization (or use cross-validation on a split pre-period).
 \end{itemize}
 \item Hard to fit crazy out of bounds values: can't match $CA$ population as linear combination of other states!
 \end{itemize}
@@ -304,10 +304,10 @@ Other things can go wrong
 \end{align*}
 
 \begin{itemize}
-\item Can get negative weights: what do those mean? 
-\item We can rule them out $w_j \geq 0$ constraints but the problem becomes more difficult to solve.
-\item This starts to look like a familiar LASSO problem: quadratic objective, $L_1$ penalty!
-\item We shouldn't be surprised by sparse models.
+\item Can get negative weights: what do those mean? (Extrapolation: ``short'' a donor.)
+\item We can rule them out with $w_j \geq 0$. For fixed $\Omega$ that is a small quadratic program; the hard part is the \alert{outer} search over $\Omega$, which is non-convex.
+\item $w_j \geq 0$ and $\sum_j w_j = 1$ put $\mathbf{w}$ on the $L_1$ ball, the same geometry as the LASSO constraint.
+\item We shouldn't be surprised by sparse solutions: a handful of donors get all the weight.
 \end{itemize}
 \end{frame}
 
@@ -316,7 +316,7 @@ Other things can go wrong
 \item The R package \texttt{synth} or \texttt{tidysynth} and accompanying examples are a good start.
 \item The R package \texttt{MSCMT} fixes some of the optimization issues in \texttt{synth}.
 \begin{itemize}
-\item When there is no set of feasible weights and the non-negativity constraint binds -- the problem is tricky to solve
+\item When no weights fit exactly and the non-negativity constraints bind, the outer search over $\Omega$ is badly behaved
 \item \texttt{synth} can produce sub-optimal solutions (and slowly).
 \end{itemize}
 
@@ -335,7 +335,7 @@ We can ask -- what are the implied regression weights for linear regression? Wha
 Why? Remember, \alert{everything is a kernel} our prediction of $\E[Y \mid X]$ is always some weighted average of other $Y_j$'s.
 \end{frame}
 
-\begin{frame}{Additonal Applications}
+\begin{frame}{Additional Applications}
 \begin{itemize}
 \item What is word of mouth effect of Superbowl ads? (Lovett, Peres, Xu QME 2019)
 \begin{itemize}
@@ -343,7 +343,7 @@ Why? Remember, \alert{everything is a kernel} our prediction of $\E[Y \mid X]$ i
 \end{itemize}
 \item What is effect of soda tax on consumption in Berkeley, CA ? (Bollinger Sexton WP 2019).
 \begin{itemize}
-\item Construct synthetic drugstores, supermarkets, and convenience stores using two donor polls: inside CA and outside CA.
+\item Construct synthetic drugstores, supermarkets, and convenience stores using two donor pools: inside CA and outside CA.
 \end{itemize}
 \item What are economic effects of German reunification?
 \begin{itemize}
@@ -392,7 +392,7 @@ Arkhangelsky, Athey, Hirshberg, Imbens and Wager (2021) write all three as weigh
 	(\hat\tau, \hat\mu, \hat\alpha, \hat\beta) = \arg\min \sum_{j}\sum_{t} \big(Y_{jt} - \mu - \alpha_j - \beta_t - \tau W_{jt}\big)^2\, \omega_j\, \lambda_t
 \end{align*}
 \begin{center}
-\begin{tabular}{lccc}
+\resizebox{\textwidth}{!}{\begin{tabular}{lccc}
 \hline
  & unit weights $\omega_j$ & time weights $\lambda_t$ & unit fixed effects $\alpha_j$? \\
 \hline
@@ -400,7 +400,7 @@ DiD & equal & equal & yes \\
 Synthetic control & fit pre-period, no intercept & equal & no \\
 Synthetic DiD & fit pre-period \emph{trends}, intercept allowed & fit pre-to-post, intercept allowed & yes \\
 \hline
-\end{tabular}
+\end{tabular}}
 \end{center}
 \small DiD trusts levels (fixed effects) but not the control group's composition; SC trusts composition
 (weights) but insists on matching levels. SDID reweights donors to track the treated unit's \emph{trend},
@@ -431,13 +431,14 @@ absorbs the level gap with $\alpha_j$, reweights pre-periods to resemble the pos
 \begin{frame}{The soda tax again: DiD, SC, and SDID on simulated cities}
 \begin{center}
 \small
-\input{tab_sdid.tex}
+\resizebox{\textwidth}{!}{\input{tab_sdid.tex}}
 \end{center}
 \medskip
-\small When the trend can be matched and the level is ordinary, SC and SDID both beat DiD. When the treated
-city sits \emph{above every donor} in level, SC cannot reproduce it (no intercept) and is off by a third; DiD
-handles the level but not the trend; SDID handles both, with a fifth of SC's bias over repeated draws. When
-the \emph{trend} is outside the hull, nothing works, and the pre-period fit says so.
+\small One treated city, 40 donors, 24 quarters, tax from quarter 17. When the trend can be matched and the
+level is ordinary, SC and SDID both beat DiD. When the treated city sits \emph{above every donor} in level,
+SC cannot reproduce it (no intercept) and is off by about a quarter; DiD handles the level but not the trend;
+SDID handles both, with a sixth of SC's bias over repeated draws. When the \emph{trend} is outside the hull,
+nothing recovers the truth, and the pre-period fit says so (SC's pre-period RMSPE triples).
 \end{frame}
 
 

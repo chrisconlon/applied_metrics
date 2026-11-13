@@ -1,8 +1,9 @@
 # Synthetic difference-in-differences vs synthetic control vs DiD (Session 11 addendum).
-# Factor model with a trend factor; one treated city, 30 donors; tax cuts sales 10% from quarter 13.
+# Factor model with a trend factor; one treated city, 40 donors, 24 quarters; tax cuts sales 10% from quarter 17.
+# Design deliberately differs from Assignment 6 Problem 2 (30 donors, 20 quarters, loadings 0.9 / 1.3).
 # Dependencies: fixest. Follows Arkhangelsky, Athey, Hirshberg, Imbens and Wager (2021).
 suppressPackageStartupMessages(library(fixest)); set.seed(66)
-J <- 30; Tq <- 20; T0 <- 12
+J <- 40; Tq <- 24; T0 <- 16
 simplex <- function(th) exp(th) / sum(exp(th))
 sc_w <- function(y1, Y0) { obj <- function(th) sum((y1[1:T0] - Y0[1:T0, ] %*% simplex(th))^2)
   simplex(optim(rep(0, ncol(Y0)), obj, method = "BFGS", control = list(maxit = 2000))$par) }
@@ -19,7 +20,7 @@ sdid <- function(Y, T0) {                                   # Y: Tq x (1 + J), c
   list(tau = coef(feols(y ~ W | unit + t, d, weights = ~wt))[1], w = w, l = l)
 }
 run <- function(mu1, alpha1 = 0, sd_alpha = 0) {
-  lam <- cbind(seq(0, 2, length.out = Tq), rnorm(Tq)); mu <- matrix(runif((J + 1) * 2), J + 1, 2); mu[1, ] <- c(mu1, 0.5)
+  lam <- cbind(seq(0, 2, length.out = Tq), rnorm(Tq)); mu <- matrix(runif((J + 1) * 2), J + 1, 2); mu[1, ] <- c(mu1, 0.3)
   alpha <- c(alpha1, rnorm(J, 0, sd_alpha))                  # unit level shifts; treated may sit above every donor
   Y <- 100 + matrix(alpha, Tq, J + 1, byrow = TRUE) + 5 * lam %*% t(mu) + matrix(rnorm(Tq * (J + 1)), Tq, J + 1)
   truth <- -0.1 * mean(Y[(T0 + 1):Tq, 1]); Y[(T0 + 1):Tq, 1] <- 0.9 * Y[(T0 + 1):Tq, 1]
@@ -29,9 +30,9 @@ run <- function(mu1, alpha1 = 0, sd_alpha = 0) {
   s <- sdid(Y, T0)
   c(truth = truth, did = did, sc = sc, sdid = unname(s$tau), pre_rmspe_sc = sqrt(mean((y1 - Y0 %*% w)[1:T0]^2)))
 }
-set.seed(66); in_hull <- run(0.9); set.seed(66); level <- run(0.9, alpha1 = 12, sd_alpha = 5); set.seed(66); out_hull <- run(1.3)
+set.seed(66); in_hull <- run(0.75); set.seed(66); level <- run(0.75, alpha1 = 15, sd_alpha = 5); set.seed(66); out_hull <- run(1.45)
 print(round(rbind(in_hull, level, out_hull), 2))
-set.seed(1); reps <- t(replicate(60, run(0.9, alpha1 = 12, sd_alpha = 5)))
+set.seed(1); reps <- t(replicate(60, run(0.75, alpha1 = 15, sd_alpha = 5)))
 bias <- colMeans(reps[, 2:4] - reps[, 1]); rmse <- sqrt(colMeans((reps[, 2:4] - reps[, 1])^2))
 print(round(rbind(bias, rmse), 2))
 write_tab <- function(file, header, rows, align) { con <- file(file, "w"); writeLines(sprintf("\\begin{tabular}{%s}\\toprule", align), con)
@@ -41,7 +42,7 @@ write_tab("tab_sdid.tex",
   " & DiD (all donors) & Synthetic control & Synthetic DiD & Truth",
   c(sprintf("Trends differ, levels similar (treated inside the hull) & %s & %s & %s & %s", fmt(in_hull["did"]), fmt(in_hull["sc"]), fmt(in_hull["sdid"]), fmt(in_hull["truth"])),
     sprintf("Trends differ \\emph{and} treated level above every donor & %s & %s & %s & %s", fmt(level["did"]), fmt(level["sc"]), fmt(level["sdid"]), fmt(level["truth"])),
-    sprintf("Treated trend outside the hull (loading $1.3$) & %s & %s & %s & %s", fmt(out_hull["did"]), fmt(out_hull["sc"]), fmt(out_hull["sdid"]), fmt(out_hull["truth"])),
+    sprintf("Treated trend outside the hull (loading $1.45$) & %s & %s & %s & %s", fmt(out_hull["did"]), fmt(out_hull["sc"]), fmt(out_hull["sdid"]), fmt(out_hull["truth"])),
     sprintf("\\midrule Bias, 60 draws of the level-shift design & %s & %s & %s & ", fmt(bias["did"], 2), fmt(bias["sc"], 2), fmt(bias["sdid"], 2)),
     sprintf("RMSE, 60 draws of the level-shift design & %s & %s & %s & ", fmt(rmse["did"], 2), fmt(rmse["sc"], 2), fmt(rmse["sdid"], 2))),
   "lcccc")
