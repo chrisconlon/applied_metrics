@@ -114,6 +114,18 @@ loadings.
 \item Placebo in space: give the treatment to each donor in turn (with the treated city removed from
 the donor pool), compute each donor's ratio of post- to pre-period RMSPE, and place the treated
 city's ratio in that distribution. Report the implied $p$-value. What does this test assume?
+\item Conformal inference (Chernozhukov, W\"uthrich and Zhu 2021; Session 11 slides). For a candidate
+effect $\theta$: subtract $\theta$ from the treated city's sales in quarters $13$--$20$, refit the
+weights on \emph{all} $20$ quarters, and take the residuals $\hat u_{t}$. Let $S$ be the mean of
+$|\hat u_{t}|$ over quarters $13$--$20$, recompute $S$ for each of the $20$ cyclic shifts of
+$(\hat u_{1}, \ldots, \hat u_{20})$, and let $p(\theta)$ be the share of shifts with $S$ at least as large
+as the unshifted one. (\texttt{augsynth}'s \texttt{summary(fit, inf\_type = "conformal")} does a
+per-quarter version; the full test is about ten lines by hand.)
+\begin{enumerate}[label=(\roman*)]
+\item Report $p(0)$ and the 90\% confidence set $\{\theta : p(\theta) > 0.10\}$ on a grid of $\theta$.
+\item Keep only the first $8$ donors and redo the placebo test in (d) and $p(0)$. What is the smallest
+$p$-value each test can produce, and what does that mean for a city with few comparable donors?
+\end{enumerate}
 \item Now move the treated city's loadings to $(1.3, 0.5)$, outside the range of the donors. Re-run
 (b). What happens to the pre-period fit, and what does that tell you about when synthetic control
 can and cannot be used?
