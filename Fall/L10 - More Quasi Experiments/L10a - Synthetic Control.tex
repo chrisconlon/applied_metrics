@@ -311,13 +311,66 @@ Other things can go wrong
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Inference with one treated unit}
+\alert{Placebo in space} (ADH): treat each donor in turn, $p = \text{rank of the treated ratio}/(J+1)$.
+\begin{itemize}
+\item Needs the treated unit to be exchangeable with the donors, which is rarely why it was treated.
+\item Coarse: with $J = 8$ donors the smallest possible $p$ is $1/9 = 0.11$. You can never reject at 10\%.
+\item Gives a $p$-value for ``no effect'', not a confidence interval.
+\end{itemize}
+\medskip
+\alert{Conformal inference} (Chernozhukov, W\"uthrich and Zhu 2021, \emph{JASA}): permute over \emph{time} instead of across units.
+\begin{itemize}
+\item Test the sharp null $H_0: \alpha_{1t} = \theta$ for every $t > T_0$; collect the $\theta$'s you cannot reject into a confidence set.
+\item Needs the residuals of the treated unit around its synthetic control to be stationary and weakly dependent over time. Exact if they are exchangeable.
+\item The resolution depends on $T$, not on $J$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conformal inference: the recipe}
+For a candidate effect $\theta$:
+\begin{enumerate}
+\item Impose the null: $\tilde Y_{1t} = Y_{1t} - \theta \cdot \mathbf{1}\{t > T_0\}$.
+\item Fit the SC weights on \alert{all} $T$ periods using $\tilde Y_{1t}$. Under $H_0$ the post-periods are untreated, so they are fair game.
+\item Residuals $\hat u_t = \tilde Y_{1t} - \sum_j \hat w_j Y_{jt}$ for $t = 1, \ldots, T$.
+\item Statistic on the post-period: $S(\hat u) = \frac{1}{T - T_0}\sum_{t > T_0} |\hat u_t|$.
+\item Recompute $S$ on reshuffled residuals; $p(\theta) = $ share at least as large as $S(\hat u)$.
+\begin{itemize}
+\item \alert{Moving block}: all $T$ cyclic shifts of $(\hat u_1, \ldots, \hat u_T)$. Robust to serial correlation; smallest $p$ is $1/T$.
+\item \alert{iid}: random reorderings. Much finer, but assumes no serial correlation.
+\end{itemize}
+\item 90\% confidence set: $\{\theta : p(\theta) > 0.10\}$.
+\end{enumerate}
+\small Intuition: if $\theta$ is wrong, the leftover effect sits in the post-period residuals, and they stand out from the pre-period ones.
+\end{frame}
+
+\begin{frame}{The soda tax: placebo vs conformal}
+\begin{center}
+\small
+\input{tab_conformal.tex}
+\end{center}
+\medskip
+\small
+\begin{itemize}
+\item Placebo $p$ is fine with 40 donors and useless with 8; conformal $p$ does not care how many donors there are.
+\item With $T = 24$ the moving-block test can't go below $1/24$, and the interval nearly reaches zero. The iid version is tight here because the simulated residuals really are iid. Quarterly sales usually are not.
+\item \texttt{augsynth}: \texttt{summary(fit, inf\_type = "conformal")} gives per-period intervals (iid by default). \texttt{conformal\_sims.R} does it by hand in about ten lines.
+\end{itemize}
+\end{frame}
+
 \begin{frame}{In practice}
 \begin{itemize}
-\item The R package \texttt{synth} or \texttt{tidysynth} and accompanying examples are a good start.
-\item The R package \texttt{MSCMT} fixes some of the optimization issues in \texttt{synth}.
+\item \alert{Default:} \texttt{augsynth} (Ben-Michael, Feller, Rothstein; install from GitHub, actively maintained).
+\begin{itemize}
+\item \texttt{progfunc = "None"} is classic SC; \texttt{"Ridge"} adds the augmented-SC bias correction.
+\item Conformal inference built in; \texttt{multisynth} handles staggered adoption.
+\end{itemize}
+\item \texttt{tidysynth}: easiest placebo machinery (\texttt{grab\_significance} gives the RMSPE-ratio $p$-value).
+\item \texttt{synthdid}: SC, DiD, and SDID side by side (next section); no longer actively maintained.
+\item The original \texttt{Synth} (which \texttt{tidysynth} wraps) has optimization issues:
 \begin{itemize}
 \item When no weights fit exactly and the non-negativity constraints bind, the outer search over $\Omega$ is badly behaved
-\item \texttt{synth} can produce sub-optimal solutions (and slowly).
+\item It can produce sub-optimal solutions (and slowly). \texttt{MSCMT} fixes this.
 \end{itemize}
 
 \end{itemize}
