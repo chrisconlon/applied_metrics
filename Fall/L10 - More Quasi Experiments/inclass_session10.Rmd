@@ -1,0 +1,153 @@
+---
+title: "In-Class Session 10: Regression Discontinuity"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 4)
+library(fixest)
+library(rdrobust)
+library(rddensity)
+set.seed(10)
+```
+
+This notebook reproduces the simulations behind Lecture 10 and leaves you four short problems. The slides use
+`rdd_sims.R` (in this folder), which runs the same simulations with more plotting. Everything is simulated, so you
+always know the right answer. You need `rdrobust` and `rddensity` from CRAN.
+
+# Part 1: The sharp design
+
+## Reproduce: SOX Section 404 at the \$75M threshold
+
+Accelerated filers (public float of at least \$75M) needed an auditor attestation of internal controls from fiscal
+2004. The running variable is $x = \log(\text{float}/\$75\text{M})$, so the cutoff is $x = 0$. The outcome is the
+fiscal 2004 log audit fee. Without SOX, audit fees rise smoothly but non-linearly with size; `curv` scales the
+curvature. The true jump is $\tau = 0.35$. We also record fiscal 2002 fees, before SOX existed.
+
+```{r}
+tau <- 0.35
+f0 <- function(x, curv = 1) 11 + 0.5 * x + curv * 0.3 * tanh(2.5 * x)
+sim_sox <- function(N = 4000, curv = 1) {
+  x <- rnorm(N, 0, 1.2)
+  u <- rnorm(N, 0, 0.25)                        # persistent audit-cost shifter
+  D <- as.integer(x >= 0)
+  data.frame(x = x, u = u, D = D,
+             y = f0(x, curv) + tau * D + u + rnorm(N, 0, 0.2),
+             y_pre = f0(x, curv) - 0.06 + u + rnorm(N, 0, 0.2))
+}
+d <- sim_sox()
+rdplot(d$y, d$x, c = 0, x.label = "log(float / $75M)", y.label = "log audit fee")
+```
+
+Global polynomials (separate on each side) against local linear regression:
+
+```{r}
+global_poly <- function(d, p) coef(feols(as.formula(sprintf("y ~ D * poly(x, %d, raw = TRUE)", p)), d))["D"]
+sapply(1:5, function(p) global_poly(d, p))
+
+rd <- rdrobust(d$y, d$x, c = 0)
+summary(rd)
+h <- rd$bws["h", "left"]
+s <- subset(d, abs(x) < h); s$k <- 1 - abs(s$x) / h
+etable(feols(y ~ D * x, s, weights = ~k, vcov = "hetero"))   # coefficient on D = rdrobust's "Conventional"
+```
+
+### Problem 1
+
+Re-simulate with `curv = 0`, so audit fees are linear in $x$ on each side. What happens to the global linear
+estimate, and to $h_{MSE}$? Explain both in terms of the bias-variance tradeoff. Then try `curv = 2`.
+
+```{r}
+# your code here
+```
+
+## Reproduce: coverage of conventional vs. robust bias-corrected CIs
+
+```{r}
+mc <- function(R = 200, N = 4000, curv = 1) {
+  out <- t(replicate(R, {
+    s <- sim_sox(N, curv); r <- rdrobust(s$y, s$x)
+    c(conv = r$ci[1, 1] <= tau & tau <= r$ci[1, 2], robust = r$ci[3, 1] <= tau & tau <= r$ci[3, 2], h = r$bws[1, 1])
+  }))
+  colMeans(out)
+}
+mc()
+```
+
+### Problem 2
+
+Rerun the Monte Carlo with `N = 1000`. What happens to $h_{MSE}$ and to the coverage of each interval? Is the
+conventional interval's problem bigger or smaller in small samples, and why? (Hint: at $h_{MSE}$, how does the bias
+compare to the standard error?)
+
+```{r}
+# your code here
+```
+
+# Part 2: Manipulation
+
+## Reproduce: float management
+
+Firms whose true float is between \$75M and \$96M ($0 \le x < 0.25$) may push their reported float just under
+\$75M to stay exempt. Firms with higher audit costs $u$ are more likely to do it; `sel` sets how strongly
+manipulation selects on $u$. Manipulators stay exempt but keep the audit fees of their true size and costs.
+
+```{r}
+manipulate <- function(d, sel = 8, base = -0.5) {
+  cand <- which(d$x >= 0 & d$x < 0.25)
+  m <- cand[runif(length(cand)) < plogis(base + sel * d$u[cand])]
+  d$x[m] <- runif(length(m), -0.12, -0.005); d$D[m] <- 0L; d$y[m] <- d$y[m] - tau
+  d
+}
+dm <- manipulate(d)
+hist(dm$x[abs(dm$x) < 1], breaks = seq(-1, 1, by = 0.04), main = "Reported float", xlab = "x")
+abline(v = 0, lty = 2)
+
+c(density_p = rddensity(dm$x)$test$p_jk,
+  jump_2004 = rdrobust(dm$y, dm$x)$coef[1],
+  jump_2002 = rdrobust(dm$y_pre, dm$x)$coef[1])
+```
+
+### Problem 3
+
+Set `sel = 0`, so manipulation is unrelated to audit costs. Which of the three numbers above still flags a problem,
+and which does not? Now vary `base` to change how many firms manipulate. Roughly how many manipulators does it
+take before the density test rejects at 5%? What does this tell you about relying on a single diagnostic?
+
+```{r}
+# your code here
+```
+
+# Part 3: Fuzzy RD
+
+## Reproduce: voluntary compliers and extensions
+
+Now crossing \$75M only raises the probability of an attestation. Low-cost firms are more likely to attest on
+either side. `fs` sets how much crossing the cutoff matters.
+
+```{r}
+fuzzy <- function(d, fs = 2.4) {
+  d$Z <- as.integer(d$x >= 0)
+  d$D <- as.integer(-1.3 + fs * d$Z - 4 * d$u + rnorm(nrow(d)) > 0)
+  d$y <- f0(d$x) + tau * d$D + d$u + rnorm(nrow(d), 0, 0.2)
+  d
+}
+df <- fuzzy(d)
+rf <- rdrobust(df$y, df$x, fuzzy = df$D)
+h <- rf$bws["h", "left"]; s <- subset(df, abs(x) < h); s$k <- 1 - abs(s$x) / h
+etable(feols(D ~ Z * x, s, weights = ~k, vcov = "hetero"),            # first stage
+       feols(y ~ Z * x, s, weights = ~k, vcov = "hetero"),            # reduced form
+       feols(y ~ x + Z:x | D ~ Z, s, weights = ~k, vcov = "hetero"))  # 2SLS = Wald ratio
+summary(rf)
+```
+
+### Problem 4
+
+First compare the conventional 2SLS interval above with the robust interval from `summary(rf)`. Which covers
+0.35, and why? (Part 1 has the answer.) Then lower `fs` toward zero. Track the first-stage jump, the 2SLS estimate and its robust confidence interval from
+`rdrobust`. At what point does the estimate become unreliable? Connect this to weak instruments from Session 7.
+
+```{r}
+# your code here
+```

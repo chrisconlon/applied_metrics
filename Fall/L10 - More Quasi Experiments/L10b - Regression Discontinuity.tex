@@ -1,302 +1,533 @@
 \documentclass[aspectratio=169,11pt]{beamer}
 \usepackage{teaching_slides}
+\usepackage{listings}
 
+\lstset{
+  language=R,
+  basicstyle=\ttfamily\tiny,
+  backgroundcolor=\color{gray!5},
+  frame=single,
+  rulecolor=\color{gray!50},
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{orange!90!black},
+  columns=flexible,
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=true
+}
 
+\usepackage{inconsolata} % nice monospace font
 
 \title[L10 - RDD]{ Econometrics I}
 \subtitle{Lecture 10: Regression Discontinuity}
 \author{Chris Conlon \\NYU Stern}
 \date{Fall 2026}
 
+% Rebuilt November 2026. Simulation-first: the running example is the Session 9 SOX-404 mandate,
+% now as a cross-section at the $75M public-float threshold (Iliev 2010), with known truth.
+% Float management (Gao, Wu and Zimmerman 2009) is the manipulation case; Burgstahler-Dichev the
+% field bunching example. Readings: Goff Ch. 5; Mixtape (Remix) Ch. 6; Cattaneo, Idrobo and
+% Titiunik, "A Practical Introduction to Regression Discontinuity Designs: Foundations".
+% Figures/tables: rdd_sims.R. Workbook: inclass_session10.Rmd.
+
 \begin{document}
 \frame{\titlepage}
 
 
-\begin{frame}{Regression Discontinuity Design}
+\begin{frame}{Where we are}
 \begin{itemize}
-\item Another popular research design is the \alert{Regression Discontinuity Design}.
-\item In some sense this is a special case of IV regression. (RDD estimates a LATE).
-\item Most of this is taken from the JEL Paper by Lee and Lemieux (2010).
-\end{itemize}              
-\end{frame}
-
-\begin{frame}{RDD: Basics}
-\begin{itemize}
-\item We have a \alert{running or forcing variable} $x$ such that 
-\begin{align*}
-\lim_{x\rightarrow c^{+}} \Pr(D_i | X_i = x) \neq \lim_{x\rightarrow c^{-}}\Pr(D_i | X_i = x)
-\end{align*}
-\item The idea is that there is a \alert{discontinuous jump} in the \alert{probability of being treated}.
-\item For now we focus on the \alert{sharp discontinuity}:\\
- $\Pr(D_i | X_i \geq c) =1$ and $\Pr(D_i | X_i < c) =0$
- \item There is no single $x$ for which we observe treatment and control.\\
-  (Compare to Propensity Score!).
-\end{itemize}              
-\end{frame}
-
-
-\begin{frame}{RDD: Basics}
-\begin{itemize}
-\item Example: a social program is available to people who earned less than \$25,000.
-\begin{itemize}              
-\item If we could compare people earning \$24,999 to people earning \$25,001 we would have as-if random assignment. (MAYBE)
-\item But we might not have that many people...
+	\item Session 9: SOX Section 404 hit firms with public float of at least \$75M and exempted smaller ones.
+	DiD compared the two groups over time and needed parallel trends.
+	\medskip
+	\item The DiD slides ended on a warning: treatment is assigned \emph{by} size, so treated and exempt firms
+	overlap only near \$75M.
+	\medskip
+	\item Today: make that the design. Compare firms just above \$75M to firms just below it, in one year.
+	\begin{itemize}
+		\item What it identifies, and the one assumption that buys it.
+		\item How to estimate a jump at a point without trusting a functional form.
+		\item How it breaks (firms manage their float) and how to tell.
+		\item What to do when the cutoff only shifts the \emph{probability} of treatment.
+	\end{itemize}
+	\medskip
+	\item Simulated throughout, so we always know the right answer.
 \end{itemize}
-\item We are going to label the \alert{treatment effect} $\tau_i$.\\
-Note: my lack of precision here!
-\item The most important assumption is that of \alert{no manipulability} $\tau_i  \perp D_i$ in some neighborhood of $c$.
-\begin{itemize}
-\item If agents can \alert{choose} $x_i$ we are in trouble: underreporting income, avoiding ``possession with intent to distribute'' for drugs, etc.
-\end{itemize}              
-\end{itemize}              
 \end{frame}
 
 
-\begin{frame}{RDD: Continuity}
+\begin{frame}{How do we construct the counterfactual?}
+We observe $Y_i(D_i)$ but never $Y_i(1-D_i)$. Ways to fill in the missing cell:
+\begin{description}
+	\item [Matching:] a unit $j$ with $X_j = X_i$ but $D_j \ne D_i$. Needs overlap: both treated and untreated
+	units at each $X$.
+	\item [Difference-in-differences:] the \emph{change} in other units. Needs parallel trends.
+	\item [\alert{Regression discontinuity:}] treatment is a deterministic function of $X$, so overlap fails
+	everywhere. Instead, compare units just on either side of the cutoff, where they should be alike in
+	everything except treatment.
+	\item [Instrumental variables:] a shifter of treatment that affects $Y$ only through $D$. A fuzzy RD is
+	exactly this, with the cutoff as the instrument.
+\end{description}
+\end{frame}
+
+
+\section{The design}
+
+\begin{frame}{Setup}
 \begin{itemize}
-\item The central idea in RDD is that of \alert{continuity}
-\item We need that $\E[Y(1)  \mid X]$ and $\E[Y(0) \mid X]$ both be continuous at $X=c$.
-\begin{itemize}
-\item We expect that $Y_i = f(x_i)$ to be a smooth, continuous function of $x_i$
-\item The \alert{only} departure from that is the treatment $\tau_i \cdot I(x_i \geq c)$.
+	\item A \alert{running variable} $X_i$ (also: forcing variable, score) and a known \alert{cutoff} $c$.
+	\medskip
+	\item \alert{Sharp} design: treatment is a deterministic function of the score,
+	\[
+		D_i = \mathbf{1}\{X_i \ge c\}.
+	\]
+	\item \alert{Fuzzy} design: the \emph{probability} of treatment jumps at $c$, but not from 0 to 1.
+	\medskip
+	\item Examples: a regulation that applies above a size threshold; a credit score below which loans are
+	not securitized; an index that holds the 1,000 largest stocks; a badge awarded above a rating.
+	\medskip
+	\item The design problem: at any given $x$, every unit is treated or every unit is untreated. There is no
+	$x$ at which we see both. Matching on $X$ is impossible, by construction.
 \end{itemize}
-\item We want to be as agnostic as possible about \alert{functional form}
-\begin{itemize}
-\item Don't want to restrict ourselves to $f(x_i) = \beta_0 + \beta_1 x_i$.
-\item The central idea: we know $f(x_i)$ absent the treatment!
-\end{itemize}   
-\end{itemize}              
 \end{frame}
 
 
-\begin{frame}{RDD: In Pictures}
+\begin{frame}{Identification: continuity}
+\begin{itemize}
+	\item Assume $\E[Y_i(0) \mid X_i = x]$ and $\E[Y_i(1) \mid X_i = x]$ are \alert{continuous} in $x$ at $c$.
+	\item In a sharp design, $\E[Y_i \mid X_i = x] = \E[Y_i(1) \mid X_i = x]$ for $x \ge c$ and
+	$\E[Y_i(0) \mid X_i = x]$ for $x < c$. Take limits from each side:
+	\[
+		\tau_{SRD} \equiv \lim_{x \downarrow c} \E[Y_i \mid X_i = x] - \lim_{x \uparrow c} \E[Y_i \mid X_i = x]
+		= \E[Y_i(1) - Y_i(0) \mid X_i = c].
+	\]
+	(Hahn, Todd and van der Klaauw 2001.)
+	\medskip
+	\item What this buys: the average effect \alert{for units at the cutoff}. Nothing about firms with \$500M of
+	float without more assumptions.
+	\medskip
+	\item What it costs: continuity is about potential outcomes, so it cannot be tested directly. It fails if
+	something else also changes at $c$, or if units can choose which side of $c$ they land on.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Running example: SOX Section 404 at \$75M}
+\begin{itemize}
+	\item Accelerated filers (public float $\ge$ \$75M) needed an auditor attestation of internal controls from
+	fiscal 2004; smaller firms were exempt. Iliev (2010, \emph{JF}) uses exactly this threshold.
+	\medskip
+	\item \alert{Our simulation:} 4,000 firms in fiscal 2004.
+	\begin{itemize}
+		\item Running variable $x = \log(\text{float} / \$75\text{M})$, so the cutoff is $x = 0$. Same float
+		distribution as Session 9.
+		\item Outcome: log audit fee. Bigger firms pay more, along a smooth, \emph{curved} function of $x$.
+		\item True jump at the cutoff: $\tau = 0.35$, the same first-year effect as in Session 9.
+		\item We also record fiscal 2002 audit fees, before SOX existed.
+	\end{itemize}
+	\medskip
+	\item Note what changed from DiD: one year, no pre-period needed for identification. The comparison is
+	across firms at nearly the same size.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The picture}
 \begin{center}
-\includegraphics[width=4.5in]{./resources/ll-fig1}
+\includegraphics[height=0.82\textheight]{fig_rd_sharp.pdf}
 \end{center}
 \end{frame}
 
 
-\begin{frame}{RDD: Sharp RD Case}
-RDD uses a set of assumptions distinct from our LATE/IV assumptions. Instead it depends on \alert{continuity}.
+\begin{frame}{Why should we believe continuity?}
 \begin{itemize}
-\item People just to the left of $c$ are a valid control for those just to the right of $c$.
-\item \alert{This is not a testable assumption} $\rightarrow$ draw pictures!
-\item We could run the regression where $D_i = \mathbf{1}[X_i > c]$.
-\begin{eqnarray*}
-Y_i = \beta_0 + \tau_i \cdot D_i + X_i \beta + \epsilon_i
-\end{eqnarray*}
-\item This puts a lot of restrictions (linearity) on the relationship between $Y$ and $X$.
-\item Also (without additional assumptions) we only learn about $\tau_i$ at the point $X=c$.
+	\item Lee (2008): if units have only \alert{imprecise control} over $X$, the luck component near $c$ makes
+	treatment \emph{as good as randomly assigned} in a small neighborhood of $c$.
+	\begin{itemize}
+		\item A firm can aim for more or less float, but its share price on the measurement date is noisy.
+		\item The classic case: close elections. Barely winning and barely losing candidates are alike.
+	\end{itemize}
+	\medskip
+	\item This turns an untestable assumption into testable predictions, as in a randomized experiment:
+	\begin{enumerate}
+		\item The \alert{density} of $X$ is smooth at $c$. No pile-up on the favorable side.
+		\item \alert{Pre-treatment covariates} do not jump at $c$. (Here: fiscal 2002 audit fees.)
+	\end{enumerate}
+	\medskip
+	\item If agents have \alert{precise} control over $X$ and care about treatment, both predictions fail. We
+	will make that happen below.
 \end{itemize}
 \end{frame}
 
 
-\begin{frame}{RDD: Nonlinearity}
-First thing to relax is assumption of linearity.
-\begin{eqnarray*}
-Y_i = f(x_i) + \tau \cdot D_i  + \epsilon_i
-\end{eqnarray*}
-This is known as \alert{partially linear model}.
+\section{Estimation}
+
+\begin{frame}{Estimation is extrapolation to a boundary}
 \begin{itemize}
-\item Three options for $f(x_i)$:
-\begin{enumerate}
-\item Kernels
-\item Polynomials: $Y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \cdots + \beta_p x^p + \tau D_i + \epsilon_i$.
-\begin{itemize}
-\item Actually, people suggest different polynomials on each side of cutoff! (Interact everything with $D_i$).
-\end{itemize}
-\item Local Linear/Polynomial Regression (next semester)
-\end{enumerate}
-\item Same objective. Want to flexibly capture what happens on both sides of cutoff.
-\item Otherwise risk confusing nonlinearity with discontinuity!
+	\item We need two limits: $\E[Y \mid X = c]$ approached from the right, and from the left. There are no
+	data \emph{at} $c$ from either side; each side's value at $c$ is an extrapolation to the edge of its data.
+	\medskip
+	\item Two families of estimators:
+	\begin{itemize}
+		\item \alert{Global}: fit a polynomial in $x$ on each side using all the data, evaluate at $c$.
+		\item \alert{Local}: fit a line on each side using only data within $h$ of $c$, weighted toward $c$.
+	\end{itemize}
+	\medskip
+	\item A kernel average (Nadaraya--Watson) is the worst choice here: at a boundary it averages points that
+	all lie on one side, so it is biased whenever $\E[Y \mid X]$ has a slope. Fitting a line removes that bias.
+	\medskip
+	\item Either way, include the score on each side \emph{separately}: $y$ on $D$, $x - c$, and $D \times (x - c)$.
+	The coefficient on $D$ is the jump at $c$.
 \end{itemize}
 \end{frame}
-	
-\begin{frame}{RDD: Kernel Boundary Problem}
+
+
+\begin{frame}{The same data, eight estimators}
 \begin{center}
-\includegraphics[width=4.5in]{./resources/ll-fig2}
+\small
+\input{tab_rd_poly.tex}
 \end{center}
-\end{frame}
-
-\begin{frame}{RDD: Polynomial Implementation Details}
-To make life easier:
+\small
 \begin{itemize}
-\item replace $\tilde{x}_i = x_i - c$.
-\item Estimate coefficients $\beta$: $(1, \tilde{x}, \tilde{x}^2, \ldots, \tilde{x}^p)$ and\\
- $\tilde{\beta}$: $(D_i, D_i \tilde{x},D_i \tilde{x}^2, \ldots, D_i \tilde{x}^p)$.
- \item Now treatment effect at $c$ just the coefficient on $D_i$. (We can ignore the interaction terms).
- \item If we want treatment effect at $x_i > c$ then we have to account for interactions.
- \begin{itemize}
- \item Identification away from $c$ is somewhat dubious anyway.
-\end{itemize}
-\item Lee and Lemieux (2010) suggest estimating a coefficient on a dummy for each bin in the polynomial regression $\sum_{k} \phi_k B_k$.
- \begin{itemize}
- \item Add polynomials until you can satisfy the test that the joint hypothesis test that $\phi_1 = \cdots \phi_k= 0$.
-\item There are better ways to choose polynomial order...
-\end{itemize}
+	\item A global line mistakes curvature for a jump: $0.69$ against $0.35$, with a tight CI. Higher orders
+	move toward the truth, but which order would you have reported without knowing it?
+	\item Local linear uses the 1,211 firms within $h$ of the cutoff and lands close.
 \end{itemize}
 \end{frame}
 
-	
-\begin{frame}{RDD: Checklist}
-Most RDD papers follow the same formula (so should yours)
+
+\begin{frame}{Why not global polynomials (Gelman and Imbens 2019)}
+\begin{center}
+\includegraphics[height=0.5\textheight]{fig_rd_weights.pdf}
+\end{center}
+\small
+Every estimator here is linear in $y$: $\hat\tau = \sum_i \omega_i y_i$. Plotted: $N \omega_i$ against $x_i$.
 \begin{itemize}
-\item Plot of $\Pr[D \mid X]$ so that we can see the discontinuity
-\item Plot of $\E[Y \mid X]$ so that we see discontinuity there also
-\item Plot of $\E[W \mid X ]$ so that we don't see a discontinuity in controls.
-\item Density of $X$ (check for manipulation).
-\item Show robustness to different ``windows''
-\item The OLS RDD estimates
-\item The Local Linear RDD estimates
-\item The polynomial (from each side) RDD estimates
-\item An f-test of ``bins'' showing that the polynomial is flexible enough.
+	\item Global fits give large, sign-switching weights to firms far from \$75M: a firm with \$1.5B of float
+	($x = 3$) moves the estimated jump at \$75M.
+	\item Results are sensitive to the order, and conventional CIs undercover (next slides). Use local linear.
 \end{itemize}
-Read Lee and Lemieux (2010) before you get started.\\
-The \texttt{rdd} package in R has many of these features.
 \end{frame}
 
 
-\begin{frame}{Application: Lee (2008)}
-Looked at incumbency advantage in the US House of Representatives
+\begin{frame}{Local linear regression}
+For bandwidth $h$ and kernel $K$, solve
+\[
+	\min_{\alpha, \beta, \tau, \gamma} \sum_{i} K\!\left(\frac{x_i - c}{h}\right)
+	\big(y_i - \alpha - \beta (x_i - c) - \tau D_i - \gamma D_i (x_i - c)\big)^2 .
+\]
 \begin{itemize}
-\item Running variable was vote share in previous election
+	\item Triangular kernel $K(u) = (1 - |u|)\,\mathbf{1}\{|u| < 1\}$: weight falls linearly to zero at $h$.
+	\item It is just weighted least squares on the subsample $|x_i - c| < h$: \texttt{feols} with \texttt{weights}.
+	\medskip
+	\item \alert{Bias--variance tradeoff} in $h$:
+	\begin{itemize}
+		\item Bias: the line misses the curvature. Roughly $\propto h^2 \times$ (second derivative of $\E[Y \mid X]$).
+		\item Variance: fewer observations. Roughly $\propto 1/(N h)$.
+	\end{itemize}
+	\item Minimizing MSE gives $h_{MSE} \propto N^{-1/5}$ (Imbens and Kalyanaraman 2012; Calonico, Cattaneo and
+	Titiunik 2014). In our data, $h_{MSE} = 0.47$: float between about \$47M and \$120M.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{The bandwidth tradeoff, against the truth}
+\begin{center}
+\includegraphics[height=0.72\textheight]{fig_rd_bandwidth.pdf}
+\end{center}
+\small Wider windows give tighter intervals around the wrong number: the curvature in audit fees leaks into the jump.
+\end{frame}
+
+
+\begin{frame}{The inference problem at $h_{MSE}$}
 \begin{itemize}
-\item Problem of naive approach: good candidates get lots of votes!
-\item Compare outcomes of districts with barely $D$ to barely $R$.
+	\item $h_{MSE}$ balances squared bias against variance, so at $h_{MSE}$ the bias is the \emph{same order} as
+	the standard error. The conventional CI, $\hat\tau \pm 1.96\,\widehat{se}$, is centered in the wrong place.
+	\medskip
+	\item Fixes:
+	\begin{itemize}
+		\item \alert{Undersmooth}: use a smaller $h$ for inference. Valid, but there is no good rule for how small.
+		\item \alert{Robust bias correction} (Calonico, Cattaneo and Titiunik 2014): estimate the bias with a
+		local quadratic, subtract it, and widen the SE to account for the noise in the bias estimate. This is
+		\texttt{rdrobust}'s default.
+		\item Bias-aware ``honest'' intervals bound the curvature directly (Armstrong and Kolesár 2020).
+	\end{itemize}
+	\medskip
+	\item Report: the conventional point estimate at $h_{MSE}$ (or the bias-corrected one) with the
+	\alert{robust} CI.
 \end{itemize}
-\item First we plot bin-scatter plots and quartic (from each side) polynomials.
-\item Discussion about how to choose bin-scatter bandwidth (CV).
-\end{itemize}
 \end{frame}
 
-\begin{frame}{Lee (2008)}
+
+\begin{frame}{Monte Carlo: 500 draws of the SOX design}
 \begin{center}
-\includegraphics[width=4.5in]{./resources/binscatter1}
+\small
+\input{tab_rd_coverage.tex}
 \end{center}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/binscatter2}
-\end{center}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/ll-fig4}
-\end{center}
-\end{frame}
-
-\begin{frame}{Other Examples}
-Luca on Yelp
+\medskip
 \begin{itemize}
-\item Have data on restaurant revenues and yelp ratings.
-\item Yelp produces a yelp score (weighted average rating) to two decimals ie: $4.32$.
-\item Score gets rounded to nearest half star
-\item Compare $4.24$ to $4.26$ to see the impact of an extra half star.
-\item Now there are multiple discontinuities: Pool  them? Estimate multiple effects?
+	\item The global quartic looked fine in our one draw. Across draws it is biased and its 95\% CI covers 78\% of the time.
+	\item Local linear at $h_{MSE}$ (mean $h = 0.45$) with a conventional CI covers 91\%.
+	\item Same point estimate, robust bias-corrected CI: 96\%, for a CI about 8\% longer.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Manipulation}
-McCrary (2008) develops a test for manipulation in running variable $x$
-\begin{center}
-\includegraphics[width=5.75in]{./resources/mccrary1.png}
-\end{center}
+
+\begin{frame}[fragile]{In practice}
+\begin{lstlisting}
+library(rdrobust)
+rd <- rdrobust(d$y, d$x, c = 0)          # local linear, triangular kernel, h_MSE, robust bias-corrected CI
+summary(rd)                               # report "Conventional" coef with the "Robust" CI
+rdplot(d$y, d$x, c = 0)                   # binned means + global fits: a picture, not an estimator
+rdbwselect(d$y, d$x, c = 0)               # bandwidths only
+
+h <- rd$bws["h", "left"]                  # the same estimate by hand
+s <- subset(d, abs(x) < h); s$k <- 1 - abs(s$x) / h
+feols(y ~ D * x, s, weights = ~k, vcov = "hetero")   # coefficient on D = rdrobust's conventional estimate
+\end{lstlisting}
+\begin{lstlisting}[language=Python]
+from rdrobust import rdrobust, rdplot     # pip install rdrobust rddensity
+rd = rdrobust(y=d.y, x=d.x, c=0); print(rd)
+\end{lstlisting}
+\begin{itemize}
+	\item Center the score at the cutoff. Interact everything with $D$.
+	\item Show sensitivity: half and double $h_{MSE}$, and a different kernel. The estimate should not swing.
+\end{itemize}
 \end{frame}
 
 
-\begin{frame}{Manipulation: Good}
+\begin{frame}{Pictures: binscatter done right}
 \begin{center}
-\includegraphics[height=0.9\textheight]{./resources/mccrary2.png}
+\includegraphics[height=0.52\textheight]{fig_rd_binscatter.pdf}
 \end{center}
+\small
+\begin{itemize}
+	\item Every RD paper shows binned means. With covariates $w$, the common shortcut (residualize $y$ and $x$ on
+	$w$, then bin) distorts the shape of $\E[y \mid x]$: the truth here is $x^2$.
+	\item Instead, regress $y$ on bin dummies and $w$ together (Cattaneo, Crump, Farrell and Feng 2024, \emph{AER}).
+	\texttt{binsreg} in R, Stata, and Python.
+\end{itemize}
 \end{frame}
 
 
-\begin{frame}{Manipulation: Bad}
-\begin{center}
-\includegraphics[height=0.9\textheight]{./resources/mccrary3.png}
-\end{center}
+\section{Is the design valid?}
+
+\begin{frame}{The main threat: firms choosing their side}
+\begin{itemize}
+	\item Gao, Wu and Zimmerman (2009, \emph{JAR}): after SOX, firms near \$75M kept their public float under the
+	threshold. They invested less, paid out more cash, and reduced shares held by non-affiliates.
+	\medskip
+	\item \alert{Our simulation:} firms with true float between \$75M and \$96M, and \emph{high} audit costs,
+	push reported float just under \$75M. 147 of the 344 eligible firms do it.
+	\medskip
+	\item They stay exempt but keep the audit fees of their true size and costs. Two problems at once:
+	\begin{itemize}
+		\item Just below \$75M, the exempt group now includes bigger, costlier firms.
+		\item Just above, the remaining accelerated filers are the low-cost ones.
+	\end{itemize}
+	Both push the estimated jump down.
+\end{itemize}
 \end{frame}
+
+
+\begin{frame}{Symptom 1: the density of the running variable}
+\begin{center}
+\includegraphics[height=0.66\textheight]{fig_rd_density.pdf}
+\end{center}
+\small McCrary (2008); Cattaneo, Jansson and Ma (2020, \emph{JASA}): estimate the density of $x$ on each side
+with local polynomials and test for a jump. \texttt{rddensity} in R, Stata and Python.
+\end{frame}
+
+
+\begin{frame}{Symptom 2: pre-treatment variables jump. And the donut}
+\begin{center}
+\small
+\resizebox{\textwidth}{!}{\input{tab_rd_manip.tex}}
+\end{center}
+\small
+\begin{itemize}
+	\item With float management, the 2004 jump collapses to zero. Both diagnostics fire: the density test rejects,
+	and \emph{2002} audit fees, set before SOX existed, ``jump'' by $-0.29$ at \$75M.
+	\item A \alert{donut} RD drops firms near the cutoff, where the manipulators are. It removes them, but then
+	extrapolates across the hole. With a curved $\E[Y \mid X]$, the estimate is noisy and biased (note the 2002 placebo).
+	\item There is no estimator that repairs manipulation. The diagnostics tell you not to trust the design.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Bunching in the field: earnings at zero}
+\begin{columns}[T]
+\begin{column}{0.55\textwidth}
+\includegraphics[width=0.95\textwidth]{fig_rd_bd.pdf}
+\end{column}
+\begin{column}{0.43\textwidth}
+\small
+\begin{itemize}
+	\item Burgstahler and Dichev (1997, \emph{JAE}): too few firms report small losses and too many report small
+	profits. Read as earnings management to avoid a loss.
+	\item Simulated here: half of firms with small losses report a small profit instead. Density test
+	$p$ = \input{tab_rd_bd_p.tex}.
+	\item Caution: Durtschi and Easton (2005, \emph{JAR}) show scaling and sample selection can also bend
+	these histograms near zero.
+	\item For RD, the lesson is the same: any threshold that matters to the agent is a reason to check the density.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{More checks}
+\begin{itemize}
+	\item \alert{Placebo cutoffs}: estimate a ``jump'' at points where nothing happens, using data on one side
+	only. You should find nothing.
+	\medskip
+	\item \alert{Placebo outcomes}: covariates and lagged outcomes, as above.
+	\medskip
+	\item \alert{Bandwidth and kernel sensitivity}: half and double $h_{MSE}$; uniform vs.\ triangular.
+	\medskip
+	\item \alert{Compound treatments}: does anything else change at the same cutoff? The \$75M line also defined
+	accelerated filers for other SEC rules, including earlier 10-K deadlines. RD estimates the effect of
+	\emph{everything} that switches at $c$.
+	\medskip
+	\item \alert{Do not} add covariates to fix imbalance. Covariates can tighten the CI in a valid design; they
+	cannot rescue an invalid one.
+\end{itemize}
+\end{frame}
+
+
+\section{Fuzzy RD}
+
+\begin{frame}{When the cutoff shifts the probability of treatment}
+\begin{itemize}
+	\item Some exempt firms obtain the attestation voluntarily; some accelerated filers get extensions or miss it.
+	The cutoff changes $\Pr(D = 1 \mid X)$ but not from 0 to 1.
+	\[
+		\tau_{FRD} = \frac{\lim_{x \downarrow c} \E[Y \mid X = x] - \lim_{x \uparrow c} \E[Y \mid X = x]}
+		{\lim_{x \downarrow c} \Pr(D = 1 \mid X = x) - \lim_{x \uparrow c} \Pr(D = 1 \mid X = x)}
+	\]
+	\item This is a Wald estimator with $Z = \mathbf{1}\{X \ge c\}$ as the instrument for $D$. With
+	monotonicity it is a \alert{LATE}: the effect for \emph{compliers at the cutoff}, firms that attest
+	because they crossed \$75M and would not have otherwise.
+	\medskip
+	\item Estimation: 2SLS within the bandwidth, with the score on each side as controls. Same kernel and $h$
+	for the first stage and the reduced form.
+	\medskip
+	\item \alert{Our simulation:} low-cost firms are more likely to attest on either side. 18\% attest below the
+	cutoff, 78\% above.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{First stage and reduced form}
+\begin{center}
+\includegraphics[height=0.66\textheight]{fig_rd_fuzzy.pdf}
+\end{center}
+\small The jump in audit fees is smaller than in the sharp design because only some firms switch status at \$75M.
+Dividing by the jump in attestation rescales it to a per-attesting-firm effect.
+\end{frame}
+
+
+\begin{frame}{Fuzzy RD estimates}
+\begin{center}
+\small
+\input{tab_rd_fuzzy.tex}
+\end{center}
+\small
+\begin{itemize}
+	\item OLS on attestation is badly biased: firms that attest are low-cost firms.
+	\item Reduced form $\div$ first stage $= 0.250 / 0.659 = 0.379$, exactly 2SLS, exactly \texttt{rdrobust}'s
+	conventional fuzzy estimate. The robust CI from \texttt{rdrobust} covers the truth.
+	\item The usual IV cautions apply: a weak first stage makes the ratio unstable.
+\end{itemize}
+\end{frame}
+
 
 \section{Extensions}
-\begin{frame}{Fuzzy RD}
-\small 
-An important extension in the \alert{Fuzzy RD}.   Back to where we started:
-\begin{align*}
-\lim_{x\rightarrow c^{+}} \Pr(D_i \mid X_i = x) \neq \lim_{x\rightarrow c^{-}} \Pr(D_i \mid X_i = x)
-\end{align*}
+
+\begin{frame}{Discrete scores, kinks, and other designs}
 \begin{itemize}
-\item We need a discontinuous jump in probability of treatment, but it doesn't need to be $0 \rightarrow 1$.
-\begin{align*}
-\tau_i(c) = \frac{\lim_{x\rightarrow c^{+}} \E(Y_i \mid X_i = x) - \lim_{x\rightarrow c^{-}}\E(Y_i \mid X_i = x)}
-{\lim_{x\rightarrow c^{+}} \Pr(D_i \mid X_i = x) - \lim_{x\rightarrow c^{-}}\Pr(d_i \mid X_i = x)}
-\quad \text{ Wald Estimator}
-\end{align*}
-\item Under sharp RD everyone was a \alert{complier}, now we have some \alert{always takers} and some \alert{never takers} too.
-\item Now we are estimating the treatment effect only for the population of compliers at $x=c$.
-\item This should start to look familiar. We are going to do IV!
+	\item \alert{Discrete running variable} (test scores, ages in years, rounded ratings): there are no
+	observations arbitrarily close to $c$, so ``local'' runs out. Kolesár and Rothe (2018, \emph{AER}): the
+	common fix of clustering on the score makes things worse; use bounds on the curvature instead.
+	\medskip
+	\item \alert{Local randomization}: in a small window, treat assignment as random and use randomization
+	inference (Cattaneo, Frandsen and Titiunik 2015). \texttt{rdlocrand}.
+	\medskip
+	\item \alert{Regression kink}: the \emph{slope} of a policy in $x$ changes at $c$ (tax brackets, benefit
+	formulas). Estimate the change in slope of $\E[Y \mid X]$ divided by the change in slope of the policy
+	(Card, Lee, Pei and Weber 2015, \emph{Econometrica}).
+	\medskip
+	\item \alert{Away from the cutoff}: the RD effect is local. Extrapolating needs extra structure, such as
+	conditional independence given other covariates (Angrist and Rokkanen 2015, \emph{JASA}).
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Related Idea: Kinks}
- A related idea is that of \alert{kinks}. 
+
+\begin{frame}{RD in your fields}
+\small
 \begin{itemize}
-\item Instead of a discontinuous jump in the outcome there is a discontinuous jump in $\beta_i$ on $x_i$.
-\item Often things like tax schedules or government benefits have a kinked pattern.
+	\item \alert{Accounting.}
+	\begin{itemize}
+		\item SOX 404 at \$75M: costs, earnings quality and stock prices (Iliev 2010, \emph{JF}).
+		\item Firms keeping their float under \$75M (Gao, Wu and Zimmerman 2009, \emph{JAR}).
+	\end{itemize}
+	\item \alert{Finance.}
+	\begin{itemize}
+		\item Lenders screen less carefully just above the FICO 620 securitization rule of thumb (Keys,
+		Mukherjee, Seru and Vig 2010, \emph{QJE}).
+		\item Price effects of moving between the Russell 1000 and 2000 (Chang, Hong and Liskovich 2015, \emph{RFS}).
+	\end{itemize}
+	\item \alert{Marketing / IS.}
+	\begin{itemize}
+		\item Half-star rounding of Yelp ratings and restaurant reservations (Anderson and Magruder 2012, \emph{EJ}).
+		\item The value of eBay's Top-Rated Seller badge (Elfenbein, Fisman and McManus 2015, \emph{AEJ: Micro}).
+	\end{itemize}
+	\item Reading one: find the score, the cutoff, who sets the cutoff, and whether the agents can move.
 \end{itemize}
 \end{frame}
 
-\section{What about binscatter?}
 
-\begin{frame}{Binscatter: Easy Version}
-All of these RDD plots used something called \alert{binscatter}
-\begin{itemize}
-\item For the running variable $x_i$ break it up into $J=20,50,100$ bins of equal \alert{density}
-\item Use the \alert{quantiles} of $x_i$.
-\begin{itemize}
-\item If we have 10 bins, each contains 10\% of the sample
-\item Like a histogram but with \alert{bins of different width}.
-\end{itemize}
-\item Compute the average value:  $b_x^j=\E[x_i \mid x_i \in \text{bin}_j]$
-\item Compute the average value:  $b_y^j=\E[y_i \mid x_i \in \text{bin}_j]$
-\item Plot $(b_y^j,b_x^j)$ for each bin $j$.
-\item Often draw a line of best fit through the points
-\end{itemize}
-But often we have other covariates!
+\begin{frame}{Checklist}
+\begin{enumerate}
+	\item Plot $\Pr(D \mid X)$: sharp or fuzzy? How big is the first stage?
+	\item Plot $\E[Y \mid X]$ with binned means. Is the jump visible?
+	\item Density of $X$ at $c$ (\texttt{rddensity}), and the story for why agents could or could not sort.
+	\item Covariates and lagged outcomes at $c$: no jumps.
+	\item Main estimate: local linear, triangular kernel, $h_{MSE}$, robust bias-corrected CI (\texttt{rdrobust}).
+	\item Sensitivity: bandwidths, kernels, donut. Placebo cutoffs.
+	\item Fuzzy: report first stage, reduced form and the ratio.
+	\item Say whose effect it is: units at the cutoff (compliers at the cutoff, if fuzzy).
+\end{enumerate}
 \end{frame}
 
 
-\begin{frame}{Binscatter: Under the Hood}
-\begin{center}
-\includegraphics[height=0.9\textheight]{./resources/bs2.png}
-\end{center}
-\end{frame}
-
-
-\begin{frame}{Binscatter: Under the Hood}
-\begin{center}
-\includegraphics[height=0.9\textheight]{./resources/bs1.png}
-\end{center}
-\end{frame}
-
-
-\begin{frame}{Binscatter as Semiparametric Regression:\\
-\small Cattaneo, Crump, Farrell, Feng (2019)}
-The right way to think of binscatter is as \alert{semiparametric} or \alert{partially linear} regression
-\begin{align*}
-y_{i}=\mu\left(x_{i}\right)+\mathbf{w}_{i}^{\prime} \gamma+\epsilon_{i}, \quad \E\left[\epsilon_{i} \mid x_{i}, \mathbf{w}_{i}\right]=0
-\end{align*}
+\begin{frame}{Recap}
 \begin{itemize}
-\item Unless $u(x_i)$ is linear, we can't partial out $y_i -\mathbf{w}_{i}^{\prime} \gamma$ via Frisch-Lovell-Waugh
-\item Most binscatter software does this wrong. Use \texttt{binsreg} in R.
+	\item RD replaces overlap with continuity: units just on either side of a cutoff stand in for each other.
+	\medskip
+	\item The estimand is local, at the cutoff. Estimating it is extrapolation to a boundary from each side.
+	\medskip
+	\item Use local linear regression, not global polynomials. At the MSE-optimal bandwidth, use robust
+	bias-corrected inference.
+	\medskip
+	\item The design fails when agents can choose their side. Check the density and pre-treatment variables;
+	no estimator fixes sorting.
+	\medskip
+	\item Fuzzy RD is IV with the cutoff as instrument, and it estimates a LATE for compliers at the cutoff.
 \end{itemize}
 \end{frame}
 
-\section{Thanks}
 
-
-
+\begin{frame}{Workbook time}
+\texttt{Fall/L10 - More Quasi Experiments/inclass\_session10.Rmd}:
+\begin{enumerate}
+	\item Reproduce the sharp estimate by hand and with \texttt{rdrobust}. Then make the audit-fee curve
+	straighter: what happens to the global linear estimate and to $h_{MSE}$?
+	\item Shrink the sample to 1,000 firms and redo the Monte Carlo. Does robust bias correction still fix coverage?
+	\item Turn on float management. Vary how strongly it selects on audit costs, and find where the density
+	test and the 2002 placebo stop detecting it.
+	\item Fuzzy: weaken the first stage until the 2SLS estimate becomes unstable.
+\end{enumerate}
+\end{frame}
 
 \end{document}
-

@@ -1,0 +1,10 @@
+\begin{tabular}{lcc}\toprule
+Within $h = 0.80$, triangular kernel & Estimate & 95\% CI \\ \midrule
+OLS: $y$ on compliance $D$ (and $x$ terms) & 0.111 & [0.08, 0.15] \\
+First stage: jump in $\Pr(D \mid x)$ & 0.659 & [0.59, 0.73] \\
+Reduced form: jump in $\E[y \mid x]$ & 0.250 & [0.19, 0.31] \\
+Wald ratio = 2SLS with $Z = \mathbf{1}\{x \ge 0\}$ as instrument & 0.379 & [0.29, 0.47] \\
+\texttt{rdrobust(..., fuzzy = D)}: bias-corrected, robust CI & 0.291 & [0.18, 0.40] \\
+\midrule
+Truth (every firm's effect) & 0.350 &  \\
+\bottomrule\end{tabular}

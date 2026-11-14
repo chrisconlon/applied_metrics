@@ -1,0 +1,13 @@
+\begin{tabular}{lccc}\toprule
+Specification & Estimate & 95\% CI & Obs.\ used \\ \midrule
+Global polynomial, order 1 each side & 0.692 & [0.66, 0.73] & 4,000 \\
+Global polynomial, order 2 each side & 0.531 & [0.49, 0.58] & 4,000 \\
+Global polynomial, order 3 each side & 0.414 & [0.36, 0.47] & 4,000 \\
+Global polynomial, order 4 each side & 0.337 & [0.27, 0.40] & 4,000 \\
+Global polynomial, order 5 each side & 0.325 & [0.25, 0.40] & 4,000 \\
+\midrule
+Local linear, triangular, $h = 0.47$ (by hand, \texttt{feols}) & 0.357 & [0.28, 0.43] & 1,211 \\
+\texttt{rdrobust}: bias-corrected, robust CI & 0.339 & [0.25, 0.42] & 1,211 \\
+\midrule
+Truth & 0.350 & &  \\
+\bottomrule\end{tabular}
