@@ -1,0 +1,199 @@
+---
+title: "In-Class Session 11: Matching and Synthetic Control"
+author: "Econometrics I"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 7, fig.height = 4)
+library(fixest)
+library(quadprog)
+library(synthdid)   # remotes::install_github("synth-inference/synthdid")
+set.seed(22)
+```
+
+This notebook goes with Lectures 11a (matching, `Fall/L9 - Quasi Experiments/L9d - Matching.pdf`) and 11b
+(synthetic control, `L10a - Synthetic Control.pdf`). It leaves you five short problems. The synthetic-control
+design is the one in the slides (`sdid_sims.R`, `conformal_sims.R`), which is *not* the Assignment 6 design.
+Everything is simulated, so you always know the right answer.
+
+# Part 1: Selection on observables (Lecture 11a)
+
+## Reproduce: a paid membership program
+
+An online retailer sells a paid membership (free shipping, member prices). Customers choose whether to join, and
+the ones who join are heavier past spenders, have been customers longer, and use the app. The outcome is spending
+next quarter, in dollars. The effect of membership is larger for heavier spenders, so the ATT and the ATE differ.
+
+Conditional independence holds *by construction*: membership depends only on the three observed covariates. `sel`
+scales how strongly past spending drives membership.
+
+```{r}
+sim_members <- function(N = 4000, sel = 1.2) {
+  past <- rnorm(N, 0, 1)                         # standardized log past spend
+  tenure <- rexp(N, 1 / 3)                       # years as a customer
+  app <- rbinom(N, 1, 0.4)                       # uses the mobile app
+  ps <- plogis(-1 + sel * past + 0.15 * tenure + 0.8 * app)
+  D <- rbinom(N, 1, ps)
+  tau_i <- 30 + 20 * past                        # heterogeneous effect, $ per quarter
+  y0 <- 200 + 60 * past + 15 * past^2 + 5 * tenure + 20 * app + rnorm(N, 0, 40)
+  data.frame(past, tenure, app, D, ps_true = ps, tau_i, y = y0 + tau_i * D)
+}
+m <- sim_members()
+truth <- c(ATE = mean(m$tau_i), ATT = mean(m$tau_i[m$D == 1]))
+truth
+```
+
+Balance before adjustment, in standardized differences (the slides' $d_k$):
+
+```{r}
+std_diff <- function(x, D, w = rep(1, length(x))) {
+  m1 <- weighted.mean(x[D == 1], w[D == 1]); m0 <- weighted.mean(x[D == 0], w[D == 0])
+  (m1 - m0) / sqrt((var(x[D == 1]) + var(x[D == 0])) / 2)
+}
+covs <- c("past", "tenure", "app")
+round(sapply(covs, function(v) std_diff(m[[v]], m$D)), 2)
+```
+
+Estimators of the ATT and ATE. The propensity score is a logit on the three covariates. Matching is one nearest
+neighbor on the estimated score, with replacement. The regression-adjustment and AIPW outcome models fit each arm
+separately with a quadratic in past spending.
+
+```{r}
+m$ps <- fitted(glm(D ~ past + tenure + app, binomial, m))
+treated <- which(m$D == 1); controls <- which(m$D == 0)
+
+# 1-NN matching on the propensity score (ATT)
+oc <- controls[order(m$ps[controls])]; pos <- findInterval(m$ps[treated], m$ps[oc])
+lo <- oc[pmax(pos, 1)]; hi <- oc[pmin(pos + 1, length(oc))]
+nn <- ifelse(abs(m$ps[lo] - m$ps[treated]) <= abs(m$ps[hi] - m$ps[treated]), lo, hi)
+att_nn <- mean(m$y[treated] - m$y[nn])
+
+# IPW (Hajek). ATT: controls weighted by ps / (1 - ps). ATE: both arms reweighted.
+w_att <- ifelse(m$D == 1, 1, m$ps / (1 - m$ps))
+att_ipw <- weighted.mean(m$y[treated], w_att[treated]) - weighted.mean(m$y[controls], w_att[controls])
+w_ate <- ifelse(m$D == 1, 1 / m$ps, 1 / (1 - m$ps))
+ate_ipw <- weighted.mean(m$y[treated], w_ate[treated]) - weighted.mean(m$y[controls], w_ate[controls])
+
+# Outcome models by arm, then AIPW (ATE)
+mu <- function(arm, f = y ~ past + I(past^2) + tenure + app) predict(lm(f, m[m$D == arm, ]), m)
+mu1 <- mu(1); mu0 <- mu(0)
+ate_ra <- mean(mu1 - mu0)
+att_ra <- mean(m$y[treated] - mu0[treated])
+aipw <- function(mu1, mu0, ps) mean(mu1 - mu0 + m$D * (m$y - mu1) / ps - (1 - m$D) * (m$y - mu0) / (1 - ps))
+ate_aipw <- aipw(mu1, mu0, m$ps)
+
+data.frame(
+  estimator = c("Difference in means", "OLS: y on D + covariates (linear)", "1-NN on propensity score",
+                "IPW (Hajek)", "Regression adjustment by arm", "IPW (Hajek)", "Regression adjustment by arm", "AIPW"),
+  estimand = c("-", "-", "ATT", "ATT", "ATT", "ATE", "ATE", "ATE"),
+  estimate = round(c(mean(m$y[treated]) - mean(m$y[controls]), coef(feols(y ~ D + past + tenure + app, m))["D"],
+                     att_nn, att_ipw, att_ra, ate_ipw, ate_ra, ate_aipw), 1),
+  truth = round(c(NA, NA, rep(truth["ATT"], 3), rep(truth["ATE"], 3)), 1))
+```
+
+Each estimate carries sampling noise. Over 200 simulated samples, all six adjusted estimators are centered on their
+truth; their standard deviations run from about \$1.5 (regression adjustment, AIPW) to \$3 (matching), \$4 (IPW for
+the ATE) and \$7 (IPW for the ATT). Matching and weighting buy robustness to the outcome model at a price in variance.
+
+Balance after weighting for the ATT:
+
+```{r}
+round(sapply(covs, function(v) std_diff(m[[v]], m$D, w_att)), 3)
+```
+
+### Problem 1
+
+The linear OLS regression controls for every confounder. In this draw it lands near the ATE, but over repeated
+samples it averages about \$33, against an ATE of \$30 and an ATT of \$40. Give two reasons, using the
+data-generating process. (Hint: what is it missing in $E[Y(0) \mid X]$, and what weights does OLS put on the
+heterogeneous effects?) Then add `I(past^2)` to the OLS and check over 100 samples. Which problem does that fix, and
+which remains?
+
+```{r}
+# your code here
+```
+
+### Problem 2
+
+Overlap. Re-simulate with `sel = 3`. Plot the estimated propensity score by treatment status, and report the
+largest ATE weight `max(w_ate)`. What happens to the IPW and AIPW estimates of the ATE, and why is the ATT less
+affected? Then trim to $0.1 \le \hat\pi \le 0.9$ (Crump et al. 2009) and re-estimate. What population is the trimmed
+estimate about, and is it still the ATE?
+
+```{r}
+# your code here
+```
+
+### Problem 3
+
+Double robustness. Compute AIPW three ways: (i) a wrong outcome model (drop `I(past^2)` and fit both arms with
+`y ~ tenure + app`) with the correct propensity score; (ii) the correct outcome model with a wrong propensity score
+(`glm(D ~ tenure + app, ...)`); (iii) both wrong. Compare each to the ATE. Repeat over 100 simulated samples if you
+have time.
+
+```{r}
+# your code here
+```
+
+# Part 2: Synthetic control (Lecture 11b)
+
+## Reproduce: a city soda tax
+
+The design in the slides: one treated city, 40 donor cities, 24 quarters, and a tax that cuts per-capita sales by
+10% from quarter 17. Sales follow a two-factor model; the treated city loads $0.75$ on the trend factor, inside
+the donors' range. `alpha1` shifts the treated city's *level*.
+
+```{r}
+sim_soda <- function(J = 40, Tq = 24, T0 = 16, mu1 = 0.75, alpha1 = 0, sd_alpha = 0) {
+  lam <- cbind(seq(0, 2, length.out = Tq), rnorm(Tq))
+  mu <- matrix(runif((J + 1) * 2), J + 1, 2); mu[1, ] <- c(mu1, 0.3)
+  alpha <- c(alpha1, rnorm(J, 0, sd_alpha))
+  Y <- 100 + matrix(alpha, Tq, J + 1, byrow = TRUE) + 5 * lam %*% t(mu) + matrix(rnorm(Tq * (J + 1)), Tq, J + 1)
+  truth <- -0.1 * mean(Y[(T0 + 1):Tq, 1]); Y[(T0 + 1):Tq, 1] <- 0.9 * Y[(T0 + 1):Tq, 1]
+  list(Y = Y, T0 = T0, truth = truth)           # Y is quarters x cities; city 1 is treated
+}
+sc_w <- function(y1, Y0) solve.QP(crossprod(Y0) + diag(1e-8, ncol(Y0)), crossprod(Y0, y1),
+                                  cbind(1, diag(ncol(Y0))), c(1, rep(0, ncol(Y0))), meq = 1)$solution
+s <- sim_soda(); Y <- s$Y; T0 <- s$T0; post <- (T0 + 1):nrow(Y)
+w <- sc_w(Y[1:T0, 1], Y[1:T0, -1])
+gap <- Y[, 1] - Y[, -1] %*% w
+round(w[w > 0.05], 2)
+c(sc = mean(gap[post]), truth = s$truth, pre_rmspe = sqrt(mean(gap[1:T0]^2)))
+
+matplot(Y, type = "l", lty = 1, col = "grey85", xlab = "quarter", ylab = "sales per capita")
+lines(Y[, 1], lwd = 2, col = "#1f4e79"); lines(Y[, -1] %*% w, lwd = 2, lty = 2, col = "#bb0000")
+abline(v = T0 + 0.5, lty = 3)
+legend("topleft", bty = "n", legend = c("treated city", "synthetic city", "donors"),
+       col = c("#1f4e79", "#bb0000", "grey70"), lwd = c(2, 2, 1), lty = c(1, 2, 1))
+```
+
+DiD, SC and synthetic DiD side by side with `synthdid` (which wants units in rows, controls first):
+
+```{r}
+three <- function(Y, T0) {
+  Ys <- t(Y)[c(2:ncol(Y), 1), ]; N0 <- ncol(Y) - 1
+  c(did = did_estimate(Ys, N0, T0), sc = sc_estimate(Ys, N0, T0), sdid = synthdid_estimate(Ys, N0, T0))
+}
+round(c(three(Y, T0), truth = s$truth), 2)
+```
+
+### Problem 4
+
+Placebo in time. Pretend the tax started in quarter 11: fit the weights on quarters 1--10 only, and look at the gap
+in quarters 11--16, all of which are truly untreated. What should you find, and what do you find? What kind of
+failure would this test catch that the pre-period fit alone would not?
+
+```{r}
+# your code here
+```
+
+### Problem 5
+
+Levels. Re-simulate with `alpha1 = 15, sd_alpha = 5`, so the treated city sits above every donor in level but
+not in trend. Compare DiD, SC and SDID to the truth, and look at SC's pre-period fit. Which estimator handles the
+level, and which handles the trend? Repeat over 50 samples and report the bias of each.
+
+```{r}
+# your code here
+```
