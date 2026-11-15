@@ -184,6 +184,29 @@ Y_i = \alpha + \beta D_i + \gamma X_i + v_i
 \end{frame}
 
 
+\begin{frame}{OLS when effects are heterogeneous}
+\small
+\begin{itemize}
+\item Angrist (1998): with saturated controls, OLS weights each cell's effect $\tau(x)$ by
+$\Var(D \mid X = x) = p(x)\,(1 - p(x))$. Cells where treatment is near 50/50 count most. That is neither the ATT
+(weights $\propto p(x)$) nor the ATE (weights $\propto 1$).
+\item Słoczyński (2022, \emph{REStat}): OLS $= w \cdot ATT + (1 - w) \cdot ATU$, and the \emph{smaller} group gets
+the \emph{larger} weight.
+\end{itemize}
+\begin{columns}[T]
+\begin{column}{0.56\textwidth}
+\resizebox{\linewidth}{!}{\input{tab_match_ols.tex}}
+\end{column}
+\begin{column}{0.42\textwidth}
+\footnotesize
+Running example (Session 11 workbook): a paid membership that heavier past spenders join more and gain more from.
+One very large sample. Members are 46\% of customers, yet OLS puts 0.62 on their effect. Fixing the functional form
+does not remove the weighting: pick the estimand, then an estimator that targets it.
+\end{column}
+\end{columns}
+\end{frame}
+
+
 
 \begin{frame}
 \frametitle{Higher Dimensions}
@@ -220,8 +243,9 @@ P(X^1) = P(X^2) & \nRightarrow  b(X^1) = b(X^2)
 \item Main Result: If treatment assignment is strongly ignorable conditional on $X$ (CIA) then it is strongly ignorable $Y(1),Y(0) \perp D \mid b(X)$ given any balancing score $b(X)$ including the propensity score:
 \begin{align*}
 \Pr(D=1 \mid Y(1), Y(0),P(X))&= \E[\Pr(D=1\mid Y(1),Y(0),X) \mid Y(1),Y(0),P(X)] \\
-&= \E[P(X) \mid Y(1),Y(0),P(X) ] = P(X) \qquad \text{(CIA in the second step)}
+&= \E[P(X) \mid Y(1),Y(0),P(X) ] = P(X)
 \end{align*}
+(The first step is iterated expectations; the second is the CIA.)
 \item Also we require that $0 < P(X) < 1$ at each $X$ which is known as the \alert{support condition}.
 \item The theorem implies that given $P(X)$ we have as if random assignment.
 \end{itemize}
@@ -273,7 +297,7 @@ How do we implement?
  where $N_1$ is the sample size of the treatment group \\
  and $\mathcal{K}(u)$ is a valid Kernel weight with bandwidth $h$ (people tend to use Gaussian Kernels here)
 \item As your propensity score gets further away from observation $i$ you get less weight
-\item As $h \rightarrow 0$  (or $\sigma_h$) the window gets smaller and we use fewer neighbors.
+\item As $h \rightarrow 0$ (for a Gaussian kernel, its standard deviation) the window shrinks: fewer, closer neighbors, so less bias and more variance.
 \end{itemize}
 \end{frame}
 
@@ -314,11 +338,31 @@ right, the correction has mean zero; if $\widehat\pi$ is right, the correction r
 \end{frame}
 
 
+\begin{frame}{Balancing weights: target balance directly}
+\small
+IPW gets balance only if the propensity model is right. Instead, choose control weights that \emph{impose} it.
+\begin{itemize}
+\item \alert{Entropy balancing} (Hainmueller 2012, \emph{Political Analysis}), for the ATT: weights as close to
+uniform as possible, subject to exact balance on chosen moments $c(X)$:
+\[
+\min_{w} \sum_{j: D_j = 0} w_j \log w_j \quad \text{s.t.} \quad \sum_{j: D_j=0} w_j\, c(X_j) = \frac{1}{N_1}\sum_{i: D_i=1} c(X_i),
+\quad \sum_j w_j = 1,\ w_j \ge 0 .
+\]
+\item The solution is $w_j \propto \exp(\lambda' c(X_j))$: a logit-shaped weight whose $\lambda$ is chosen for
+balance, not likelihood. If the means of $c(X)$ are what $\E[Y(0) \mid X]$ depends on, the ATT is unbiased.
+\item Running example, $c(X) = (\text{past}, \text{past}^2, \text{tenure}, \text{app})$: bias $0.0$ over 200 draws.
+\item Relatives: covariate balancing propensity score (Imai and Ratkovic 2014, \emph{JRSSB}); synthetic control is
+the same idea with one treated unit and pre-period outcomes as $c(X)$.
+\item \texttt{WeightIt::weightit(D \textasciitilde{} ..., method = "ebal", estimand = "ATT")}.
+\end{itemize}
+\end{frame}
+
+
 \begin{frame}
-\frametitle{IPW vs Propensity Score: What's the Difference?}
+\frametitle{Matching vs.\ Weighting on the Propensity Score}
 \begin{columns}
 \begin{column}{.5\textwidth}
-Propensity Scores
+Propensity-Score Matching
 \begin{itemize}
 	\item Find individual with similar $p(X)$
 	\item Excludes unmatched participants
@@ -338,6 +382,35 @@ Inverse Probability Weights
 \end{itemize}
 \end{column}
 \end{columns}
+\end{frame}
+
+
+\begin{frame}{Overlap: look before you estimate}
+\begin{center}
+\includegraphics[height=0.5\textheight]{fig_match_overlap.pdf}
+\end{center}
+\small
+\begin{itemize}
+\item Same membership program, two strengths of selection on past spending. On the right, many members have
+$\hat\pi$ near 1 and many non-members near 0: few comparable customers on the other side.
+\item The ATE needs $0 < p(x) < 1$ everywhere. The ATT needs only $p(x) < 1$: every member needs comparable non-members.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Weak overlap: what breaks, and what trimming buys}
+\begin{center}
+\small
+\resizebox{0.8\textwidth}{!}{\input{tab_match_overlap.tex}}
+\end{center}
+\small
+\begin{itemize}
+\item 200 draws of 4,000 customers. Under strong selection IPW's standard deviation rises fivefold: a few customers
+carry weights in the hundreds. Regression adjustment suffers least because it extrapolates, which is safe only when
+the outcome model is right.
+\item Trimming to $0.1 \le \hat\pi \le 0.9$ (Crump, Hotz, Imbens and Mitnik 2009) restores precision but keeps half
+the customers and \alert{changes the estimand}: 31.3 for those kept, not 30.0.
+\end{itemize}
 \end{frame}
 
 
@@ -434,6 +507,47 @@ So that the ATE is given by: $ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left\{\tilde{Y}_{
 \end{frame}
 
 
+\begin{frame}{Inference}
+\begin{itemize}
+\item \alert{Nearest-neighbor matching} with a fixed number of matches $M$ is not a smooth function of the data.
+\begin{itemize}
+\item The bootstrap is \alert{not valid} for it (Abadie and Imbens 2008, \emph{Econometrica}): resampling creates
+ties and duplicate units that the original sample never had.
+\item Use the Abadie--Imbens (2006) analytic variance (what \texttt{teffects nnmatch} reports).
+\end{itemize}
+\medskip
+\item \alert{Matching on an estimated propensity score}: the first stage changes the variance. Ignoring it is
+conservative for the ATE but can go either way for the ATT (Abadie and Imbens 2016, \emph{Econometrica});
+\texttt{teffects psmatch} applies the correction.
+\medskip
+\item \alert{Weighting and AIPW} are smooth: the sandwich (stacking the logit and the weighted means) or the bootstrap
+both work. For AIPW, the variance of the influence function, $\widehat{\Var}(\hat\psi_i)/n$, is all you need.
+\medskip
+\item Large weights show up as large standard errors. That is information, not a nuisance.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Propensity-score matching: handle with care}
+\begin{itemize}
+\item King and Nielsen (2019, \emph{Political Analysis}): matching on $\hat\pi$ alone approximates a \emph{completely}
+randomized experiment, not a blocked one. Once pairs are close in $\hat\pi$, pruning further can \emph{increase}
+imbalance on $X$. Prefer matching on $X$ (Mahalanobis, coarsened exact) or weighting, and check balance on $X$.
+\medskip
+\item Design choices move the answer:
+\begin{itemize}
+\item Shipman, Swanquist and Whited (2017, \emph{TAR}): calipers, replacement and the variables in $\hat\pi$ change
+the matched sample and the estimate in accounting applications.
+\item Big 4 audit quality: Lawrence, Minutti-Meza and Zhang (2011, \emph{TAR}) find the Big 4 effect disappears after
+matching on client characteristics; DeFond, Erkens and Zhang (2017, \emph{Management Science}) find most design
+choices restore it.
+\end{itemize}
+\medskip
+\item Report the choices, show balance on $X$ (not just on $\hat\pi$), and show the estimate under alternatives.
+\end{itemize}
+\end{frame}
+
+
 
 
 
@@ -444,8 +558,30 @@ So that the ATE is given by: $ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left\{\tilde{Y}_{
 \item Base case is easy enough to do on your own using a canned $k$-NN package.
 \item Even regression/bias adjustment is pretty easy
 \item Computing ATE, ATT, ATUT is relatively straightforward on the matched sample
-\item \texttt{MatchIt} in \texttt{R} (Ho, Imai, King and Stuart) or \texttt{nnmatch} in Stata (Abadie et al.)
-\item Documentation here is pretty good: \url{https://scholar.harvard.edu/files/imbens/files/sjpdf-1.html_.pdf}.
+\item R: \texttt{MatchIt} (Ho, Imai, King and Stuart) for matching, \texttt{WeightIt} for weighting, \texttt{cobalt} for balance.
+\item Stata: \texttt{teffects nnmatch}, \texttt{teffects psmatch}, \texttt{teffects ipw}, \texttt{teffects aipw} are built in.
+The estimators and variances follow Abadie, Drukker, Herr and Imbens (2004, \emph{Stata Journal}).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{In practice}
+\begin{lstlisting}
+library(MatchIt); library(WeightIt); library(cobalt)
+# 1-NN on a logit propensity score, with replacement, for the ATT
+mo <- matchit(D ~ past + tenure + app, data = m, method = "nearest", distance = "glm",
+              estimand = "ATT", replace = TRUE)
+bal.tab(mo, un = TRUE, thresholds = c(m = 0.1))          # standardized differences before and after
+md <- match.data(mo); lm(y ~ D, md, weights = weights)    # ATT
+
+# Weighting: IPW ("glm") or entropy balancing ("ebal")
+wo <- weightit(D ~ past + I(past^2) + tenure + app, data = m, method = "ebal", estimand = "ATT")
+love.plot(wo, thresholds = c(m = 0.1))                   # the balance picture from the start of the lecture
+lm(y ~ D, m, weights = wo$weights)                       # ATT
+\end{lstlisting}
+\begin{itemize}
+\item Look at balance and overlap before you look at the outcome. Choose the design without $Y$.
+\item The point estimates from \texttt{lm} are right; get standard errors from the methods on the Inference slide.
 \end{itemize}
 \end{frame}
 
@@ -488,6 +624,43 @@ So that the ATE is given by: $ATE_M=\frac{1}{N} \sum_{i=1}^{N}\left\{\tilde{Y}_{
 
 
 
+
+
+\section{When conditional independence fails}
+
+\begin{frame}{Balance on $X$ is not balance on $U$}
+\begin{center}
+\input{tab_match_unobs.tex}
+\end{center}
+\medskip
+\begin{itemize}
+\item Same membership program plus an unobserved taste for shopping $U$ that raises both joining and spending.
+200 draws; every estimator conditions on the observed $X$ only.
+\item All balance $X$; all are off by about \$18. Matching, weighting and regression differ in how they use $X$, not
+in what they assume about $U$.
+\item The CIA is not testable. The useful question is how strong $U$ would have to be to change the conclusion.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Sensitivity analysis}
+\begin{itemize}
+\item \alert{Selection on observables as a guide to selection on unobservables} (Altonji, Elder and Taber 2005,
+\emph{JPE}): if adding controls barely moves the estimate, unobservables would need to be much more important than
+observables to explain it away.
+\medskip
+\item \alert{Coefficient stability with $R^2$} (Oster 2019, \emph{JBES}): movement in the coefficient means little
+unless you also track how much $R^2$ rises. Reports $\delta$, the selection on unobservables relative to observables
+that would drive the effect to zero.
+\medskip
+\item \alert{Omitted-variable bias in partial $R^2$} (Cinelli and Hazlett 2020, \emph{JRSSB}): the \emph{robustness
+value} is how much residual variance in both $D$ and $Y$ a confounder must explain to overturn the estimate.
+Benchmark it against observed covariates: ``a confounder as strong as past spending would...'' \texttt{sensemakr}.
+\medskip
+\item Report one of these next to any selection-on-observables estimate. It turns ``we controlled for everything''
+into a statement readers can evaluate.
+\end{itemize}
+\end{frame}
 
 
 \section{Case Study}
@@ -587,6 +760,9 @@ Notes: Control weeks are selected through nearest-neighbor matching using four c
 \begin{frame}
 \frametitle{Exercises}
 \begin{itemize}
+\item The classic test case: LaLonde (1986, \emph{AER}) asked whether non-experimental methods could recover the
+experimental effect of a job-training program (NSW). Mostly they could not. Dehejia and Wahba (1999, \emph{JASA})
+revisited it with propensity scores. The data ship with \texttt{MatchIt}: \texttt{data(lalonde, package = "MatchIt")}.
 \item This would be a good time to work through the vignette for \texttt{cobalt}
  \url{https://cran.r-project.org/web/packages/cobalt/vignettes/cobalt.html}
  \item Compare the ATT for the LaLonde data with the IPW, Nearest Neighbor, and Propensity Score estimates.

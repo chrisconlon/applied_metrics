@@ -13,8 +13,9 @@ set.seed(22)
 ```
 
 This notebook goes with Lectures 11a (matching, `Fall/L9 - Quasi Experiments/L9d - Matching.pdf`) and 11b
-(synthetic control, `L10a - Synthetic Control.pdf`). It leaves you five short problems. The synthetic-control
-design is the one in the slides (`sdid_sims.R`, `conformal_sims.R`), which is *not* the Assignment 6 design.
+(synthetic control, `L10a - Synthetic Control.pdf`). It leaves you five short problems. The membership program is
+the one behind the matching slides (`Fall/L9 - Quasi Experiments/matching_sims.R`). The synthetic-control design is
+the one in the slides (`sdid_sims.R`, `conformal_sims.R`), which is *not* the Assignment 6 design.
 Everything is simulated, so you always know the right answer.
 
 # Part 1: Selection on observables (Lecture 11a)
